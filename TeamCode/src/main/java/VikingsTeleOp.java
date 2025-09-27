@@ -23,10 +23,6 @@ public class VikingsTeleOp extends LinearOpMode {
         double x = gamepad.left_stick_x * 1.1; // Counteract imperfect strafing
         double rx = gamepad.right_stick_x;
 
-        if(gamepad.left_trigger>.1)
-        {
-            hub.leftWheel.setPower(gamepad.left_trigger);
-        }
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio,
         // but only if at least one is out of the range [-1, 1]
