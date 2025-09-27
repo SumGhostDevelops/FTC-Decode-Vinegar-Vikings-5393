@@ -11,7 +11,10 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 // This is initialization
 
-public class ControlHub {
+public class ControlHub
+{
+
+
     public DcMotor leftFront;
     public DcMotor rightFront;
     public DcMotor leftBack;
@@ -32,10 +35,11 @@ public class ControlHub {
         leftBack = map.get(DcMotor.class, "leftBack");
         rightBack = map.get(DcMotor.class, "rightBack");
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         //This is one of the motors to move the arm up and down
-        leftWheel = map.get(DcMotor.class, "leftWheel");
+        //leftWheel = map.get(DcMotor.class, "leftWheel");
         //This is one of the motors to move the arm up and down
-        rightWheel = map.get(DcMotor.class, "rightWheel");
+        //rightWheel = map.get(DcMotor.class, "rightWheel");
 
         //camera=map.get(WebcamName.class,"camera");
         drive=new MecanumDrive(map,initialPose);
