@@ -41,10 +41,10 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (!gamepad.x) // if power is not called to be killed
         {
-            hub.leftFront.setPower(frontLeftPower);
-            hub.leftBack.setPower(backLeftPower);
-            hub.rightFront.setPower(frontRightPower);
-            hub.rightBack.setPower(backRightPower);
+            hub.leftFront.setPower(frontLeftPower/2);
+            hub.leftBack.setPower(backLeftPower/2);
+            hub.rightFront.setPower(frontRightPower/2);
+            hub.rightBack.setPower(backRightPower/2);
         }
     }
 }
