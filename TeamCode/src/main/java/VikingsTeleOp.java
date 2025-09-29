@@ -19,7 +19,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
     public void motorAction(Gamepad gamepad)
     {
-        double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
+        double y = gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x * 1.1; // Counteract imperfect strafing
         double rx = gamepad.right_stick_x;
 
@@ -41,10 +41,10 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (!gamepad.x) // if power is not called to be killed
         {
-            hub.leftFront.setPower(frontLeftPower/2);
-            hub.leftBack.setPower(backLeftPower/2);
-            hub.rightFront.setPower(frontRightPower/2);
-            hub.rightBack.setPower(backRightPower/2);
+            hub.leftFront.setPower(frontLeftPower/2.67);
+            hub.leftBack.setPower(backLeftPower/2.67);
+            hub.rightFront.setPower(frontRightPower/2.67);
+            hub.rightBack.setPower(backRightPower/2.67);
             //half power
         }
     }
