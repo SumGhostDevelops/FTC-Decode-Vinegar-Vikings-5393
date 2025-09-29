@@ -38,6 +38,14 @@ import com.qualcomm.robotcore.hardware.Gamepad;
             double backLeftPower = (y - x + rx) / denominator;
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
+
+            if (gamepad.right_bumper) {
+                frontLeftPower *= 0.5;
+                backLeftPower *= 0.5;
+                frontRightPower *= 0.5;
+                backRightPower *= 0.5;
+            }
+
             if (gamepad.x) // if you press x it kills all power
             {
                 frontLeftPower=0;
