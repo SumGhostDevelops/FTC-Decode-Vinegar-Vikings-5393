@@ -45,6 +45,7 @@ public class VikingsTeleOp extends LinearOpMode {
             hub.leftBack.setPower(backLeftPower/2);
             hub.rightFront.setPower(frontRightPower/2);
             hub.rightBack.setPower(backRightPower/2);
+            //half power
         }
     }
 }
