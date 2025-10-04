@@ -6,11 +6,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 @TeleOp(name="VikingsTeleOp")
 
 public class VikingsTeleopCode {
-    import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
-    @TeleOp(name="VikingsTeleOp")
     public class VikingsTeleOp extends LinearOpMode {
         ControlHub hub;
         @Override
