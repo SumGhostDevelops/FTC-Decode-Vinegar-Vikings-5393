@@ -38,7 +38,6 @@ public class VikingsTeleopCode {
             double backLeftPower = (y - x + rx) / denominator;
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
-
             if (gamepad.right_bumper) { //if right bumper is pressed, then it halves the speed
                 frontLeftPower *= 0.5;
                 backLeftPower *= 0.5;
@@ -52,7 +51,6 @@ public class VikingsTeleopCode {
                 frontRightPower *= 2;
                 backRightPower *= 2;
             }
-
             if (gamepad.x) // if you press x it kills all power
             {
                 frontLeftPower=0;
