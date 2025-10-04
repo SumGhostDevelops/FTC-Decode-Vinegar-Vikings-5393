@@ -17,8 +17,10 @@ public class ControlHub
     public DcMotor rightFront;
     public DcMotor leftBack;
     public DcMotor rightBack;
-    public ElapsedTime timer;
+    public WebcamName camera;
     MecanumDrive drive;
+
+    public ElapsedTime timer;
     public CRServo BasicServo;
     public Servo RegularServo;
 
@@ -30,7 +32,7 @@ public class ControlHub
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        //camera=map.get(WebcamName.class,"camera");
+        camera = map.get(WebcamName.class,"Webcam 1");
         drive = new MecanumDrive(map,initialPose);
     }
 }
