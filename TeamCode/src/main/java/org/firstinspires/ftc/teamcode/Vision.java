@@ -28,6 +28,7 @@ public class Vision extends LinearOpMode
                 .setDrawCubeProjection(true)
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
+                .setLensIntrinsics(1424.38, 1424.38, 637.325, 256.774)
                 .build();
 
         // 2. Create the Vision Portal.
