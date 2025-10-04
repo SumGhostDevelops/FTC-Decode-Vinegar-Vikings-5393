@@ -39,7 +39,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
-            if (gamepad.right_bumper) {
+            if (gamepad.right_bumper) { //if right bumper is pressed, then it halves the speed
                 frontLeftPower *= 0.5;
                 backLeftPower *= 0.5;
                 frontRightPower *= 0.5;
