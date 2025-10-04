@@ -51,7 +51,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
                 backRightPower *= 0.5;
             }
 
-            if (gamepad.right_bumper) { //if left bumper is pressed, then it doubles the speed
+            if (gamepad.left_bumper) { //if left bumper is pressed, then it doubles the speed
                 frontLeftPower *= 2;
                 backLeftPower *= 2;
                 frontRightPower *= 2;
