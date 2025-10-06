@@ -10,7 +10,7 @@ public class VikingsTeleOp extends LinearOpMode {
     private double powerMultiplier = 0.4; // initial power reduction value
 
     ControlHub hub = new ControlHub();
-    VisionTeleOp visionTeleOp = new VisionTeleOp();
+    VisionHelper visionHelper;
 
     @Override
     public void runOpMode() throws InterruptedException {
