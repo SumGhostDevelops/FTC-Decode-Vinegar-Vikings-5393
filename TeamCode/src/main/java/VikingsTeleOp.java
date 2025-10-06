@@ -3,6 +3,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
 @TeleOp(name="VikingsTeleOp")
 public class VikingsTeleOp extends LinearOpMode {
     private final double upperMultiplierLimit = 0.6;
@@ -15,15 +17,19 @@ public class VikingsTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         hub.init(hardwareMap, new Pose2d(10,10,Math.toRadians(Math.PI/2)));
+        WebcamName camera = hub.camera;
+        visionHelper = new VisionHelper(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, 2);
 
         waitForStart();
         while (opModeIsActive())
         {
             motorAction(gamepad1);
         }
+
+        visionHelper.close();
     }
 
-    public void motorAction(Gamepad gamepad)
+    public void motorAction(Gamepad gamepad) throws InterruptedException
     {
         double y = gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x * 1.1; // Counteract imperfect strafing
@@ -63,6 +69,35 @@ public class VikingsTeleOp extends LinearOpMode {
             hub.leftBack.setPower(backLeftPower*powerMultiplier);
             hub.rightFront.setPower(frontRightPower*powerMultiplier);
             hub.rightBack.setPower(backRightPower*powerMultiplier);
+        }
+
+        if (gamepad.y)
+        {
+            double yaw = visionHelper.get("yaw");
+            double time = TurningMath.Calculate(yaw) * 2.5;
+
+            if (yaw > 0)
+            {
+                hub.leftFront.setPower(frontLeftPower*powerMultiplier);
+                hub.leftBack.setPower(backLeftPower*powerMultiplier);
+                hub.rightFront.setPower(-frontRightPower*powerMultiplier);
+                hub.rightBack.setPower(-backRightPower*powerMultiplier);
+            }
+            else
+            {
+                hub.leftFront.setPower(-frontLeftPower*powerMultiplier);
+                hub.leftBack.setPower(-backLeftPower*powerMultiplier);
+                hub.rightFront.setPower(frontRightPower*powerMultiplier);
+                hub.rightBack.setPower(backRightPower*powerMultiplier);
+            }
+
+            wait((long) time);
+
+            hub.leftFront.setPower(0);
+            hub.leftBack.setPower(0);
+            hub.rightFront.setPower(0);
+            hub.rightBack.setPower(0);
+
         }
     }
 }
