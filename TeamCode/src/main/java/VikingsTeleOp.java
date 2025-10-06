@@ -2,13 +2,18 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+
 @TeleOp(name="VikingsTeleOp")
 public class VikingsTeleOp extends LinearOpMode {
-    ControlHub hub;
+    private final double upperMultiplierLimit = 0.6;
+    private final double lowerMultiplierLimit = 0.05;
+    private double powerMultiplier = 0.4; // initial power reduction value
+
+    ControlHub hub = new ControlHub();
+
     @Override
     public void runOpMode() throws InterruptedException {
-        hub = new ControlHub();
-        hub.init(hardwareMap,new Pose2d(10,10,1));
+        hub.init(hardwareMap, new Pose2d(10,10,Math.toRadians(Math.PI/2)));
 
         waitForStart();
         while (opModeIsActive())
@@ -31,21 +36,32 @@ public class VikingsTeleOp extends LinearOpMode {
         double backLeftPower = (y - x + rx) / denominator;
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
+
+
+
         if (gamepad.x) // if you press x it kills all power
         {
-            frontLeftPower=0;
-            frontRightPower=0;
-            backLeftPower=0;
-            backRightPower=0;
+            frontLeftPower = 0;
+            frontRightPower = 0;
+            backLeftPower = 0;
+            backRightPower = 0;
+        }
+
+        if (gamepad.left_bumper && powerMultiplier > lowerMultiplierLimit)
+        {
+            powerMultiplier -= 0.05;
+        }
+        else if (gamepad.right_bumper && powerMultiplier < upperMultiplierLimit)
+        {
+            powerMultiplier += 0.05;
         }
 
         if (!gamepad.x) // if power is not called to be killed
         {
-            hub.leftFront.setPower(frontLeftPower/2.67);
-            hub.leftBack.setPower(backLeftPower/2.67);
-            hub.rightFront.setPower(frontRightPower/2.67);
-            hub.rightBack.setPower(backRightPower/2.67);
-            //half power
+            hub.leftFront.setPower(frontLeftPower*powerMultiplier);
+            hub.leftBack.setPower(backLeftPower*powerMultiplier);
+            hub.rightFront.setPower(frontRightPower*powerMultiplier);
+            hub.rightBack.setPower(backRightPower*powerMultiplier);
         }
     }
 }
