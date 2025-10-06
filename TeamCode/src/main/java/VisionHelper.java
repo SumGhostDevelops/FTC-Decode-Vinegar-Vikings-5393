@@ -83,6 +83,11 @@ public class VisionHelper
     public double get(String value)
     {
         List<AprilTagDetection> currentDetections = getDetections();
+        if (currentDetections.isEmpty()) // send lie to warn if there are no detections
+        {
+            return 0;
+        }
+
         AprilTagDetection tag = currentDetections.get(0);
 
         switch (value)

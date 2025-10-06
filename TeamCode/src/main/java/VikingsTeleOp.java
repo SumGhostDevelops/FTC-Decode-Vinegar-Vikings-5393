@@ -91,7 +91,9 @@ public class VikingsTeleOp extends LinearOpMode {
                 hub.rightBack.setPower(backRightPower*powerMultiplier);
             }
 
+            telemetry.addData("Time to turn:", time);
             sleep((long) (time*1000));
+            telemetry.addLine("Done turning!");
 
             hub.leftFront.setPower(0);
             hub.leftBack.setPower(0);
