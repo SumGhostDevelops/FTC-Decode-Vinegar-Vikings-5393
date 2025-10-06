@@ -91,7 +91,7 @@ public class VikingsTeleOp extends LinearOpMode {
                 hub.rightBack.setPower(backRightPower*powerMultiplier);
             }
 
-            wait((long) time);
+            sleep((long) (time*1000));
 
             hub.leftFront.setPower(0);
             hub.leftBack.setPower(0);
