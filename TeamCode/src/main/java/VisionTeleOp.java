@@ -1,7 +1,3 @@
-package org.firstinspires.ftc.teamcode;
-
-import android.util.Size;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -13,16 +9,15 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 @TeleOp
-public class Vision extends LinearOpMode
+public class VisionTeleOp extends LinearOpMode
 {
-
-    final int RESOLUTION_WIDTH = 640;
-    final int RESOLUTION_HEIGHT = 480;
+    //final int RESOLUTION_WIDTH = 640;
+    //final int RESOLUTION_HEIGHT = 480;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
-        // 1. Create the AprilTag processor using the static Builder.
+        // create the AprilTag processor using the static Builder
         AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
@@ -31,11 +26,11 @@ public class Vision extends LinearOpMode
                 .setLensIntrinsics(1424.38, 1424.38, 637.325, 256.774)
                 .build();
 
-        // 2. Create the Vision Portal.
+        // create the Vision Portal
         VisionPortal visionPortal = new VisionPortal.Builder()
                 .addProcessor(tagProcessor)
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1")) // Replace "Webcam 1" with your webcam's name in the config
-                //.setCameraResolution(new Size(RESOLUTION_HEIGHT, RESOLUTION_WIDTH))
+                //.setCameraResolution(new Size(RESOLUTION_HEIGHT, RESOLUTION_WIDTH)) this crashes the driverhub for some reason lol
                 .enableLiveView(true)
                 .build();
 
@@ -43,15 +38,16 @@ public class Vision extends LinearOpMode
 
         while (!isStopRequested() && opModeIsActive())
         {
-            // 3. Get a list of the current detections.
+            // get a list of the current detections
             List<AprilTagDetection> currentDetections = tagProcessor.getDetections();
 
             if (!currentDetections.isEmpty())
             {
-                // Get the first detection from the list.
+                // get the first detection from the list; temp for now and we can get if it is a certain id
                 AprilTagDetection tag = currentDetections.get(0);
 
-                // Telemetry for the first detected tag
+                // telemetry for the first detected tag
+                // telemtry.addData() allows it to be seen in the driverhub
                 telemetry.addData("Detected Tag ID", tag.id);
                 telemetry.addData("x", tag.ftcPose.x);
                 telemetry.addData("y", tag.ftcPose.y);
@@ -66,7 +62,7 @@ public class Vision extends LinearOpMode
             telemetry.update();
         }
 
-        // 4. Don't forget to close the vision portal when you're done.
+        // close vision portal at the end
         visionPortal.close();
     }
 }
