@@ -1,7 +1,3 @@
-package org.firstinspires.ftc.teamcode;
-
-import android.util.Size;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -13,9 +9,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 @TeleOp
-public class Vision extends LinearOpMode
+public class VisionTeleOp extends LinearOpMode
 {
-
     final int RESOLUTION_WIDTH = 640;
     final int RESOLUTION_HEIGHT = 480;
 
