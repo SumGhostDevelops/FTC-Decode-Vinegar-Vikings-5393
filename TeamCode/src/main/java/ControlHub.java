@@ -3,6 +3,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -18,6 +19,8 @@ public class ControlHub
     public DcMotor leftBack;
     public DcMotor rightBack;
     public WebcamName camera;
+    private IMU imu;
+
     MecanumDrive drive;
 
     public ElapsedTime timer;
@@ -31,8 +34,9 @@ public class ControlHub
         rightBack = map.get(DcMotor.class, "rightBack");
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        imu = map.get(IMU.class, "imu");
         camera = map.get(WebcamName.class,"Webcam 1");
+
         drive = new MecanumDrive(map,initialPose);
     }
 }

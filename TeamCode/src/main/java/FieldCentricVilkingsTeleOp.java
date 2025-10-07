@@ -1,4 +1,5 @@
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -6,12 +7,19 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-@TeleOp(name="VikingsTeleOp")
-public class VikingsTeleOp extends LinearOpMode {
+/*
+
+Vee Here!
+I just wanted to quickly implement Field Centric Driving since i feel like its better for this comp; however,
+i dont want to change any code without telling anyone so I shall make a comment.
+either replace this or make a new class to test it out lmao
+
+@TeleOp(name="FieldCentricVilkingsTeleOp")
+public class FieldCentricVilkingsTeleOp extends LinearOpMode {
     private final double upperMultiplierLimit = 0.6;
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.4; // initial power reduction value
-    private IMU imu;
+
 
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
@@ -19,9 +27,21 @@ public class VikingsTeleOp extends LinearOpMode {
 
 
 
+
     @Override
     public void runOpMode() throws InterruptedException {
         hub.init(hardwareMap, new Pose2d(10,10,Math.toRadians(Math.PI/2)));
+
+
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+
+ // depending on what direction the logo is facing on the control hub would determine what orientation is.
+ //change depending on what it actually is lmao
+
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
+
+        imu.initialize(parameters);
 
         visionHelper = new VisionHelper(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, 2);
 
@@ -36,20 +56,27 @@ public class VikingsTeleOp extends LinearOpMode {
 
     public void motorAction(Gamepad gamepad) throws InterruptedException
     {
-        double y = gamepad.left_stick_y; // Remember, Y stick value is reversed
-        double x = gamepad.left_stick_x * 1.1; // Counteract imperfect strafing
-        double rx = gamepad.right_stick_x;
+        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+        double x = gamepad1.left_stick_x;
+        double rx = gamepad1.right_stick_x;
+        double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double rotX = x * Math.cos(-heading) - y * Math.sin(-heading);
+        double rotY = x * Math.sin(-heading) + y * Math.cos(-heading);
+
 
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio,
         // but only if at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y + x + rx) / denominator;
-        double backLeftPower = (y - x + rx) / denominator;
-        double frontRightPower = (y - x - rx) / denominator;
-        double backRightPower = (y + x - rx) / denominator;
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+        double frontLeftPower = (rotY + rotX + rx) / denominator;
+        double backLeftPower = (rotY - rotX + rx) / denominator;
+        double frontRightPower = (rotY - rotX - rx) / denominator;
+        double backRightPower = (rotY + rotX - rx) / denominator;
 
-
+        //pick anything lmao
+            if (gamepad1.b) {
+                imu.resetYaw();
+            }
 
         if (gamepad.x) // if you press x it kills all power
         {
@@ -108,3 +135,15 @@ public class VikingsTeleOp extends LinearOpMode {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+*/
