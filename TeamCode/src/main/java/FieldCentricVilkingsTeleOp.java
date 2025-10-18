@@ -19,7 +19,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
     WebcamName camera = hub.camera;
-    IMU imu = hub.imu;
+
 
 
 
@@ -39,7 +39,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
 
-        imu.initialize(parameters);
+        hub.imu.initialize(parameters);
 
         visionHelper = new VisionHelper(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, 2);
 
@@ -57,7 +57,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
         double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
-        double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double heading = hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         double rotX = x * Math.cos(-heading) - y * Math.sin(-heading);
         double rotY = x * Math.sin(-heading) + y * Math.cos(-heading);
 
@@ -73,7 +73,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
         //pick anything lmao
             if (gamepad1.b) {
-                imu.resetYaw();
+                hub.imu.resetYaw();
             }
 
         if (gamepad.x) // if you press x it kills all power
