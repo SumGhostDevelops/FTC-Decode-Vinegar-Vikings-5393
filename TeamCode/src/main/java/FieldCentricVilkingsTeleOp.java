@@ -6,13 +6,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-/*
-
-Vee Here!
-I just wanted to quickly implement Field Centric Driving since i feel like its better for this comp; however,
-i dont want to change any code without telling anyone so I shall make a comment.
-either replace this or make a new class to test it out lmao
 
 @TeleOp(name="FieldCentricVilkingsTeleOp")
 public class FieldCentricVilkingsTeleOp extends LinearOpMode {
@@ -24,6 +19,9 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
     WebcamName camera = hub.camera;
+    IMU imu = hub.imu;
+
+
 
 
 
@@ -38,8 +36,8 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
  // depending on what direction the logo is facing on the control hub would determine what orientation is.
  //change depending on what it actually is lmao
 
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
 
         imu.initialize(parameters);
 
@@ -137,13 +135,3 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 }
 
 
-
-
-
-
-
-
-
-
-
-*/

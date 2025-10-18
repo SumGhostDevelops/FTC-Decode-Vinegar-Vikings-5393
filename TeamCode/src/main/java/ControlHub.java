@@ -19,7 +19,7 @@ public class ControlHub
     public DcMotor leftBack;
     public DcMotor rightBack;
     public WebcamName camera;
-    private IMU imu;
+    public IMU imu;
 
     MecanumDrive drive;
 
