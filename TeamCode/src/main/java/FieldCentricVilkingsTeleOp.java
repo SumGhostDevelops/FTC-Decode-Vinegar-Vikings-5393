@@ -54,9 +54,9 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
     public void motorAction(Gamepad gamepad) throws InterruptedException
     {
-        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
+        double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
+        double x = gamepad.left_stick_x;
+        double rx = gamepad.right_stick_x;
         double heading = hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         double rotX = x * Math.cos(-heading) - y * Math.sin(-heading);
         double rotY = x * Math.sin(-heading) + y * Math.cos(-heading);
