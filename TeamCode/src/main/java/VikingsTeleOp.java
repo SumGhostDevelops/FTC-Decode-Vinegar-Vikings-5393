@@ -11,7 +11,7 @@ public class VikingsTeleOp extends LinearOpMode {
     private final double upperMultiplierLimit = 0.6;
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.4; // initial power reduction value
-    private IMU imu;
+
 
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
