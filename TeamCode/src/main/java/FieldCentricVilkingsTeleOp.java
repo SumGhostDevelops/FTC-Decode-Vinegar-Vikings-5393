@@ -103,7 +103,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
         if (gamepad.y)
         {
-            double yaw = visionHelper.get("yaw");
+            double yaw = visionHelper.getYaw();
             double time = TurningMath.Calculate(yaw) * 2.5;
 
             if (yaw > 0)
