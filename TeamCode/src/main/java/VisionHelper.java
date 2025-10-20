@@ -80,27 +80,112 @@ public class VisionHelper
     }
      */
 
-    public double get(String value)
+    private Object getSingleDetectionOrError()
     {
         List<AprilTagDetection> currentDetections = getDetections();
-        if (currentDetections.isEmpty()) // send lie to warn if there are no detections
+
+        if (currentDetections.isEmpty()) // -1 if no detections
         {
-            return 0;
+            return -1;
         }
 
-        AprilTagDetection tag = currentDetections.get(0);
-
-        switch (value)
+        if (currentDetections.size() > 1) // -2 if there are more than one detections
         {
-            case "yaw":
-            {
-                return tag.ftcPose.yaw;
-            }
-            default:
-            {
-                throw new IllegalArgumentException(value + " is not within the valid range of 0-2.");
-            }
+            return -2;
         }
+
+        return currentDetections.get(0);
+    }
+    public double getRoll()
+    {
+        Object result = getSingleDetectionOrError();
+
+        if (result instanceof Integer) // func returned an error
+        {
+            return (double) result;
+        }
+
+        AprilTagDetection tag = (AprilTagDetection) result;
+        return tag.ftcPose.roll;
+
+    }
+
+    public double getPitch()
+    {
+        Object result = getSingleDetectionOrError();
+
+        if (result instanceof Integer)
+        {
+            return (double) result;
+        }
+
+        AprilTagDetection tag = (AprilTagDetection) result;
+        return tag.ftcPose.pitch;
+    }
+
+    public double getYaw()
+    {
+        Object result = getSingleDetectionOrError();
+
+        if (result instanceof Integer) // func returned an error
+        {
+            return (double) result;
+        }
+
+        AprilTagDetection tag = (AprilTagDetection) result;
+        return tag.ftcPose.yaw;
+    }
+
+    public int getId()
+    {
+        Object result = getSingleDetectionOrError();
+
+        if (result instanceof Integer)
+        {
+            return (int) result;
+        }
+
+        AprilTagDetection tag = (AprilTagDetection) result;
+        return tag.id;
+    }
+
+    public double getX()
+    {
+        Object result = getSingleDetectionOrError();
+
+        if (result instanceof Integer) // func returned an error
+        {
+            return (double) result;
+        }
+
+        AprilTagDetection tag = (AprilTagDetection) result;
+        return tag.ftcPose.x;
+    }
+
+    public double getY()
+    {
+        Object result = getSingleDetectionOrError();
+
+        if (result instanceof Integer) // func returned an error
+        {
+            return (double) result;
+        }
+
+        AprilTagDetection tag = (AprilTagDetection) result;
+        return tag.ftcPose.y;
+    }
+
+    public double getZ()
+    {
+        Object result = getSingleDetectionOrError();
+
+        if (result instanceof Integer) // func returned an error
+        {
+            return (double) result;
+        }
+
+        AprilTagDetection tag = (AprilTagDetection) result;
+        return tag.ftcPose.z;
     }
 
     public void close()
