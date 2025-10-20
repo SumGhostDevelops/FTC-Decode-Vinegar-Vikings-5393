@@ -18,9 +18,6 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
-    WebcamName camera = hub.camera;
-
-
 
 
 
@@ -40,8 +37,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
                 RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
 
         hub.imu.initialize(parameters);
-
-        visionHelper = new VisionHelper(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, 2);
+        hub.imu.resetYaw();
 
         waitForStart();
         while (opModeIsActive())
