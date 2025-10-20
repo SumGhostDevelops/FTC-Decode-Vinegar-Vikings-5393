@@ -26,19 +26,19 @@ public class VisionHelper
 
         switch (debugLevel)
         {
-            case 0:
+            case 0: // production
             {
                 showDebugText = false;
                 showLiveView = false;
                 break;
             }
-            case 1:
+            case 1: // only text
             {
                 showDebugText = true;
                 showLiveView = false;
                 break;
             }
-            case 2:
+            case 2: // only live view
             {
                 showDebugText = false;
                 showLiveView = true;
