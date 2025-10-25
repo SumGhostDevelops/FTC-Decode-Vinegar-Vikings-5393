@@ -80,68 +80,69 @@ public class VisionHelper
     }
      */
 
-    private AprilTagDetection getSingleDetectionOrError()
+    private AprilTagDetection getSingleDetectionOrError() throws Exception
     {
+        // TODO: Just make this call an error and then handle the error
         List<AprilTagDetection> currentDetections = getDetections();
 
-        /*
-        if (currentDetections.isEmpty()) // -1 if no detections
+        if (currentDetections.isEmpty())
         {
-            return -1;
+            throw new Exception("No detections found.");
         }
-
-        if (currentDetections.size() > 1) // -2 if there are more than one detections
+        else if (currentDetections.size() > 1)
         {
-            return -2;
+            throw new Exception("Too many detections (" + currentDetections.size() + ") found.");
         }
-        */
 
         return currentDetections.get(0);
     }
-    public double getRoll()
+    public double getRoll() throws Exception
     {
-        Object result = getSingleDetectionOrError();
+        AprilTagDetection tag;
 
-        if (result instanceof Integer) // func returned an error
+        try
         {
-            return (double) result;
+            tag = getSingleDetectionOrError();
+        } catch (Exception e)
+        {
+            throw new Exception(e);
         }
 
-        AprilTagDetection tag = (AprilTagDetection) result;
         return tag.ftcPose.roll;
-
     }
 
-    public double getPitch()
+    public double getPitch() throws Exception
     {
-        Object result = getSingleDetectionOrError();
+        AprilTagDetection tag;
 
-        if (result instanceof Integer)
+        try
         {
-            return (double) result;
+            tag = getSingleDetectionOrError();
+        } catch (Exception e)
+        {
+            throw new Exception(e);
         }
 
-        AprilTagDetection tag = (AprilTagDetection) result;
         return tag.ftcPose.pitch;
     }
 
-    public double getYaw()
+    public double getYaw() throws Exception
     {
         // TODO: Fix later
-        /*
-        Object result = getSingleDetectionOrError();
+        AprilTagDetection tag;
 
-        if (result instanceof Integer)
+        try
         {
-            return (double) result;
+            tag = getSingleDetectionOrError();
+        } catch (Exception e)
+        {
+            throw new Exception(e);
         }
 
-         */
-
-        AprilTagDetection tag = getSingleDetectionOrError();
         return tag.ftcPose.yaw;
     }
 
+    /*
     public int getId()
     {
         Object result = getSingleDetectionOrError();
@@ -193,7 +194,7 @@ public class VisionHelper
         AprilTagDetection tag = (AprilTagDetection) result;
         return tag.ftcPose.z;
     }
-
+    */
     public void close()
     {
         visionPortal.close();

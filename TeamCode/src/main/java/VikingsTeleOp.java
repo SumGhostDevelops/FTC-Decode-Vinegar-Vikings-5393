@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
+
+// TODO: Move all code to FieldCentric
+
 @TeleOp(name="VikingsTeleOp")
 public class VikingsTeleOp extends LinearOpMode {
     private final double upperMultiplierLimit = 0.6;
@@ -70,7 +73,18 @@ public class VikingsTeleOp extends LinearOpMode {
                 // TODO: Add code to only aim if the AprilTag ID is ours
 
                 // Resolve the Yaw and time it takes to turn
-                double yaw = visionHelper.getYaw();
+                double yaw = 0;
+
+                try
+                {
+                    yaw = visionHelper.getYaw();
+                }
+                catch (Exception e)
+                {
+                    telemetry.addLine("Not turning; encountered error:");
+                    telemetry.addLine(String.valueOf(e));
+                }
+
                 double time = TurningMath.Calculate(yaw) * 2.5;
 
                 if (yaw > 0)
