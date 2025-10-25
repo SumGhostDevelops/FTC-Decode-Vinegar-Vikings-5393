@@ -12,6 +12,10 @@ public class VikingsTeleOp extends LinearOpMode {
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.4; // initial power reduction value
 
+    private boolean leftBumperPressed = false;
+    private boolean rightBumperPressed = false;
+    private boolean yButtonPressed = false;
+
 
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
@@ -61,35 +65,47 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.y) // Auto aim to AprilTag
         {
-            // TODO: Add code to only aim if the AprilTag ID is ours
-
-            // Resolve the Yaw and time it takes to turn
-            double yaw = visionHelper.getYaw();
-            double time = TurningMath.Calculate(yaw) * 2.5;
-
-            if (yaw > 0)
+            if (!yButtonPressed)
             {
-                hub.leftFront.setPower(frontLeftPower * powerMultiplier);
-                hub.leftBack.setPower(backLeftPower * powerMultiplier);
-                hub.rightFront.setPower(-frontRightPower * powerMultiplier);
-                hub.rightBack.setPower(-backRightPower * powerMultiplier);
-            }
-            else
-            {
-                hub.leftFront.setPower(-frontLeftPower * powerMultiplier);
-                hub.leftBack.setPower(-backLeftPower * powerMultiplier);
-                hub.rightFront.setPower(frontRightPower * powerMultiplier);
-                hub.rightBack.setPower(backRightPower * powerMultiplier);
-            }
+                // TODO: Add code to only aim if the AprilTag ID is ours
 
-            telemetry.addData("Time to turn:", time);
-            sleep((long) (time * 1000));
-            telemetry.addLine("Done turning!");
+                // Resolve the Yaw and time it takes to turn
+                double yaw = visionHelper.getYaw();
+                double time = TurningMath.Calculate(yaw) * 2.5;
 
-            hub.leftFront.setPower(0);
-            hub.leftBack.setPower(0);
-            hub.rightFront.setPower(0);
-            hub.rightBack.setPower(0);
+                if (yaw > 0)
+                {
+                    hub.leftFront.setPower(-powerMultiplier);
+                    hub.leftBack.setPower(-powerMultiplier);
+                    hub.rightFront.setPower(powerMultiplier);
+                    hub.rightBack.setPower(powerMultiplier);
+                }
+                else
+                {
+                    hub.leftFront.setPower(powerMultiplier);
+                    hub.leftBack.setPower(powerMultiplier);
+                    hub.rightFront.setPower(-powerMultiplier);
+                    hub.rightBack.setPower(-powerMultiplier);
+                }
+
+                telemetry.addData("Vision Yaw", yaw);
+                telemetry.addData("Calculated Turn Time (s)", time);
+                telemetry.update();
+
+                sleep((long) (time * 1000));
+
+                // Stop motors after turning
+                hub.leftFront.setPower(0);
+                hub.leftBack.setPower(0);
+                hub.rightFront.setPower(0);
+                hub.rightBack.setPower(0);
+
+                telemetry.addLine("Done turning!");
+            }
+        }
+        else
+        {
+            yButtonPressed = false;
         }
 
         if (gamepad.a)
@@ -124,11 +140,25 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.left_bumper && powerMultiplier > lowerMultiplierLimit) // Lower speed
         {
-            powerMultiplier -= 0.05;
+            if (!leftBumperPressed)
+            {
+                powerMultiplier -= 0.05;
+            }
         }
-        else if (gamepad.right_bumper && powerMultiplier < upperMultiplierLimit) // Increase speed
+        else
         {
-            powerMultiplier += 0.05;
+            leftBumperPressed = false;
+        }
+        if (gamepad.right_bumper && powerMultiplier < upperMultiplierLimit) // Increase speed
+        {
+            if (!rightBumperPressed)
+            {
+                powerMultiplier += 0.05;
+            }
+        }
+        else
+        {
+            rightBumperPressed = false;
         }
 
         if (gamepad.right_trigger > 0.25) // TODO: Shoot
@@ -146,5 +176,7 @@ public class VikingsTeleOp extends LinearOpMode {
         hub.leftBack.setPower(backLeftPower * powerMultiplier);
         hub.rightFront.setPower(frontRightPower * powerMultiplier);
         hub.rightBack.setPower(backRightPower * powerMultiplier);
+
+        telemetry.update();
     }
 }
