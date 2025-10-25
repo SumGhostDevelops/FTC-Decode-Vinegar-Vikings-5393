@@ -19,7 +19,7 @@ public class VisionHelper
 
     private List<AprilTagDetection> detections;
 
-    public VisionHelper(double[] lensIntrinsics, WebcamName webcamName, int debugLevel)
+    public VisionHelper(double[] lensIntrinsics, WebcamName webcamName, int debugLevel) // TODO: Remove debug level cus I swear it doesn't work/doesn't get used
     {
         // lens instrinsics dont worry about it
         double fx = lensIntrinsics[0];
