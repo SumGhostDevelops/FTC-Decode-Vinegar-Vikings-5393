@@ -34,7 +34,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
  //change depending on what it actually is lmao
 
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
         hub.imu.initialize(parameters);
         hub.imu.resetYaw();
@@ -76,7 +76,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
                 hub.imu.resetYaw();
             }
 
-        if (gamepad.x) // if you press x it kills all power
+        if (gamepad.x) // Panic button; kills all power TODO: Remove later
         {
             frontLeftPower = 0;
             frontRightPower = 0;
@@ -84,53 +84,93 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
             backRightPower = 0;
         }
 
-        if (gamepad.left_bumper && powerMultiplier > lowerMultiplierLimit)
+        if (gamepad.y) // Auto aim to AprilTag
         {
-            powerMultiplier -= 0.05;
-        }
-        else if (gamepad.right_bumper && powerMultiplier < upperMultiplierLimit)
-        {
-            powerMultiplier += 0.05;
-        }
+            // TODO: Add code to only aim if the AprilTag ID is ours
 
-        if (!gamepad.x) // if power is not called to be killed
-        {
-            hub.leftFront.setPower(frontLeftPower*powerMultiplier);
-            hub.leftBack.setPower(backLeftPower*powerMultiplier);
-            hub.rightFront.setPower(frontRightPower*powerMultiplier);
-            hub.rightBack.setPower(backRightPower*powerMultiplier);
-        }
-
-        if (gamepad.y)
-        {
+            // Resolve the Yaw and time it takes to turn
             double yaw = visionHelper.getYaw();
             double time = TurningMath.Calculate(yaw) * 2.5;
 
             if (yaw > 0)
             {
-                hub.leftFront.setPower(frontLeftPower*powerMultiplier);
-                hub.leftBack.setPower(backLeftPower*powerMultiplier);
-                hub.rightFront.setPower(-frontRightPower*powerMultiplier);
-                hub.rightBack.setPower(-backRightPower*powerMultiplier);
+                hub.leftFront.setPower(frontLeftPower * powerMultiplier);
+                hub.leftBack.setPower(backLeftPower * powerMultiplier);
+                hub.rightFront.setPower(-frontRightPower * powerMultiplier);
+                hub.rightBack.setPower(-backRightPower * powerMultiplier);
             }
             else
             {
-                hub.leftFront.setPower(-frontLeftPower*powerMultiplier);
-                hub.leftBack.setPower(-backLeftPower*powerMultiplier);
-                hub.rightFront.setPower(frontRightPower*powerMultiplier);
-                hub.rightBack.setPower(backRightPower*powerMultiplier);
+                hub.leftFront.setPower(-frontLeftPower * powerMultiplier);
+                hub.leftBack.setPower(-backLeftPower * powerMultiplier);
+                hub.rightFront.setPower(frontRightPower * powerMultiplier);
+                hub.rightBack.setPower(backRightPower * powerMultiplier);
             }
 
             telemetry.addData("Time to turn:", time);
-            sleep((long) (time*1000));
+            sleep((long) (time * 1000));
             telemetry.addLine("Done turning!");
 
             hub.leftFront.setPower(0);
             hub.leftBack.setPower(0);
             hub.rightFront.setPower(0);
             hub.rightBack.setPower(0);
+        }
+
+        if (gamepad.a)
+        {
 
         }
+
+        if (gamepad.b)
+        {
+
+        }
+
+        if (gamepad.dpad_up)
+        {
+
+        }
+
+        if (gamepad.dpad_down)
+        {
+
+        }
+
+        if (gamepad.dpad_left)
+        {
+
+        }
+
+        if (gamepad.dpad_right)
+        {
+
+        }
+
+        if (gamepad.left_bumper && powerMultiplier > lowerMultiplierLimit) // Lower speed
+        {
+            powerMultiplier -= 0.05;
+        }
+        else if (gamepad.right_bumper && powerMultiplier < upperMultiplierLimit) // Increase speed
+        {
+            powerMultiplier += 0.05;
+        }
+
+        if (gamepad.right_trigger > 0.25) // TODO: Shoot
+        {
+
+        }
+
+        if (gamepad.left_trigger > 0.25)
+        {
+
+        }
+
+        // Handle movement inputs
+        hub.leftFront.setPower(frontLeftPower * powerMultiplier);
+        hub.leftBack.setPower(backLeftPower * powerMultiplier);
+        hub.rightFront.setPower(frontRightPower * powerMultiplier);
+        hub.rightBack.setPower(backRightPower * powerMultiplier);
     }
 }
 
