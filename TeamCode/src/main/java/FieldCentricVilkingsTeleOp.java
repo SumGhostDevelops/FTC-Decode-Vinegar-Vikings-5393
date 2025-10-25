@@ -147,18 +147,22 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
         }
 
-        if (gamepad.left_bumper && powerMultiplier > lowerMultiplierLimit) // Lower speed
+        if (gamepad.left_bumper && (powerMultiplier > lowerMultiplierLimit)) // Lower speed
         {
             if (!leftBumperPressed) {
                 powerMultiplier -= 0.05;
+                leftBumperPressed = true;
+                telemetry.addData("Power Multiplier: ", powerMultiplier);
             }
         } else {
             leftBumperPressed = false;
         }
-        if (gamepad.right_bumper && powerMultiplier < upperMultiplierLimit) // Increase speed
+        if (gamepad.right_bumper && (powerMultiplier < upperMultiplierLimit)) // Increase speed
         {
             if (!rightBumperPressed) {
                 powerMultiplier += 0.05;
+                rightBumperPressed = true;
+                telemetry.addData("Power Multiplier: ", powerMultiplier);
             }
         } else {
             rightBumperPressed = false;
