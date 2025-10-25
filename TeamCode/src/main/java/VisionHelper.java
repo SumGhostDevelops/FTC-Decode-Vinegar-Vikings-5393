@@ -80,10 +80,11 @@ public class VisionHelper
     }
      */
 
-    private Object getSingleDetectionOrError()
+    private AprilTagDetection getSingleDetectionOrError()
     {
         List<AprilTagDetection> currentDetections = getDetections();
 
+        /*
         if (currentDetections.isEmpty()) // -1 if no detections
         {
             return -1;
@@ -93,6 +94,7 @@ public class VisionHelper
         {
             return -2;
         }
+        */
 
         return currentDetections.get(0);
     }
@@ -125,14 +127,18 @@ public class VisionHelper
 
     public double getYaw()
     {
+        // TODO: Fix later
+        /*
         Object result = getSingleDetectionOrError();
 
-        if (result instanceof Integer) // func returned an error
+        if (result instanceof Integer)
         {
             return (double) result;
         }
 
-        AprilTagDetection tag = (AprilTagDetection) result;
+         */
+
+        AprilTagDetection tag = getSingleDetectionOrError();
         return tag.ftcPose.yaw;
     }
 
