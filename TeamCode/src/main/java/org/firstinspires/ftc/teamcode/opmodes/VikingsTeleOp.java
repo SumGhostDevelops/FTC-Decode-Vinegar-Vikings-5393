@@ -74,11 +74,6 @@ public class VikingsTeleOp extends LinearOpMode {
         double backRightPower = (rotY + rotX - rx) / denominator;
 
 
-        //pick anything lmao
-        if (gamepad1.b) {
-            hub.imu.resetYaw();
-        }
-
         // TODO: Add keybind system for different drivers
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
@@ -101,7 +96,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.bWasPressed())
         {
-
+            hub.imu.resetYaw();
         }
 
         if (gamepad.dpadUpWasPressed())
