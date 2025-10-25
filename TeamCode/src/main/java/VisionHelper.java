@@ -1,9 +1,11 @@
+import org.firstinspires.ftc.teamcode.Exceptions.MultipleTagsDetectedException;
+import org.firstinspires.ftc.teamcode.Exceptions.NoTagsDetectedException;
+import org.firstinspires.ftc.teamcode.Exceptions.TagNotDetectedException;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class VisionHelper
@@ -13,8 +15,12 @@ public class VisionHelper
     private boolean showLiveView;
     private boolean showDebugText;
 
+    private List<AprilTagDetection> detections;
+
     public VisionHelper(double[] lensIntrinsics, WebcamName webcamName, int debugLevel)
-    {   double fx = lensIntrinsics[0];
+    {
+        // lens instrinsics dont worry about it
+        double fx = lensIntrinsics[0];
         double fy = lensIntrinsics[1];
         double cx = lensIntrinsics[2];
         double cy = lensIntrinsics[3];
@@ -63,138 +69,76 @@ public class VisionHelper
 
     }
 
-    public List<AprilTagDetection> getDetections()
+    private List<AprilTagDetection> getCachedDetections()
     {
-        return tagProcessor.getDetections();
+        return this.detections;
     }
 
-    /*
-    public boolean updateDriverHubData()
-    {
-        List<AprilTagDetection> currentDetections = getDetections();
-
-        if (!currentDetections.isEmpty())
-        {
-            break;
-        }
-    }
+    public void updateDetections()
+    /**
+     * Detections are cached for efficiency. Calling this method updates the cache to the latest frame.
      */
-
-    private AprilTagDetection getSingleDetectionOrError() throws Exception
     {
-        // TODO: Just make this call an error and then handle the error
-        List<AprilTagDetection> currentDetections = getDetections();
-
-        if (currentDetections.isEmpty())
-        {
-            throw new Exception("No detections found.");
-        }
-        else if (currentDetections.size() > 1)
-        {
-            throw new Exception("Too many detections (" + currentDetections.size() + ") found.");
-        }
-
-        return currentDetections.get(0);
+        this.detections = tagProcessor.getDetections();
     }
-    public double getRoll() throws Exception
+    public boolean tagIdExists(int id)
+    /**
+     * Checks if an AprilTag ID is detected by Vision
+     */
     {
-        AprilTagDetection tag;
+        List<AprilTagDetection> tags = getCachedDetections();
 
-        try
+        // Iterate through all of the tags and check if any of them match the requested ID
+        for (AprilTagDetection tag: tags)
         {
-            tag = getSingleDetectionOrError();
-        } catch (Exception e)
-        {
-            throw new Exception(e);
+            if (tag.id == id)
+            {
+                return true;
+            }
         }
 
-        return tag.ftcPose.roll;
+
+        return false;
     }
 
-    public double getPitch() throws Exception
+    public AprilTagDetection getSingleDetection() throws NoTagsDetectedException, MultipleTagsDetectedException
+    /**
+     * Returns the first AprilTagDetection found
+     */
     {
-        AprilTagDetection tag;
+        List<AprilTagDetection> detections = getCachedDetections();
 
-        try
+        if (detections.isEmpty())
         {
-            tag = getSingleDetectionOrError();
-        } catch (Exception e)
+            throw new NoTagsDetectedException();
+        }
+        else if (detections.size() > 1)
         {
-            throw new Exception(e);
+            throw new MultipleTagsDetectedException(detections.size());
         }
 
-        return tag.ftcPose.pitch;
+        return detections.get(0);
     }
 
-    public double getYaw() throws Exception
+    public AprilTagDetection getSingleDetection(int id) throws NoTagsDetectedException, TagNotDetectedException
+    /**
+     * Returns a specific AprilTagDetection, or throws a NoTagsDetectedException or TagNotDetectedException
+     */
     {
-        // TODO: Fix later
-        AprilTagDetection tag;
+        List<AprilTagDetection> detections = getCachedDetections();
 
-        try
+        if (detections.isEmpty())
         {
-            tag = getSingleDetectionOrError();
-        } catch (Exception e)
+            throw new NoTagsDetectedException();
+        }
+        else if (!tagIdExists(id))
         {
-            throw new Exception(e);
+            throw new TagNotDetectedException(id);
         }
 
-        return tag.ftcPose.yaw;
+        return detections.get(0);
     }
 
-    /*
-    public int getId()
-    {
-        Object result = getSingleDetectionOrError();
-
-        if (result instanceof Integer)
-        {
-            return (int) result;
-        }
-
-        AprilTagDetection tag = (AprilTagDetection) result;
-        return tag.id;
-    }
-
-    public double getX()
-    {
-        Object result = getSingleDetectionOrError();
-
-        if (result instanceof Integer) // func returned an error
-        {
-            return (double) result;
-        }
-
-        AprilTagDetection tag = (AprilTagDetection) result;
-        return tag.ftcPose.x;
-    }
-
-    public double getY()
-    {
-        Object result = getSingleDetectionOrError();
-
-        if (result instanceof Integer) // func returned an error
-        {
-            return (double) result;
-        }
-
-        AprilTagDetection tag = (AprilTagDetection) result;
-        return tag.ftcPose.y;
-    }
-
-    public double getZ()
-    {
-        Object result = getSingleDetectionOrError();
-
-        if (result instanceof Integer) // func returned an error
-        {
-            return (double) result;
-        }
-
-        AprilTagDetection tag = (AprilTagDetection) result;
-        return tag.ftcPose.z;
-    }
-    */
     public void close()
     {
         visionPortal.close();
