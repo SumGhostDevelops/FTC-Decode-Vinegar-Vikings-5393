@@ -1,6 +1,8 @@
-import org.firstinspires.ftc.teamcode.Exceptions.MultipleTagsDetectedException;
-import org.firstinspires.ftc.teamcode.Exceptions.NoTagsDetectedException;
-import org.firstinspires.ftc.teamcode.Exceptions.TagNotDetectedException;
+package org.firstinspires.ftc.teamcode.robot;
+
+import org.firstinspires.ftc.teamcode.exceptions.MultipleTagsDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.TagNotDetectedException;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;

@@ -1,5 +1,8 @@
+package org.firstinspires.ftc.teamcode.opmodes;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -8,8 +11,9 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
+@Disabled
 @TeleOp
-public class VisionTeleOp extends LinearOpMode
+public class VisionDemoTeleOp extends LinearOpMode
 {
     //final int RESOLUTION_WIDTH = 640;
     //final int RESOLUTION_HEIGHT = 480;

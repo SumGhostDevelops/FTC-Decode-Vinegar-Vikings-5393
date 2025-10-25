@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Exceptions;
+package org.firstinspires.ftc.teamcode.exceptions;
 
 public class NoTagsDetectedException extends Exception
 {
