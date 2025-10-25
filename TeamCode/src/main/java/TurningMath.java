@@ -13,7 +13,7 @@ public class TurningMath
         double timeToActivate = timeToTurnNinety * (degreesToTurn/90);
         return timeToActivate;
         */
-        return timeToTurnNinety * (degrees / 90.0);
+        return Math.abs(timeToTurnNinety * (degrees / 90.0));
     }
 
 }
