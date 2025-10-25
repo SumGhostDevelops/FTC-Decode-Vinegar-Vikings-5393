@@ -14,24 +14,24 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
     private final double upperMultiplierLimit = 0.6;
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.4; // initial power reduction value
+    private boolean leftBumperPressed = false;
+    private boolean rightBumperPressed = false;
+    private boolean yButtonPressed = false;
 
 
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
 
 
-
-
-
     @Override
     public void runOpMode() throws InterruptedException {
-        hub.init(hardwareMap, new Pose2d(10,10,Math.toRadians(Math.PI/2)));
+        hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
 
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
- // depending on what direction the logo is facing on the control hub would determine what orientation is.
- //change depending on what it actually is lmao
+                // depending on what direction the logo is facing on the control hub would determine what orientation is.
+                //change depending on what it actually is lmao
 
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
@@ -40,16 +40,14 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
         hub.imu.resetYaw();
 
         waitForStart();
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
             motorAction(gamepad1);
         }
 
         visionHelper.close();
     }
 
-    public void motorAction(Gamepad gamepad) throws InterruptedException
-    {
+    public void motorAction(Gamepad gamepad) throws InterruptedException {
         double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;
@@ -72,9 +70,11 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
 
         //pick anything lmao
-            if (gamepad1.b) {
-                hub.imu.resetYaw();
-            }
+        if (gamepad1.b) {
+            hub.imu.resetYaw();
+        }
+
+        // TODO: Add keybind system for different drivers
 
         if (gamepad.x) // Panic button; kills all power TODO: Remove later
         {
@@ -86,74 +86,82 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
         if (gamepad.y) // Auto aim to AprilTag
         {
-            // TODO: Add code to only aim if the AprilTag ID is ours
+            if (!yButtonPressed) {
+                // TODO: Add code to only aim if the AprilTag ID is ours
 
-            // Resolve the Yaw and time it takes to turn
-            double yaw = visionHelper.getYaw();
-            double time = TurningMath.Calculate(yaw) * 2.5;
+                // Resolve the Yaw and time it takes to turn
+                double yaw = visionHelper.getYaw();
+                double time = TurningMath.Calculate(yaw) * 2.5;
 
-            if (yaw > 0)
-            {
-                hub.leftFront.setPower(frontLeftPower * powerMultiplier);
-                hub.leftBack.setPower(backLeftPower * powerMultiplier);
-                hub.rightFront.setPower(-frontRightPower * powerMultiplier);
-                hub.rightBack.setPower(-backRightPower * powerMultiplier);
+                if (yaw > 0) {
+                    hub.leftFront.setPower(-powerMultiplier);
+                    hub.leftBack.setPower(-powerMultiplier);
+                    hub.rightFront.setPower(powerMultiplier);
+                    hub.rightBack.setPower(powerMultiplier);
+                } else {
+                    hub.leftFront.setPower(powerMultiplier);
+                    hub.leftBack.setPower(powerMultiplier);
+                    hub.rightFront.setPower(-powerMultiplier);
+                    hub.rightBack.setPower(-powerMultiplier);
+                }
+
+                telemetry.addData("Vision Yaw", yaw);
+                telemetry.addData("Calculated Turn Time (s)", time);
+                telemetry.update();
+
+                sleep((long) (time * 1000));
+
+                // Stop motors after turning
+                hub.leftFront.setPower(0);
+                hub.leftBack.setPower(0);
+                hub.rightFront.setPower(0);
+                hub.rightBack.setPower(0);
+
+                telemetry.addLine("Done turning!");
             }
-            else
-            {
-                hub.leftFront.setPower(-frontLeftPower * powerMultiplier);
-                hub.leftBack.setPower(-backLeftPower * powerMultiplier);
-                hub.rightFront.setPower(frontRightPower * powerMultiplier);
-                hub.rightBack.setPower(backRightPower * powerMultiplier);
-            }
-
-            telemetry.addData("Time to turn:", time);
-            sleep((long) (time * 1000));
-            telemetry.addLine("Done turning!");
-
-            hub.leftFront.setPower(0);
-            hub.leftBack.setPower(0);
-            hub.rightFront.setPower(0);
-            hub.rightBack.setPower(0);
+        } else {
+            yButtonPressed = false;
         }
 
-        if (gamepad.a)
-        {
+        if (gamepad.a) {
 
         }
 
-        if (gamepad.b)
-        {
+        if (gamepad.b) {
 
         }
 
-        if (gamepad.dpad_up)
-        {
+        if (gamepad.dpad_up) {
 
         }
 
-        if (gamepad.dpad_down)
-        {
+        if (gamepad.dpad_down) {
 
         }
 
-        if (gamepad.dpad_left)
-        {
+        if (gamepad.dpad_left) {
 
         }
 
-        if (gamepad.dpad_right)
-        {
+        if (gamepad.dpad_right) {
 
         }
 
         if (gamepad.left_bumper && powerMultiplier > lowerMultiplierLimit) // Lower speed
         {
-            powerMultiplier -= 0.05;
+            if (!leftBumperPressed) {
+                powerMultiplier -= 0.05;
+            }
+        } else {
+            leftBumperPressed = false;
         }
-        else if (gamepad.right_bumper && powerMultiplier < upperMultiplierLimit) // Increase speed
+        if (gamepad.right_bumper && powerMultiplier < upperMultiplierLimit) // Increase speed
         {
-            powerMultiplier += 0.05;
+            if (!rightBumperPressed) {
+                powerMultiplier += 0.05;
+            }
+        } else {
+            rightBumperPressed = false;
         }
 
         if (gamepad.right_trigger > 0.25) // TODO: Shoot
@@ -161,8 +169,7 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
         }
 
-        if (gamepad.left_trigger > 0.25)
-        {
+        if (gamepad.left_trigger > 0.25) {
 
         }
 
@@ -171,6 +178,8 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
         hub.leftBack.setPower(backLeftPower * powerMultiplier);
         hub.rightFront.setPower(frontRightPower * powerMultiplier);
         hub.rightBack.setPower(backRightPower * powerMultiplier);
+
+        telemetry.update();
     }
 }
 
