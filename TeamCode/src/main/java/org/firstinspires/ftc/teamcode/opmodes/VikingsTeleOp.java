@@ -23,11 +23,6 @@ public class VikingsTeleOp extends LinearOpMode {
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.4; // initial power reduction value
 
-    // For handling duplicate/multiple button presses
-    private boolean leftBumperPressed = false;
-    private boolean rightBumperPressed = false;
-    private boolean yButtonPressed = false;
-
     // Initialize some stuff
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
@@ -86,7 +81,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         // TODO: Add keybind system for different drivers
 
-        if (gamepad.x) // Panic button; kills all power TODO: Remove later
+        if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
         {
             frontLeftPower = 0;
             frontRightPower = 0;
@@ -94,124 +89,53 @@ public class VikingsTeleOp extends LinearOpMode {
             backRightPower = 0;
         }
 
-        if (gamepad.y) // Auto aim to AprilTag
+        if (gamepad.yWasPressed()) // Auto aim to AprilTag
         {
-            if (!yButtonPressed)
-            {
-                AprilTagDetection tag;
-                visionHelper.updateDetections();
-
-                // Getting an AprilTag is a dangerous method, so simply restart the iteration if there is an error
-                try
-                {
-                    tag = visionHelper.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
-                }
-                catch (NoTagsDetectedException | MultipleTagsDetectedException e)
-                {
-                    telemetry.addLine(String.valueOf(e));
-                    telemetry.update();
-                    return; // Restart motorAction() if there is an error; should have negligible effect on driving
-                }
-
-                // Resolve the Yaw and time it takes to turn
-                double yaw = tag.ftcPose.yaw;
-
-                double time = TurningMath.Calculate(yaw) * 2.5;
-
-                if (yaw > 0)
-                {
-                    hub.leftFront.setPower(-powerMultiplier);
-                    hub.leftBack.setPower(-powerMultiplier);
-                    hub.rightFront.setPower(powerMultiplier);
-                    hub.rightBack.setPower(powerMultiplier);
-                }
-                else
-                {
-                    hub.leftFront.setPower(powerMultiplier);
-                    hub.leftBack.setPower(powerMultiplier);
-                    hub.rightFront.setPower(-powerMultiplier);
-                    hub.rightBack.setPower(-powerMultiplier);
-                }
-
-                telemetry.addData("Vision Yaw", yaw);
-                telemetry.addData("Calculated Turn Time (s)", time);
-                telemetry.update();
-
-                sleep((long) (time * 1000));
-
-                // Stop motors after turning
-                hub.leftFront.setPower(0);
-                hub.leftBack.setPower(0);
-                hub.rightFront.setPower(0);
-                hub.rightBack.setPower(0);
-
-                telemetry.addLine("Done turning!");
-                telemetry.update();
-            }
-        }
-        else
-        {
-            yButtonPressed = false;
+            autoAim();
         }
 
-        if (gamepad.a)
+        if (gamepad.aWasPressed())
         {
 
         }
 
-        if (gamepad.b)
+        if (gamepad.bWasPressed())
         {
 
         }
 
-        if (gamepad.dpad_up)
+        if (gamepad.dpadUpWasPressed())
         {
 
         }
 
-        if (gamepad.dpad_down)
+        if (gamepad.dpadDownWasPressed())
         {
 
         }
 
-        if (gamepad.dpad_left)
+        if (gamepad.dpadLeftWasPressed())
         {
 
         }
 
-        if (gamepad.dpad_right)
+        if (gamepad.dpadRightWasPressed())
         {
 
         }
 
-        if (gamepad.left_bumper && (powerMultiplier > lowerMultiplierLimit)) // Lower speed
+        if (gamepad.leftBumperWasPressed() && (powerMultiplier > lowerMultiplierLimit)) // Lower speed
         {
-            if (!leftBumperPressed)
-            {
-                powerMultiplier -= 0.05;
-                leftBumperPressed = true;
-                telemetry.addData("Power Multiplier: ", powerMultiplier);
-                telemetry.update();
-            }
-        }
-        else
-        {
-            leftBumperPressed = false;
+            powerMultiplier -= 0.05;
+            telemetry.addData("Power Multiplier: ", powerMultiplier);
+            telemetry.update();
         }
 
-        if (gamepad.right_bumper && (powerMultiplier < upperMultiplierLimit)) // Increase speed
+        if (gamepad.rightBumperWasPressed() && (powerMultiplier > lowerMultiplierLimit)) // Lower speed
         {
-            if (!rightBumperPressed)
-            {
-                powerMultiplier += 0.05;
-                rightBumperPressed = true;
-                telemetry.addData("Power Multiplier: ", powerMultiplier);
-                telemetry.update();
-            }
-        }
-        else
-        {
-            rightBumperPressed = false;
+            powerMultiplier -= 0.05;
+            telemetry.addData("Power Multiplier: ", powerMultiplier);
+            telemetry.update();
         }
 
         if (gamepad.right_trigger > 0.25) // Shoot
@@ -230,6 +154,59 @@ public class VikingsTeleOp extends LinearOpMode {
         hub.rightFront.setPower(frontRightPower * powerMultiplier);
         hub.rightBack.setPower(backRightPower * powerMultiplier);
 
+        telemetry.update();
+    }
+
+    private void autoAim()
+    {
+        AprilTagDetection tag;
+        visionHelper.updateDetections();
+
+        // Getting an AprilTag is a dangerous method, so simply restart the iteration if there is an error
+        try
+        {
+            tag = visionHelper.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
+        }
+        catch (NoTagsDetectedException | MultipleTagsDetectedException e)
+        {
+            telemetry.addLine(String.valueOf(e));
+            telemetry.update();
+            return; // Restart motorAction() if there is an error; should have negligible effect on driving
+        }
+
+        // Resolve the Yaw and time it takes to turn
+        double yaw = tag.ftcPose.yaw;
+
+        double time = TurningMath.Calculate(yaw) * 2.5;
+
+        if (yaw > 0)
+        {
+            hub.leftFront.setPower(-powerMultiplier);
+            hub.leftBack.setPower(-powerMultiplier);
+            hub.rightFront.setPower(powerMultiplier);
+            hub.rightBack.setPower(powerMultiplier);
+        }
+        else
+        {
+            hub.leftFront.setPower(powerMultiplier);
+            hub.leftBack.setPower(powerMultiplier);
+            hub.rightFront.setPower(-powerMultiplier);
+            hub.rightBack.setPower(-powerMultiplier);
+        }
+
+        telemetry.addData("Vision Yaw", yaw);
+        telemetry.addData("Calculated Turn Time (s)", time);
+        telemetry.update();
+
+        sleep((long) (time * 1000));
+
+        // Stop motors after turning
+        hub.leftFront.setPower(0);
+        hub.leftBack.setPower(0);
+        hub.rightFront.setPower(0);
+        hub.rightBack.setPower(0);
+
+        telemetry.addLine("Done turning!");
         telemetry.update();
     }
 }
