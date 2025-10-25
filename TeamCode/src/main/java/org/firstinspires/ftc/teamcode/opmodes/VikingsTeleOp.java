@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.ControlHub;
+import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.exceptions.MultipleTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.util.TurningMath;
@@ -16,16 +16,19 @@ import org.firstinspires.ftc.teamcode.robot.VisionHelper;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
-@TeleOp(name="org.firstinspires.ftc.teamcode.opmodes.FieldCentricVilkingsTeleOp")
-public class FieldCentricVilkingsTeleOp extends LinearOpMode {
+@TeleOp(name="VikingsTeleOp")
+public class VikingsTeleOp extends LinearOpMode {
+    // Arbritary values for stuff
     private final double upperMultiplierLimit = 0.6;
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.4; // initial power reduction value
+
+    // For handling duplicate/multiple button presses
     private boolean leftBumperPressed = false;
     private boolean rightBumperPressed = false;
     private boolean yButtonPressed = false;
 
-
+    // Initialize some stuff
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
 
