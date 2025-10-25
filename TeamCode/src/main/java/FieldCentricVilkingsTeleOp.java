@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Exceptions.MultipleTagsDetectedException;
+import org.firstinspires.ftc.teamcode.Exceptions.NoTagsDetectedException;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 @TeleOp(name="FieldCentricVilkingsTeleOp")
@@ -86,19 +89,37 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
 
         if (gamepad.y) // Auto aim to AprilTag
         {
-            if (!yButtonPressed) {
-                // TODO: Add code to only aim if the AprilTag ID is ours
+            if (!yButtonPressed)
+            {
+                AprilTagDetection tag;
+                visionHelper.updateDetections();
+
+                // Getting an AprilTag is a dangerous method, so simply restart the iteration if there is an error
+                try
+                {
+                    tag = visionHelper.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
+                }
+                catch (NoTagsDetectedException | MultipleTagsDetectedException e)
+                {
+                    telemetry.addLine(String.valueOf(e));
+                    telemetry.update();
+                    return; // Restart motorAction() if there is an error; should have negligible effect on driving
+                }
 
                 // Resolve the Yaw and time it takes to turn
-                double yaw = visionHelper.getYaw();
+                double yaw = tag.ftcPose.yaw;
+
                 double time = TurningMath.Calculate(yaw) * 2.5;
 
-                if (yaw > 0) {
+                if (yaw > 0)
+                {
                     hub.leftFront.setPower(-powerMultiplier);
                     hub.leftBack.setPower(-powerMultiplier);
                     hub.rightFront.setPower(powerMultiplier);
                     hub.rightBack.setPower(powerMultiplier);
-                } else {
+                }
+                else
+                {
                     hub.leftFront.setPower(powerMultiplier);
                     hub.leftBack.setPower(powerMultiplier);
                     hub.rightFront.setPower(-powerMultiplier);
@@ -118,62 +139,81 @@ public class FieldCentricVilkingsTeleOp extends LinearOpMode {
                 hub.rightBack.setPower(0);
 
                 telemetry.addLine("Done turning!");
+                telemetry.update();
             }
-        } else {
+        }
+        else
+        {
             yButtonPressed = false;
         }
 
-        if (gamepad.a) {
+        if (gamepad.a)
+        {
 
         }
 
-        if (gamepad.b) {
+        if (gamepad.b)
+        {
 
         }
 
-        if (gamepad.dpad_up) {
+        if (gamepad.dpad_up)
+        {
 
         }
 
-        if (gamepad.dpad_down) {
+        if (gamepad.dpad_down)
+        {
 
         }
 
-        if (gamepad.dpad_left) {
+        if (gamepad.dpad_left)
+        {
 
         }
 
-        if (gamepad.dpad_right) {
+        if (gamepad.dpad_right)
+        {
 
         }
 
         if (gamepad.left_bumper && (powerMultiplier > lowerMultiplierLimit)) // Lower speed
         {
-            if (!leftBumperPressed) {
+            if (!leftBumperPressed)
+            {
                 powerMultiplier -= 0.05;
                 leftBumperPressed = true;
                 telemetry.addData("Power Multiplier: ", powerMultiplier);
+                telemetry.update();
             }
-        } else {
+        }
+        else
+        {
             leftBumperPressed = false;
         }
+
         if (gamepad.right_bumper && (powerMultiplier < upperMultiplierLimit)) // Increase speed
         {
-            if (!rightBumperPressed) {
+            if (!rightBumperPressed)
+            {
                 powerMultiplier += 0.05;
                 rightBumperPressed = true;
                 telemetry.addData("Power Multiplier: ", powerMultiplier);
+                telemetry.update();
             }
-        } else {
+        }
+        else
+        {
             rightBumperPressed = false;
         }
 
-        if (gamepad.right_trigger > 0.25) // TODO: Shoot
+        if (gamepad.right_trigger > 0.25) // Shoot
         {
 
         }
 
-        if (gamepad.left_trigger > 0.25) {
+        if (gamepad.left_trigger > 0.25)
+        {
 
         }
 

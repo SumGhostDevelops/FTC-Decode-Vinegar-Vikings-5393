@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Exceptions.MultipleTagsDetectedException;
+import org.firstinspires.ftc.teamcode.Exceptions.NoTagsDetectedException;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 // TODO: Move all code to FieldCentric
@@ -70,20 +73,23 @@ public class VikingsTeleOp extends LinearOpMode {
         {
             if (!yButtonPressed)
             {
-                // TODO: Add code to only aim if the AprilTag ID is ours
+                AprilTagDetection tag;
+                visionHelper.updateDetections();
 
-                // Resolve the Yaw and time it takes to turn
-                double yaw = 0;
-
+                // Getting an AprilTag is a dangerous method, so simply restart the iteration if there is an error
                 try
                 {
-                    yaw = visionHelper.getYaw();
+                    tag = visionHelper.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
                 }
-                catch (Exception e)
+                catch (NoTagsDetectedException | MultipleTagsDetectedException e)
                 {
-                    telemetry.addLine("Not turning; encountered error:");
                     telemetry.addLine(String.valueOf(e));
+                    telemetry.update();
+                    return; // Restart motorAction() if there is an error; should have negligible effect on driving
                 }
+
+                // Resolve the Yaw and time it takes to turn
+                double yaw = tag.ftcPose.yaw;
 
                 double time = TurningMath.Calculate(yaw) * 2.5;
 
@@ -115,6 +121,7 @@ public class VikingsTeleOp extends LinearOpMode {
                 hub.rightBack.setPower(0);
 
                 telemetry.addLine("Done turning!");
+                telemetry.update();
             }
         }
         else
@@ -154,26 +161,35 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.left_bumper && (powerMultiplier > lowerMultiplierLimit)) // Lower speed
         {
-            if (!leftBumperPressed) {
+            if (!leftBumperPressed)
+            {
                 powerMultiplier -= 0.05;
                 leftBumperPressed = true;
                 telemetry.addData("Power Multiplier: ", powerMultiplier);
+                telemetry.update();
             }
-        } else {
+        }
+        else
+        {
             leftBumperPressed = false;
         }
+
         if (gamepad.right_bumper && (powerMultiplier < upperMultiplierLimit)) // Increase speed
         {
-            if (!rightBumperPressed) {
+            if (!rightBumperPressed)
+            {
                 powerMultiplier += 0.05;
                 rightBumperPressed = true;
                 telemetry.addData("Power Multiplier: ", powerMultiplier);
+                telemetry.update();
             }
-        } else {
+        }
+        else
+        {
             rightBumperPressed = false;
         }
 
-        if (gamepad.right_trigger > 0.25) // TODO: Shoot
+        if (gamepad.right_trigger > 0.25) // Shoot
         {
 
         }
