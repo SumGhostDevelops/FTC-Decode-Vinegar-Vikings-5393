@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.ControlHub;
+import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.exceptions.MultipleTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.util.TurningMath;
@@ -18,7 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 // TODO: Move all code to FieldCentric
 
 @Disabled
-@TeleOp(name="org.firstinspires.ftc.teamcode.opmodes.VikingsTeleOp")
+@TeleOp(name="OldVikingsTeleOp")
 public class OldVikingsTeleOp extends LinearOpMode {
     private final double upperMultiplierLimit = 0.6;
     private final double lowerMultiplierLimit = 0.05;
