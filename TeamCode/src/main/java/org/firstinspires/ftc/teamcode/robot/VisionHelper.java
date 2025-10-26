@@ -71,25 +71,28 @@ public class VisionHelper
 
     }
 
-    private List<AprilTagDetection> getCachedDetections()
     /**
-    * Returns the cached detections. These are only the detections from the last checked updateDetections() frame.
-    */
+     * Returns the cached detections. These are only the detections from the last checked updateDetections() frame.
+     */
+    private List<AprilTagDetection> getCachedDetections()
     {
         return this.detections;
     }
 
-    public void updateDetections()
     /**
      * Detections are cached for efficiency. Calling this method updates the cache to the latest frame.
      */
+    public void updateDetections()
     {
         this.detections = tagProcessor.getDetections();
     }
-    public boolean tagIdExists(int id)
+
     /**
-     * Checks if an AprilTag ID is detected by Vision
+     * Checks if an AprilTag with a certain ID is in the cached detections.
+     * @param id The ID of the AprilTag to check.
+     * @return Whether the AprilTag with the requested ID is in the cached detections.
      */
+    public boolean tagIdExists(int id)
     {
         List<AprilTagDetection> tags = getCachedDetections();
 
@@ -102,14 +105,14 @@ public class VisionHelper
             }
         }
 
-
         return false;
     }
 
-    public AprilTagDetection getSingleDetection() throws NoTagsDetectedException, MultipleTagsDetectedException
     /**
-     * Returns the first AprilTagDetection found
+     * Returns the first AprilTagDetection found and throws an error otherwise.
+     * @return The first AprilTagDetection found.
      */
+    public AprilTagDetection getSingleDetection() throws NoTagsDetectedException, MultipleTagsDetectedException
     {
         List<AprilTagDetection> detections = getCachedDetections();
 
@@ -125,10 +128,12 @@ public class VisionHelper
         return detections.get(0);
     }
 
-    public AprilTagDetection getSingleDetection(int id) throws NoTagsDetectedException, TagNotDetectedException
     /**
-     * Returns a specific AprilTagDetection, or throws a NoTagsDetectedException or TagNotDetectedException
+     * Returns a specific AprilTagDetection and throws an error otherwise.
+     * @param id The ID of the AprilTag to return.
+     * @return The AprilTagDetection with the requested ID.
      */
+    public AprilTagDetection getSingleDetection(int id) throws NoTagsDetectedException, TagNotDetectedException
     {
         List<AprilTagDetection> detections = getCachedDetections();
 
@@ -144,6 +149,9 @@ public class VisionHelper
         return detections.get(0);
     }
 
+    /**
+     * Closes the vision portal.
+     */
     public void close()
     {
         visionPortal.close();
