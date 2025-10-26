@@ -72,6 +72,9 @@ public class VisionHelper
     }
 
     private List<AprilTagDetection> getCachedDetections()
+    /**
+    * Returns the cached detections. These are only the detections from the last checked updateDetections() frame.
+    */
     {
         return this.detections;
     }
