@@ -167,7 +167,8 @@ public class VikingsTeleOp extends LinearOpMode {
         }
         catch (NoTagsDetectedException | MultipleTagsDetectedException e)
         {
-            telemetry.addLine(String.valueOf(e));
+            telemetry.addLine("Auto Aim command cancelled.");
+            telemetry.addData("Error: ", e);
             telemetry.update();
             return; // Restart motorAction() if there is an error; should have negligible effect on driving
         }
@@ -177,6 +178,9 @@ public class VikingsTeleOp extends LinearOpMode {
 
         double time = TurningMath.Calculate(yaw) * 2.5;
         // TODO: Add a maximum limit for time for competition in case it is some ungodly high number
+        telemetry.addData("Vision Yaw: ", yaw);
+        telemetry.addData("Calculated Turn Time (s): ", time);
+        telemetry.update();
 
         if (yaw > 0)
         {
@@ -192,10 +196,6 @@ public class VikingsTeleOp extends LinearOpMode {
             hub.rightFront.setPower(-powerMultiplier);
             hub.rightBack.setPower(-powerMultiplier);
         }
-
-        telemetry.addData("Vision Yaw", yaw);
-        telemetry.addData("Calculated Turn Time (s)", time);
-        telemetry.update();
 
         sleep((long) (time * 1000));
 
