@@ -126,9 +126,9 @@ public class VikingsTeleOp extends LinearOpMode {
             telemetry.update();
         }
 
-        if (gamepad.rightBumperWasPressed() && (powerMultiplier > lowerMultiplierLimit)) // Lower speed
+        if (gamepad.rightBumperWasPressed() && (powerMultiplier < upperMultiplierLimit)) // Increase speed
         {
-            powerMultiplier -= 0.05;
+            powerMultiplier += 0.05;
             telemetry.addData("Power Multiplier: ", powerMultiplier);
             telemetry.update();
         }
