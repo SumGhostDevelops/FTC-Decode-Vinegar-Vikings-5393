@@ -21,7 +21,7 @@ public class VikingsTeleOp extends LinearOpMode {
     // Arbritary values for stuff
     private final double upperMultiplierLimit = 0.75;
     private final double lowerMultiplierLimit = 0.05;
-    private double powerMultiplier = 0.4; // initial power reduction value
+    private double powerMultiplier = 0.5; // initial power reduction value
 
     // Initialize some stuff
     ControlHub hub = new ControlHub();
