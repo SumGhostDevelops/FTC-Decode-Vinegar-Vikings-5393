@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.exceptions;
 
 public class TooManyTagsDetectedException extends Exception
 {
+    /**
+     * "Too many AprilTags were detected."
+     */
     public TooManyTagsDetectedException()
     {
         super("Too many AprilTags were detected.");
