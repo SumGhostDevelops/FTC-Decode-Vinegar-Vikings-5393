@@ -19,7 +19,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @TeleOp(name="VikingsTeleOp")
 public class VikingsTeleOp extends LinearOpMode {
     // Arbritary values for stuff
-    private final double upperMultiplierLimit = 0.6;
+    private final double upperMultiplierLimit = 0.75;
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.4; // initial power reduction value
 
