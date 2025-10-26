@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.exceptions.MultipleTagsDetectedException;
@@ -27,12 +28,13 @@ public class VikingsTeleOp extends LinearOpMode {
     // Initialize some stuff
     ControlHub hub = new ControlHub();
     VisionHelper visionHelper;
+    WebcamName camera = hub.camera;
 
 
     @Override
     public void runOpMode() throws InterruptedException {
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
-
+        visionHelper = new VisionHelper(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, 2);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
