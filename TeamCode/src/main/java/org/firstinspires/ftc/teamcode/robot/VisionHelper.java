@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import org.firstinspires.ftc.teamcode.exceptions.MultipleTagsDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.TagNotDetectedException;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -112,7 +112,7 @@ public class VisionHelper
      * Returns the first AprilTagDetection found and throws an error otherwise.
      * @return The first AprilTagDetection found.
      */
-    public AprilTagDetection getSingleDetection() throws NoTagsDetectedException, MultipleTagsDetectedException
+    public AprilTagDetection getSingleDetection() throws NoTagsDetectedException, TooManyTagsDetectedException
     {
         List<AprilTagDetection> detections = getCachedDetections();
 
@@ -122,7 +122,7 @@ public class VisionHelper
         }
         else if (detections.size() > 1)
         {
-            throw new MultipleTagsDetectedException(detections.size());
+            throw new TooManyTagsDetectedException(1, detections.size());
         }
 
         return detections.get(0);

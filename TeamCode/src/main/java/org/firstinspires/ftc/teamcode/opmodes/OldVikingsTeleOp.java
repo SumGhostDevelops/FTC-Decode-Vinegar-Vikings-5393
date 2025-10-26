@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
-import org.firstinspires.ftc.teamcode.exceptions.MultipleTagsDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.util.TurningMath;
 import org.firstinspires.ftc.teamcode.robot.VisionHelper;
@@ -87,7 +87,7 @@ public class OldVikingsTeleOp extends LinearOpMode {
                 {
                     tag = visionHelper.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
                 }
-                catch (NoTagsDetectedException | MultipleTagsDetectedException e)
+                catch (NoTagsDetectedException | TooManyTagsDetectedException e)
                 {
                     telemetry.addLine(String.valueOf(e));
                     telemetry.update();
