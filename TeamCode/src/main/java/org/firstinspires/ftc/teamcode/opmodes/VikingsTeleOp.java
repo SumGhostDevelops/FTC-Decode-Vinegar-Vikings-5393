@@ -19,6 +19,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @TeleOp(name="VikingsTeleOp")
 public class VikingsTeleOp extends LinearOpMode {
     // Arbritary values for stuff
+    // TODO: Tune these speeds OR make them easily editable (FTC dashboard?)
     private final double upperMultiplierLimit = 0.75;
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.5; // initial power reduction value
