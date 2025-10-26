@@ -176,6 +176,7 @@ public class VikingsTeleOp extends LinearOpMode {
         double yaw = tag.ftcPose.yaw;
 
         double time = TurningMath.Calculate(yaw) * 2.5;
+        // TODO: Add a maximum limit for time for competition in case it is some ungodly high number
 
         if (yaw > 0)
         {
@@ -208,5 +209,3 @@ public class VikingsTeleOp extends LinearOpMode {
         telemetry.update();
     }
 }
-
-
