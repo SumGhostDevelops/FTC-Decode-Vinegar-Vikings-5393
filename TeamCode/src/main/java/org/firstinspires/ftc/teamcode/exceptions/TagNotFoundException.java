@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.exceptions;
 
-public class TagNotDetectedException extends RuntimeException
+public class TagNotFoundException extends RuntimeException
 {
-    public TagNotDetectedException()
+    public TagNotFoundException()
     {
         super("The AprilTag was not detected.");
     }
 
-    public TagNotDetectedException(int id)
+    public TagNotFoundException(int id)
     {
         super("The AprilTag with ID " + id + " was not detected.");
     }

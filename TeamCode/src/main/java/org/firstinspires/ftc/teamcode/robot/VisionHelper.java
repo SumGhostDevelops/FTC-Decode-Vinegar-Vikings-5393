@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
-import org.firstinspires.ftc.teamcode.exceptions.TagNotDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -133,7 +133,7 @@ public class VisionHelper
      * @param id The ID of the AprilTag to return.
      * @return The AprilTagDetection with the requested ID.
      */
-    public AprilTagDetection getSingleDetection(int id) throws NoTagsDetectedException, TagNotDetectedException
+    public AprilTagDetection getSingleDetection(int id) throws NoTagsDetectedException, TagNotFoundException
     {
         List<AprilTagDetection> detections = getCachedDetections();
 
@@ -143,7 +143,7 @@ public class VisionHelper
         }
         else if (!tagIdExists(id))
         {
-            throw new TagNotDetectedException(id);
+            throw new TagNotFoundException(id);
         }
 
         return detections.get(0);
