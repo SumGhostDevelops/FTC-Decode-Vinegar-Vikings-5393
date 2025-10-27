@@ -122,6 +122,9 @@ public class AprilTagWebcam
      */
     public void close()
     {
-        visionPortal.close();
+        if (visionPortal != null)
+        {
+            visionPortal.close();
+        }
     }
 }
