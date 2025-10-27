@@ -16,6 +16,8 @@ import org.firstinspires.ftc.teamcode.util.TurningMath;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import java.util.List;
+
 
 @TeleOp(name="VikingsTeleOp")
 public class VikingsTeleOp extends LinearOpMode {
@@ -24,6 +26,8 @@ public class VikingsTeleOp extends LinearOpMode {
     private final double upperMultiplierLimit = 0.75;
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.5; // initial power reduction value
+
+    private int obeliskId;
 
     // Initialize some stuff
     ControlHub hub = new ControlHub();
@@ -92,9 +96,25 @@ public class VikingsTeleOp extends LinearOpMode {
             autoAim();
         }
 
-        if (gamepad.aWasPressed())
+        if (gamepad.aWasPressed()) // Scan Obelisk
         {
+            AprilTagDetection tag;
 
+            try
+            {
+                tag = aprilTagWebcam.scanObelisk();
+            }
+            catch (NoTagsDetectedException e)
+            {
+                telemetry.addLine("No obelisk tags detected!");
+                telemetry.update();
+                return;
+            }
+
+            telemetry.addLine("AprilTag ID " + tag.id + " detected!");
+            telemetry.update();
+
+            obeliskId = tag.id;
         }
 
         if (gamepad.bWasPressed())
