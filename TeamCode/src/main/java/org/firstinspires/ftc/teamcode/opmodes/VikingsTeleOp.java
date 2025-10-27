@@ -34,7 +34,7 @@ public class VikingsTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
-        aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, 2);
+        aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
