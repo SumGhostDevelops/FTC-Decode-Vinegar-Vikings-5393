@@ -143,16 +143,22 @@ public class VikingsTeleOp extends LinearOpMode {
 
         }
 
-        if (gamepad.leftBumperWasPressed() && (powerMultiplier > lowerMultiplierLimit)) // Lower speed
+        if (gamepad.leftBumperWasPressed()) // Lower speed
         {
-            powerMultiplier -= 0.05;
+            if (powerMultiplier > lowerMultiplierLimit)
+            {
+                powerMultiplier -= 0.05;
+            }
             telemetry.addData("Power Multiplier: ", powerMultiplier);
             telemetry.update();
         }
 
-        if (gamepad.rightBumperWasPressed() && (powerMultiplier < upperMultiplierLimit)) // Increase speed
+        if (gamepad.rightBumperWasPressed()) // Increase speed
         {
-            powerMultiplier += 0.05;
+            if (powerMultiplier < upperMultiplierLimit)
+            {
+                powerMultiplier -= 0.05;
+            }
             telemetry.addData("Power Multiplier: ", powerMultiplier);
             telemetry.update();
         }
