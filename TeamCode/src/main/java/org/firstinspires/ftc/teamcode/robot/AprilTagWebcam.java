@@ -121,6 +121,20 @@ public class AprilTagWebcam
     }
 
     /**
+     * Returns the list of cached detections.
+     * @return The list of cached detections.
+     */
+    public List<AprilTagDetection> getDetections() throws NoTagsDetectedException
+    {
+        if (cachedTagDetections.isEmpty())
+        {
+            throw new NoTagsDetectedException();
+        }
+
+        return cachedTagDetections;
+    }
+
+    /**
      * Closes the vision portal.
      */
     public void close()
