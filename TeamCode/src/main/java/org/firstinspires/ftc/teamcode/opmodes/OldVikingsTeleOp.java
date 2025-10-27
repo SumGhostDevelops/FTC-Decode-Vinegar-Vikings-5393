@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.util.TurningMath;
-import org.firstinspires.ftc.teamcode.robot.VisionHelper;
+import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
@@ -30,7 +30,7 @@ public class OldVikingsTeleOp extends LinearOpMode {
 
 
     ControlHub hub = new ControlHub();
-    VisionHelper visionHelper;
+    AprilTagWebcam aprilTagWebcam;
     WebcamName camera = hub.camera;
 
 
@@ -39,7 +39,7 @@ public class OldVikingsTeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         hub.init(hardwareMap, new Pose2d(10,10,Math.toRadians(Math.PI/2)));
 
-        visionHelper = new VisionHelper(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, 2);
+        aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, 2);
 
         waitForStart();
         while (opModeIsActive())
@@ -47,7 +47,7 @@ public class OldVikingsTeleOp extends LinearOpMode {
             motorAction(gamepad1);
         }
 
-        visionHelper.close();
+        aprilTagWebcam.close();
     }
 
     public void motorAction(Gamepad gamepad) throws InterruptedException
@@ -80,12 +80,12 @@ public class OldVikingsTeleOp extends LinearOpMode {
             if (!yButtonPressed)
             {
                 AprilTagDetection tag;
-                visionHelper.updateDetections();
+                aprilTagWebcam.updateDetections();
 
                 // Getting an AprilTag is a dangerous method, so simply restart the iteration if there is an error
                 try
                 {
-                    tag = visionHelper.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
+                    tag = aprilTagWebcam.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
                 }
                 catch (NoTagsDetectedException | TooManyTagsDetectedException e)
                 {

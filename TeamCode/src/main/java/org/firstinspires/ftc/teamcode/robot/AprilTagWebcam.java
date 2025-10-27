@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import java.util.List;
 
-public class VisionHelper
+public class AprilTagWebcam
 {
     private AprilTagProcessor tagProcessor;
     private VisionPortal visionPortal;
@@ -19,7 +19,13 @@ public class VisionHelper
 
     private List<AprilTagDetection> detections;
 
-    public VisionHelper(double[] lensIntrinsics, WebcamName webcamName, int debugLevel) // TODO: Remove debug level cus I swear it doesn't work/doesn't get used
+    /**
+     * Creates a new VisionHelper.
+     * @param lensIntrinsics The lens intrinsics of the camera.
+     * @param webcamName     The name of the webcam.
+     * @param debugLevel     The level of debug information to show.
+     */
+    public AprilTagWebcam(double[] lensIntrinsics, WebcamName webcamName, int debugLevel) // TODO: Remove debug level cus I swear it doesn't work/doesn't get used
     {
         // lens instrinsics dont worry about it
         double fx = lensIntrinsics[0];
