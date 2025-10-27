@@ -48,7 +48,6 @@ public class AprilTagWebcam
                 .addProcessor(tagProcessor)
                 .setCamera(webcamName)
                 .setCameraResolution(new Size(640, 480))
-                .enableLiveView(showLiveView)
                 .build();
 
     }
