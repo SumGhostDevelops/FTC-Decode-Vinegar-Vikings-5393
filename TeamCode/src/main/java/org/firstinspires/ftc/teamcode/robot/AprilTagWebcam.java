@@ -121,17 +121,20 @@ public class AprilTagWebcam
     }
 
     /**
-     * Returns the list of cached detections.
-     * @return The list of cached detections.
+     * Returns the first AprilTagDetection with an obelisk ID and returns an error otherwise.
+     * @return The first AprilTagDetection with an obelisk ID.
      */
-    public List<AprilTagDetection> getDetections() throws NoTagsDetectedException
+    public AprilTagDetection scanObelisk() throws NoTagsDetectedException
     {
-        if (cachedTagDetections.isEmpty())
+        for (AprilTagDetection tag: cachedTagDetections)  // TODO: Add check to see if there is only 1 valid tag in the list since we might detect more than 1 tag on the obelisk
         {
-            throw new NoTagsDetectedException();
+            if (tag.id == 21 || tag.id == 22 || tag.id == 23)
+            {
+                return tag;
+            }
         }
 
-        return cachedTagDetections;
+        throw new NoTagsDetectedException();
     }
 
     /**
