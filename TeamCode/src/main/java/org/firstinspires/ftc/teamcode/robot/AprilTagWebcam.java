@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import android.util.Size;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
@@ -14,18 +18,16 @@ public class AprilTagWebcam
 {
     private AprilTagProcessor tagProcessor;
     private VisionPortal visionPortal;
-    private boolean showLiveView;
-    private boolean showDebugText;
 
-    private List<AprilTagDetection> detections;
+    private List<AprilTagDetection> cachedTagDetections;
 
     /**
      * Creates a new VisionHelper.
      * @param lensIntrinsics The lens intrinsics of the camera.
      * @param webcamName     The name of the webcam.
-     * @param debugLevel     The level of debug information to show.
+     * @param showLiveView   Whether to show the live view of the camera.
      */
-    public AprilTagWebcam(double[] lensIntrinsics, WebcamName webcamName, int debugLevel) // TODO: Remove debug level cus I swear it doesn't work/doesn't get used
+    public AprilTagWebcam(double[] lensIntrinsics, WebcamName webcamName, boolean showLiveView) // TODO: Remove debug level cus I swear it doesn't work/doesn't get used
     {
         // lens instrinsics dont worry about it
         double fx = lensIntrinsics[0];
@@ -33,56 +35,22 @@ public class AprilTagWebcam
         double cx = lensIntrinsics[2];
         double cy = lensIntrinsics[3];
 
-        if (debugLevel < 0 || debugLevel > 2)
-        {
-            throw new IllegalArgumentException(debugLevel + " is not within the valid range of 0-2.");
-        }
-
-        switch (debugLevel)
-        {
-            case 0: // production
-            {
-                showDebugText = false;
-                showLiveView = false;
-                break;
-            }
-            case 1: // only text
-            {
-                showDebugText = true;
-                showLiveView = false;
-                break;
-            }
-            case 2: // only live view
-            {
-                showDebugText = false;
-                showLiveView = true;
-                break;
-            }
-        }
-
         tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(showLiveView)
                 .setDrawCubeProjection(showLiveView)
                 .setDrawTagID(showLiveView)
                 .setDrawTagOutline(showLiveView)
                 .setLensIntrinsics(fx, fy, cx, cy)
+                .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES)
                 .build();
 
         visionPortal = new VisionPortal.Builder()
                 .addProcessor(tagProcessor)
                 .setCamera(webcamName)
-                //.setCameraResolution(new Size(RESOLUTION_HEIGHT, RESOLUTION_WIDTH)) this crashes the driverhub for some reason lol
+                .setCameraResolution(new Size(640, 480))
                 .enableLiveView(showLiveView)
                 .build();
 
-    }
-
-    /**
-     * Returns the cached detections. These are only the detections from the last checked updateDetections() frame.
-     */
-    private List<AprilTagDetection> getCachedDetections()
-    {
-        return this.detections;
     }
 
     /**
@@ -90,7 +58,7 @@ public class AprilTagWebcam
      */
     public void updateDetections()
     {
-        this.detections = tagProcessor.getDetections();
+        this.cachedTagDetections = tagProcessor.getDetections();
     }
 
     /**
@@ -100,10 +68,8 @@ public class AprilTagWebcam
      */
     public boolean tagIdExists(int id)
     {
-        List<AprilTagDetection> tags = getCachedDetections();
-
         // Iterate through all of the tags and check if any of them match the requested ID
-        for (AprilTagDetection tag: tags)
+        for (AprilTagDetection tag: cachedTagDetections)
         {
             if (tag.id == id)
             {
@@ -120,18 +86,16 @@ public class AprilTagWebcam
      */
     public AprilTagDetection getSingleDetection() throws NoTagsDetectedException, TooManyTagsDetectedException
     {
-        List<AprilTagDetection> detections = getCachedDetections();
-
-        if (detections.isEmpty())
+        if (cachedTagDetections.isEmpty())
         {
             throw new NoTagsDetectedException();
         }
-        else if (detections.size() > 1)
+        else if (cachedTagDetections.size() > 1)
         {
-            throw new TooManyTagsDetectedException(1, detections.size());
+            throw new TooManyTagsDetectedException(1, cachedTagDetections.size());
         }
 
-        return detections.get(0);
+        return cachedTagDetections.get(0);
     }
 
     /**
@@ -141,9 +105,7 @@ public class AprilTagWebcam
      */
     public AprilTagDetection getSingleDetection(int id) throws NoTagsDetectedException, TagNotFoundException
     {
-        List<AprilTagDetection> detections = getCachedDetections();
-
-        if (detections.isEmpty())
+        if (cachedTagDetections.isEmpty())
         {
             throw new NoTagsDetectedException();
         }
@@ -152,7 +114,7 @@ public class AprilTagWebcam
             throw new TagNotFoundException(id);
         }
 
-        return detections.get(0);
+        return cachedTagDetections.get(0);
     }
 
     /**
