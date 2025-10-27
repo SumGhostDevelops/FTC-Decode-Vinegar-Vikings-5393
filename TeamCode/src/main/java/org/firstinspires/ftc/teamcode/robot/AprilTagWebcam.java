@@ -61,9 +61,9 @@ public class AprilTagWebcam
     }
 
     /**
-     * Checks if an AprilTag with a certain ID is in the cached detections.
+     * Checks if an AprilTag with a certain ID is in the list of cached detections.
      * @param id The ID of the AprilTag to check.
-     * @return Whether the AprilTag with the requested ID is in the cached detections.
+     * @return Whether the AprilTag with the requested ID is in the list cached detections.
      */
     public boolean tagIdExists(int id)
     {
@@ -108,12 +108,16 @@ public class AprilTagWebcam
         {
             throw new NoTagsDetectedException();
         }
-        else if (!tagIdExists(id))
+
+        for (AprilTagDetection tag: cachedTagDetections)
         {
-            throw new TagNotFoundException(id);
+            if (tag.id == id)
+            {
+                return tag;
+            }
         }
 
-        return cachedTagDetections.get(0);
+        throw new TagNotFoundException(id);
     }
 
     /**
