@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
+import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -125,8 +126,13 @@ public class AprilTagWebcam
      * Returns the first AprilTagDetection with an obelisk ID and returns an error otherwise.
      * @return The first AprilTagDetection with an obelisk ID.
      */
-    public AprilTagDetection scanObelisk() throws NoTagsDetectedException
+    public AprilTagDetection scanObelisk() throws NoTagsDetectedException, UnexpectedTagIDException
     {
+        if (cachedTagDetections.isEmpty())
+        {
+            throw new NoTagsDetectedException();
+        }
+
         for (AprilTagDetection tag: cachedTagDetections)  // TODO: Add check to see if there is only 1 valid tag in the list since we might detect more than 1 tag on the obelisk
         {
             if (tag.id == 21 || tag.id == 22 || tag.id == 23)
@@ -135,7 +141,7 @@ public class AprilTagWebcam
             }
         }
 
-        throw new NoTagsDetectedException();
+        throw new UnexpectedTagIDException();
     }
 
     /**

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
@@ -106,7 +107,13 @@ public class VikingsTeleOp extends LinearOpMode {
             }
             catch (NoTagsDetectedException e)
             {
-                telemetry.addLine("No obelisk tags detected!");
+                telemetry.addLine("No tags detected.");
+                telemetry.update();
+                return;
+            }
+            catch (UnexpectedTagIDException e)
+            {
+                telemetry.addLine("Tags were detected, but none were a valid obelisk tag.");
                 telemetry.update();
                 return;
             }
