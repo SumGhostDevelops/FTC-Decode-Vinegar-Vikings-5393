@@ -310,7 +310,7 @@ public class VikingsTeleOp extends LinearOpMode {
             telemetry.update();
 
             // The loop continues as long as the robot is not within the tolerance range and the opmode is active.
-        } while (Math.abs(error) > tolerance && opModeIsActive());
+        } while (Math.abs(error) > tolerance && opModeIsActive() && !gamepad1.yWasPressed());
 
         // Stop all motors once the turn is complete.
         hub.leftFront.setPower(0);
