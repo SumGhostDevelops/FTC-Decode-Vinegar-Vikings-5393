@@ -276,10 +276,10 @@ public class VikingsTeleOp extends LinearOpMode {
         telemetry.update();
 
         // Call the new PID turning method
-        turnToAnglePID(targetAngle);
+        turnToAngle(targetAngle);
     }
 
-    private void turnToAnglePID(double targetAngle) {
+    private void turnToAngle(double targetAngle) {
         // A simple P-controller for turning. You can tune this value.
         double kP = 0.05; // Proportional gain - START with a small value and tune it.
         double error;
