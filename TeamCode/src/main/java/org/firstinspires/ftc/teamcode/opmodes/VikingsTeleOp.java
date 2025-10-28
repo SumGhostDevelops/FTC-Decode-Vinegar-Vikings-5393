@@ -315,5 +315,4 @@ public class VikingsTeleOp extends LinearOpMode {
         telemetry.addLine("Finished turning!");
         telemetry.update();
     }
-
 }
