@@ -111,7 +111,6 @@ public class VikingsTeleOp extends LinearOpMode {
                 return;
             }
 
-            telemetry.addLine("Old Obelisk ID: " + obeliskId);
             telemetry.addLine("New Obelisk ID: " + tag.id);
             telemetry.update();
 
