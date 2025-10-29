@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
-import org.firstinspires.ftc.teamcode.util.TurningMath;
+import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -97,7 +97,7 @@ public class OldVikingsTeleOp extends LinearOpMode {
                 // Resolve the Yaw and time it takes to turn
                 double yaw = tag.ftcPose.yaw;
 
-                double time = TurningMath.Calculate(yaw) * 2.5;
+                double time = RobotMath.Calculate(yaw) * 2.5;
 
                 if (yaw > 0)
                 {
