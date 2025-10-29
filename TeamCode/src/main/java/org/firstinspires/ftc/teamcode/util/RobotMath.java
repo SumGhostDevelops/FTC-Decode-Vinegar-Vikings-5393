@@ -15,9 +15,9 @@ public class RobotMath
         return Math.abs(timeToTurnNinety * (degrees / 90.0));
     }
 
-    public static double angleAddition(double currentHeading, double headingToCorrect)
+    public static double angleAddition(double currentHeading, double headingToCorrectBy)
     {
-        double sum = currentHeading + headingToCorrect;
+        double sum = currentHeading + headingToCorrectBy;
 
         // Use the modulo operator to handle wrapping around 360 degrees
         double normalized = sum % 360.0;
