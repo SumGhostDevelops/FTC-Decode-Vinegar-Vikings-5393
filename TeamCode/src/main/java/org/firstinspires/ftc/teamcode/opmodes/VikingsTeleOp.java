@@ -13,11 +13,9 @@ import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
-import org.firstinspires.ftc.teamcode.util.TurningMath;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
+import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.List;
 
 
 @TeleOp(name="VikingsTeleOp")
@@ -134,9 +132,13 @@ public class VikingsTeleOp extends LinearOpMode {
 
         }
 
-        if (gamepad.dpadDownWasPressed())
+        if (gamepad.dpadDownWasPressed()) // Mostly a demo. Can be removed later. Turns the bot around 180 degrees.
         {
+            double currentBotHeading = hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
+            double newAngle = RobotMath.angleAddition(currentBotHeading, 180);
+
+            turnToAngle(newAngle);
         }
 
         if (gamepad.dpadLeftWasPressed())
@@ -268,7 +270,7 @@ public class VikingsTeleOp extends LinearOpMode {
         double currentBotHeading = hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         // Calculate the absolute target angle for the robot to face.
-        double targetAngle = currentBotHeading + yawToCorrect;
+        double targetAngle = RobotMath.angleAddition(currentBotHeading, yawToCorrect);
 
         telemetry.addData("Vision Yaw Correction: ", yawToCorrect);
         telemetry.addData("Current Heading: ", currentBotHeading);
