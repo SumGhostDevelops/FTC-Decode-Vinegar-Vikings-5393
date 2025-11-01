@@ -97,23 +97,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.aWasPressed()) // Scan Obelisk
         {
-            int newObeliskId = Actions.scanObelisk(robot);
-
-            if (newObeliskId != -1)
-            {
-                obeliskId = newObeliskId;
-            }
-            else if (newObeliskId != obeliskId)
-            {
-                obeliskId = newObeliskId;
-                telemetry.addLine("New Obelisk ID: " + newObeliskId);
-                telemetry.update();
-            }
-            else
-            {
-                telemetry.addLine("The same obelisk was detected.");
-                telemetry.update();
-            }
+            Actions.scanObelisk(robot);
         }
 
         if (gamepad.bWasPressed())
