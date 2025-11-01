@@ -60,6 +60,7 @@ public class Actions
 
         robot.status.setMode("Manual");
         robot.status.clearExtra();
+        robot.telemetry.log().add("Finished turning.");
         robot.status.updateTelemetry(robot.telemetry);
         robot.telemetry.log().add("Finished turning.");
     }
