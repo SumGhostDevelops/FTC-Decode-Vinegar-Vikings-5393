@@ -25,8 +25,6 @@ public class VikingsTeleOp extends LinearOpMode {
     private final double lowerMultiplierLimit = 0.05;
     private double powerMultiplier = 0.5; // initial power reduction value
 
-    private int obeliskId;
-
     // Initialize some stuff
     ControlHub hub = new ControlHub();
     AprilTagWebcam aprilTagWebcam;
