@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gam
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
 import org.firstinspires.ftc.teamcode.util.ObeliskHelper;
@@ -135,9 +136,9 @@ public class Actions
 
         try
         {
-            tag = robot.webcam.getSingleDetection();
+            tag = robot.webcam.getSingleDetection(tagId);
         }
-        catch (NoTagsDetectedException | TooManyTagsDetectedException e)
+        catch (NoTagsDetectedException | TagNotFoundException e)
         {
             robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
             return;
