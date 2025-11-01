@@ -178,6 +178,24 @@ public class Actions
         turnToAngle(robot, targetAngle);
     }
 
+    private static void aimToAprilTag(Robot robot, AprilTagDetection tag)
+    {
+        // Get the yaw from the AprilTag detection. This is how many degrees we need to turn.
+        double yawToCorrect = tag.ftcPose.yaw;
+
+        // Get the robot's current heading from the IMU.
+        double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+
+        // Calculate the absolute target angle for the robot to face.
+        double targetAngle = RobotMath.angleAddition(currentBotHeading, yawToCorrect);
+
+        robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
+        robot.telemetry.update();
+
+        // Call the new PID turning method
+        turnToAngle(robot, targetAngle);
+    }
+
     public static void move(Robot robot)
     {
         Wheels wheels = robot.wheels;
