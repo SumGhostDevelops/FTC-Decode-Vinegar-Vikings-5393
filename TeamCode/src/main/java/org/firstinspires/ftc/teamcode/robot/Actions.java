@@ -138,4 +138,12 @@ public class Actions
         // Call the new PID turning method
         turnToAngle(robot, targetAngle);
     }
+
+    public static void move(Robot robot)
+    {
+        robot.hub.leftFront.setPower(robot.status.getSpeed());
+        robot.hub.leftBack.setPower(robot.status.getSpeed());
+        robot.hub.rightFront.setPower(robot.status.getSpeed());
+        robot.hub.rightBack.setPower(robot.status.getSpeed());
+    }
 }
