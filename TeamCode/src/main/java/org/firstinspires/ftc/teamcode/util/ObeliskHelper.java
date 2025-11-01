@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
-public class ObeliskConversion
+public class ObeliskHelper
 {
     public static String idToString(int obeliskId)
     {
@@ -30,5 +30,15 @@ public class ObeliskConversion
             default:
                 throw new IllegalArgumentException(obeliskString + " is not a valid obelisk combination.");
         }
+    }
+
+    public static boolean isObelisk(int obeliskId)
+    {
+        if (obeliskId >= 21 && obeliskId <= 23)
+        {
+            return true;
+        }
+
+        return false;
     }
 }
