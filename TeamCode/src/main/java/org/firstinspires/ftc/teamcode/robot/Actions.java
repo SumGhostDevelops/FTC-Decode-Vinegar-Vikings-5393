@@ -146,12 +146,6 @@ public class Actions
         AprilTagDetection tag;
         robot.webcam.updateDetections();
 
-        if (!robot.webcam.tagIdExists(tagId))
-        {
-            robot.telemetry.log().add("Auto Aim command cancelled. Error: AprilTag w/ ID " + tagId + " not found.");
-            return;
-        }
-
         try
         {
             tag = robot.webcam.getSingleDetection();
