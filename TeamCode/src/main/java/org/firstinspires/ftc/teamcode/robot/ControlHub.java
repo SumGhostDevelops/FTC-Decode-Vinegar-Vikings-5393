@@ -20,6 +20,7 @@ public class ControlHub
     public DcMotor rightFront;
     public DcMotor leftBack;
     public DcMotor rightBack;
+    public DcMotor launcher;
     public WebcamName camera;
     public IMU imu;
 
@@ -39,5 +40,6 @@ public class ControlHub
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         camera = map.get(WebcamName.class,"Webcam 1");
         drive = new MecanumDrive(map,initialPose);
+        launcher = map.get(DcMotor.class, "launcher");
     }
 }
