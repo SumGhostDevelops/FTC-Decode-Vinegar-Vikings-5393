@@ -143,9 +143,13 @@ public class VikingsTeleOp extends LinearOpMode {
             robot.status.updateTelemetry(telemetry);
         }
 
-        if (gamepad.right_trigger > 0.25) // Shoot
+        if (gamepad.right_trigger > 0.15) // Shoot
         {
-            Actions.launchBall(robot);
+            robot.hub.launcher.setPower(gamepad.right_trigger * 0.8);
+        }
+        else
+        {
+            robot.hub.launcher.setPower(0);
         }
 
         if (gamepad.left_trigger > 0.25)
@@ -155,6 +159,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         // Handle movement inputs
         Actions.move(robot);
+
         robot.telemetry.update();
     }
     /*

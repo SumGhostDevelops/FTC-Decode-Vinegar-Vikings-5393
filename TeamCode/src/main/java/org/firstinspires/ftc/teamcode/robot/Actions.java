@@ -180,4 +180,9 @@ public class Actions
     {
         Launcher.launch(robot);
     }
+
+    public static void manualLaunchBall(Robot robot)
+    {
+        Launcher.manualLaunch(robot);
+    }
 }

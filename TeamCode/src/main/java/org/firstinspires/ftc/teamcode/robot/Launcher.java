@@ -15,4 +15,9 @@ public class Launcher
         }
         robot.hub.launcher.setPower(0);
     }
+
+    public static void manualLaunch(Robot robot)
+    {
+        robot.hub.launcher.setPower(robot.gamepad.right_trigger * 0.8);
+    }
 }

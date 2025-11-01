@@ -64,4 +64,9 @@ public class Wheels
         rightFront = power;
         rightBack = power;
     }
+
+    public boolean isNonZeroPower()
+    {
+        return leftFront != 0 || leftBack != 0 || rightFront != 0 || rightBack != 0;
+    }
 }
