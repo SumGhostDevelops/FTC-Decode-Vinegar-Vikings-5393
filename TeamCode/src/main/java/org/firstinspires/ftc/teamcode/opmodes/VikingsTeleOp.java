@@ -21,9 +21,8 @@ import org.firstinspires.ftc.teamcode.util.RobotMath;
 public class VikingsTeleOp extends LinearOpMode {
     // Arbritary values for stuff
     // TODO: Tune these speeds OR make them easily editable (FTC dashboard?)
-    private final double upperMultiplierLimit = 0.75;
-    private final double lowerMultiplierLimit = 0.05;
-    private double powerMultiplier = 0.5; // initial power reduction value
+    private final double upperSpeedLimit = 0.75;
+    private final double lowerSpeedLimit = 0.05;
 
     // Initialize some stuff
     ControlHub hub = new ControlHub();
@@ -47,6 +46,8 @@ public class VikingsTeleOp extends LinearOpMode {
 
         hub.imu.initialize(parameters);
         hub.imu.resetYaw();
+
+        telemetry.setAutoClear(false);
 
         waitForStart();
         while (opModeIsActive()) {
@@ -129,22 +130,20 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.leftBumperWasPressed()) // Lower speed
         {
-            if (powerMultiplier > lowerMultiplierLimit)
+            if (robot.status.getSpeed() - 0.05 >= lowerSpeedLimit)
             {
-                powerMultiplier -= 0.05;
+                robot.status.setSpeed(robot.status.getSpeed() - 0.05);
             }
-            telemetry.addData("Power Multiplier: ", powerMultiplier);
-            telemetry.update();
+            robot.status.updateTelemetry(telemetry);
         }
 
         if (gamepad.rightBumperWasPressed()) // Increase speed
         {
-            if (powerMultiplier < upperMultiplierLimit)
+            if (robot.status.getSpeed() + 0.05 <= upperSpeedLimit)
             {
-                powerMultiplier -= 0.05;
+                robot.status.setSpeed(robot.status.getSpeed() + 0.05);
             }
-            telemetry.addData("Power Multiplier: ", powerMultiplier);
-            telemetry.update();
+            robot.status.updateTelemetry(telemetry);
         }
 
         if (gamepad.right_trigger > 0.25) // Shoot
@@ -158,12 +157,7 @@ public class VikingsTeleOp extends LinearOpMode {
         }
 
         // Handle movement inputs
-        hub.leftFront.setPower(frontLeftPower * powerMultiplier);
-        hub.leftBack.setPower(backLeftPower * powerMultiplier);
-        hub.rightFront.setPower(frontRightPower * powerMultiplier);
-        hub.rightBack.setPower(backRightPower * powerMultiplier);
-
-        telemetry.update();
+        Actions.move(robot);
     }
     /*
     private void autoAim()
