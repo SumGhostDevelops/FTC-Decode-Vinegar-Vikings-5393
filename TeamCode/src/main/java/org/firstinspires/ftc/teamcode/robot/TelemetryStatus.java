@@ -2,49 +2,85 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.*;
+
 public class TelemetryStatus
 {
     private String mode;
+    private double speed;
     private String obeliskCombination;
-    private String extra = "";
+    private Map<String, String> extra;
 
-    public TelemetryStatus(String mode, String obeliskCombination)
+    public TelemetryStatus()
     {
-        this.mode = mode;
-        this.obeliskCombination = obeliskCombination;
+        this.mode = "Manual";
+        this.speed = 0;
+        this.obeliskCombination = "";
+        this.extra = new HashMap<String, String>();
     }
 
-    public TelemetryStatus(String mode, String obeliskCombination, String extra)
+    public TelemetryStatus(double speed, String obeliskCombination, Map<String, String> extra)
     {
-        this.mode = mode;
+        this.mode = "Manual";
+        this.speed = speed;
         this.obeliskCombination = obeliskCombination;
         this.extra = extra;
     }
 
-    public void updateMode(String mode)
+    public String getMode()
+    {
+        return mode;
+    }
+
+    public double getSpeed()
+    {
+        return speed;
+    }
+
+    public String getObeliskCombination()
+    {
+        return obeliskCombination;
+    }
+
+    public Map<String, String> getExtra()
+    {
+        return extra;
+    }
+
+    public void setMode(String mode)
     {
         this.mode = mode;
     }
 
-    public void updateObeliskCombination(String obeliskCombination)
+    public void setSpeed(double speed)
+    {
+        this.speed = speed;
+    }
+
+    public void setObeliskCombination(String obeliskCombination)
     {
         this.obeliskCombination = obeliskCombination;
     }
 
-    public void updateExtra(String extra)
+    public void setExtra(Map<String, String> extra)
     {
         this.extra = extra;
     }
 
-    public void updateTelemetry(Telemetry telemetry)
+    public void update(Telemetry telemetry)
     {
         telemetry.clear();
+
         telemetry.addData("Mode", mode);
+        telemetry.addData("Speed", speed);
         telemetry.addData("Obelisk Combination", obeliskCombination);
 
-        if (extra != "")
+        if (!extra.isEmpty())
         {
-            telemetry.addData("Extra", extra);
+            for (Map.Entry<String, String> entry : extra.entrySet())
+            {
+                telemetry.addData(entry.getKey(), entry.getValue());
+            }
         }
 
         telemetry.update();
