@@ -176,33 +176,8 @@ public class Actions
         robot.hub.rightBack.setPower(wheels.getRightBackPower() * speed);
     }
 
-    public static void scanTag24(Robot robot)
+    public static void launchBall(Robot robot)
     {
-        AprilTagDetection tag;
-        robot.webcam.updateDetections();
-
-        try
-        {
-            tag = robot.webcam.getSingleDetection();
-        }
-        catch (NoTagsDetectedException | TooManyTagsDetectedException e)
-        {
-            robot.telemetry.log().add("Scan cancelled. Error: " + e.getMessage());
-            return;
-        }
-
-        if (tag.id != 24)
-        {
-            robot.telemetry.log().add("ID targeted is not ID 24.");
-            return;
-        }
-
-        robot.telemetry.log().add("Detected Tag ID: " + tag.id);
-        robot.telemetry.log().add("x: " + tag.ftcPose.x);
-        robot.telemetry.log().add("y: " + tag.ftcPose.y);
-        robot.telemetry.log().add("z: " + tag.ftcPose.z);
-        robot.telemetry.log().add("roll: " + tag.ftcPose.roll);
-        robot.telemetry.log().add("pitch: " + tag.ftcPose.pitch);
-        robot.telemetry.log().add("yaw: " + tag.ftcPose.yaw);
+        Launcher.launch(robot);
     }
 }
