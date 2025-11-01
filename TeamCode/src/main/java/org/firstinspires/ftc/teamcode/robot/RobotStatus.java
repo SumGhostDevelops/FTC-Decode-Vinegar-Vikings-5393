@@ -69,6 +69,16 @@ public class RobotStatus
         this.extra = extra;
     }
 
+    public void addExtra(String key, String value)
+    {
+        extra.put(key, value);
+    }
+
+    public void clearExtra()
+    {
+        extra.clear();
+    }
+
     public void updateTelemetry(Telemetry telemetry)
     {
         telemetry.clear();
