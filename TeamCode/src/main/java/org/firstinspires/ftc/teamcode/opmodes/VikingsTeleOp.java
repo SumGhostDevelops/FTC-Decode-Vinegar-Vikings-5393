@@ -24,6 +24,7 @@ public class VikingsTeleOp extends LinearOpMode {
     // TODO: Tune these speeds OR make them easily editable (FTC dashboard?)
     private final double upperSpeedLimit = 0.75;
     private final double lowerSpeedLimit = 0.05;
+    private final int goalTagId = 24;
 
     // Initialize some stuff
     Robot robot;
@@ -87,7 +88,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            Actions.aimToAprilTag(robot, 24);
+            Actions.aimToAprilTag(robot, goalTagId);
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk
@@ -144,7 +145,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.right_trigger > 0.25) // Shoot
         {
-
+            Actions.launchBall(robot);
         }
 
         if (gamepad.left_trigger > 0.25)
