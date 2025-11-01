@@ -142,9 +142,12 @@ public class Actions
 
     public static void move(Robot robot)
     {
-        robot.hub.leftFront.setPower(robot.status.getSpeed());
-        robot.hub.leftBack.setPower(robot.status.getSpeed());
-        robot.hub.rightFront.setPower(robot.status.getSpeed());
-        robot.hub.rightBack.setPower(robot.status.getSpeed());
+        Wheels wheels = robot.wheels;
+        double speed = robot.status.getSpeed();
+
+        robot.hub.leftFront.setPower(wheels.getLeftFrontPower() * speed);
+        robot.hub.leftBack.setPower(wheels.getLeftBackPower() * speed);
+        robot.hub.rightFront.setPower(wheels.getRightFrontPower() * speed);
+        robot.hub.rightBack.setPower(wheels.getRightBackPower() * speed);
     }
 }
