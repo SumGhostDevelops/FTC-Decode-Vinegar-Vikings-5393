@@ -9,10 +9,15 @@ import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import java.util.*;
+
 public class Actions
 {
     public static void turnToAngle(Robot robot, double targetAngle)
     {
+        Map<String, String> telemetryExtra = new HashMap<String, String>();
+
+        robot.telemetry.log().add("-turnToAngle--------");
         // A simple P-controller for turning. You can tune this value.
         double kP = 0.05; // Proportional gain - START with a small value and tune it.
         double error;
@@ -37,9 +42,13 @@ public class Actions
             robot.hub.rightFront.setPower(-motorPower);
             robot.hub.rightBack.setPower(-motorPower);
 
-            robot.telemetry.addData("Current Angle", currentAngle);
-            robot.telemetry.addData("Target Angle", targetAngle);
-            robot.telemetry.addData("Error", error);
+            robot.status.setMode("Automatic (Turning)");
+            telemetryExtra.put("Current Angle", String.format("%.1f", motorPower));
+            telemetryExtra.put("Target Angle", String.format("%.1f", targetAngle));
+            telemetryExtra.put("Error", String.format("%.1f", error));
+            robot.status.setExtra(telemetryExtra);
+
+            robot.status.updateTelemetry(robot.telemetry);
             robot.telemetry.update();
 
             // The loop continues as long as the robot is not within the tolerance range and the opmode is active.
@@ -51,8 +60,10 @@ public class Actions
         robot.hub.rightFront.setPower(0);
         robot.hub.rightBack.setPower(0);
 
-        robot.telemetry.addLine("Finished turning!");
-        robot.telemetry.update();
+        robot.status.setMode("Manual");
+        robot.status.clearExtra();
+        robot.status.updateTelemetry(robot.telemetry);
+        robot.telemetry.log().add("Finished turning.");
     }
 
     public static int scanObelisk(Robot robot)
@@ -65,25 +76,29 @@ public class Actions
         }
         catch (NoTagsDetectedException e)
         {
-            robot.telemetry.addLine("No tags detected.");
+            robot.telemetry.log().add("No tags detected.");
             robot.telemetry.update();
             return -1;
         }
         catch (UnexpectedTagIDException e)
         {
-            robot.telemetry.addLine("Tags were detected, but none were a valid obelisk tag.");
+            robot.telemetry.log().add("Tags were detected, but none were a valid obelisk tag.");
             robot.telemetry.update();
             return -1;
         }
 
-        robot.telemetry.addLine("New Obelisk ID: " + tag.id);
-        robot.telemetry.update();
+        robot.telemetry.clear();
+        robot.status.setMode("Manual");
+        robot.status.setObeliskId(tag.id);
+        robot.telemetry.log().add("New Obelisk ID: " + tag.id);
+        robot.status.updateTelemetry(robot.telemetry);
 
         return tag.id;
     }
 
     public static void aimToAprilTag(Robot robot)
     {
+        robot.telemetry.log().add("-aimToAprilTag---------");
         AprilTagDetection tag;
         robot.webcam.updateDetections();
 
@@ -93,8 +108,7 @@ public class Actions
         }
         catch (NoTagsDetectedException | TooManyTagsDetectedException e)
         {
-            robot.telemetry.addLine("Auto Aim command cancelled.");
-            robot.telemetry.addData("Error: ", e);
+            robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
             robot.telemetry.update();
             return;
         }
@@ -108,9 +122,7 @@ public class Actions
         // Calculate the absolute target angle for the robot to face.
         double targetAngle = RobotMath.angleAddition(currentBotHeading, yawToCorrect);
 
-        robot.telemetry.addData("Vision Yaw Correction: ", yawToCorrect);
-        robot.telemetry.addData("Current Heading: ", currentBotHeading);
-        robot.telemetry.addData("Target Heading: ", targetAngle);
+        robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
         robot.telemetry.update();
 
         // Call the new PID turning method
