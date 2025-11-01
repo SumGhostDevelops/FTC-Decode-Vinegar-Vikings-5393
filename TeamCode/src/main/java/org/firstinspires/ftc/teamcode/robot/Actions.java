@@ -62,7 +62,6 @@ public class Actions
         robot.status.clearExtra();
         robot.telemetry.log().add("Finished turning.");
         robot.status.updateTelemetry(robot.telemetry);
-        robot.telemetry.log().add("Finished turning.");
     }
 
     public static void scanObelisk(Robot robot)
