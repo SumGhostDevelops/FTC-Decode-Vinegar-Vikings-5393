@@ -154,6 +154,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         // Handle movement inputs
         Actions.move(robot);
+        robot.telemetry.update();
     }
     /*
     private void autoAim()
