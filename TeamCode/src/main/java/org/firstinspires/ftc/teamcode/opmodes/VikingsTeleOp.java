@@ -9,15 +9,12 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
 import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
-import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
-import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.robot.RobotStatus;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 @TeleOp(name="VikingsTeleOp")
@@ -40,7 +37,7 @@ public class VikingsTeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
-        robot = new Robot(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive);
+        robot = new Robot(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new RobotStatus());
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -82,7 +79,7 @@ public class VikingsTeleOp extends LinearOpMode {
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-
+        telemetry.setAutoClear(false);
         // TODO: Add keybind system for different drivers
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
