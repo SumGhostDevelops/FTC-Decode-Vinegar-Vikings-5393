@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.util;
 
 public class ObeliskConversion
 {
-    private static String idToString(int obeliskId)
+    public static String idToString(int obeliskId)
     {
         switch (obeliskId)
         {
@@ -17,7 +17,7 @@ public class ObeliskConversion
         }
     }
 
-    private static int stringToId(String obeliskString)
+    public static int stringToId(String obeliskString)
     {
         switch (obeliskString)
         {
