@@ -193,7 +193,7 @@ public class Actions
 
         if (tag.id != 24)
         {
-            robot.telemetry.log().add("ID targetted is not ID 24.");
+            robot.telemetry.log().add("ID targeted is not ID 24.");
             return;
         }
 
