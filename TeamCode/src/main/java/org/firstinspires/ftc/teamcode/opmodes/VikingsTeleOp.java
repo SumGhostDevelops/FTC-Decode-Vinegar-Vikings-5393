@@ -85,9 +85,9 @@ public class VikingsTeleOp extends LinearOpMode {
             robot.wheels.setAllWheelsPower(0);
         }
 
-        if (gamepad.yWasPressed()) // Auto aim to AprilTag
+        if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            Actions.aimToAprilTag(robot);
+            Actions.aimToAprilTag(robot, 24);
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk

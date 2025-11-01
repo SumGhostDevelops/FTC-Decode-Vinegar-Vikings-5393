@@ -68,6 +68,7 @@ public class Actions
     {
         AprilTagDetection tag;
         robot.telemetry.log().add("-scanObelisk---------");
+        robot.webcam.updateDetections();
 
         try
         {
@@ -120,6 +121,44 @@ public class Actions
         {
             robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
             robot.telemetry.update();
+            return;
+        }
+
+        // Get the yaw from the AprilTag detection. This is how many degrees we need to turn.
+        double yawToCorrect = tag.ftcPose.yaw;
+
+        // Get the robot's current heading from the IMU.
+        double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+
+        // Calculate the absolute target angle for the robot to face.
+        double targetAngle = RobotMath.angleAddition(currentBotHeading, yawToCorrect);
+
+        robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
+        robot.telemetry.update();
+
+        // Call the new PID turning method
+        turnToAngle(robot, targetAngle);
+    }
+
+    public static void aimToAprilTag(Robot robot, int tagId)
+    {
+        robot.telemetry.log().add("-aimToAprilTag---------");
+        AprilTagDetection tag;
+        robot.webcam.updateDetections();
+
+        try
+        {
+            tag = robot.webcam.getSingleDetection();
+        }
+        catch (NoTagsDetectedException | TooManyTagsDetectedException e)
+        {
+            robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
+            robot.telemetry.update();
+            return;
+        }
+
+        if (tag.id != tagId)
+        {
             return;
         }
 
