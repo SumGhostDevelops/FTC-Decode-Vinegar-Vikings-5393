@@ -78,7 +78,11 @@ public class VikingsTeleOp extends LinearOpMode {
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        telemetry.setAutoClear(false);
+        robot.wheels.setLeftFrontPower((rotY + rotX + rx) / denominator);
+        robot.wheels.setLeftBackPower((rotY - rotX + rx) / denominator);
+        robot.wheels.setRightFrontPower((rotY - rotX - rx) / denominator);
+        robot.wheels.setRightBackPower((rotY + rotX - rx) / denominator);
+
         // TODO: Add keybind system for different drivers
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
