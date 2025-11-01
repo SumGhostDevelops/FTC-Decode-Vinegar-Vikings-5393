@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import org.firstinspires.ftc.teamcode.util.ObeliskConversion;
+import org.firstinspires.ftc.teamcode.util.ObeliskHelper;
 
 import java.util.*;
 
@@ -85,7 +85,7 @@ public class RobotStatus
 
         telemetry.addData("Mode", mode);
         telemetry.addData("Speed", speed);
-        telemetry.addData("Obelisk Combination", ObeliskConversion.idToString(obeliskId));
+        telemetry.addData("Obelisk Combination", ObeliskHelper.idToString(obeliskId));
 
         if (!extra.isEmpty())
         {
