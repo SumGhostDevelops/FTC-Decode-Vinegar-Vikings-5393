@@ -6,16 +6,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
+import org.firstinspires.ftc.teamcode.util.ObeliskHelper;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.*;
 
 public class Actions
 {
     public static void turnToAngle(Robot robot, double targetAngle)
     {
-        Map<String, String> telemetryExtra = new HashMap<String, String>();
+        robot.status.clearExtra();
 
         robot.telemetry.log().add("-turnToAngle--------");
         // A simple P-controller for turning. You can tune this value.
@@ -43,10 +42,9 @@ public class Actions
             robot.hub.rightBack.setPower(-motorPower);
 
             robot.status.setMode("Automatic (Turning)");
-            telemetryExtra.put("Current Angle", String.format("%.1f", motorPower));
-            telemetryExtra.put("Target Angle", String.format("%.1f", targetAngle));
-            telemetryExtra.put("Error", String.format("%.1f", error));
-            robot.status.setExtra(telemetryExtra);
+            robot.status.addExtra("Current Angle", String.format("%.1f", motorPower));
+            robot.status.addExtra("Target Angle", String.format("%.1f", targetAngle));
+            robot.status.addExtra("Error", String.format("%.1f", error));
 
             robot.status.updateTelemetry(robot.telemetry);
             robot.telemetry.update();
@@ -66,9 +64,10 @@ public class Actions
         robot.telemetry.log().add("Finished turning.");
     }
 
-    public static int scanObelisk(Robot robot)
+    public static void scanObelisk(Robot robot)
     {
         AprilTagDetection tag;
+        robot.telemetry.log().add("-scanObelisk---------");
 
         try
         {
@@ -78,22 +77,33 @@ public class Actions
         {
             robot.telemetry.log().add("No tags detected.");
             robot.telemetry.update();
-            return -1;
+            return;
         }
         catch (UnexpectedTagIDException e)
         {
             robot.telemetry.log().add("Tags were detected, but none were a valid obelisk tag.");
             robot.telemetry.update();
-            return -1;
+            return;
         }
 
-        robot.telemetry.clear();
+        if (tag.id == robot.status.getObeliskId())
+        {
+            robot.telemetry.log().add("The same obelisk was detected.");
+            robot.telemetry.update();
+            return;
+        }
+
+        if (!ObeliskHelper.isObelisk(tag.id))
+        {
+            robot.telemetry.log().add("The detected tag was not a valid obelisk tag.");
+            robot.telemetry.update();
+            return;
+        }
+
         robot.status.setMode("Manual");
         robot.status.setObeliskId(tag.id);
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
         robot.status.updateTelemetry(robot.telemetry);
-
-        return tag.id;
     }
 
     public static void aimToAprilTag(Robot robot)
