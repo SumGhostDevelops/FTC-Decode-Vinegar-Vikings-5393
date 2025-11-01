@@ -83,10 +83,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
         {
-            frontLeftPower = 0;
-            frontRightPower = 0;
-            backLeftPower = 0;
-            backRightPower = 0;
+            robot.wheels.setAllWheelsPower(0);
         }
 
         if (gamepad.yWasPressed()) // Auto aim to AprilTag
