@@ -14,9 +14,10 @@ public class Robot
     public Gamepad gamepad;
     public Supplier<Boolean> opModeIsActive;
     public RobotStatus status;
+    public Wheels wheels;
 
 
-    public Robot(ControlHub hub, AprilTagWebcam webcam, Telemetry telemetry, Gamepad gamepad, Supplier<Boolean> opModeIsActive, RobotStatus status)
+    public Robot(ControlHub hub, AprilTagWebcam webcam, Telemetry telemetry, Gamepad gamepad, Supplier<Boolean> opModeIsActive, RobotStatus status, Wheels wheels)
     {
         this.hub = hub;
         this.webcam = webcam;
@@ -24,5 +25,6 @@ public class Robot
         this.gamepad = gamepad;
         this.opModeIsActive = opModeIsActive;
         this.status = status;
+        this.wheels = wheels;
     }
 }
