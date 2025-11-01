@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 public class Launcher
 {
-    public static void Launch(Robot robot)
+    public static void launch(Robot robot)
     {
         robot.hub.launcher.setPower(0.75);
         try
