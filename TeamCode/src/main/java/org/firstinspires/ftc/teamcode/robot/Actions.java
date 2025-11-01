@@ -107,7 +107,7 @@ public class Actions
         robot.status.updateTelemetry(robot.telemetry);
     }
 
-    public static void aimToAprilTag(Robot robot)
+    public static void aimToAnyAprilTag(Robot robot, String pickingMethod)
     {
         robot.telemetry.log().add("-aimToAprilTag---------");
         AprilTagDetection tag;
