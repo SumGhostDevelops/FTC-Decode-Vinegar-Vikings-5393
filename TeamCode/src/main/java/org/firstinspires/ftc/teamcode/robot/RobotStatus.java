@@ -2,28 +2,30 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import org.firstinspires.ftc.teamcode.util.ObeliskConversion;
+
 import java.util.*;
 
-public class TelemetryStatus
+public class RobotStatus
 {
     private String mode;
     private double speed;
-    private String obeliskCombination;
+    private int obeliskId;
     private Map<String, String> extra;
 
-    public TelemetryStatus()
+    public RobotStatus()
     {
         this.mode = "Manual";
         this.speed = 0;
-        this.obeliskCombination = "";
+        this.obeliskId = -1;
         this.extra = new HashMap<String, String>();
     }
 
-    public TelemetryStatus(double speed, String obeliskCombination, Map<String, String> extra)
+    public RobotStatus(double speed, int obeliskId, Map<String, String> extra)
     {
         this.mode = "Manual";
         this.speed = speed;
-        this.obeliskCombination = obeliskCombination;
+        this.obeliskId = obeliskId;
         this.extra = extra;
     }
 
@@ -37,9 +39,9 @@ public class TelemetryStatus
         return speed;
     }
 
-    public String getObeliskCombination()
+    public int getObeliskId()
     {
-        return obeliskCombination;
+        return obeliskId;
     }
 
     public Map<String, String> getExtra()
@@ -57,9 +59,9 @@ public class TelemetryStatus
         this.speed = speed;
     }
 
-    public void setObeliskCombination(String obeliskCombination)
+    public void setObeliskId(int obeliskCombination)
     {
-        this.obeliskCombination = obeliskCombination;
+        this.obeliskId = obeliskCombination;
     }
 
     public void setExtra(Map<String, String> extra)
@@ -67,13 +69,13 @@ public class TelemetryStatus
         this.extra = extra;
     }
 
-    public void update(Telemetry telemetry)
+    public void updateTelemetry(Telemetry telemetry)
     {
         telemetry.clear();
 
         telemetry.addData("Mode", mode);
         telemetry.addData("Speed", speed);
-        telemetry.addData("Obelisk Combination", obeliskCombination);
+        telemetry.addData("Obelisk Combination", ObeliskConversion.idToString(obeliskId));
 
         if (!extra.isEmpty())
         {
