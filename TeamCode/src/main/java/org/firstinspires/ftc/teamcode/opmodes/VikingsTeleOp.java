@@ -10,10 +10,12 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
+import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
+import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -32,12 +34,13 @@ public class VikingsTeleOp extends LinearOpMode {
     ControlHub hub = new ControlHub();
     AprilTagWebcam aprilTagWebcam;
     WebcamName camera = hub.camera;
-
+    Robot robot;
 
     @Override
     public void runOpMode() throws InterruptedException {
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
+        robot = new Robot(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -92,34 +95,28 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.yWasPressed()) // Auto aim to AprilTag
         {
-            autoAim();
+            Actions.aimToAprilTag(robot);
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk
         {
-            AprilTagDetection tag;
+            int newObeliskId = Actions.scanObelisk(robot);
 
-            try
+            if (newObeliskId != -1)
             {
-                tag = aprilTagWebcam.scanObelisk();
+                obeliskId = newObeliskId;
             }
-            catch (NoTagsDetectedException e)
+            else if (newObeliskId != obeliskId)
             {
-                telemetry.addLine("No tags detected.");
+                obeliskId = newObeliskId;
+                telemetry.addLine("New Obelisk ID: " + newObeliskId);
                 telemetry.update();
-                return;
             }
-            catch (UnexpectedTagIDException e)
+            else
             {
-                telemetry.addLine("Tags were detected, but none were a valid obelisk tag.");
+                telemetry.addLine("The same obelisk was detected.");
                 telemetry.update();
-                return;
             }
-
-            telemetry.addLine("New Obelisk ID: " + tag.id);
-            telemetry.update();
-
-            obeliskId = tag.id;
         }
 
         if (gamepad.bWasPressed())
@@ -138,7 +135,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
             double newAngle = RobotMath.angleAddition(currentBotHeading, 180);
 
-            turnToAngle(newAngle);
+            Actions.turnToAngle(robot, newAngle);
         }
 
         if (gamepad.dpadLeftWasPressed())
@@ -189,7 +186,6 @@ public class VikingsTeleOp extends LinearOpMode {
 
         telemetry.update();
     }
-
     /*
     private void autoAim()
     {
@@ -245,82 +241,4 @@ public class VikingsTeleOp extends LinearOpMode {
         telemetry.update();
     }
      */
-
-    private void autoAim()
-    {
-        AprilTagDetection tag;
-        aprilTagWebcam.updateDetections();
-
-        try
-        {
-            tag = aprilTagWebcam.getSingleDetection();
-        }
-        catch (NoTagsDetectedException | TooManyTagsDetectedException e)
-        {
-            telemetry.addLine("Auto Aim command cancelled.");
-            telemetry.addData("Error: ", e);
-            telemetry.update();
-            return;
-        }
-
-        // Get the yaw from the AprilTag detection. This is how many degrees we need to turn.
-        double yawToCorrect = tag.ftcPose.yaw;
-
-        // Get the robot's current heading from the IMU.
-        double currentBotHeading = hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
-        // Calculate the absolute target angle for the robot to face.
-        double targetAngle = RobotMath.angleAddition(currentBotHeading, yawToCorrect);
-
-        telemetry.addData("Vision Yaw Correction: ", yawToCorrect);
-        telemetry.addData("Current Heading: ", currentBotHeading);
-        telemetry.addData("Target Heading: ", targetAngle);
-        telemetry.update();
-
-        // Call the new PID turning method
-        turnToAngle(targetAngle);
-    }
-
-    private void turnToAngle(double targetAngle) {
-        // A simple P-controller for turning. You can tune this value.
-        double kP = 0.05; // Proportional gain - START with a small value and tune it.
-        double error;
-        double motorPower;
-        double tolerance = 2.0; // The robot is "close enough" if it's within 2 degrees of the target.
-
-        do {
-            // The IMU gives us the current angle of the robot.
-            double currentAngle = hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
-            // This is the "error" - how far we are from our target angle.
-            error = targetAngle - currentAngle;
-
-            // Calculate the motor power. This is the "Proportional" part of PID.
-            // The power will be high when the error is large, and small as we get closer.
-            motorPower = error * kP;
-
-            // Apply power to the motors to turn the robot.
-            // To turn right (positive error), left wheels go forward and right wheels go backward.
-            hub.leftFront.setPower(motorPower);
-            hub.leftBack.setPower(motorPower);
-            hub.rightFront.setPower(-motorPower);
-            hub.rightBack.setPower(-motorPower);
-
-            telemetry.addData("Current Angle", currentAngle);
-            telemetry.addData("Target Angle", targetAngle);
-            telemetry.addData("Error", error);
-            telemetry.update();
-
-            // The loop continues as long as the robot is not within the tolerance range and the opmode is active.
-        } while (Math.abs(error) > tolerance && opModeIsActive() && !gamepad1.yWasPressed());
-
-        // Stop all motors once the turn is complete.
-        hub.leftFront.setPower(0);
-        hub.leftBack.setPower(0);
-        hub.rightFront.setPower(0);
-        hub.rightBack.setPower(0);
-
-        telemetry.addLine("Finished turning!");
-        telemetry.update();
-    }
 }
