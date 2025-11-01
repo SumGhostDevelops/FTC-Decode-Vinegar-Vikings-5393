@@ -153,7 +153,6 @@ public class Actions
         catch (NoTagsDetectedException | TooManyTagsDetectedException e)
         {
             robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
-            robot.telemetry.update();
             return;
         }
 
