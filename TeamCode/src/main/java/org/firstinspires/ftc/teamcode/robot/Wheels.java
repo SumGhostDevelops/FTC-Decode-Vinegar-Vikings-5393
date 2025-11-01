@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.robot;
 
 public class Wheels
 {
+    // TODO: Consider changing how this class works because it operates more as of a value storer that needs to be manually applied
+
     private double leftFront;
     private double leftBack;
     private double rightFront;
