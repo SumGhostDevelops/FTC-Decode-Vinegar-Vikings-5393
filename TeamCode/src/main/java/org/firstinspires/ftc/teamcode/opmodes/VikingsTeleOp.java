@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.RobotStatus;
+import org.firstinspires.ftc.teamcode.robot.Wheels;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 
 
@@ -25,16 +26,14 @@ public class VikingsTeleOp extends LinearOpMode {
     private final double lowerSpeedLimit = 0.05;
 
     // Initialize some stuff
-    ControlHub hub = new ControlHub();
-    AprilTagWebcam aprilTagWebcam;
-    WebcamName camera = hub.camera;
     Robot robot;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        ControlHub hub = new ControlHub();
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
-        aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
-        robot = new Robot(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new RobotStatus());
+        AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
+        robot = new Robot(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new RobotStatus(), new Wheels());
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -44,8 +43,8 @@ public class VikingsTeleOp extends LinearOpMode {
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
-        hub.imu.initialize(parameters);
-        hub.imu.resetYaw();
+        robot.hub.imu.initialize(parameters);
+        robot.hub.imu.resetYaw();
 
         telemetry.setAutoClear(false);
 
@@ -54,14 +53,14 @@ public class VikingsTeleOp extends LinearOpMode {
             motorAction(gamepad1);
         }
 
-        aprilTagWebcam.close();
+        robot.webcam.close();
     }
 
     public void motorAction(Gamepad gamepad) throws InterruptedException {
         double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;
-        double botHeading = hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double botHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         // Rotate the movement direction counter to the bot's rotation
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -73,10 +72,6 @@ public class VikingsTeleOp extends LinearOpMode {
         // This ensures all the powers maintain the same ratio,
         // but only if at least one is out of the range [-1, 1]
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-        double frontLeftPower = (rotY + rotX + rx) / denominator;
-        double backLeftPower = (rotY - rotX + rx) / denominator;
-        double frontRightPower = (rotY - rotX - rx) / denominator;
-        double backRightPower = (rotY + rotX - rx) / denominator;
 
         robot.wheels.setLeftFrontPower((rotY + rotX + rx) / denominator);
         robot.wheels.setLeftBackPower((rotY - rotX + rx) / denominator);
@@ -102,7 +97,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.bWasPressed())
         {
-            hub.imu.resetYaw();
+            robot.hub.imu.resetYaw();
         }
 
         if (gamepad.dpadUpWasPressed())
@@ -112,7 +107,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.dpadDownWasPressed()) // Mostly a demo. Can be removed later. Turns the bot around 180 degrees.
         {
-            double currentBotHeading = hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
             double newAngle = RobotMath.angleAddition(currentBotHeading, 180);
 
@@ -164,12 +159,12 @@ public class VikingsTeleOp extends LinearOpMode {
     private void autoAim()
     {
         AprilTagDetection tag;
-        aprilTagWebcam.updateDetections();
+        robot.webcam.updateDetections();
 
         // Getting an AprilTag is a dangerous method, so simply restart the iteration if there is an error
         try
         {
-            tag = aprilTagWebcam.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
+            tag = robot.webcam.getSingleDetection(); // TODO: Add code to only aim if the AprilTag ID is ours
         }
         catch (NoTagsDetectedException | TooManyTagsDetectedException e)
         {
@@ -190,26 +185,26 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (yaw > 0)
         {
-            hub.leftFront.setPower(-powerMultiplier);
-            hub.leftBack.setPower(-powerMultiplier);
-            hub.rightFront.setPower(powerMultiplier);
-            hub.rightBack.setPower(powerMultiplier);
+            robot.hub.leftFront.setPower(-powerMultiplier);
+            robot.hub.leftBack.setPower(-powerMultiplier);
+            robot.hub.rightFront.setPower(powerMultiplier);
+            robot.hub.rightBack.setPower(powerMultiplier);
         }
         else
         {
-            hub.leftFront.setPower(powerMultiplier);
-            hub.leftBack.setPower(powerMultiplier);
-            hub.rightFront.setPower(-powerMultiplier);
-            hub.rightBack.setPower(-powerMultiplier);
+            robot.hub.leftFront.setPower(powerMultiplier);
+            robot.hub.leftBack.setPower(powerMultiplier);
+            robot.hub.rightFront.setPower(-powerMultiplier);
+            robot.hub.rightBack.setPower(-powerMultiplier);
         }
 
         sleep((long) (time * 1000));
 
         // Stop motors after turning
-        hub.leftFront.setPower(0);
-        hub.leftBack.setPower(0);
-        hub.rightFront.setPower(0);
-        hub.rightBack.setPower(0);
+        robot.hub.leftFront.setPower(0);
+        robot.hub.leftBack.setPower(0);
+        robot.hub.rightFront.setPower(0);
+        robot.hub.rightBack.setPower(0);
 
         telemetry.addLine("Done turning!");
         telemetry.update();
