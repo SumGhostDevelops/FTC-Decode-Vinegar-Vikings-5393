@@ -66,7 +66,7 @@ left_drive
 right_drive
 left_arm
 
-** Servos:
+** org.firstinspires.ftc.teamcode.util.Servos:
 left_hand
 right_hand
 arm
