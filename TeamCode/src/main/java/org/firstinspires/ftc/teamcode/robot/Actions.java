@@ -178,11 +178,20 @@ public class Actions
 
     public static void launchBall(Robot robot)
     {
-        Launcher.launch(robot);
+        robot.hub.launcher.setPower(0.75);
+        try
+        {
+            robot.hub.launcher.wait(1000);
+        }
+        catch (InterruptedException e)
+        {
+            robot.telemetry.log().add("Launcher waiting failed. Error: " + e.getMessage());
+        }
+        robot.hub.launcher.setPower(0);
     }
 
     public static void manualLaunchBall(Robot robot)
     {
-        Launcher.manualLaunch(robot);
+        robot.hub.launcher.setPower(robot.gamepad.right_trigger * 0.8);
     }
 }
