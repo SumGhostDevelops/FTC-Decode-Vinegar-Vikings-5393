@@ -143,9 +143,9 @@ public class VikingsTeleOp extends LinearOpMode {
             robot.status.updateTelemetry(telemetry);
         }
 
-        if (gamepad.right_trigger > 0.15) // Shoot
+        if (gamepad.right_trigger > 0.05) // Shoot
         {
-            robot.hub.launcher.setPower(gamepad.right_trigger * 0.8);
+            robot.hub.launcher.setPower(gamepad.right_trigger);
         }
         else
         {

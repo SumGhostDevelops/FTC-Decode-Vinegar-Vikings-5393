@@ -85,7 +85,7 @@ public class RobotStatus
 
         telemetry.addData("Mode", mode);
         telemetry.addData("Speed", speed);
-        telemetry.addData("Obelisk Combination", ObeliskHelper.idToString(obeliskId));
+        telemetry.addData("Obelisk Combination", obeliskId);
 
         if (!extra.isEmpty())
         {
