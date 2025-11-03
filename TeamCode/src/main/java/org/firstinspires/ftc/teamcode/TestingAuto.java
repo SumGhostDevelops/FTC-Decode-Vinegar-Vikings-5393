@@ -14,8 +14,15 @@ import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 @Autonomous(name="SampleAuto")
 
 public class TestingAuto extends LinearOpMode {
+    int WheelDiameter = 104; //mm
+    double WheelCircumference = WheelDiameter * Math.PI;
+    double rotation;
+
+    double ticksPerRev = 537.7;
+
     @Override
     public void runOpMode() throws InterruptedException {
+
         //create starting pose
         Pose2d beginPose = new Pose2d(new Vector2d(0, 63), Math.toRadians(270));
 
@@ -29,8 +36,9 @@ public class TestingAuto extends LinearOpMode {
                 .splineToSplineHeading(new Pose2d(40, 0, Math.toRadians(180)), Math.toRadians(270))
                 .splineToConstantHeading(new Vector2d(40, -48), Math.toRadians(0))
                 .lineToXLinearHeading(0, Math.toRadians(90))
-                .stopAndAdd()
                 .build();
         Actions.runBlocking(new SequentialAction(path));
+
+
     }
 }
