@@ -2,29 +2,27 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import org.firstinspires.ftc.teamcode.util.ObeliskHelper;
-
 import java.util.*;
 
 public class RobotStatus
 {
     private String mode;
-    private double speed;
+    private double speedScalar;
     private int obeliskId;
     private Map<String, String> extra;
 
     public RobotStatus()
     {
         this.mode = "Manual";
-        this.speed = 0;
+        this.speedScalar = 0;
         this.obeliskId = -1;
         this.extra = new HashMap<String, String>();
     }
 
-    public RobotStatus(double speed, int obeliskId, Map<String, String> extra)
+    public RobotStatus(double speedScalar, int obeliskId, Map<String, String> extra)
     {
         this.mode = "Manual";
-        this.speed = speed;
+        this.speedScalar = speedScalar;
         this.obeliskId = obeliskId;
         this.extra = extra;
     }
@@ -34,9 +32,9 @@ public class RobotStatus
         return mode;
     }
 
-    public double getSpeed()
+    public double getSpeedScalar()
     {
-        return speed;
+        return speedScalar;
     }
 
     public int getObeliskId()
@@ -54,9 +52,9 @@ public class RobotStatus
         this.mode = mode;
     }
 
-    public void setSpeed(double speed)
+    public void setSpeedScalar(double speedScalar)
     {
-        this.speed = speed;
+        this.speedScalar = speedScalar;
     }
 
     public void setObeliskId(int obeliskCombination)
@@ -84,7 +82,7 @@ public class RobotStatus
         telemetry.clear();
 
         telemetry.addData("Mode", mode);
-        telemetry.addData("Speed", speed);
+        telemetry.addData("Speed", speedScalar);
         telemetry.addData("Obelisk Combination", obeliskId);
 
         if (!extra.isEmpty())

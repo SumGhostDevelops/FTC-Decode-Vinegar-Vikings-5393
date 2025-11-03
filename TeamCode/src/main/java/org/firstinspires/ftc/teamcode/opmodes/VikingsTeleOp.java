@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
@@ -127,18 +126,18 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.leftBumperWasPressed()) // Lower speed
         {
-            if (robot.status.getSpeed() - 0.05 >= lowerSpeedLimit)
+            if (robot.status.getSpeedScalar() - 0.05 >= lowerSpeedLimit)
             {
-                robot.status.setSpeed(robot.status.getSpeed() - 0.05);
+                robot.status.setSpeedScalar(robot.status.getSpeedScalar() - 0.05);
             }
             robot.status.updateTelemetry(telemetry);
         }
 
         if (gamepad.rightBumperWasPressed()) // Increase speed
         {
-            if (robot.status.getSpeed() + 0.05 <= upperSpeedLimit)
+            if (robot.status.getSpeedScalar() + 0.05 <= upperSpeedLimit)
             {
-                robot.status.setSpeed(robot.status.getSpeed() + 0.05);
+                robot.status.setSpeedScalar(robot.status.getSpeedScalar() + 0.05);
             }
             robot.status.updateTelemetry(telemetry);
         }
