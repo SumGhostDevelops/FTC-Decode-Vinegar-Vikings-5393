@@ -172,6 +172,6 @@ public class Actions
 
     public static void manualLaunchBall(Robot robot)
     {
-        robot.hub.launcher.setPower(robot.gamepad.right_trigger * 0.8);
+        robot.hub.launcher.setPower(robot.gamepad.right_trigger * 0.9);
     }
 }
