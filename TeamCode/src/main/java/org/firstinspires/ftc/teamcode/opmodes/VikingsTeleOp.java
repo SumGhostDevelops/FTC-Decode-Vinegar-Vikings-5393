@@ -40,7 +40,7 @@ public class VikingsTeleOp extends LinearOpMode {
                 // depending on what direction the logo is facing on the control hub would determine what orientation is.
                 //change depending on what it actually is lmao
 
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
         robot.hub.imu.initialize(parameters);
@@ -153,7 +153,11 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.left_trigger > 0.25)
         {
-
+            robot.hub.loader.setPower(1);
+        }
+        else
+        {
+            robot.hub.loader.setPower(0);
         }
 
         // Handle movement inputs
