@@ -108,26 +108,6 @@ public class Actions
         robot.status.updateTelemetry(robot.telemetry);
     }
 
-    public static void aimToAnyAprilTag(Robot robot, String pickingMethod)
-    {
-        robot.telemetry.log().add("-aimToAprilTag---------");
-        AprilTagDetection tag;
-        robot.webcam.updateDetections();
-
-        try
-        {
-            tag = robot.webcam.getSingleDetection();
-        }
-        catch (NoTagsDetectedException | TooManyTagsDetectedException e)
-        {
-            robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
-            robot.telemetry.update();
-            return;
-        }
-
-        aimToAprilTag(robot, tag);
-    }
-
     public static void aimToAprilTag(Robot robot, int tagId)
     {
         robot.telemetry.log().add("-aimToAprilTag---------");
