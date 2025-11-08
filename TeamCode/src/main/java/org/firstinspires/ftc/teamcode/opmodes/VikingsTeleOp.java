@@ -24,7 +24,6 @@ public class VikingsTeleOp extends LinearOpMode {
     private final double upperSpeedLimit = 0.75;
     private final double lowerSpeedLimit = 0.05;
     private final int goalTagId = 24;
-
     // Initialize some stuff
     Robot robot;
 
@@ -102,16 +101,12 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.dpadUpWasPressed())
         {
-
+            Actions.changeLauncherPower(0.01);
         }
 
         if (gamepad.dpadDownWasPressed()) // Mostly a demo. Can be removed later. Turns the bot around 180 degrees.
         {
-            double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
-            double newAngle = RobotMath.angleAddition(currentBotHeading, 180);
-
-            Actions.turnToAngle(robot, newAngle);
+            Actions.changeLauncherPower(-0.01);
         }
 
         if (gamepad.dpadLeftWasPressed())

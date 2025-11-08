@@ -40,7 +40,7 @@ public class ControlHub
         rightBack = map.get(DcMotor.class, "rightBack");
         imu = map.get(IMU.class, "imu");
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+
         camera = map.get(WebcamName.class,"Webcam 1");
         drive = new MecanumDrive(map,initialPose);
         launcher = map.get(DcMotor.class, "launcher");
