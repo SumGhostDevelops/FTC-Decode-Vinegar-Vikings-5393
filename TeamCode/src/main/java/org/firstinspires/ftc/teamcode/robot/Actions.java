@@ -22,7 +22,9 @@ public class Actions
         double kP = 0.05; // Proportional gain - START with a small value and tune it.
         double error;
         double motorPower;
-        double tolerance = 2.0; // The robot is "close enough" if it's within 2 degrees of the target.
+        double tolerance = 2.0;
+        // The robot is "close enough" if it's within 2 degrees of the target.
+
 
         do {
             // The IMU gives us the current angle of the robot.
@@ -43,7 +45,7 @@ public class Actions
             robot.hub.rightBack.setPower(-motorPower);
 
             robot.status.setMode("Automatic (Turning)");
-            robot.status.addExtra("Current Angle", String.format("%.1f", motorPower));
+            robot.status.addExtra("Current Angle", String.format("%.1f", currentAngle));
             robot.status.addExtra("Target Angle", String.format("%.1f", targetAngle));
             robot.status.addExtra("Error", String.format("%.1f", error));
 
@@ -51,7 +53,7 @@ public class Actions
             robot.telemetry.update();
 
             // The loop continues as long as the robot is not within the tolerance range and the opmode is active.
-        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !gamepad1.yWasPressed());
+        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get());
 
         // Stop all motors once the turn is complete.
         robot.hub.leftFront.setPower(0);
@@ -155,7 +157,6 @@ public class Actions
         robot.hub.rightFront.setPower(wheels.getRightFrontPower() * speedScalar);
         robot.hub.rightBack.setPower(wheels.getRightBackPower() * speedScalar);
     }
-
     public static void launchBall(Robot robot)
     {
         robot.hub.launcher.setPower(0.75);
@@ -172,6 +173,12 @@ public class Actions
 
     public static void manualLaunchBall(Robot robot)
     {
-        robot.hub.launcher.setPower(robot.gamepad.right_trigger * 0.9);
+        double launcherPower = Variables.getLauncherPower();
+        robot.hub.launcher.setPower(launcherPower);
+    }
+
+    public static void changeLauncherPower (Double change)
+    {
+        Variables.setLauncherPower(Math.max(0.7, Math.min(1, Variables.getLauncherPower()+change)));
     }
 }
