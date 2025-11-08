@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.util.ObeliskHelper;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 public class Actions
 {
     public static void turnToAngle(Robot robot, double targetAngle)
@@ -52,7 +54,7 @@ public class Actions
             robot.status.updateTelemetry(robot.telemetry);
             robot.telemetry.update();
 
-        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get());
+        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop all motors
         robot.hub.leftFront.setPower(0);
