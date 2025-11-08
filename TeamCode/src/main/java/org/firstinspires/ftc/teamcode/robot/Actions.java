@@ -68,6 +68,83 @@ public class Actions
         robot.status.updateTelemetry(robot.telemetry);
     }
 
+    public static void newTurnToAngle(Robot robot, double targetAngle)
+    {
+        robot.status.clearExtra();
+        robot.telemetry.log().add("-turnToAngle (PD)--------");
+
+        // --- Tuning Gains (You MUST tune these) ---
+        double kP = 0.07;  // Proportional (The "gas") - Start with this higher
+        double kD = 0.002; // Derivative (The "brake") - Start small
+        double minTurnPower = 0.1; // Minimum power to overcome friction
+
+        double error;
+        double motorPower;
+        double tolerance = 1.0; // We can be more precise now
+
+        // Variables for the 'D' term
+        double lastError = 0;
+        double derivative;
+        ElapsedTime timer = new ElapsedTime();
+
+        do {
+            double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            error = RobotMath.normalizeAngle(targetAngle - currentAngle);
+
+            // --- 'D' Term Calculation ---
+            // This is the "rate of change" of the error, or how fast we're turning.
+            derivative = (error - lastError) / timer.seconds();
+
+            // --- PD Power Calculation ---
+            // motorPower = (Proportional push) + (Derivative brake)
+            motorPower = (error * kP) + (derivative * kD);
+
+            // --- Minimum Power ---
+            // If the calculated power is too small, boost it to the min
+            // power to overcome static friction.
+            if (Math.abs(error) > tolerance)
+            {
+                if (Math.abs(motorPower) < minTurnPower)
+                {
+                    motorPower = Math.signum(motorPower) * minTurnPower;
+                }
+            }
+
+            // Clamp the final power
+            motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
+
+            // Apply power
+            robot.hub.leftFront.setPower(-motorPower);
+            robot.hub.leftBack.setPower(-motorPower);
+            robot.hub.rightFront.setPower(motorPower);
+            robot.hub.rightBack.setPower(motorPower);
+
+            // Update loop variables for next cycle
+            lastError = error;
+            timer.reset();
+
+            // Telemetry
+            robot.status.setMode("Automatic (Turning)");
+            robot.status.addExtra("Current Angle", String.format("%.1f", currentAngle));
+            robot.status.addExtra("Target Angle", String.format("%.1f", targetAngle));
+            robot.status.addExtra("Error", String.format("%.1f", error));
+            robot.status.updateTelemetry(robot.telemetry);
+            robot.telemetry.update();
+
+        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
+
+        // Stop all motors
+        robot.hub.leftFront.setPower(0);
+        robot.hub.leftBack.setPower(0);
+        robot.hub.rightFront.setPower(0);
+        robot.hub.rightBack.setPower(0);
+
+        robot.status.setMode("Manual");
+        robot.status.clearExtra();
+        robot.telemetry.log().add("Finished turning.");
+        robot.status.updateTelemetry(robot.telemetry);
+    }
+
     public static void scanObelisk(Robot robot)
     {
         AprilTagDetection tag;
