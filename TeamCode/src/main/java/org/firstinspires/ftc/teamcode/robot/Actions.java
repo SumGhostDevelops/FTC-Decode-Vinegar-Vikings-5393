@@ -39,10 +39,10 @@ public class Actions
             motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
 
             // Apply power to the motors to turn the robot.
-            robot.hub.leftFront.setPower(motorPower);
-            robot.hub.leftBack.setPower(motorPower);
-            robot.hub.rightFront.setPower(-motorPower);
-            robot.hub.rightBack.setPower(-motorPower);
+            robot.hub.leftFront.setPower(-motorPower);
+            robot.hub.leftBack.setPower(-motorPower);
+            robot.hub.rightFront.setPower(motorPower);
+            robot.hub.rightBack.setPower(motorPower);
 
             // Telemetry
             robot.status.setMode("Automatic (Turning)");
