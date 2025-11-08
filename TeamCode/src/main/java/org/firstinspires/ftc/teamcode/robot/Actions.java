@@ -137,7 +137,7 @@ public class Actions
         double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         // Calculate the absolute target angle for the robot to face.
-        double targetAngle = RobotMath.angleAddition(currentBotHeading, yawToCorrect);
+        double targetAngle = RobotMath.normalizeAngle(currentBotHeading + yawToCorrect);
 
         robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
         robot.telemetry.update();
