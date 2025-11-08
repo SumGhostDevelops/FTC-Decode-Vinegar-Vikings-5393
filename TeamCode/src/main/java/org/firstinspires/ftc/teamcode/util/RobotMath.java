@@ -50,4 +50,19 @@ public class RobotMath
 
         return normalized;
     }
+
+    /**
+     * Normalizes an angle to be within the -180 to +180 degree range.
+     * @param angle The angle to normalize.
+     * @return The angle, wrapped to the -180 to +180 range.
+     */
+    public static double normalizeAngle(double angle) {
+        while (angle > 180.0) {
+            angle -= 360.0;
+        }
+        while (angle <= -180.0) {
+            angle += 360.0;
+        }
+        return angle;
+    }
 }
