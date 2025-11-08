@@ -24,7 +24,7 @@ public class Actions
         double kP = 0.05; // Proportional gain
         double error;
         double motorPower;
-        double tolerance = 2.0; // Stop when within 2 degrees
+        double tolerance = 0.5; // Stop when within this many degrees
 
         do {
             // The IMU gives us the current angle of the robot.
@@ -41,10 +41,10 @@ public class Actions
             motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
 
             // Apply power to the motors to turn the robot.
-            robot.hub.leftFront.setPower(motorPower);
-            robot.hub.leftBack.setPower(motorPower);
-            robot.hub.rightFront.setPower(-motorPower);
-            robot.hub.rightBack.setPower(-motorPower);
+            robot.hub.leftFront.setPower(-motorPower);
+            robot.hub.leftBack.setPower(-motorPower);
+            robot.hub.rightFront.setPower(motorPower);
+            robot.hub.rightBack.setPower(motorPower);
 
             // Telemetry
             robot.status.setMode("Automatic (Turning)");
@@ -178,8 +178,9 @@ public class Actions
         robot.hub.launcher.setPower(launcherPower);
     }
 
-    public static void changeLauncherPower (Double change)
+    public static void changeLauncherPower (Robot robot, Double change)
     {
         Variables.setLauncherPower(Math.max(0.7, Math.min(1, Variables.getLauncherPower()+change)));
+        robot.telemetry.log().add("New Launcher Power: " + Variables.getLauncherPower());
     }
 }
