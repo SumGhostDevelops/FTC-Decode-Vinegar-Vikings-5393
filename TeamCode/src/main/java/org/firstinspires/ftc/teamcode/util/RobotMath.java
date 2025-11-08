@@ -15,36 +15,13 @@ public class RobotMath
         return Math.abs(timeToTurnNinety * (degrees / 90.0));
     }
 
-    public static double angleAddition(double currentHeading, double headingToCorrectBy)
+    public double normalizeAbsoluteAngle(double angle)
     {
-        double sum = currentHeading + headingToCorrectBy;
+        // 1. Calculate the remainder using modulo
+        double normalized = angle % 360.0;
 
-        // Use the modulo operator to handle wrapping around 360 degrees
-        double normalized = sum % 360.0;
-
-        // If the result is negative, add 360 to bring it into the positive range
-        if (normalized < 0)
-        {
-            normalized += 360.0;
-        }
-
-        return normalized;
-    }
-
-    public static double angleAddition(List<Double> headings)
-    {
-        double sum = 0;
-        for (double heading : headings)
-        {
-            sum += heading;
-        }
-
-        // Use the modulo operator to handle wrapping around 360 degrees
-        double normalized = sum % 360.0;
-
-        // If the result is negative, add 360 to bring it into the positive range
-        if (normalized < 0)
-        {
+        // 2. If the result is negative, add 360 to bring it into the 0-360 range
+        if (normalized < 0) {
             normalized += 360.0;
         }
 
