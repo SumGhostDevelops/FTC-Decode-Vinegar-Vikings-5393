@@ -176,8 +176,9 @@ public class Actions
         robot.hub.launcher.setPower(launcherPower);
     }
 
-    public static void changeLauncherPower (Double change)
+    public static void changeLauncherPower (Robot robot, Double change)
     {
         Variables.setLauncherPower(Math.max(0.7, Math.min(1, Variables.getLauncherPower()+change)));
+        robot.telemetry.log().add("New Launcher Power: " + Variables.getLauncherPower());
     }
 }

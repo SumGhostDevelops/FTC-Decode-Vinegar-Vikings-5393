@@ -101,12 +101,12 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.dpadUpWasPressed())
         {
-            Actions.changeLauncherPower(0.01);
+            Actions.changeLauncherPower(robot,0.01);
         }
 
         if (gamepad.dpadDownWasPressed()) // Mostly a demo. Can be removed later. Turns the bot around 180 degrees.
         {
-            Actions.changeLauncherPower(-0.01);
+            Actions.changeLauncherPower(robot,-0.01);
         }
 
         if (gamepad.dpadLeftWasPressed())
