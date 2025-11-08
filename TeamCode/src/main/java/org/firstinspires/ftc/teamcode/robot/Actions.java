@@ -16,46 +16,45 @@ public class Actions
     public static void turnToAngle(Robot robot, double targetAngle)
     {
         robot.status.clearExtra();
-
         robot.telemetry.log().add("-turnToAngle--------");
-        // A simple P-controller for turning. You can tune this value.
-        double kP = 0.05; // Proportional gain - START with a small value and tune it.
+
+        // A simple P-controller for turning.
+        double kP = 0.05; // Proportional gain
         double error;
         double motorPower;
-        double tolerance = 2.0;
-        // The robot is "close enough" if it's within 2 degrees of the target.
-
+        double tolerance = 2.0; // Stop when within 2 degrees
 
         do {
             // The IMU gives us the current angle of the robot.
             double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
-            // This is the "error" - how far we are from our target angle.
-            error = targetAngle - currentAngle;
+            // Calculate the error, normalizing it to the -180 to +180 range
+            // This finds the shortest path to the target angle.
+            error = RobotMath.normalizeAngle(targetAngle - currentAngle);
 
-            // Calculate the motor power. This is the "Proportional" part of PID.
-            // The power will be high when the error is large, and small as we get closer.
+            // Calculate the motor power.
             motorPower = error * kP;
 
+            // Clamp the motor power to the valid range of -1.0 to 1.0
+            motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
+
             // Apply power to the motors to turn the robot.
-            // To turn right (positive error), left wheels go forward and right wheels go backward.
             robot.hub.leftFront.setPower(motorPower);
             robot.hub.leftBack.setPower(motorPower);
             robot.hub.rightFront.setPower(-motorPower);
             robot.hub.rightBack.setPower(-motorPower);
 
+            // Telemetry
             robot.status.setMode("Automatic (Turning)");
             robot.status.addExtra("Current Angle", String.format("%.1f", currentAngle));
             robot.status.addExtra("Target Angle", String.format("%.1f", targetAngle));
             robot.status.addExtra("Error", String.format("%.1f", error));
-
             robot.status.updateTelemetry(robot.telemetry);
             robot.telemetry.update();
 
-            // The loop continues as long as the robot is not within the tolerance range and the opmode is active.
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get());
 
-        // Stop all motors once the turn is complete.
+        // Stop all motors
         robot.hub.leftFront.setPower(0);
         robot.hub.leftBack.setPower(0);
         robot.hub.rightFront.setPower(0);
