@@ -13,18 +13,18 @@ public class RobotContext
     public Telemetry telemetry;
     public Gamepad gamepad;
     public Supplier<Boolean> opModeIsActive;
-    public Robot status;
+    public Robot self;
     public Wheels wheels;
 
 
-    public RobotContext(ControlHub hub, AprilTagWebcam webcam, Telemetry telemetry, Gamepad gamepad, Supplier<Boolean> opModeIsActive, Robot status, Wheels wheels)
+    public RobotContext(ControlHub hub, AprilTagWebcam webcam, Telemetry telemetry, Gamepad gamepad, Supplier<Boolean> opModeIsActive, Robot self, Wheels wheels)
     {
         this.hub = hub;
         this.webcam = webcam;
         this.telemetry = telemetry;
         this.gamepad = gamepad;
         this.opModeIsActive = opModeIsActive;
-        this.status = status;
+        this.self = self;
         this.wheels = wheels;
     }
 }

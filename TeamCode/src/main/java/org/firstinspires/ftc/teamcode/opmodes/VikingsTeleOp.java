@@ -24,14 +24,14 @@ public class VikingsTeleOp extends LinearOpMode {
     private final double lowerSpeedLimit = 0.05;
     private final int goalTagId = 24;
     // Initialize some stuff
-    RobotContext robotContext;
+    RobotContext robot;
 
     @Override
     public void runOpMode() throws InterruptedException {
         ControlHub hub = new ControlHub();
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
-        robotContext = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(), new Wheels());
+        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(), new Wheels());
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -41,8 +41,8 @@ public class VikingsTeleOp extends LinearOpMode {
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
-        robotContext.hub.imu.initialize(parameters);
-        robotContext.hub.imu.resetYaw();
+        robot.hub.imu.initialize(parameters);
+        robot.hub.imu.resetYaw();
 
         telemetry.setAutoClear(false);
 
@@ -51,14 +51,14 @@ public class VikingsTeleOp extends LinearOpMode {
             motorAction(gamepad1);
         }
 
-        robotContext.webcam.close();
+        robot.webcam.close();
     }
 
     public void motorAction(Gamepad gamepad) throws InterruptedException {
         double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;
-        double botHeading = robotContext.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double botHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         // Rotate the movement direction counter to the bot's rotation
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -71,41 +71,41 @@ public class VikingsTeleOp extends LinearOpMode {
         // but only if at least one is out of the range [-1, 1]
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
 
-        robotContext.wheels.leftFront = (rotY + rotX + rx) / denominator;
-        robotContext.wheels.leftBack = (rotY - rotX + rx) / denominator;
-        robotContext.wheels.rightFront = (rotY - rotX - rx) / denominator;
-        robotContext.wheels.rightBack = (rotY + rotX - rx) / denominator;
+        robot.wheels.leftFront = (rotY + rotX + rx) / denominator;
+        robot.wheels.leftBack = (rotY - rotX + rx) / denominator;
+        robot.wheels.rightFront = (rotY - rotX - rx) / denominator;
+        robot.wheels.rightBack = (rotY + rotX - rx) / denominator;
 
         // TODO: Add keybind system for different drivers
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
         {
-            robotContext.wheels.setAllPower(0);
+            robot.wheels.setAllPower(0);
         }
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            Actions.aimToAprilTag(robotContext, goalTagId);
+            Actions.aimToAprilTag(robot, goalTagId);
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk
         {
-            Actions.scanObelisk(robotContext);
+            Actions.scanObelisk(robot);
         }
 
         if (gamepad.bWasPressed())
         {
-            robotContext.hub.imu.resetYaw();
+            robot.hub.imu.resetYaw();
         }
 
         if (gamepad.dpadUpWasPressed())
         {
-            Actions.changeLauncherPower(robotContext,0.01);
+            Actions.changeLauncherPower(robot,0.01);
         }
 
         if (gamepad.dpadDownWasPressed()) // Mostly a demo. Can be removed later. Turns the bot around 180 degrees.
         {
-            Actions.changeLauncherPower(robotContext,-0.01);
+            Actions.changeLauncherPower(robot,-0.01);
         }
 
         if (gamepad.dpadLeftWasPressed())
@@ -120,43 +120,43 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.leftBumperWasPressed()) // Lower speed
         {
-            if (robotContext.status.speedScalar - 0.05 >= lowerSpeedLimit)
+            if (robot.self.speed - 0.05 >= lowerSpeedLimit)
             {
-                robotContext.status.speedScalar -= 0.05;
+                robot.self.speed -= 0.05;
             }
-            robotContext.status.updateTelemetry(telemetry);
+            robot.self.updateTelemetry(telemetry);
         }
 
         if (gamepad.rightBumperWasPressed()) // Increase speed
         {
-            if (robotContext.status.speedScalar + 0.05 <= upperSpeedLimit)
+            if (robot.self.speed + 0.05 <= upperSpeedLimit)
             {
-                robotContext.status.speedScalar += 0.05;
+                robot.self.speed += 0.05;
             }
-            robotContext.status.updateTelemetry(telemetry);
+            robot.self.updateTelemetry(telemetry);
         }
 
         if (gamepad.right_trigger > 0.05) // Shoot
         {
-            Actions.manualLaunchBall(robotContext);
+            Actions.manualLaunchBall(robot);
         }
         else
         {
-            robotContext.hub.launcher.setPower(0);
+            robot.hub.launcher.setPower(0);
         }
 
         if (gamepad.left_trigger > 0.25)
         {
-            robotContext.hub.loader.setPower(1);
+            robot.hub.loader.setPower(1);
         }
         else
         {
-            robotContext.hub.loader.setPower(0);
+            robot.hub.loader.setPower(0);
         }
 
         // Handle movement inputs
-        Actions.move(robotContext);
+        Actions.move(robot);
 
-        robotContext.telemetry.update();
+        robot.telemetry.update();
     }
 }

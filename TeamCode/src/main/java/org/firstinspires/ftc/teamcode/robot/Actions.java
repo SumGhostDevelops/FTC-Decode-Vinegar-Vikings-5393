@@ -14,7 +14,7 @@ public class Actions
 {
     public static void turnToAngle(RobotContext robotContext, double targetAngle)
     {
-        robotContext.status.extra.clear();
+        robotContext.self.extra.clear();
         robotContext.telemetry.log().add("-turnToAngle--------");
 
         // A simple P-controller for turning.
@@ -44,11 +44,11 @@ public class Actions
             robotContext.hub.rightBack.setPower(motorPower);
 
             // Telemetry
-            robotContext.status.mode = "Automatic (Turning)";
-            robotContext.status.extra.put("Current Angle", String.format("%.1f", currentAngle));
-            robotContext.status.extra.put("Target Angle", String.format("%.1f", targetAngle));
-            robotContext.status.extra.put("Error", String.format("%.1f", error));
-            robotContext.status.updateTelemetry(robotContext.telemetry);
+            robotContext.self.mode = "Automatic (Turning)";
+            robotContext.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
+            robotContext.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
+            robotContext.self.extra.put("Error", String.format("%.1f", error));
+            robotContext.self.updateTelemetry(robotContext.telemetry);
             robotContext.telemetry.update();
 
         } while (Math.abs(error) > tolerance && robotContext.opModeIsActive.get() && !robotContext.gamepad.yWasPressed());
@@ -56,15 +56,15 @@ public class Actions
         // Stop all motors
         stopMoving(robotContext);
 
-        robotContext.status.mode = "Manual";
-        robotContext.status.extra.clear();
+        robotContext.self.mode = "Manual";
+        robotContext.self.extra.clear();
         robotContext.telemetry.log().add("Finished turning.");
-        robotContext.status.updateTelemetry(robotContext.telemetry);
+        robotContext.self.updateTelemetry(robotContext.telemetry);
     }
 
     public static void newTurnToAngle(RobotContext robotContext, double targetAngle, double kP, double kD, double minTurnPower)
     {
-        robotContext.status.extra.clear();
+        robotContext.self.extra.clear();
         robotContext.telemetry.log().add("-turnToAngle (PD)--------");
 
         /*
@@ -120,11 +120,11 @@ public class Actions
             timer.reset();
 
             // Telemetry
-            robotContext.status.mode = "Automatic (Turning)";
-            robotContext.status.extra.put("Current Angle", String.format("%.1f", currentAngle));
-            robotContext.status.extra.put("Target Angle", String.format("%.1f", targetAngle));
-            robotContext.status.extra.put("Error", String.format("%.1f", error));
-            robotContext.status.updateTelemetry(robotContext.telemetry);
+            robotContext.self.mode = "Automatic (Turning)";
+            robotContext.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
+            robotContext.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
+            robotContext.self.extra.put("Error", String.format("%.1f", error));
+            robotContext.self.updateTelemetry(robotContext.telemetry);
             robotContext.telemetry.update();
 
         } while (Math.abs(error) > tolerance && robotContext.opModeIsActive.get() && !robotContext.gamepad.yWasPressed());
@@ -132,10 +132,10 @@ public class Actions
         // Stop all motors
         stopMoving(robotContext);
 
-        robotContext.status.mode = "Manual";
-        robotContext.status.extra.clear();
+        robotContext.self.mode = "Manual";
+        robotContext.self.extra.clear();
         robotContext.telemetry.log().add("Finished turning.");
-        robotContext.status.updateTelemetry(robotContext.telemetry);
+        robotContext.self.updateTelemetry(robotContext.telemetry);
     }
 
     public static void scanObelisk(RobotContext robotContext)
@@ -161,7 +161,7 @@ public class Actions
             return;
         }
 
-        if (tag.id == robotContext.status.obeliskId)
+        if (tag.id == robotContext.self.obeliskId)
         {
             robotContext.telemetry.log().add("The same obelisk was detected.");
             robotContext.telemetry.update();
@@ -175,10 +175,10 @@ public class Actions
             return;
         }
 
-        robotContext.status.mode = "Manual";
-        robotContext.status.obeliskId = tag.id;
+        robotContext.self.mode = "Manual";
+        robotContext.self.obeliskId = tag.id;
         robotContext.telemetry.log().add("New Obelisk ID: " + tag.id);
-        robotContext.status.updateTelemetry(robotContext.telemetry);
+        robotContext.self.updateTelemetry(robotContext.telemetry);
     }
 
     public static void aimToAprilTag(RobotContext robotContext, int tagId)
@@ -221,7 +221,7 @@ public class Actions
     public static void move(RobotContext robotContext)
     {
         Wheels wheels = robotContext.wheels;
-        double speedScalar = robotContext.status.speedScalar;
+        double speedScalar = robotContext.self.speed;
 
         robotContext.hub.leftFront.setPower(wheels.leftFront * speedScalar);
         robotContext.hub.leftBack.setPower(wheels.leftBack * speedScalar);

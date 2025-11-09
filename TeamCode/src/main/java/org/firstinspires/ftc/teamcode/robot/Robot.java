@@ -7,22 +7,22 @@ import java.util.*;
 public class Robot
 {
     public String mode;
-    public double speedScalar;
+    public double speed;
     public int obeliskId;
     public Map<String, String> extra;
 
     public Robot()
     {
         this.mode = "Manual";
-        this.speedScalar = 0;
+        this.speed = 0;
         this.obeliskId = -1;
         this.extra = new HashMap<String, String>();
     }
 
-    public Robot(double speedScalar, int obeliskId, Map<String, String> extra)
+    public Robot(double speed, int obeliskId, Map<String, String> extra)
     {
         this.mode = "Manual";
-        this.speedScalar = speedScalar;
+        this.speed = speed;
         this.obeliskId = obeliskId;
         this.extra = extra;
     }
@@ -32,7 +32,7 @@ public class Robot
         telemetry.clear();
 
         telemetry.addData("Mode", mode);
-        telemetry.addData("Speed", speedScalar);
+        telemetry.addData("Speed", speed);
         telemetry.addData("Obelisk Combination", obeliskId);
 
         if (!extra.isEmpty())
