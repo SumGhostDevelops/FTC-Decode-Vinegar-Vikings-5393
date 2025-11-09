@@ -94,7 +94,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
         {
-            robot.wheels.setAllWheelsPower(0);
+            Actions.stopMoving(robot);
         }
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag

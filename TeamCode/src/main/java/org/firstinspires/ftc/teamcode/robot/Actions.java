@@ -57,10 +57,7 @@ public class Actions
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop all motors
-        robot.hub.leftFront.setPower(0);
-        robot.hub.leftBack.setPower(0);
-        robot.hub.rightFront.setPower(0);
-        robot.hub.rightBack.setPower(0);
+        stopMoving(robot);
 
         robot.status.mode = "Manual";
         robot.status.extra.clear();
@@ -136,10 +133,7 @@ public class Actions
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop all motors
-        robot.hub.leftFront.setPower(0);
-        robot.hub.leftBack.setPower(0);
-        robot.hub.rightFront.setPower(0);
-        robot.hub.rightBack.setPower(0);
+        stopMoving(robot);
 
         robot.status.mode = "Manual";
         robot.status.extra.clear();
@@ -237,6 +231,13 @@ public class Actions
         robot.hub.rightFront.setPower(wheels.rightFront * speedScalar);
         robot.hub.rightBack.setPower(wheels.rightBack * speedScalar);
     }
+
+    public static void stopMoving(Robot robot)
+    {
+        robot.wheels.setAllPower(0);
+        move(robot);
+    }
+
     public static void launchBall(Robot robot)
     {
         robot.hub.launcher.setPower(0.75);

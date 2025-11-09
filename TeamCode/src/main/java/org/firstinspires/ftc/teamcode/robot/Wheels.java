@@ -25,7 +25,7 @@ public class Wheels
         this.rightBack = rightBack;
     }
 
-    public void setAllWheelsPower(double power)
+    public void setAllPower(double power)
     {
         leftFront = power;
         leftBack = power;

@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.RobotStatus;
 import org.firstinspires.ftc.teamcode.robot.Wheels;
-import org.firstinspires.ftc.teamcode.util.RobotMath;
 
 
 @TeleOp(name="VikingsTeleOp")
@@ -81,7 +80,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
         {
-            robot.wheels.setAllWheelsPower(0);
+            robot.wheels.setAllPower(0);
         }
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
@@ -121,18 +120,18 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.leftBumperWasPressed()) // Lower speed
         {
-            if (robot.status.getSpeedScalar() - 0.05 >= lowerSpeedLimit)
+            if (robot.status.speedScalar - 0.05 >= lowerSpeedLimit)
             {
-                robot.status.setSpeedScalar(robot.status.getSpeedScalar() - 0.05);
+                robot.status.speedScalar -= 0.05;
             }
             robot.status.updateTelemetry(telemetry);
         }
 
         if (gamepad.rightBumperWasPressed()) // Increase speed
         {
-            if (robot.status.getSpeedScalar() + 0.05 <= upperSpeedLimit)
+            if (robot.status.speedScalar + 0.05 <= upperSpeedLimit)
             {
-                robot.status.setSpeedScalar(robot.status.getSpeedScalar() + 0.05);
+                robot.status.speedScalar += 0.05;
             }
             robot.status.updateTelemetry(telemetry);
         }
