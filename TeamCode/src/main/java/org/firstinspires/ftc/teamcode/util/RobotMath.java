@@ -42,4 +42,9 @@ public class RobotMath
         }
         return angle;
     }
+
+    public static double clampPower(double motorPower)
+    {
+        return Math.max(-1.0, Math.min(1.0, motorPower));
+    }
 }

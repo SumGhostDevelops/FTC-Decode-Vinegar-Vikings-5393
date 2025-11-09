@@ -223,10 +223,10 @@ public class Actions
         Wheels wheels = robot.wheels;
         double speedScalar = robot.self.speed;
 
-        robot.hub.leftFront.setPower(wheels.leftFront * speedScalar);
-        robot.hub.leftBack.setPower(wheels.leftBack * speedScalar);
-        robot.hub.rightFront.setPower(wheels.rightFront * speedScalar);
-        robot.hub.rightBack.setPower(wheels.rightBack * speedScalar);
+        robot.hub.leftFront.setPower(RobotMath.clampPower(wheels.leftFront * speedScalar));
+        robot.hub.leftBack.setPower(RobotMath.clampPower(wheels.leftBack * speedScalar));
+        robot.hub.rightFront.setPower(RobotMath.clampPower(wheels.rightFront * speedScalar));
+        robot.hub.rightBack.setPower(RobotMath.clampPower(wheels.rightBack * speedScalar));
     }
 
     public static void stopMoving(RobotContext robot)
