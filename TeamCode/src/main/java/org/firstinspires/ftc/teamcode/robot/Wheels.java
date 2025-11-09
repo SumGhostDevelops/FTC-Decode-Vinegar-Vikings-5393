@@ -4,10 +4,10 @@ public class Wheels
 {
     // TODO: Consider changing how this class works because it operates more as of a value storer that needs to be manually applied
 
-    private double leftFront;
-    private double leftBack;
-    private double rightFront;
-    private double rightBack;
+    public double leftFront;
+    public double leftBack;
+    public double rightFront;
+    public double rightBack;
 
     public Wheels()
     {
@@ -22,38 +22,6 @@ public class Wheels
         this.leftFront = leftFront;
         this.leftBack = leftBack;
         this.rightFront = rightFront;
-        this.rightBack = rightBack;
-    }
-
-    public double getLeftFrontPower() {
-        return leftFront;
-    }
-
-    public double getLeftBackPower() {
-        return leftBack;
-    }
-
-    public double getRightFrontPower() {
-        return rightFront;
-    }
-
-    public double getRightBackPower() {
-        return rightBack;
-    }
-
-    public void setLeftFrontPower(double leftFront) {
-        this.leftFront = leftFront;
-    }
-
-    public void setLeftBackPower(double leftBack) {
-        this.leftBack = leftBack;
-    }
-
-    public void setRightFrontPower(double rightFront) {
-        this.rightFront = rightFront;
-    }
-
-    public void setRightBackPower(double rightBack) {
         this.rightBack = rightBack;
     }
 

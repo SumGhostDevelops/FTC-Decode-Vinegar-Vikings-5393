@@ -85,10 +85,10 @@ public class TuneTurningTeleOp extends LinearOpMode {
         // but only if at least one is out of the range [-1, 1]
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
 
-        robot.wheels.setLeftFrontPower((rotY + rotX + rx) / denominator);
-        robot.wheels.setLeftBackPower((rotY - rotX + rx) / denominator);
-        robot.wheels.setRightFrontPower((rotY - rotX - rx) / denominator);
-        robot.wheels.setRightBackPower((rotY + rotX - rx) / denominator);
+        robot.wheels.leftFront = (rotY + rotX + rx) / denominator;
+        robot.wheels.leftBack = (rotY - rotX + rx) / denominator;
+        robot.wheels.rightFront = (rotY - rotX - rx) / denominator;
+        robot.wheels.rightBack = (rotY + rotX - rx) / denominator;
 
         // TODO: Add keybind system for different drivers
 
