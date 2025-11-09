@@ -230,10 +230,10 @@ public class Actions
         Wheels wheels = robot.wheels;
         double speedScalar = robot.status.getSpeedScalar();
 
-        robot.hub.leftFront.setPower(wheels.getLeftFrontPower() * speedScalar);
-        robot.hub.leftBack.setPower(wheels.getLeftBackPower() * speedScalar);
-        robot.hub.rightFront.setPower(wheels.getRightFrontPower() * speedScalar);
-        robot.hub.rightBack.setPower(wheels.getRightBackPower() * speedScalar);
+        robot.hub.leftFront.setPower(wheels.leftFront * speedScalar);
+        robot.hub.leftBack.setPower(wheels.leftBack * speedScalar);
+        robot.hub.rightFront.setPower(wheels.rightFront * speedScalar);
+        robot.hub.rightBack.setPower(wheels.rightBack * speedScalar);
     }
     public static void launchBall(Robot robot)
     {
