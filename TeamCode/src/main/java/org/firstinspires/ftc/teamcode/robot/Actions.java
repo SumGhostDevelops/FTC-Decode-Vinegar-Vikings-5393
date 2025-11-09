@@ -251,13 +251,14 @@ public class Actions
 
     public static void manualLaunchBall(RobotContext robot)
     {
-        double launcherPower = Variables.getLauncherPower();
-        robot.hub.launcher.setPower(launcherPower);
+        robot.hub.launcher.setPower(robot.launcher.power);
     }
 
     public static void changeLauncherPower (RobotContext robot, Double change)
     {
-        Variables.setLauncherPower(Math.max(0.7, Math.min(1, Variables.getLauncherPower()+change)));
-        robot.telemetry.log().add("New Launcher Power: " + Variables.getLauncherPower());
+        Launcher launcher = robot.launcher;
+
+        launcher.power = Math.max(0.7, Math.min(1, launcher.power + change));
+        robot.telemetry.log().add("New Launcher Power: " + launcher.power);
     }
 }
