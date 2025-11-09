@@ -1,30 +1,48 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import java.util.function.Supplier;
+import java.util.*;
 
 public class Robot
 {
-    public ControlHub hub;
-    public AprilTagWebcam webcam;
-    public Telemetry telemetry;
-    public Gamepad gamepad;
-    public Supplier<Boolean> opModeIsActive;
-    public RobotStatus status;
-    public Wheels wheels;
+    public String mode;
+    public double speedScalar;
+    public int obeliskId;
+    public Map<String, String> extra;
 
-
-    public Robot(ControlHub hub, AprilTagWebcam webcam, Telemetry telemetry, Gamepad gamepad, Supplier<Boolean> opModeIsActive, RobotStatus status, Wheels wheels)
+    public Robot()
     {
-        this.hub = hub;
-        this.webcam = webcam;
-        this.telemetry = telemetry;
-        this.gamepad = gamepad;
-        this.opModeIsActive = opModeIsActive;
-        this.status = status;
-        this.wheels = wheels;
+        this.mode = "Manual";
+        this.speedScalar = 0;
+        this.obeliskId = -1;
+        this.extra = new HashMap<String, String>();
+    }
+
+    public Robot(double speedScalar, int obeliskId, Map<String, String> extra)
+    {
+        this.mode = "Manual";
+        this.speedScalar = speedScalar;
+        this.obeliskId = obeliskId;
+        this.extra = extra;
+    }
+
+    public void updateTelemetry(Telemetry telemetry)
+    {
+        telemetry.clear();
+
+        telemetry.addData("Mode", mode);
+        telemetry.addData("Speed", speedScalar);
+        telemetry.addData("Obelisk Combination", obeliskId);
+
+        if (!extra.isEmpty())
+        {
+            for (Map.Entry<String, String> entry : extra.entrySet())
+            {
+                telemetry.addData(entry.getKey(), entry.getValue());
+            }
+        }
+
+        telemetry.update();
     }
 }

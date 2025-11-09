@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
 import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
+import org.firstinspires.ftc.teamcode.robot.RobotContext;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.RobotStatus;
 import org.firstinspires.ftc.teamcode.robot.Wheels;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -28,7 +28,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
     private final double lowerSpeedLimit = 0.05;
     private final int goalTagId = 24;
     // Initialize some stuff
-    Robot robot;
+    RobotContext robotContext;
 
     // for tuning PID values
     private double kP = 0.07;  // Proportional (The "gas") - Start with this higher
@@ -40,7 +40,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
         ControlHub hub = new ControlHub();
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
-        robot = new Robot(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new RobotStatus(), new Wheels());
+        robotContext = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(), new Wheels());
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -50,29 +50,29 @@ public class TuneTurningTeleOp extends LinearOpMode {
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
-        robot.hub.imu.initialize(parameters);
-        robot.hub.imu.resetYaw();
+        robotContext.hub.imu.initialize(parameters);
+        robotContext.hub.imu.resetYaw();
 
         telemetry.setAutoClear(false);
-        robot.telemetry.addLine("kP = bumpers, kD = dpad vertical, minTurnPower = dpad horizontal");
-        robot.telemetry.addData("kP", kP);
-        robot.telemetry.addData("kD", kD);
-        robot.telemetry.addData("minTurnPower", minTurnPower);
-        robot.telemetry.update();
+        robotContext.telemetry.addLine("kP = bumpers, kD = dpad vertical, minTurnPower = dpad horizontal");
+        robotContext.telemetry.addData("kP", kP);
+        robotContext.telemetry.addData("kD", kD);
+        robotContext.telemetry.addData("minTurnPower", minTurnPower);
+        robotContext.telemetry.update();
 
         waitForStart();
         while (opModeIsActive()) {
             motorAction(gamepad1);
         }
 
-        robot.webcam.close();
+        robotContext.webcam.close();
     }
 
     public void motorAction(Gamepad gamepad) throws InterruptedException {
         double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;
-        double botHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double botHeading = robotContext.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         // Rotate the movement direction counter to the bot's rotation
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -85,21 +85,21 @@ public class TuneTurningTeleOp extends LinearOpMode {
         // but only if at least one is out of the range [-1, 1]
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
 
-        robot.wheels.leftFront = (rotY + rotX + rx) / denominator;
-        robot.wheels.leftBack = (rotY - rotX + rx) / denominator;
-        robot.wheels.rightFront = (rotY - rotX - rx) / denominator;
-        robot.wheels.rightBack = (rotY + rotX - rx) / denominator;
+        robotContext.wheels.leftFront = (rotY + rotX + rx) / denominator;
+        robotContext.wheels.leftBack = (rotY - rotX + rx) / denominator;
+        robotContext.wheels.rightFront = (rotY - rotX - rx) / denominator;
+        robotContext.wheels.rightBack = (rotY + rotX - rx) / denominator;
 
         // TODO: Add keybind system for different drivers
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
         {
-            Actions.stopMoving(robot);
+            Actions.stopMoving(robotContext);
         }
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            aimToAprilTag(robot, goalTagId);
+            aimToAprilTag(robotContext, goalTagId);
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk
@@ -108,49 +108,49 @@ public class TuneTurningTeleOp extends LinearOpMode {
 
         if (gamepad.bWasPressed())
         {
-            robot.hub.imu.resetYaw();
+            robotContext.hub.imu.resetYaw();
         }
 
         if (gamepad.dpadUpWasPressed()) // increase kD
         {
             kD += 0.001;
-            robot.telemetry.addData("kD", kD);
-            robot.telemetry.update();
+            robotContext.telemetry.addData("kD", kD);
+            robotContext.telemetry.update();
         }
 
         if (gamepad.dpadDownWasPressed()) // decrease kD
         {
             kD -= 0.001;
-            robot.telemetry.addData("kD", kD);
-            robot.telemetry.update();
+            robotContext.telemetry.addData("kD", kD);
+            robotContext.telemetry.update();
         }
 
         if (gamepad.dpadLeftWasPressed()) // decrease minTurnPower
         {
             minTurnPower -= 0.01;
-            robot.telemetry.addData("minTurnPower", minTurnPower);
-            robot.telemetry.update();
+            robotContext.telemetry.addData("minTurnPower", minTurnPower);
+            robotContext.telemetry.update();
         }
 
         if (gamepad.dpadRightWasPressed()) // increase minTurnPower
         {
             minTurnPower += 0.01;
-            robot.telemetry.addData("minTurnPower", minTurnPower);
-            robot.telemetry.update();
+            robotContext.telemetry.addData("minTurnPower", minTurnPower);
+            robotContext.telemetry.update();
         }
 
         if (gamepad.leftBumperWasPressed()) // increase kp
         {
             kD += 0.01;
-            robot.telemetry.addData("kP", kP);
-            robot.telemetry.update();
+            robotContext.telemetry.addData("kP", kP);
+            robotContext.telemetry.update();
         }
 
         if (gamepad.rightBumperWasPressed()) // decrease kp
         {
             kD -= 0.01;
-            robot.telemetry.addData("kP", kP);
-            robot.telemetry.update();
+            robotContext.telemetry.addData("kP", kP);
+            robotContext.telemetry.update();
         }
 
         if (gamepad.right_trigger > 0.05) // Shoot
@@ -165,49 +165,49 @@ public class TuneTurningTeleOp extends LinearOpMode {
         }
         else
         {
-            robot.hub.loader.setPower(0);
+            robotContext.hub.loader.setPower(0);
         }
 
         // Handle movement inputs
-        Actions.move(robot);
+        Actions.move(robotContext);
 
-        robot.telemetry.update();
+        robotContext.telemetry.update();
     }
 
-    public void aimToAprilTag(Robot robot, int tagId)
+    public void aimToAprilTag(RobotContext robotContext, int tagId)
     {
-        robot.telemetry.log().add("-aimToAprilTag---------");
+        robotContext.telemetry.log().add("-aimToAprilTag---------");
         AprilTagDetection tag;
-        robot.webcam.updateDetections();
+        robotContext.webcam.updateDetections();
 
         try
         {
-            tag = robot.webcam.getSingleDetection(tagId);
+            tag = robotContext.webcam.getSingleDetection(tagId);
         }
         catch (NoTagsDetectedException | TagNotFoundException e)
         {
-            robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
+            robotContext.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
             return;
         }
 
-        aimToAprilTag(robot, tag);
+        aimToAprilTag(robotContext, tag);
     }
 
-    private void aimToAprilTag(Robot robot, AprilTagDetection tag)
+    private void aimToAprilTag(RobotContext robotContext, AprilTagDetection tag)
     {
         // Get the yaw from the AprilTag detection. This is how many degrees we need to turn.
         double yawToCorrect = tag.ftcPose.yaw;
 
         // Get the robot's current heading from the IMU.
-        double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        double currentBotHeading = robotContext.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         // Calculate the absolute target angle for the robot to face.
         double targetAngle = RobotMath.normalizeAngle(currentBotHeading + yawToCorrect);
 
-        robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
-        robot.telemetry.update();
+        robotContext.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
+        robotContext.telemetry.update();
 
         // Call the new PID turning method
-        Actions.newTurnToAngle(robot, targetAngle, kP, kD, minTurnPower);
+        Actions.newTurnToAngle(robotContext, targetAngle, kP, kD, minTurnPower);
     }
 }
