@@ -12,10 +12,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Actions
 {
-    public static void turnToAngle(RobotContext robotContext, double targetAngle)
+    public static void turnToAngle(RobotContext robot, double targetAngle)
     {
-        robotContext.self.extra.clear();
-        robotContext.telemetry.log().add("-turnToAngle--------");
+        robot.self.extra.clear();
+        robot.telemetry.log().add("-turnToAngle--------");
 
         // A simple P-controller for turning.
         double kP = 0.05; // Proportional gain
@@ -25,7 +25,7 @@ public class Actions
 
         do {
             // The IMU gives us the current angle of the robot.
-            double currentAngle = robotContext.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
             // Calculate the error, normalizing it to the -180 to +180 range
             // This finds the shortest path to the target angle.
@@ -38,34 +38,34 @@ public class Actions
             motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
 
             // Apply power to the motors to turn the robot.
-            robotContext.hub.leftFront.setPower(-motorPower);
-            robotContext.hub.leftBack.setPower(-motorPower);
-            robotContext.hub.rightFront.setPower(motorPower);
-            robotContext.hub.rightBack.setPower(motorPower);
+            robot.hub.leftFront.setPower(-motorPower);
+            robot.hub.leftBack.setPower(-motorPower);
+            robot.hub.rightFront.setPower(motorPower);
+            robot.hub.rightBack.setPower(motorPower);
 
             // Telemetry
-            robotContext.self.mode = "Automatic (Turning)";
-            robotContext.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
-            robotContext.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
-            robotContext.self.extra.put("Error", String.format("%.1f", error));
-            robotContext.self.updateTelemetry(robotContext.telemetry);
-            robotContext.telemetry.update();
+            robot.self.mode = "Automatic (Turning)";
+            robot.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
+            robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
+            robot.self.extra.put("Error", String.format("%.1f", error));
+            robot.self.updateTelemetry(robot.telemetry);
+            robot.telemetry.update();
 
-        } while (Math.abs(error) > tolerance && robotContext.opModeIsActive.get() && !robotContext.gamepad.yWasPressed());
+        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop all motors
-        stopMoving(robotContext);
+        stopMoving(robot);
 
-        robotContext.self.mode = "Manual";
-        robotContext.self.extra.clear();
-        robotContext.telemetry.log().add("Finished turning.");
-        robotContext.self.updateTelemetry(robotContext.telemetry);
+        robot.self.mode = "Manual";
+        robot.self.extra.clear();
+        robot.telemetry.log().add("Finished turning.");
+        robot.self.updateTelemetry(robot.telemetry);
     }
 
-    public static void newTurnToAngle(RobotContext robotContext, double targetAngle, double kP, double kD, double minTurnPower)
+    public static void newTurnToAngle(RobotContext robot, double targetAngle, double kP, double kD, double minTurnPower)
     {
-        robotContext.self.extra.clear();
-        robotContext.telemetry.log().add("-turnToAngle (PD)--------");
+        robot.self.extra.clear();
+        robot.telemetry.log().add("-turnToAngle (PD)--------");
 
         /*
         // --- Tuning Gains (You MUST tune these) ---
@@ -84,7 +84,7 @@ public class Actions
         ElapsedTime timer = new ElapsedTime();
 
         do {
-            double currentAngle = robotContext.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
             error = RobotMath.normalizeAngle(targetAngle - currentAngle);
 
             // --- 'D' Term Calculation ---
@@ -110,94 +110,94 @@ public class Actions
             motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
 
             // Apply power
-            robotContext.hub.leftFront.setPower(-motorPower);
-            robotContext.hub.leftBack.setPower(-motorPower);
-            robotContext.hub.rightFront.setPower(motorPower);
-            robotContext.hub.rightBack.setPower(motorPower);
+            robot.hub.leftFront.setPower(-motorPower);
+            robot.hub.leftBack.setPower(-motorPower);
+            robot.hub.rightFront.setPower(motorPower);
+            robot.hub.rightBack.setPower(motorPower);
 
             // Update loop variables for next cycle
             lastError = error;
             timer.reset();
 
             // Telemetry
-            robotContext.self.mode = "Automatic (Turning)";
-            robotContext.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
-            robotContext.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
-            robotContext.self.extra.put("Error", String.format("%.1f", error));
-            robotContext.self.updateTelemetry(robotContext.telemetry);
-            robotContext.telemetry.update();
+            robot.self.mode = "Automatic (Turning)";
+            robot.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
+            robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
+            robot.self.extra.put("Error", String.format("%.1f", error));
+            robot.self.updateTelemetry(robot.telemetry);
+            robot.telemetry.update();
 
-        } while (Math.abs(error) > tolerance && robotContext.opModeIsActive.get() && !robotContext.gamepad.yWasPressed());
+        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop all motors
-        stopMoving(robotContext);
+        stopMoving(robot);
 
-        robotContext.self.mode = "Manual";
-        robotContext.self.extra.clear();
-        robotContext.telemetry.log().add("Finished turning.");
-        robotContext.self.updateTelemetry(robotContext.telemetry);
+        robot.self.mode = "Manual";
+        robot.self.extra.clear();
+        robot.telemetry.log().add("Finished turning.");
+        robot.self.updateTelemetry(robot.telemetry);
     }
 
-    public static void scanObelisk(RobotContext robotContext)
+    public static void scanObelisk(RobotContext robot)
     {
         AprilTagDetection tag;
-        robotContext.telemetry.log().add("-scanObelisk---------");
-        robotContext.webcam.updateDetections();
+        robot.telemetry.log().add("-scanObelisk---------");
+        robot.webcam.updateDetections();
 
         try
         {
-            tag = robotContext.webcam.scanObelisk();
+            tag = robot.webcam.scanObelisk();
         }
         catch (NoTagsDetectedException e)
         {
-            robotContext.telemetry.log().add("No tags detected.");
-            robotContext.telemetry.update();
+            robot.telemetry.log().add("No tags detected.");
+            robot.telemetry.update();
             return;
         }
         catch (UnexpectedTagIDException e)
         {
-            robotContext.telemetry.log().add("Tags were detected, but none were a valid obelisk tag.");
-            robotContext.telemetry.update();
+            robot.telemetry.log().add("Tags were detected, but none were a valid obelisk tag.");
+            robot.telemetry.update();
             return;
         }
 
-        if (tag.id == robotContext.self.obeliskId)
+        if (tag.id == robot.self.obeliskId)
         {
-            robotContext.telemetry.log().add("The same obelisk was detected.");
-            robotContext.telemetry.update();
+            robot.telemetry.log().add("The same obelisk was detected.");
+            robot.telemetry.update();
             return;
         }
 
         if (!ObeliskHelper.isObelisk(tag.id))
         {
-            robotContext.telemetry.log().add("The detected tag was not a valid obelisk tag.");
-            robotContext.telemetry.update();
+            robot.telemetry.log().add("The detected tag was not a valid obelisk tag.");
+            robot.telemetry.update();
             return;
         }
 
-        robotContext.self.mode = "Manual";
-        robotContext.self.obeliskId = tag.id;
-        robotContext.telemetry.log().add("New Obelisk ID: " + tag.id);
-        robotContext.self.updateTelemetry(robotContext.telemetry);
+        robot.self.mode = "Manual";
+        robot.self.obeliskId = tag.id;
+        robot.telemetry.log().add("New Obelisk ID: " + tag.id);
+        robot.self.updateTelemetry(robot.telemetry);
     }
 
-    public static void aimToAprilTag(RobotContext robotContext, int tagId)
+    public static void aimToAprilTag(RobotContext robot, int tagId)
     {
-        robotContext.telemetry.log().add("-aimToAprilTag---------");
+        robot.telemetry.log().add("-aimToAprilTag---------");
         AprilTagDetection tag;
-        robotContext.webcam.updateDetections();
+        robot.webcam.updateDetections();
 
         try
         {
-            tag = robotContext.webcam.getSingleDetection(tagId);
+            tag = robot.webcam.getSingleDetection(tagId);
         }
         catch (NoTagsDetectedException | TagNotFoundException e)
         {
-            robotContext.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
+            robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
             return;
         }
 
-        aimToAprilTag(robotContext, tag);
+        aimToAprilTag(robot, tag);
     }
 
     private static void aimToAprilTag(RobotContext robotContext, AprilTagDetection tag)
@@ -218,46 +218,46 @@ public class Actions
         turnToAngle(robotContext, targetAngle);
     }
 
-    public static void move(RobotContext robotContext)
+    public static void move(RobotContext robot)
     {
-        Wheels wheels = robotContext.wheels;
-        double speedScalar = robotContext.self.speed;
+        Wheels wheels = robot.wheels;
+        double speedScalar = robot.self.speed;
 
-        robotContext.hub.leftFront.setPower(wheels.leftFront * speedScalar);
-        robotContext.hub.leftBack.setPower(wheels.leftBack * speedScalar);
-        robotContext.hub.rightFront.setPower(wheels.rightFront * speedScalar);
-        robotContext.hub.rightBack.setPower(wheels.rightBack * speedScalar);
+        robot.hub.leftFront.setPower(wheels.leftFront * speedScalar);
+        robot.hub.leftBack.setPower(wheels.leftBack * speedScalar);
+        robot.hub.rightFront.setPower(wheels.rightFront * speedScalar);
+        robot.hub.rightBack.setPower(wheels.rightBack * speedScalar);
     }
 
-    public static void stopMoving(RobotContext robotContext)
+    public static void stopMoving(RobotContext robot)
     {
-        robotContext.wheels.setAllPower(0);
-        move(robotContext);
+        robot.wheels.setAllPower(0);
+        move(robot);
     }
 
-    public static void launchBall(RobotContext robotContext)
+    public static void launchBall(RobotContext robot)
     {
-        robotContext.hub.launcher.setPower(0.75);
+        robot.hub.launcher.setPower(0.75);
         try
         {
-            robotContext.hub.launcher.wait(1000);
+            robot.hub.launcher.wait(1000);
         }
         catch (InterruptedException e)
         {
-            robotContext.telemetry.log().add("Launcher waiting failed. Error: " + e.getMessage());
+            robot.telemetry.log().add("Launcher waiting failed. Error: " + e.getMessage());
         }
-        robotContext.hub.launcher.setPower(0);
+        robot.hub.launcher.setPower(0);
     }
 
-    public static void manualLaunchBall(RobotContext robotContext)
+    public static void manualLaunchBall(RobotContext robot)
     {
         double launcherPower = Variables.getLauncherPower();
-        robotContext.hub.launcher.setPower(launcherPower);
+        robot.hub.launcher.setPower(launcherPower);
     }
 
-    public static void changeLauncherPower (RobotContext robotContext, Double change)
+    public static void changeLauncherPower (RobotContext robot, Double change)
     {
         Variables.setLauncherPower(Math.max(0.7, Math.min(1, Variables.getLauncherPower()+change)));
-        robotContext.telemetry.log().add("New Launcher Power: " + Variables.getLauncherPower());
+        robot.telemetry.log().add("New Launcher Power: " + Variables.getLauncherPower());
     }
 }
