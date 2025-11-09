@@ -17,7 +17,7 @@ public class Actions
 {
     public static void turnToAngle(Robot robot, double targetAngle)
     {
-        robot.status.clearExtra();
+        robot.status.extra.clear();
         robot.telemetry.log().add("-turnToAngle--------");
 
         // A simple P-controller for turning.
@@ -47,10 +47,10 @@ public class Actions
             robot.hub.rightBack.setPower(motorPower);
 
             // Telemetry
-            robot.status.setMode("Automatic (Turning)");
-            robot.status.addExtra("Current Angle", String.format("%.1f", currentAngle));
-            robot.status.addExtra("Target Angle", String.format("%.1f", targetAngle));
-            robot.status.addExtra("Error", String.format("%.1f", error));
+            robot.status.mode = "Automatic (Turning)";
+            robot.status.extra.put("Current Angle", String.format("%.1f", currentAngle));
+            robot.status.extra.put("Target Angle", String.format("%.1f", targetAngle));
+            robot.status.extra.put("Error", String.format("%.1f", error));
             robot.status.updateTelemetry(robot.telemetry);
             robot.telemetry.update();
 
@@ -62,21 +62,23 @@ public class Actions
         robot.hub.rightFront.setPower(0);
         robot.hub.rightBack.setPower(0);
 
-        robot.status.setMode("Manual");
-        robot.status.clearExtra();
+        robot.status.mode = "Manual";
+        robot.status.extra.clear();
         robot.telemetry.log().add("Finished turning.");
         robot.status.updateTelemetry(robot.telemetry);
     }
 
-    public static void newTurnToAngle(Robot robot, double targetAngle)
+    public static void newTurnToAngle(Robot robot, double targetAngle, double kP, double kD, double minTurnPower)
     {
-        robot.status.clearExtra();
+        robot.status.extra.clear();
         robot.telemetry.log().add("-turnToAngle (PD)--------");
 
+        /*
         // --- Tuning Gains (You MUST tune these) ---
         double kP = 0.07;  // Proportional (The "gas") - Start with this higher
         double kD = 0.002; // Derivative (The "brake") - Start small
         double minTurnPower = 0.1; // Minimum power to overcome friction
+         */
 
         double error;
         double motorPower;
@@ -124,10 +126,10 @@ public class Actions
             timer.reset();
 
             // Telemetry
-            robot.status.setMode("Automatic (Turning)");
-            robot.status.addExtra("Current Angle", String.format("%.1f", currentAngle));
-            robot.status.addExtra("Target Angle", String.format("%.1f", targetAngle));
-            robot.status.addExtra("Error", String.format("%.1f", error));
+            robot.status.mode = "Automatic (Turning)";
+            robot.status.extra.put("Current Angle", String.format("%.1f", currentAngle));
+            robot.status.extra.put("Target Angle", String.format("%.1f", targetAngle));
+            robot.status.extra.put("Error", String.format("%.1f", error));
             robot.status.updateTelemetry(robot.telemetry);
             robot.telemetry.update();
 
@@ -139,8 +141,8 @@ public class Actions
         robot.hub.rightFront.setPower(0);
         robot.hub.rightBack.setPower(0);
 
-        robot.status.setMode("Manual");
-        robot.status.clearExtra();
+        robot.status.mode = "Manual";
+        robot.status.extra.clear();
         robot.telemetry.log().add("Finished turning.");
         robot.status.updateTelemetry(robot.telemetry);
     }
@@ -168,7 +170,7 @@ public class Actions
             return;
         }
 
-        if (tag.id == robot.status.getObeliskId())
+        if (tag.id == robot.status.obeliskId)
         {
             robot.telemetry.log().add("The same obelisk was detected.");
             robot.telemetry.update();
@@ -182,8 +184,8 @@ public class Actions
             return;
         }
 
-        robot.status.setMode("Manual");
-        robot.status.setObeliskId(tag.id);
+        robot.status.mode = "Manual";
+        robot.status.obeliskId = tag.id;
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
         robot.status.updateTelemetry(robot.telemetry);
     }
@@ -228,7 +230,7 @@ public class Actions
     public static void move(Robot robot)
     {
         Wheels wheels = robot.wheels;
-        double speedScalar = robot.status.getSpeedScalar();
+        double speedScalar = robot.status.speedScalar;
 
         robot.hub.leftFront.setPower(wheels.leftFront * speedScalar);
         robot.hub.leftBack.setPower(wheels.leftBack * speedScalar);

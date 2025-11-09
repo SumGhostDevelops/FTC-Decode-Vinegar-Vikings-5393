@@ -174,7 +174,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
         robot.telemetry.update();
     }
 
-    public static void aimToAprilTag(Robot robot, int tagId)
+    public void aimToAprilTag(Robot robot, int tagId)
     {
         robot.telemetry.log().add("-aimToAprilTag---------");
         AprilTagDetection tag;
@@ -193,7 +193,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
         aimToAprilTag(robot, tag);
     }
 
-    private static void aimToAprilTag(Robot robot, AprilTagDetection tag)
+    private void aimToAprilTag(Robot robot, AprilTagDetection tag)
     {
         // Get the yaw from the AprilTag detection. This is how many degrees we need to turn.
         double yawToCorrect = tag.ftcPose.yaw;
@@ -208,6 +208,6 @@ public class TuneTurningTeleOp extends LinearOpMode {
         robot.telemetry.update();
 
         // Call the new PID turning method
-        Actions.newTurnToAngle(robot, targetAngle);
+        Actions.newTurnToAngle(robot, targetAngle, kP, kD, minTurnPower);
     }
 }
