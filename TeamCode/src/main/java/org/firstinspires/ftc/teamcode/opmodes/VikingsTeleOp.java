@@ -23,7 +23,7 @@ public class VikingsTeleOp extends LinearOpMode {
     // TODO: Tune these speeds OR make them easily editable (FTC dashboard?)
     private final double upperSpeedLimit = 0.75;
     private final double lowerSpeedLimit = 0.05;
-    private final int goalTagId = 24;
+    private final String team = "red";
     // Initialize some stuff
     RobotContext robot;
 
@@ -32,7 +32,7 @@ public class VikingsTeleOp extends LinearOpMode {
         ControlHub hub = new ControlHub();
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
-        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(), new Wheels(), new Launcher());
+        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(team), new Wheels(), new Launcher());
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -86,7 +86,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            Actions.aimToAprilTag(robot, goalTagId);
+            Actions.aimToAprilTag(robot, robot.self.getGoalId());
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk

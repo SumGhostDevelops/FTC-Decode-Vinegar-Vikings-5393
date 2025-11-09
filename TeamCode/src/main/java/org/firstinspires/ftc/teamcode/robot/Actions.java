@@ -44,7 +44,7 @@ public class Actions
             robot.hub.rightBack.setPower(motorPower);
 
             // Telemetry
-            robot.self.mode = "Automatic (Turning)";
+            robot.self.mode = "automatic";
             robot.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
             robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
             robot.self.extra.put("Error", String.format("%.1f", error));
@@ -56,7 +56,7 @@ public class Actions
         // Stop all motors
         stopMoving(robot);
 
-        robot.self.mode = "Manual";
+        robot.self.mode = "manual";
         robot.self.extra.clear();
         robot.telemetry.log().add("Finished turning.");
         robot.self.updateTelemetry(robot.telemetry);
@@ -120,7 +120,7 @@ public class Actions
             timer.reset();
 
             // Telemetry
-            robot.self.mode = "Automatic (Turning)";
+            robot.self.mode = "automatic";
             robot.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
             robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
             robot.self.extra.put("Error", String.format("%.1f", error));
@@ -132,7 +132,7 @@ public class Actions
         // Stop all motors
         stopMoving(robot);
 
-        robot.self.mode = "Manual";
+        robot.self.mode = "manual";
         robot.self.extra.clear();
         robot.telemetry.log().add("Finished turning.");
         robot.self.updateTelemetry(robot.telemetry);
@@ -175,7 +175,7 @@ public class Actions
             return;
         }
 
-        robot.self.mode = "Manual";
+        robot.self.mode = "manual";
         robot.self.obeliskId = tag.id;
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
         robot.self.updateTelemetry(robot.telemetry);
