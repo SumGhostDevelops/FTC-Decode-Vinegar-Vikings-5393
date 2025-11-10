@@ -43,14 +43,11 @@ public class VikingsAuton extends LinearOpMode
         telemetry.setAutoClear(false);
 
         waitForStart();
-        while (opModeIsActive())
+        actions.aimToAprilTag(robot.self.getGoalId());
+        for (int i = 0; i < 3; i++)
         {
-            actions.aimToAprilTag(robot.self.getGoalId());
-            for (int i = 0; i < 3; i++)
-            {
-                actions.loadLaunchBall();
+            actions.loadLaunchBall();
 
-            }
         }
 
         robot.webcam.close();
