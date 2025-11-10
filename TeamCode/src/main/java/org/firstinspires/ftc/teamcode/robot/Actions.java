@@ -49,7 +49,6 @@ public class Actions
             robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
             robot.self.extra.put("Error", String.format("%.1f", error));
             robot.self.updateTelemetry(robot.telemetry);
-            robot.telemetry.update();
 
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
@@ -125,7 +124,6 @@ public class Actions
             robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
             robot.self.extra.put("Error", String.format("%.1f", error));
             robot.self.updateTelemetry(robot.telemetry);
-            robot.telemetry.update();
 
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
