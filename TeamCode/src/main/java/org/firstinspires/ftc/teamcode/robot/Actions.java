@@ -68,33 +68,48 @@ public class Actions
         robot.self.updateTelemetry(robot.telemetry);
     }
 
+    /**
+     * Turns the robot to a target angle using a PD controller.
+     *
+     * @param targetAngle The absolute target angle (in degrees).
+     * @param kP          The Proportional gain.
+     * @param kD          The Derivative gain.
+     * @param minTurnPower The minimum power to apply to overcome friction.
+     */
     public void newTurnToAngle(double targetAngle, double kP, double kD, double minTurnPower)
     {
         robot.self.extra.clear();
         robot.telemetry.log().add("-turnToAngle (PD)--------");
 
-        /*
-        // --- Tuning Gains (You MUST tune these) ---
-        double kP = 0.07;  // Proportional (The "gas") - Start with this higher
-        double kD = 0.002; // Derivative (The "brake") - Start small
-        double minTurnPower = 0.1; // Minimum power to overcome friction
-         */
-
         double error;
         double motorPower;
-        double tolerance = 1.0; // We can be more precise now
+        double tolerance = 1.0; // Angle tolerance in degrees
 
         // Variables for the 'D' term
-        double lastError = 0;
+        double lastError;
         double derivative;
         ElapsedTime timer = new ElapsedTime();
 
+        // --- FIX: Initialize variables *before* the loop ---
+        // Get the first error reading
+        double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        error = RobotMath.normalizeAngle(targetAngle - currentAngle);
+
+        // Set lastError to the current error so the D-term is 0 on the first loop
+        // This prevents the initial "derivative spike"
+        lastError = error;
+
+        // Reset the timer right before the loop starts
+        timer.reset();
+        // --- End of Fix ---
+
         do {
-            double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            // Get new angle and calculate error
+            currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
             error = RobotMath.normalizeAngle(targetAngle - currentAngle);
 
             // --- 'D' Term Calculation ---
-            // This is the "rate of change" of the error, or how fast we're turning.
+            // Calculate the rate of change (how fast the error is changing)
             derivative = (error - lastError) / timer.seconds();
 
             // --- PD Power Calculation ---
@@ -102,20 +117,21 @@ public class Actions
             motorPower = (error * kP) + (derivative * kD);
 
             // --- Minimum Power ---
-            // If the calculated power is too small, boost it to the min
-            // power to overcome static friction.
+            // If the calculated power is too small but we're not at the target,
+            // boost it to the min power to overcome static friction.
             if (Math.abs(error) > tolerance)
             {
                 if (Math.abs(motorPower) < minTurnPower)
                 {
+                    // Apply the sign of the motorPower (or error) to the min power
                     motorPower = Math.signum(motorPower) * minTurnPower;
                 }
             }
 
-            // Clamp the final power
+            // Clamp the final power to the -1.0 to 1.0 range
             motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
 
-            // Apply power
+            // Apply power to motors for a point turn
             robot.hub.leftFront.setPower(-motorPower);
             robot.hub.leftBack.setPower(-motorPower);
             robot.hub.rightFront.setPower(motorPower);
@@ -130,6 +146,8 @@ public class Actions
             robot.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
             robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
             robot.self.extra.put("Error", String.format("%.1f", error));
+            robot.self.extra.put("Power", String.format("%.2f", motorPower));
+            robot.self.extra.put("Deriv", String.format("%.2f", derivative));
             robot.self.updateTelemetry(robot.telemetry);
 
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());

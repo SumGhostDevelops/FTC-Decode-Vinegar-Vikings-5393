@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.teamcode.robot.Actions;
@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.RobotContext;
 import org.firstinspires.ftc.teamcode.robot.Wheels;
 
-@TeleOp(name="VikingsAuton")
+@Autonomous(name="VikingsAuton")
 public class VikingsAuton extends LinearOpMode
 {
     private final String team = "red";
@@ -45,6 +45,7 @@ public class VikingsAuton extends LinearOpMode
         waitForStart();
         while (opModeIsActive())
         {
+            actions.aimToAprilTag(robot.self.getGoalId());
             for (int i = 0; i < 3; i++)
             {
                 actions.loadLaunchBall();
