@@ -29,6 +29,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
     private final String teamColor = "blue";
     // Initialize some stuff
     RobotContext robot;
+    Actions actions;
 
     // for tuning PID values
     private double kP = 0.07;  // Proportional (The "gas") - Start with this higher
@@ -41,6 +42,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
         robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(teamColor), new Wheels());
+        actions = new Actions(robot);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -94,7 +96,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
 
         if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
         {
-            Actions.stopMoving(robot);
+            actions.stopMoving();
         }
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
@@ -170,7 +172,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
         }
 
         // Handle movement inputs
-        Actions.move(robot);
+        actions.move();
 
         robot.telemetry.update();
     }
@@ -209,6 +211,6 @@ public class TuneTurningTeleOp extends LinearOpMode {
         robotContext.telemetry.update();
 
         // Call the new PID turning method
-        Actions.newTurnToAngle(robotContext, targetAngle, kP, kD, minTurnPower);
+        actions.newTurnToAngle(targetAngle, kP, kD, minTurnPower);
     }
 }

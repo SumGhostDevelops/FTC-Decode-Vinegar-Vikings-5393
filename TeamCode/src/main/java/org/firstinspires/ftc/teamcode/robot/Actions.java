@@ -12,7 +12,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Actions
 {
-    public static void turnToAngle(RobotContext robot, double targetAngle)
+    private RobotContext robot;
+
+    public Actions(RobotContext robot)
+    {
+        this.robot = robot;
+    }
+
+    public void turnToAngle(double targetAngle)
     {
         robot.self.extra.clear();
         robot.telemetry.log().add("-turnToAngle--------");
@@ -53,7 +60,7 @@ public class Actions
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop all motors
-        stopMoving(robot);
+        stopMoving();
 
         robot.self.mode = "manual";
         robot.self.extra.clear();
@@ -61,7 +68,7 @@ public class Actions
         robot.self.updateTelemetry(robot.telemetry);
     }
 
-    public static void newTurnToAngle(RobotContext robot, double targetAngle, double kP, double kD, double minTurnPower)
+    public void newTurnToAngle(double targetAngle, double kP, double kD, double minTurnPower)
     {
         robot.self.extra.clear();
         robot.telemetry.log().add("-turnToAngle (PD)--------");
@@ -128,7 +135,7 @@ public class Actions
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop all motors
-        stopMoving(robot);
+        stopMoving();
 
         robot.self.mode = "manual";
         robot.self.extra.clear();
@@ -136,7 +143,7 @@ public class Actions
         robot.self.updateTelemetry(robot.telemetry);
     }
 
-    public static void scanObelisk(RobotContext robot)
+    public void scanObelisk()
     {
         AprilTagDetection tag;
         robot.telemetry.log().add("-scanObelisk---------");
@@ -178,7 +185,7 @@ public class Actions
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
     }
 
-    public static void aimToAprilTag(RobotContext robot, int tagId)
+    public void aimToAprilTag(int tagId)
     {
         robot.telemetry.log().add("-aimToAprilTag---------");
         AprilTagDetection tag;
@@ -194,28 +201,28 @@ public class Actions
             return;
         }
 
-        aimToAprilTag(robot, tag);
+        aimToAprilTag(tag);
     }
 
-    private static void aimToAprilTag(RobotContext robotContext, AprilTagDetection tag)
+    private void aimToAprilTag(AprilTagDetection tag)
     {
         // Get the yaw from the AprilTag detection. This is how many degrees we need to turn.
         double yawToCorrect = tag.ftcPose.yaw;
 
         // Get the robot's current heading from the IMU.
-        double currentBotHeading = robotContext.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         // Calculate the absolute target angle for the robot to face.
         double targetAngle = RobotMath.normalizeAngle(currentBotHeading + yawToCorrect);
 
-        robotContext.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
-        robotContext.telemetry.update();
+        robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
+        robot.telemetry.update();
 
         // Call the new PID turning method
-        turnToAngle(robotContext, targetAngle);
+        turnToAngle(targetAngle);
     }
 
-    public static void move(RobotContext robot)
+    public void move()
     {
         Wheels wheels = robot.wheels;
         double speedScalar = robot.self.getSpeed();
@@ -226,28 +233,46 @@ public class Actions
         robot.hub.rightBack.setPower(RobotMath.clampPower(wheels.rightBack * speedScalar));
     }
 
-    public static void stopMoving(RobotContext robot)
+    public void stopMoving()
     {
         robot.wheels.setAllPower(0);
-        move(robot);
+        move();
     }
 
-    public static void launchBall(RobotContext robot)
+    public void loadLaunchBall()
     {
-        robot.hub.launcher.setPower(0.75);
+        robot.hub.loader.setPower(1);
+        sleep(1);
+        robot.hub.loader.setPower(0);
+
+        robot.self.setLauncherSpeed(0.75);
+        robot.hub.launcher.setPower(robot.self.getLauncherSpeed());
+        robot.self.updateTelemetry(robot.telemetry);
+        sleep(1);
+        robot.hub.launcher.setPower(0);
+        robot.self.updateTelemetry(robot.telemetry);
+    }
+
+    public void manualLaunchBall()
+    {
+        robot.hub.launcher.setPower(robot.self.getLauncherSpeed());
+        robot.self.updateTelemetry(robot.telemetry);
+    }
+
+    public void sleep(double seconds)
+    {
+        long milliseconds = (long) (seconds * 1000);
+
+        robot.telemetry.log().add("Sleeping for " + seconds + "seconds.");
+        robot.telemetry.update();
+
         try
         {
-            robot.hub.launcher.wait(1000);
+            Thread.sleep(milliseconds);
         }
         catch (InterruptedException e)
         {
-            robot.telemetry.log().add("Launcher waiting failed. Error: " + e.getMessage());
+            Thread.currentThread().interrupt();
         }
-        robot.hub.launcher.setPower(0);
-    }
-
-    public static void manualLaunchBall(RobotContext robot)
-    {
-        robot.hub.launcher.setPower(robot.self.getLauncherSpeed());
     }
 }

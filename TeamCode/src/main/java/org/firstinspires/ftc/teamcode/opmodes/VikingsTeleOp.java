@@ -25,6 +25,7 @@ public class VikingsTeleOp extends LinearOpMode {
     private final String team = "red";
     // Initialize some stuff
     RobotContext robot;
+    Actions actions;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -32,6 +33,7 @@ public class VikingsTeleOp extends LinearOpMode {
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
         robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(team), new Wheels());
+        actions = new Actions(robot);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -85,12 +87,12 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            Actions.aimToAprilTag(robot, robot.self.getGoalId());
+            actions.aimToAprilTag(robot.self.getGoalId());
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk
         {
-            Actions.scanObelisk(robot);
+            actions.scanObelisk();
         }
 
         if (gamepad.bWasPressed())
@@ -130,7 +132,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.right_trigger > 0.25) // Shoot
         {
-            Actions.manualLaunchBall(robot);
+            actions.manualLaunchBall();
         }
         else
         {
@@ -147,7 +149,7 @@ public class VikingsTeleOp extends LinearOpMode {
         }
 
         // Handle movement inputs
-        Actions.move(robot);
+        actions.move();
 
         robot.telemetry.update();
     }
