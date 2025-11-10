@@ -11,7 +11,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
-import org.firstinspires.ftc.teamcode.robot.Launcher;
 import org.firstinspires.ftc.teamcode.robot.RobotContext;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.Wheels;
@@ -32,7 +31,7 @@ public class VikingsTeleOp extends LinearOpMode {
         ControlHub hub = new ControlHub();
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
-        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(team), new Wheels(), new Launcher());
+        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(team), new Wheels());
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -101,12 +100,12 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.dpadUpWasPressed())
         {
-            Actions.changeLauncherPower(robot,0.01);
+            robot.self.setLauncherSpeed(robot.self.getLauncherSpeed() + 0.01);
         }
 
         if (gamepad.dpadDownWasPressed()) // Mostly a demo. Can be removed later. Turns the bot around 180 degrees.
         {
-            Actions.changeLauncherPower(robot,-0.01);
+            robot.self.setLauncherSpeed(robot.self.getLauncherSpeed() - 0.01);
         }
 
         if (gamepad.dpadLeftWasPressed())
@@ -121,20 +120,12 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.leftBumperWasPressed()) // Lower speed
         {
-            if (robot.self.speed - 0.05 >= lowerSpeedLimit)
-            {
-                robot.self.speed -= 0.05;
-            }
-            robot.self.updateTelemetry(telemetry);
+            robot.self.setSpeed(robot.self.getSpeed() - 0.05);
         }
 
         if (gamepad.rightBumperWasPressed()) // Increase speed
         {
-            if (robot.self.speed + 0.05 <= upperSpeedLimit)
-            {
-                robot.self.speed += 0.05;
-            }
-            robot.self.updateTelemetry(telemetry);
+            robot.self.setSpeed(robot.self.getSpeed() + 0.05);
         }
 
         if (gamepad.right_trigger > 0.25) // Shoot
@@ -146,7 +137,7 @@ public class VikingsTeleOp extends LinearOpMode {
             robot.hub.launcher.setPower(0);
         }
 
-        if (gamepad.left_trigger > 0.25)
+        if (gamepad.left_trigger > 0.25) // Turn loader on
         {
             robot.hub.loader.setPower(1);
         }

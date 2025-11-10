@@ -161,7 +161,7 @@ public class Actions
             return;
         }
 
-        if (tag.id == robot.self.obeliskId)
+        if (tag.id == robot.self.getObeliskId())
         {
             robot.telemetry.log().add("The same obelisk was detected.");
             robot.telemetry.update();
@@ -176,9 +176,8 @@ public class Actions
         }
 
         robot.self.mode = "manual";
-        robot.self.obeliskId = tag.id;
+        robot.self.setObeliskId(tag.id);
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
-        robot.self.updateTelemetry(robot.telemetry);
     }
 
     public static void aimToAprilTag(RobotContext robot, int tagId)
@@ -221,7 +220,7 @@ public class Actions
     public static void move(RobotContext robot)
     {
         Wheels wheels = robot.wheels;
-        double speedScalar = robot.self.speed;
+        double speedScalar = robot.self.getSpeed();
 
         robot.hub.leftFront.setPower(RobotMath.clampPower(wheels.leftFront * speedScalar));
         robot.hub.leftBack.setPower(RobotMath.clampPower(wheels.leftBack * speedScalar));
@@ -251,14 +250,6 @@ public class Actions
 
     public static void manualLaunchBall(RobotContext robot)
     {
-        robot.hub.launcher.setPower(robot.launcher.power);
-    }
-
-    public static void changeLauncherPower (RobotContext robot, Double change)
-    {
-        Launcher launcher = robot.launcher;
-
-        launcher.power = Math.max(0.7, Math.min(1, launcher.power + change));
-        robot.telemetry.log().add("New Launcher Power: " + launcher.power);
+        robot.hub.launcher.setPower(robot.self.getLauncherSpeed());
     }
 }

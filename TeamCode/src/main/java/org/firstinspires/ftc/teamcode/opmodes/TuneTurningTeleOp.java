@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
 import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
-import org.firstinspires.ftc.teamcode.robot.Launcher;
 import org.firstinspires.ftc.teamcode.robot.RobotContext;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.Wheels;
@@ -27,7 +26,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
     // TODO: Tune these speeds OR make them easily editable (FTC dashboard?)
     private final double upperSpeedLimit = 0.75;
     private final double lowerSpeedLimit = 0.05;
-    private final int goalTagId = 24;
+    private final String teamColor = "blue";
     // Initialize some stuff
     RobotContext robot;
 
@@ -41,7 +40,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
         ControlHub hub = new ControlHub();
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
-        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(), new Wheels(), new Launcher());
+        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(teamColor), new Wheels());
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
 
@@ -100,7 +99,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            aimToAprilTag(robot, goalTagId);
+            aimToAprilTag(robot, robot.self.getGoalId());
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk
@@ -142,14 +141,14 @@ public class TuneTurningTeleOp extends LinearOpMode {
 
         if (gamepad.leftBumperWasPressed()) // increase kp
         {
-            kD += 0.01;
+            kP += 0.01;
             robot.telemetry.addData("kP", kP);
             robot.telemetry.update();
         }
 
         if (gamepad.rightBumperWasPressed()) // decrease kp
         {
-            kD -= 0.01;
+            kP -= 0.01;
             robot.telemetry.addData("kP", kP);
             robot.telemetry.update();
         }
