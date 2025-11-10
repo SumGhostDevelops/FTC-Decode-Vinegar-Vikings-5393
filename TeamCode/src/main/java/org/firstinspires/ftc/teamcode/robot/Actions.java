@@ -242,7 +242,7 @@ public class Actions
     public void loadLaunchBall()
     {
         robot.hub.loader.setPower(1);
-        sleep(1);
+        sleep(0.5);
         robot.hub.loader.setPower(0);
 
         robot.self.setLauncherSpeed(0.75);
