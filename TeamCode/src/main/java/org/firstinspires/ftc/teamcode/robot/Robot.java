@@ -15,7 +15,7 @@ public class Robot
 
     private Robot()
     {
-        this("blue", 0, 0.7, -1, new HashMap<String, String>());
+        this("blue", 0.7, 0.7, -1, new HashMap<String, String>());
     }
 
     public Robot(String teamColor)
