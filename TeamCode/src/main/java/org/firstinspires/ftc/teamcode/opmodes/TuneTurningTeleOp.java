@@ -56,7 +56,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
         robot.hub.imu.resetYaw();
 
         telemetry.setAutoClear(false);
-        robot.telemetry.addLine("kP = bumpers, kD = dpad vertical, minTurnPower = dpad horizontal");
+        robot.telemetry.addData("kP = bumpers, kD = dpad vertical, minTurnPower = dpad horizontal", "");
         robot.telemetry.addData("kP", kP);
         robot.telemetry.addData("kD", kD);
         robot.telemetry.addData("minTurnPower", minTurnPower);
