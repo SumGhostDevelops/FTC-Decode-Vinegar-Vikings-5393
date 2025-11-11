@@ -11,7 +11,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-@Disabled
+//@Disabled
 @TeleOp
 public class VisionDemoTeleOp extends LinearOpMode
 {

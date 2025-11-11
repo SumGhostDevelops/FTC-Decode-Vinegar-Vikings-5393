@@ -142,9 +142,9 @@ public class Robot
         switch (this.teamColor)
         {
             case "blue":
-                return 24;
-            case "red":
                 return 20;
+            case "red":
+                return 24;
             default:
                 throw new IllegalStateException("Unexpected teamColor: " + this.teamColor);
         }
