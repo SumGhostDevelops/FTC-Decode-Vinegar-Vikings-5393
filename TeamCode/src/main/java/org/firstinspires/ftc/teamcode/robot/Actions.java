@@ -28,7 +28,7 @@ public class Actions
         double kP = 0.05; // Proportional gain
         double error;
         double motorPower;
-        double tolerance = 0.5; // Stop when within this many degrees
+        double tolerance = 2; // Stop when within this many degrees
 
         do {
             // The IMU gives us the current angle of the robot.
