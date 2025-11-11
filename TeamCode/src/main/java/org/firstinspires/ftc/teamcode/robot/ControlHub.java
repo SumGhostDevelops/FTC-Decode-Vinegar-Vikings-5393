@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -22,7 +23,7 @@ public class ControlHub
     public DcMotor rightFront;
     public DcMotor leftBack;
     public DcMotor rightBack;
-    public DcMotor launcher;
+    public DcMotorEx launcher;
     public WebcamName camera;
     public IMU imu;
     public CRServo loader;
@@ -43,7 +44,7 @@ public class ControlHub
 
         camera = map.get(WebcamName.class,"Webcam 1");
         drive = new MecanumDrive(map,initialPose);
-        launcher = map.get(DcMotor.class, "launcher");
+        launcher = map.get(DcMotorEx.class, "launcher");
         launcher.setDirection(DcMotorSimple.Direction.REVERSE);
         loader = map.get(CRServo.class, "Loader");
         loader.setDirection(CRServo.Direction.REVERSE);

@@ -55,7 +55,7 @@ public class Actions
             robot.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
             robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
             robot.self.extra.put("Error", String.format("%.1f", error));
-            robot.self.updateTelemetry(robot.telemetry);
+            robot.self.updateTelemetry(robot);
 
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
@@ -65,7 +65,7 @@ public class Actions
         robot.self.mode = "manual";
         robot.self.extra.clear();
         robot.telemetry.log().add("Finished turning.");
-        robot.self.updateTelemetry(robot.telemetry);
+        robot.self.updateTelemetry(robot);
     }
 
     /**
@@ -148,7 +148,7 @@ public class Actions
             robot.self.extra.put("Error", String.format("%.1f", error));
             robot.self.extra.put("Power", String.format("%.2f", motorPower));
             robot.self.extra.put("Deriv", String.format("%.2f", derivative));
-            robot.self.updateTelemetry(robot.telemetry);
+            robot.self.updateTelemetry(robot);
 
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
@@ -158,7 +158,7 @@ public class Actions
         robot.self.mode = "manual";
         robot.self.extra.clear();
         robot.telemetry.log().add("Finished turning.");
-        robot.self.updateTelemetry(robot.telemetry);
+        robot.self.updateTelemetry(robot);
     }
 
     public void scanObelisk()
@@ -265,16 +265,16 @@ public class Actions
 
         robot.self.setLauncherSpeed(0.75);
         robot.hub.launcher.setPower(robot.self.getLauncherSpeed());
-        robot.self.updateTelemetry(robot.telemetry);
+        robot.self.updateTelemetry(robot);
         sleep(1);
         robot.hub.launcher.setPower(0);
-        robot.self.updateTelemetry(robot.telemetry);
+        robot.self.updateTelemetry(robot);
     }
 
     public void manualLaunchBall()
     {
         robot.hub.launcher.setPower(robot.self.getLauncherSpeed());
-        robot.self.updateTelemetry(robot.telemetry);
+        robot.self.updateTelemetry(robot);
     }
 
     public void sleep(double seconds)

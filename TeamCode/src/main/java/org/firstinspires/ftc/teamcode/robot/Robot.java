@@ -114,14 +114,16 @@ public class Robot
     }
 
 
-    public void updateTelemetry(Telemetry telemetry)
+    public void updateTelemetry(RobotContext robot)
     {
+        Telemetry telemetry = robot.telemetry;
         telemetry.clear();
 
         telemetry.addData("Team", teamColor);
         telemetry.addData("Mode", mode);
         telemetry.addData("Speed", speed);
         telemetry.addData("Launcher Speed", launcherSpeed);
+        telemetry.addData("Launcher RPM", (robot.hub.launcher.getVelocity() * 60) / 537.7);
         telemetry.addData("Obelisk Combination", obeliskId);
 
         if (!extra.isEmpty())
@@ -140,9 +142,9 @@ public class Robot
         switch (this.teamColor)
         {
             case "blue":
-                return 20;
-            case "red":
                 return 24;
+            case "red":
+                return 20;
             default:
                 throw new IllegalStateException("Unexpected teamColor: " + this.teamColor);
         }
