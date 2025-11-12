@@ -143,7 +143,7 @@ public class Actions
 
             // Telemetry
             robot.self.mode = "automatic";
-            robot.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
+            robot.telemetry.log().add("Current Angle", String.format("%.1f", currentAngle));
             robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
             robot.self.extra.put("Error", String.format("%.1f", error));
             robot.self.extra.put("Power", String.format("%.2f", motorPower));

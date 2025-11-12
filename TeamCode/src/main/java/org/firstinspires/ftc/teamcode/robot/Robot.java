@@ -73,7 +73,7 @@ public class Robot
     public boolean setSpeed(double newSpeed)
     {
         double lowerSpeedLimit = 0.05;
-        double upperSpeedLimit = 0.75;
+        double upperSpeedLimit = 1;
 
         if (newSpeed > upperSpeedLimit || newSpeed < lowerSpeedLimit)
         {

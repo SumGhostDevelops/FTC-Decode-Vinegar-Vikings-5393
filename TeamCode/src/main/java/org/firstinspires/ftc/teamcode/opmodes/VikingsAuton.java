@@ -44,19 +44,28 @@ public class VikingsAuton extends LinearOpMode
 
         waitForStart();
 
-        robot.hub.launcher.setPower(0.8);
+        robot.hub.launcher.setPower(0.78);
 
         actions.sleep(3);
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 4; i++)
         {
             robot.hub.loader.setPower(1);
-            actions.sleep(0.5);
+            actions.sleep(0.3);
             robot.hub.loader.setPower(0);
+            if (i == 3)
+            {
+                actions.sleep(0.5);
+                break;
+            }
             actions.sleep(2);
-
         }
 
         robot.hub.launcher.setPower(0);
+        robot.wheels.setAllPower(1);
+        actions.move();
+        actions.sleep(0.4);
+        robot.wheels.setAllPower(0);
+        actions.move();
 
         robot.webcam.close();
     }
