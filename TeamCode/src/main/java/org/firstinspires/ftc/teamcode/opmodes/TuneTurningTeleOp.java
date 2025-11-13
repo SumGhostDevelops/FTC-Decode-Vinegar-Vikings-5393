@@ -26,13 +26,13 @@ public class TuneTurningTeleOp extends LinearOpMode {
     // TODO: Tune these speeds OR make them easily editable (FTC dashboard?)
     private final double upperSpeedLimit = 0.75;
     private final double lowerSpeedLimit = 0.05;
-    private final String teamColor = "blue";
+    private final String teamColor = "red";
     // Initialize some stuff
     RobotContext robot;
     Actions actions;
 
     // for tuning PID values
-    private double kP = 0.07;  // Proportional (The "gas") - Start with this higher
+    private double kP = 0.01;  // Proportional (The "gas") - Start with this higher
     private double kD = 0.002; // Derivative (The "brake") - Start small
     private double minTurnPower = 0.1; // Minimum power to overcome friction
 
@@ -70,7 +70,8 @@ public class TuneTurningTeleOp extends LinearOpMode {
         robot.webcam.close();
     }
 
-    public void motorAction(Gamepad gamepad) throws InterruptedException {
+    public void motorAction(Gamepad gamepad) throws InterruptedException
+    {
         double y = -gamepad.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;
@@ -101,13 +102,24 @@ public class TuneTurningTeleOp extends LinearOpMode {
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            aimToAprilTag(robot, robot.self.getGoalId());
+            aimToAprilTag(robot.self.getGoalId());
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk
         {
+            telemetry.addData("Current IMU Angle: ", robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+            robot.webcam.updateDetections();
+            try
+            {
+                AprilTagDetection tag = robot.webcam.getSingleDetection(robot.self.getGoalId());
+                telemetry.log().add("AprilTag bearing: " + tag.ftcPose.bearing);
+                telemetry.log().add("AprilTag yaw: " + tag.ftcPose.yaw);
+            } catch (NoTagsDetectedException | TagNotFoundException e)
+            {
+                telemetry.addData("AprilTag not found. Error: ", e.getMessage());
+                return;
+            }
         }
-
         if (gamepad.bWasPressed())
         {
             robot.hub.imu.resetYaw();
@@ -141,32 +153,30 @@ public class TuneTurningTeleOp extends LinearOpMode {
             robot.telemetry.update();
         }
 
-        if (gamepad.leftBumperWasPressed()) // increase kp
+        if (gamepad.leftBumperWasPressed()) // decrease kp
         {
-            kP += 0.01;
+            kP -= 0.001;
             robot.telemetry.addData("kP", kP);
             robot.telemetry.update();
         }
 
-        if (gamepad.rightBumperWasPressed()) // decrease kp
+        if (gamepad.rightBumperWasPressed()) // increase kp
         {
-            kP -= 0.01;
+            kP += 0.001;
             robot.telemetry.addData("kP", kP);
             robot.telemetry.update();
         }
 
         if (gamepad.right_trigger > 0.05) // Shoot
         {
-        }
-        else
+        } else
         {
             robot.hub.launcher.setPower(0);
         }
 
         if (gamepad.left_trigger > 0.25)
         {
-        }
-        else
+        } else
         {
             robot.hub.loader.setPower(0);
         }
@@ -177,38 +187,38 @@ public class TuneTurningTeleOp extends LinearOpMode {
         robot.telemetry.update();
     }
 
-    public void aimToAprilTag(RobotContext robotContext, int tagId)
+    public void aimToAprilTag(int tagId)
     {
-        robotContext.telemetry.log().add("-aimToAprilTag---------");
+        robot.telemetry.log().add("-aimToAprilTag---------");
         AprilTagDetection tag;
-        robotContext.webcam.updateDetections();
+        robot.webcam.updateDetections();
 
         try
         {
-            tag = robotContext.webcam.getSingleDetection(tagId);
+            tag = robot.webcam.getSingleDetection(tagId);
         }
         catch (NoTagsDetectedException | TagNotFoundException e)
         {
-            robotContext.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
+            robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
             return;
         }
 
-        aimToAprilTag(robotContext, tag);
+        aimToAprilTag(tag);
     }
 
-    private void aimToAprilTag(RobotContext robotContext, AprilTagDetection tag)
+    private void aimToAprilTag(AprilTagDetection tag)
     {
         // Get the yaw from the AprilTag detection. This is how many degrees we need to turn.
-        double yawToCorrect = tag.ftcPose.yaw;
+        double yawToCorrect = tag.ftcPose.bearing;
 
         // Get the robot's current heading from the IMU.
-        double currentBotHeading = robotContext.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         // Calculate the absolute target angle for the robot to face.
         double targetAngle = RobotMath.normalizeAngle(currentBotHeading + yawToCorrect);
 
-        robotContext.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
-        robotContext.telemetry.update();
+        robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
+        robot.telemetry.update();
 
         // Call the new PID turning method
         actions.newTurnToAngle(targetAngle, kP, kD, minTurnPower);

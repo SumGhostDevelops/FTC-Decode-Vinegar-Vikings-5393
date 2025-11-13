@@ -28,7 +28,7 @@ public class Actions
         double kP = 0.05; // Proportional gain
         double error;
         double motorPower;
-        double tolerance = 2; // Stop when within this many degrees
+        double tolerance = 0.5; // Stop when within this many degrees
 
         do {
             // The IMU gives us the current angle of the robot.
@@ -52,9 +52,9 @@ public class Actions
 
             // Telemetry
             robot.self.mode = "automatic";
-            robot.self.extra.put("Current Angle", String.format("%.1f", currentAngle));
-            robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
-            robot.self.extra.put("Error", String.format("%.1f", error));
+            robot.telemetry.log().add("Current Angle: " + String.format("%.1f", currentAngle));
+            robot.telemetry.log().add("Target Angle: " + String.format("%.1f", targetAngle));
+            robot.telemetry.log().add("Error: " + String.format("%.1f", error));
             robot.self.updateTelemetry(robot);
 
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
@@ -68,14 +68,6 @@ public class Actions
         robot.self.updateTelemetry(robot);
     }
 
-    /**
-     * Turns the robot to a target angle using a PD controller.
-     *
-     * @param targetAngle The absolute target angle (in degrees).
-     * @param kP          The Proportional gain.
-     * @param kD          The Derivative gain.
-     * @param minTurnPower The minimum power to apply to overcome friction.
-     */
     public void newTurnToAngle(double targetAngle, double kP, double kD, double minTurnPower)
     {
         robot.self.extra.clear();
@@ -143,11 +135,11 @@ public class Actions
 
             // Telemetry
             robot.self.mode = "automatic";
-            robot.telemetry.log().add("Current Angle", String.format("%.1f", currentAngle));
-            robot.self.extra.put("Target Angle", String.format("%.1f", targetAngle));
-            robot.self.extra.put("Error", String.format("%.1f", error));
-            robot.self.extra.put("Power", String.format("%.2f", motorPower));
-            robot.self.extra.put("Deriv", String.format("%.2f", derivative));
+            robot.telemetry.log().add("Current Angle" + String.format("%.1f", currentAngle));
+            robot.telemetry.log().add("Target Angle" + String.format("%.1f", targetAngle));
+            robot.telemetry.log().add("Error" + String.format("%.1f", error));
+            robot.telemetry.log().add("Power" + String.format("%.2f", motorPower));
+            robot.telemetry.log().add("Deriv" + String.format("%.2f", derivative));
             robot.self.updateTelemetry(robot);
 
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
@@ -159,6 +151,11 @@ public class Actions
         robot.self.extra.clear();
         robot.telemetry.log().add("Finished turning.");
         robot.self.updateTelemetry(robot);
+    }
+
+    public void imuTurnToAngle(double kP, double kD, double minTurnPower)
+    {
+
     }
 
     public void scanObelisk()
@@ -203,42 +200,7 @@ public class Actions
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
     }
 
-    public void aimToAprilTag(int tagId)
-    {
-        robot.telemetry.log().add("-aimToAprilTag---------");
-        AprilTagDetection tag;
-        robot.webcam.updateDetections();
 
-        try
-        {
-            tag = robot.webcam.getSingleDetection(tagId);
-        }
-        catch (NoTagsDetectedException | TagNotFoundException e)
-        {
-            robot.telemetry.log().add("Auto Aim command cancelled. Error: " + e.getMessage());
-            return;
-        }
-
-        aimToAprilTag(tag);
-    }
-
-    private void aimToAprilTag(AprilTagDetection tag)
-    {
-        // Get the yaw from the AprilTag detection. This is how many degrees we need to turn.
-        double yawToCorrect = tag.ftcPose.yaw;
-
-        // Get the robot's current heading from the IMU.
-        double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
-        // Calculate the absolute target angle for the robot to face.
-        double targetAngle = RobotMath.normalizeAngle(currentBotHeading + yawToCorrect);
-
-        robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
-        robot.telemetry.update();
-
-        // Call the new PID turning method
-        turnToAngle(targetAngle);
-    }
 
     public void move()
     {

@@ -42,13 +42,13 @@ public class AprilTagWebcam
                 .setDrawTagID(showLiveView)
                 .setDrawTagOutline(showLiveView)
                 .setLensIntrinsics(fx, fy, cx, cy)
-                //.setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES)
+                .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES)
                 .build();
 
         visionPortal = new VisionPortal.Builder()
                 .addProcessor(tagProcessor)
                 .setCamera(webcamName)
-                //.setCameraResolution(new Size(640, 480))
+                .setCameraResolution(new Size(1280, 720))
                 .enableLiveView(showLiveView)
                 .build();
 
