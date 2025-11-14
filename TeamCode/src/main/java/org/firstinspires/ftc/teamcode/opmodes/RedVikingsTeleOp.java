@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
 import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
@@ -18,8 +19,8 @@ import org.firstinspires.ftc.teamcode.robot.Wheels;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 
 
-@TeleOp(name="VikingsTeleOp")
-public class VikingsTeleOp extends LinearOpMode {
+@TeleOp(name="RedVikingsTeleOp")
+public class RedVikingsTeleOp extends LinearOpMode {
     // Arbritary values for stuff
     // TODO: Tune these speeds OR make them easily editable (FTC dashboard?)
     private final double upperSpeedLimit = 0.75;
@@ -87,9 +88,26 @@ public class VikingsTeleOp extends LinearOpMode {
             robot.wheels.setAllPower(0);
         }
 
-        if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
+        if (gamepad.yWasPressed()) // Auto aim to AprilTag and update launcher power
         {
-            actions.aimToAprilTag(robot.self.getGoalId());
+            double distance;
+            double newPower;
+            int tagId = robot.self.getGoalId();
+            actions.aimToAprilTag(tagId, -1);
+
+            try
+            {
+                distance = robot.webcam.getComponentDistanceToTag(tagId);
+                newPower = RobotMath.distanceToPower(distance);
+                telemetry.log().add("Component distance to AprilTag " + tagId + ": " + distance);
+                telemetry.log().add("Launcher power: " + robot.self.getLauncherSpeed() + " -> " + newPower);
+                robot.self.setLauncherSpeed(newPower);
+                robot.self.updateTelemetry(robot);
+            }
+            catch (NoTagsDetectedException | TagNotFoundException e)
+            {
+                telemetry.log().add("Could not get component distance to AprilTag; error: " + e.getMessage());
+            }
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk
@@ -100,6 +118,7 @@ public class VikingsTeleOp extends LinearOpMode {
         if (gamepad.bWasPressed())
         {
             robot.hub.imu.resetYaw();
+            robot.telemetry.log().add("IMU reset!");
         }
 
         if (gamepad.dpadUpWasPressed())

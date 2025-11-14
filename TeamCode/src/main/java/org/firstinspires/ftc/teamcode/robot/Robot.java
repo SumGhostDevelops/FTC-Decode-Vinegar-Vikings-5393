@@ -85,8 +85,8 @@ public class Robot
 
     public boolean setLauncherSpeed(double newSpeed)
     {
-        double lowerSpeedLimit = 0.7;
-        double upperSpeedLimit = 1;
+        double lowerSpeedLimit = 0.5;
+        double upperSpeedLimit = 0.8;
 
         if (newSpeed > upperSpeedLimit || newSpeed < lowerSpeedLimit)
         {

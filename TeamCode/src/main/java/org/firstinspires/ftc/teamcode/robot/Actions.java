@@ -165,7 +165,7 @@ public class Actions
         robot.self.mode = "automatic";
         robot.self.updateTelemetry(robot);
 
-        double tolerance = 1.0; // Angle tolerance in degrees (e.g., 1 degree)
+        double tolerance = 2; // Angle tolerance in degrees (e.g., 1 degree)
 
         // Initialize variables outside the loop
         double error;
@@ -253,10 +253,15 @@ public class Actions
 
     public void aimToAprilTag(int tagId)
     {
-        aimToAprilTag(tagId, 0.01, 0.002, 0.1);
+        aimToAprilTag(tagId, 0.01, 0.002, 0.1, 0);
     }
 
-    public void aimToAprilTag(int tagId, double kP, double kD, double minTurnPower)
+    public void aimToAprilTag(int tagId, double angleOffset)
+    {
+        aimToAprilTag(tagId, 0.01, 0.002, 0.1, angleOffset);
+    }
+
+    public void aimToAprilTag(int tagId, double kP, double kD, double minTurnPower, double angleOffset)
     {
         AprilTagDetection tag;
         robot.telemetry.log().add("-aimToAprilTag---------");
@@ -271,16 +276,16 @@ public class Actions
             return;
         }
 
-        aimToAprilTag(tag, kP, kD, minTurnPower);
+        aimToAprilTag(tag, kP, kD, minTurnPower, angleOffset);
     }
 
-    private void aimToAprilTag(AprilTagDetection tag, double kP, double kD, double minTurnPower)
+    private void aimToAprilTag(AprilTagDetection tag, double kP, double kD, double minTurnPower, double angleOffset)
     {
         double offset = tag.ftcPose.bearing;
 
         double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
-        double targetAngle = RobotMath.convert360AngleTo180(currentAngle + offset);
+        double targetAngle = RobotMath.convert360AngleTo180(currentAngle + offset + angleOffset);
 
         imuTurnToAngle(targetAngle, kP, kD, minTurnPower);
     }

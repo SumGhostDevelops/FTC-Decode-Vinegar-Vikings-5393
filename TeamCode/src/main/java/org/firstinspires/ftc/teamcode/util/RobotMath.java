@@ -85,6 +85,11 @@ public class RobotMath
     {
         return angularVelocity * radius;
     }
+
+    public static double distanceToPower(double distance)
+    {
+        return 0.0789328*distance +0.498708;
+    }
 }
 
 // Augie wus here

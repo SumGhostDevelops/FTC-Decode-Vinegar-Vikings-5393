@@ -42,7 +42,7 @@ public class AprilTagWebcam
                 .setDrawTagID(showLiveView)
                 .setDrawTagOutline(showLiveView)
                 .setLensIntrinsics(fx, fy, cx, cy)
-                .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES)
+                .setOutputUnits(DistanceUnit.METER, AngleUnit.DEGREES)
                 .build();
 
         visionPortal = new VisionPortal.Builder()
@@ -149,6 +149,31 @@ public class AprilTagWebcam
         }
 
         throw new TagNotFoundException();
+    }
+
+    public double getComponentDistanceToTag(int tagId) throws NoTagsDetectedException, TagNotFoundException
+    {
+        AprilTagDetection tag = null;
+
+        if (cachedTagDetections.isEmpty())
+        {
+            throw new NoTagsDetectedException();
+        }
+
+        for (AprilTagDetection possibleTag : cachedTagDetections)
+        {
+            if (possibleTag.id == tagId)
+            {
+                tag = possibleTag;
+            }
+        }
+
+        if (tag == null)
+        {
+            throw new TagNotFoundException(tagId);
+        }
+
+        return Math.sqrt(Math.pow(tag.ftcPose.z, 2) + Math.pow(tag.ftcPose.y, 2));
     }
 
     /**

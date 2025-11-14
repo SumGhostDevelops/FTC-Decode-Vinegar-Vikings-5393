@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.robot.Wheels;
 
 import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
+import org.firstinspires.ftc.teamcode.util.RobotMath;
 
 @Autonomous(name="VikingsAuton")
 public class VikingsAuton extends LinearOpMode
@@ -49,15 +50,28 @@ public class VikingsAuton extends LinearOpMode
 
         robot.webcam.updateDetections();
 
+        double distance;
+        double newPower;
+        int tagId;
+
         try
         {
-            actions.aimToAprilTag(robot.webcam.getAnyGoalId());
+            tagId = robot.webcam.getAnyGoalId();
+            actions.aimToAprilTag(tagId);
+
+            distance = robot.webcam.getComponentDistanceToTag(tagId);
+            newPower = RobotMath.distanceToPower(distance);
+            telemetry.log().add("Component distance to AprilTag " + tagId + ": " + distance);
+            telemetry.log().add("Launcher power: " + robot.self.getLauncherSpeed() + " -> " + newPower);
+            robot.self.setLauncherSpeed(newPower);
+            robot.self.updateTelemetry(robot);
         }
         catch (NoTagsDetectedException | TagNotFoundException e)
         {
             robot.telemetry.log().add("Could not find the AprilTag, so we will not automatically aim: " + e.getMessage());
         }
-        robot.hub.launcher.setPower(0.78);
+
+        // TODO: Replace this with the code that automatically changes the launcher power based on distance
 
         actions.sleep(3);
         for (int i = 0; i < 4; i++)
