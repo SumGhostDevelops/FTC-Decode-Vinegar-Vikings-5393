@@ -233,13 +233,13 @@ public class Actions
             // 8. Update for next iteration
             lastError = error;
 
-            // Telemetry update (Keep outside the critical timing loop for best performance)
+            /* Telemetry update (Keep outside the critical timing loop for best performance)
             robot.telemetry.log().add("Current Angle" + String.format("%.1f", currentAngle));
             robot.telemetry.log().add("Error" + String.format("%.1f", error));
             robot.telemetry.log().add("Power" + String.format("%.2f", motorPower));
             robot.telemetry.log().add("Deriv" + String.format("%.2f", derivative));
             robot.self.updateTelemetry(robot);
-
+            */
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop and clean up
