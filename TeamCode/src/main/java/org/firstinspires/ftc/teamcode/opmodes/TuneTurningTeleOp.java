@@ -102,19 +102,20 @@ public class TuneTurningTeleOp extends LinearOpMode {
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            aimToAprilTag(robot.self.getGoalId());
+            actions.aimToAprilTag(robot.self.getGoalId(), kP, kD, minTurnPower);
         }
 
-        if (gamepad.aWasPressed()) // Scan Obelisk
+        if (gamepad.aWasPressed()) // Scan apriltag
         {
             telemetry.addData("Current IMU Angle: ", robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
             robot.webcam.updateDetections();
             try
             {
-                AprilTagDetection tag = robot.webcam.getSingleDetection(robot.self.getGoalId());
+                AprilTagDetection tag = robot.webcam.getAnyDetection();
+                telemetry.log().add("AprilTag ID: " + tag.id);
                 telemetry.log().add("AprilTag bearing: " + tag.ftcPose.bearing);
                 telemetry.log().add("AprilTag yaw: " + tag.ftcPose.yaw);
-            } catch (NoTagsDetectedException | TagNotFoundException e)
+            } catch (NoTagsDetectedException e)
             {
                 telemetry.addData("AprilTag not found. Error: ", e.getMessage());
                 return;
@@ -215,7 +216,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
         double currentBotHeading = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         // Calculate the absolute target angle for the robot to face.
-        double targetAngle = RobotMath.normalizeAngle(currentBotHeading + yawToCorrect);
+        double targetAngle = RobotMath.convert360AngleTo180(currentBotHeading + yawToCorrect);
 
         robot.telemetry.log().add("Turning to AprilTag " + tag.id + ".");
         robot.telemetry.update();

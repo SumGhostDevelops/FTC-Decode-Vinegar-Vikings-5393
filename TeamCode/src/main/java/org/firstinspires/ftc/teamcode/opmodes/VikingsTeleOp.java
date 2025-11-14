@@ -122,12 +122,12 @@ public class VikingsTeleOp extends LinearOpMode {
 
         if (gamepad.leftBumperWasPressed()) // Lower speed
         {
-            robot.self.setSpeed(robot.self.getSpeed() - 0.05);
+            robot.self.setSpeed(robot.self.getSpeed() - 0.2);
         }
 
         if (gamepad.rightBumperWasPressed()) // Increase speed
         {
-            robot.self.setSpeed(robot.self.getSpeed() + 0.05);
+            robot.self.setSpeed(robot.self.getSpeed() + 0.2);
         }
 
         if (gamepad.right_trigger > 0.25) // Shoot

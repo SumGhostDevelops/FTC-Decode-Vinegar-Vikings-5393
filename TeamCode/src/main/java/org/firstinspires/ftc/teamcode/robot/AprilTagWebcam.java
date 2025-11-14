@@ -122,6 +122,16 @@ public class AprilTagWebcam
         throw new TagNotFoundException(id);
     }
 
+    public AprilTagDetection getAnyDetection() throws NoTagsDetectedException
+    {
+        if (cachedTagDetections.isEmpty())
+        {
+            throw new NoTagsDetectedException();
+        }
+
+        return cachedTagDetections.get(0);
+    }
+
     /**
      * Returns the first AprilTagDetection with an obelisk ID and returns an error otherwise.
      * @return The first AprilTagDetection with an obelisk ID.

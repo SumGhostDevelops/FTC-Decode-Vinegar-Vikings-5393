@@ -36,7 +36,7 @@ public class Actions
 
             // Calculate the error, normalizing it to the -180 to +180 range
             // This finds the shortest path to the target angle.
-            error = RobotMath.normalizeAngle(targetAngle - currentAngle);
+            error = RobotMath.convert360AngleTo180(targetAngle - currentAngle);
 
             // Calculate the motor power.
             motorPower = error * kP;
@@ -85,7 +85,7 @@ public class Actions
         // --- FIX: Initialize variables *before* the loop ---
         // Get the first error reading
         double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        error = RobotMath.normalizeAngle(targetAngle - currentAngle);
+        error = RobotMath.convert360AngleTo180(targetAngle - currentAngle);
 
         // Set lastError to the current error so the D-term is 0 on the first loop
         // This prevents the initial "derivative spike"
@@ -98,7 +98,7 @@ public class Actions
         do {
             // Get new angle and calculate error
             currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-            error = RobotMath.normalizeAngle(targetAngle - currentAngle);
+            error = RobotMath.convert360AngleTo180(targetAngle - currentAngle);
 
             // --- 'D' Term Calculation ---
             // Calculate the rate of change (how fast the error is changing)
@@ -153,9 +153,137 @@ public class Actions
         robot.self.updateTelemetry(robot);
     }
 
-    public void imuTurnToAngle(double kP, double kD, double minTurnPower)
+    /**
+     * Turns the robot to a specific target angle using an IMU and a PD controller.
+     * @param targetAngle The desired angle, expected to be in the -180 to +180 range.
+     * @param kP Proportional gain.
+     * @param kD Derivative gain.
+     * @param minTurnPower The minimum motor power to overcome static friction.
+     */
+    public void imuTurnToAngle(double targetAngle, double kP, double kD, double minTurnPower)
     {
+        robot.telemetry.log().add("-imuTurnToAngle---------");
+        robot.self.mode = "automatic";
+        robot.self.updateTelemetry(robot);
 
+        double tolerance = 1.0; // Angle tolerance in degrees (e.g., 1 degree)
+
+        // Initialize variables outside the loop
+        double error;
+        double motorPower;
+        double lastError;
+        double derivative;
+
+        // CRITICAL FIX: Use a dedicated timer for derivative calculation
+        ElapsedTime loopTimer = new ElapsedTime();
+        double loopTime;
+
+        // Calculate initial error and save it
+        double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+
+        // Assuming RobotMath.convert360AngleTo180 correctly wraps the error difference
+        error = RobotMath.convert360AngleTo180(targetAngle - currentAngle);
+        lastError = error;
+
+        // Reset timer to start measuring the first loop iteration time
+        loopTimer.reset();
+
+        do
+        {
+            // 1. Get new angle and calculate time elapsed
+            currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            loopTime = loopTimer.seconds();
+            loopTimer.reset(); // Reset timer at the beginning of the loop
+
+            // 2. Calculate the error (difference between target and current)
+            error = RobotMath.convert360AngleTo180(targetAngle - currentAngle);
+
+            // 3. Calculate Derivative Term (Handle division by zero safety)
+            if (loopTime > 0.0001)
+            { // Check for near-zero time to prevent division by zero/oversize D-term
+                derivative = (error - lastError) / loopTime;
+            }
+            else
+            {
+                derivative = 0.0;
+            }
+
+            // 4. Calculate raw motor power (PD Control Law)
+            motorPower = (error * kP) + (derivative * kD);
+
+            // 5. Apply minTurnPower (Min Motor Power Logic Fix)
+            // Only apply min power if the error is still outside tolerance
+            if (Math.abs(error) > tolerance)
+            {
+                if (Math.abs(motorPower) < minTurnPower)
+                {
+                    // Boost power to minTurnPower to overcome friction, keeping the same sign/direction
+                    motorPower = Math.signum(motorPower) * minTurnPower;
+                }
+            }
+
+            // 6. Clamp power to the legal range [-1.0, 1.0]
+            motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
+
+            // 7. Apply power to motors (Assuming standard mecanum/tank drive)
+            robot.hub.leftFront.setPower(-motorPower);
+            robot.hub.leftBack.setPower(-motorPower);
+            robot.hub.rightFront.setPower(motorPower);
+            robot.hub.rightBack.setPower(motorPower);
+
+            // 8. Update for next iteration
+            lastError = error;
+
+            // Telemetry update (Keep outside the critical timing loop for best performance)
+            robot.telemetry.log().add("Current Angle" + String.format("%.1f", currentAngle));
+            robot.telemetry.log().add("Error" + String.format("%.1f", error));
+            robot.telemetry.log().add("Power" + String.format("%.2f", motorPower));
+            robot.telemetry.log().add("Deriv" + String.format("%.2f", derivative));
+            robot.self.updateTelemetry(robot);
+
+        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
+
+        // Stop and clean up
+        stopMoving();
+
+        robot.self.mode = "manual";
+        robot.telemetry.log().add("Finished turning.");
+        robot.telemetry.log().add("Final error: " + String.format("%.1f", error));
+        robot.self.updateTelemetry(robot);
+    }
+
+    public void aimToAprilTag(int tagId)
+    {
+        aimToAprilTag(tagId, 0.01, 0.002, 0.1);
+    }
+
+    public void aimToAprilTag(int tagId, double kP, double kD, double minTurnPower)
+    {
+        AprilTagDetection tag;
+        robot.telemetry.log().add("-aimToAprilTag---------");
+        robot.webcam.updateDetections();
+        try
+        {
+            tag = robot.webcam.getSingleDetection(tagId);
+        }
+        catch (NoTagsDetectedException | TagNotFoundException e)
+        {
+            robot.telemetry.log().add("Cancelling aiming command: " + e.getMessage());
+            return;
+        }
+
+        aimToAprilTag(tag, kP, kD, minTurnPower);
+    }
+
+    private void aimToAprilTag(AprilTagDetection tag, double kP, double kD, double minTurnPower)
+    {
+        double offset = tag.ftcPose.bearing;
+
+        double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+
+        double targetAngle = RobotMath.convert360AngleTo180(currentAngle + offset);
+
+        imuTurnToAngle(targetAngle, kP, kD, minTurnPower);
     }
 
     public void scanObelisk()
@@ -199,8 +327,6 @@ public class Actions
         robot.self.setObeliskId(tag.id);
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
     }
-
-
 
     public void move()
     {
@@ -252,6 +378,7 @@ public class Actions
         }
         catch (InterruptedException e)
         {
+            robot.telemetry.log().add("Interrupted while sleeping: " + e.getMessage());
             Thread.currentThread().interrupt();
         }
     }
