@@ -49,6 +49,7 @@ public class AprilTagWebcam
                 .addProcessor(tagProcessor)
                 .setCamera(webcamName)
                 .setCameraResolution(new Size(1280, 720))
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .enableLiveView(showLiveView)
                 .build();
 
