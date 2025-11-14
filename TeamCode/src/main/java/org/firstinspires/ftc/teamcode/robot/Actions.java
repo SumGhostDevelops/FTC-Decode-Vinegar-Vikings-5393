@@ -327,6 +327,33 @@ public class Actions
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
     }
 
+    public void getVelocity(int tagId, double launchAngle)
+    {
+        AprilTagDetection tag;
+        robot.telemetry.log().add("-getVelocity---------");
+        robot.webcam.updateDetections();
+
+        try
+        {
+            tag = robot.webcam.getSingleDetection(tagId);
+        }
+        catch (NoTagsDetectedException | TagNotFoundException e)
+        {
+            robot.telemetry.log().add("Cancelling velocity command: " + e.getMessage());
+            return;
+        }
+
+        getVelocity(tag, launchAngle);
+    }
+
+    private double getVelocity(AprilTagDetection tag, double launchAngle)
+    {
+        double x = tag.ftcPose.y;
+        double y = tag.ftcPose.z;
+
+        return RobotMath.velocityGivenDisplacement(launchAngle, x, y);
+    }
+
     public void move()
     {
         Wheels wheels = robot.wheels;

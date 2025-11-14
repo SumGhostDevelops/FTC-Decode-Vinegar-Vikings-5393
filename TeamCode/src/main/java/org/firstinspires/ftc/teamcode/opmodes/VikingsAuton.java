@@ -13,6 +13,9 @@ import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.RobotContext;
 import org.firstinspires.ftc.teamcode.robot.Wheels;
 
+import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
+
 @Autonomous(name="VikingsAuton")
 public class VikingsAuton extends LinearOpMode
 {
@@ -26,7 +29,7 @@ public class VikingsAuton extends LinearOpMode
         ControlHub hub = new ControlHub();
         hub.init(hardwareMap, new Pose2d(10, 10, Math.toRadians(Math.PI / 2)));
         AprilTagWebcam aprilTagWebcam = new AprilTagWebcam(new double[]{1424.38, 1424.38, 637.325, 256.774}, hub.camera, true);
-        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(team), new Wheels());
+        robot = new RobotContext(hub, aprilTagWebcam, telemetry, gamepad1, this::opModeIsActive, new Robot(), new Wheels());
         actions = new Actions(robot);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -44,6 +47,16 @@ public class VikingsAuton extends LinearOpMode
 
         waitForStart();
 
+        robot.webcam.updateDetections();
+
+        try
+        {
+            actions.aimToAprilTag(robot.webcam.getAnyGoalId());
+        }
+        catch (NoTagsDetectedException | TagNotFoundException e)
+        {
+            robot.telemetry.log().add("Could not find the AprilTag, so we will not automatically aim: " + e.getMessage());
+        }
         robot.hub.launcher.setPower(0.78);
 
         actions.sleep(3);

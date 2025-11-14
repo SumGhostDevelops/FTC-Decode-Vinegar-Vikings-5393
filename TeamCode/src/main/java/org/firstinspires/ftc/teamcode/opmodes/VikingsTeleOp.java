@@ -8,12 +8,14 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
 import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.robot.RobotContext;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.Wheels;
+import org.firstinspires.ftc.teamcode.util.RobotMath;
 
 
 @TeleOp(name="VikingsTeleOp")
@@ -80,7 +82,7 @@ public class VikingsTeleOp extends LinearOpMode {
 
         // TODO: Add keybind system for different drivers
 
-        if (gamepad.xWasPressed()) // Panic button; kills all power TODO: Remove later
+        if (gamepad.xWasPressed()) // Update velocity of launcher
         {
             robot.wheels.setAllPower(0);
         }

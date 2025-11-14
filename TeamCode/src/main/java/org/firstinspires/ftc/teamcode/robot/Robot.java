@@ -13,7 +13,7 @@ public class Robot
     private int obeliskId;
     public Map<String, String> extra;
 
-    private Robot()
+    public Robot()
     {
         this("blue", 0.7, 0.7, -1, new HashMap<String, String>());
     }

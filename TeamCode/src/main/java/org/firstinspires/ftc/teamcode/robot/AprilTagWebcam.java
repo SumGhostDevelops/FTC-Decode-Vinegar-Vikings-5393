@@ -133,6 +133,24 @@ public class AprilTagWebcam
         return cachedTagDetections.get(0);
     }
 
+    public int getAnyGoalId() throws NoTagsDetectedException, TagNotFoundException
+    {
+        if (cachedTagDetections.isEmpty())
+        {
+            throw new NoTagsDetectedException();
+        }
+
+        for (AprilTagDetection tag : cachedTagDetections)
+        {
+            if (tag.id == 20 || tag.id == 24)
+            {
+                return tag.id;
+            }
+        }
+
+        throw new TagNotFoundException();
+    }
+
     /**
      * Returns the first AprilTagDetection with an obelisk ID and returns an error otherwise.
      * @return The first AprilTagDetection with an obelisk ID.
