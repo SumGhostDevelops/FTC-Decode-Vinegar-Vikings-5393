@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
+import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
 import org.firstinspires.ftc.teamcode.robot.Actions;
 import org.firstinspires.ftc.teamcode.robot.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.robot.ControlHub;
@@ -13,12 +15,8 @@ import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.RobotContext;
 import org.firstinspires.ftc.teamcode.robot.Wheels;
 
-import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
-import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
-import org.firstinspires.ftc.teamcode.util.RobotMath;
-
-@Autonomous(name="VikingsAuton")
-public class VikingsAuton extends LinearOpMode
+@Autonomous(name="VikingsBasicAuton")
+public class VikingsBasicAuton extends LinearOpMode
 {
     RobotContext robot;
     Actions actions;
@@ -47,36 +45,9 @@ public class VikingsAuton extends LinearOpMode
 
         waitForStart();
 
-        robot.webcam.updateDetections();
+        int seconds = 25;
 
-        try
-        {
-            int tagId = robot.webcam.getAnyGoalId();
-            actions.aimToAprilTag(tagId);
-            actions.updateLauncherSpeed();
-        }
-        catch (NoTagsDetectedException | TagNotFoundException e)
-        {
-            robot.telemetry.log().add("Could not find the AprilTag, so we will not automatically aim: " + e.getMessage());
-        }
-
-        robot.hub.launcher.setPower(robot.self.getLauncherSpeed());
-
-        actions.sleep(3);
-        for (int i = 0; i < 4; i++)
-        {
-            robot.hub.loader.setPower(1);
-            actions.sleep(0.4);
-            robot.hub.loader.setPower(0);
-            if (i == 3)
-            {
-                actions.sleep(0.5);
-                break;
-            }
-            actions.sleep(2);
-        }
-
-        robot.hub.launcher.setPower(0);
+        actions.sleep(seconds);
         robot.wheels.setAllPower(1);
         actions.move();
         actions.sleep(0.4);
