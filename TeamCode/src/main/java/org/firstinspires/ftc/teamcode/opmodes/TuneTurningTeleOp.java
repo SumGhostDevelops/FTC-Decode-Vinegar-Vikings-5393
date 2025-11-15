@@ -102,7 +102,7 @@ public class TuneTurningTeleOp extends LinearOpMode {
 
         if (gamepad.yWasPressed()) // Auto aim to opposite AprilTag
         {
-            actions.aimToAprilTag(robot.self.getGoalId(), kP, kD, minTurnPower);
+            actions.aimToAprilTag(robot.self.getGoalId(), kP, kD, minTurnPower, 0);
         }
 
         if (gamepad.aWasPressed()) // Scan apriltag
@@ -222,6 +222,6 @@ public class TuneTurningTeleOp extends LinearOpMode {
         robot.telemetry.update();
 
         // Call the new PID turning method
-        actions.newTurnToAngle(targetAngle, kP, kD, minTurnPower);
+        actions.imuTurnToAngle(targetAngle, kP, kD, minTurnPower);
     }
 }

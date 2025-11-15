@@ -19,139 +19,6 @@ public class Actions
         this.robot = robot;
     }
 
-    public void turnToAngle(double targetAngle)
-    {
-        robot.self.extra.clear();
-        robot.telemetry.log().add("-turnToAngle--------");
-        // A simple P-controller for turning.5V
-        double kP = 0.05; // Proportional gain
-        double error;
-        double motorPower;
-        double tolerance = 0.5; // Stop when within this many degrees
-
-        do {
-            // The IMU gives us the current angle of the robot.
-            double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
-            // Calculate the error, normalizing it to the -180 to +180 range
-            // This finds the shortest path to the target angle.
-            error = RobotMath.convert360AngleTo180(targetAngle - currentAngle);
-
-            // Calculate the motor power.
-            motorPower = error * kP;
-
-            // Clamp the motor power to the valid range of -1.0 to 1.0
-            motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
-
-            // Apply power to the motors to turn the robot.
-            robot.hub.leftFront.setPower(-motorPower);
-            robot.hub.leftBack.setPower(-motorPower);
-            robot.hub.rightFront.setPower(motorPower);
-            robot.hub.rightBack.setPower(motorPower);
-
-            // Telemetry
-            robot.self.mode = "automatic";
-            robot.telemetry.log().add("Current Angle: " + String.format("%.1f", currentAngle));
-            robot.telemetry.log().add("Target Angle: " + String.format("%.1f", targetAngle));
-            robot.telemetry.log().add("Error: " + String.format("%.1f", error));
-            robot.self.updateTelemetry(robot);
-
-        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
-
-        // Stop all motors
-        stopMoving();
-
-        robot.self.mode = "manual";
-        robot.self.extra.clear();
-        robot.telemetry.log().add("Finished turning.");
-        robot.self.updateTelemetry(robot);
-    }
-
-    public void newTurnToAngle(double targetAngle, double kP, double kD, double minTurnPower)
-    {
-        robot.self.extra.clear();
-        robot.telemetry.log().add("-turnToAngle (PD)--------");
-
-        double error;
-        double motorPower;
-        double tolerance = 1.0; // Angle tolerance in degrees
-
-        // Variables for the 'D' term
-        double lastError;
-        double derivative;
-        ElapsedTime timer = new ElapsedTime();
-
-        // --- FIX: Initialize variables *before* the loop ---
-        // Get the first error reading
-        double currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        error = RobotMath.convert360AngleTo180(targetAngle - currentAngle);
-
-        // Set lastError to the current error so the D-term is 0 on the first loop
-        // This prevents the initial "derivative spike"
-        lastError = error;
-
-        // Reset the timer right before the loop starts
-        timer.reset();
-        // --- End of Fix ---
-
-        do {
-            // Get new angle and calculate error
-            currentAngle = robot.hub.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-            error = RobotMath.convert360AngleTo180(targetAngle - currentAngle);
-
-            // --- 'D' Term Calculation ---
-            // Calculate the rate of change (how fast the error is changing)
-            derivative = (error - lastError) / timer.seconds();
-
-            // --- PD Power Calculation ---
-            // motorPower = (Proportional push) + (Derivative brake)
-            motorPower = (error * kP) + (derivative * kD);
-
-            // --- Minimum Power ---
-            // If the calculated power is too small but we're not at the target,
-            // boost it to the min power to overcome static friction.
-            if (Math.abs(error) > tolerance)
-            {
-                if (Math.abs(motorPower) < minTurnPower)
-                {
-                    // Apply the sign of the motorPower (or error) to the min power
-                    motorPower = Math.signum(motorPower) * minTurnPower;
-                }
-            }
-
-            // Clamp the final power to the -1.0 to 1.0 range
-            motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
-
-            // Apply power to motors for a point turn
-            robot.hub.leftFront.setPower(-motorPower);
-            robot.hub.leftBack.setPower(-motorPower);
-            robot.hub.rightFront.setPower(motorPower);
-            robot.hub.rightBack.setPower(motorPower);
-
-            // Update loop variables for next cycle
-            lastError = error;
-            timer.reset();
-
-            // Telemetry
-            robot.self.mode = "automatic";
-            robot.telemetry.log().add("Current Angle" + String.format("%.1f", currentAngle));
-            robot.telemetry.log().add("Target Angle" + String.format("%.1f", targetAngle));
-            robot.telemetry.log().add("Error" + String.format("%.1f", error));
-            robot.telemetry.log().add("Power" + String.format("%.2f", motorPower));
-            robot.telemetry.log().add("Deriv" + String.format("%.2f", derivative));
-            robot.self.updateTelemetry(robot);
-
-        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
-
-        // Stop all motors
-        stopMoving();
-
-        robot.self.mode = "manual";
-        robot.self.extra.clear();
-        robot.telemetry.log().add("Finished turning.");
-        robot.self.updateTelemetry(robot);
-    }
-
     /**
      * Turns the robot to a specific target angle using an IMU and a PD controller.
      * @param targetAngle The desired angle, expected to be in the -180 to +180 range.
@@ -232,14 +99,6 @@ public class Actions
 
             // 8. Update for next iteration
             lastError = error;
-
-            /* Telemetry update (Keep outside the critical timing loop for best performance)
-            robot.telemetry.log().add("Current Angle" + String.format("%.1f", currentAngle));
-            robot.telemetry.log().add("Error" + String.format("%.1f", error));
-            robot.telemetry.log().add("Power" + String.format("%.2f", motorPower));
-            robot.telemetry.log().add("Deriv" + String.format("%.2f", derivative));
-            robot.self.updateTelemetry(robot);
-            */
         } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepad.yWasPressed());
 
         // Stop and clean up
@@ -332,31 +191,28 @@ public class Actions
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
     }
 
-    public void getVelocity(int tagId, double launchAngle)
+    public void updateLauncherSpeed()
     {
-        AprilTagDetection tag;
-        robot.telemetry.log().add("-getVelocity---------");
         robot.webcam.updateDetections();
+
+        double distance;
+        double newPower;
+
+        int tagId = robot.self.getGoalId();
 
         try
         {
-            tag = robot.webcam.getSingleDetection(tagId);
+            distance = robot.webcam.getComponentDistanceToTag(tagId);
+            newPower = RobotMath.distanceToPower(distance);
+            //robot.telemetry.log().add("Component distance to AprilTag " + tagId + ": " + distance);
+            robot.telemetry.log().add("New launcher power: " + robot.self.getLauncherSpeed() + " -> " + newPower);
+            robot.self.setLauncherSpeed(newPower);
+            robot.self.updateTelemetry(robot);
         }
         catch (NoTagsDetectedException | TagNotFoundException e)
         {
-            robot.telemetry.log().add("Cancelling velocity command: " + e.getMessage());
-            return;
+            robot.telemetry.log().add("Could not get component distance to AprilTag; error: " + e.getMessage());
         }
-
-        getVelocity(tag, launchAngle);
-    }
-
-    private double getVelocity(AprilTagDetection tag, double launchAngle)
-    {
-        double x = tag.ftcPose.y;
-        double y = tag.ftcPose.z;
-
-        return RobotMath.velocityGivenDisplacement(launchAngle, x, y);
     }
 
     public void move()
@@ -412,5 +268,8 @@ public class Actions
             robot.telemetry.log().add("Interrupted while sleeping: " + e.getMessage());
             Thread.currentThread().interrupt();
         }
+
+        robot.telemetry.log().add("Done sleeping.");
+        robot.telemetry.update();
     }
 }

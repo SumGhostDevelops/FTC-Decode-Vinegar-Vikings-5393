@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.*;
 
@@ -10,12 +13,14 @@ public class Robot
     public String mode;
     private double speed;
     private double launcherSpeed;
+    private double launcherRpm = 0;
+    private double launcherRpmDerivative = 0;
     private int obeliskId;
-    public Map<String, String> extra;
+    ElapsedTime timer;
 
     public Robot()
     {
-        this("blue", 0.7, 0.7, -1, new HashMap<String, String>());
+        this("blue", 0.7, 0.7, -1);
     }
 
     public Robot(String teamColor)
@@ -24,14 +29,14 @@ public class Robot
         this.teamColor = teamColor;
     }
 
-    public Robot(String teamColor, double speed, double launcherSpeed, int obeliskId, Map<String, String> extra)
+    public Robot(String teamColor, double speed, double launcherSpeed, int obeliskId)
     {
         this.teamColor = teamColor;
         this.mode = "manual";
         this.speed = speed;
         this.launcherSpeed = launcherSpeed;
         this.obeliskId = obeliskId;
-        this.extra = extra;
+        timer = new ElapsedTime();
     }
 
     public String getTeamColor()
@@ -117,22 +122,41 @@ public class Robot
     public void updateTelemetry(RobotContext robot)
     {
         Telemetry telemetry = robot.telemetry;
+
+        // --- Derivative Calculation ---
+
+        // 1. Calculate the time elapsed since the last updateTelemetry call.
+        double timeDelta = timer.seconds();
+        timer.reset(); // Reset the timer for the next interval
+
+        // 2. Store the previous RPM value before calculating the new one.
+        double oldLauncherRpm = this.launcherRpm;
+
+        double ticksPerSecond = robot.hub.launcher.getVelocity();
+        launcherRpm = robot.hub.launcher.getVelocity(AngleUnit.DEGREES) / 6.0;
+
+        // 4. Calculate the derivative (rate of change) in RPM per second.
+        //    Avoid division by zero if the loop is extremely fast.
+        if (timeDelta > 0)
+        {
+            this.launcherRpmDerivative = (this.launcherRpm - oldLauncherRpm) / timeDelta;
+        }
+        else
+        {
+            this.launcherRpmDerivative = 0;
+        }
+
+        // --- End of Derivative Calculation ---
+
         telemetry.clear();
 
         telemetry.addData("Team", teamColor);
         telemetry.addData("Mode", mode);
         telemetry.addData("Speed", speed);
         telemetry.addData("Launcher Speed", launcherSpeed);
-        telemetry.addData("Launcher RPM", (robot.hub.launcher.getVelocity() * 60) / 537.7);
+        telemetry.addData("Launcher RPM", launcherRpm);
+        telemetry.addData("Launcher RPM Rate (deriv)", launcherRpmDerivative);
         telemetry.addData("Obelisk Combination", obeliskId);
-
-        if (!extra.isEmpty())
-        {
-            for (Map.Entry<String, String> entry : extra.entrySet())
-            {
-                telemetry.addData(entry.getKey(), entry.getValue());
-            }
-        }
 
         telemetry.update();
     }
