@@ -50,34 +50,24 @@ public class VikingsAuton extends LinearOpMode
 
         robot.webcam.updateDetections();
 
-        double distance;
-        double newPower;
-        int tagId;
-
         try
         {
-            tagId = robot.webcam.getAnyGoalId();
+            int tagId = robot.webcam.getAnyGoalId();
             actions.aimToAprilTag(tagId);
-
-            distance = robot.webcam.getComponentDistanceToTag(tagId);
-            newPower = RobotMath.distanceToPower(distance);
-            telemetry.log().add("Component distance to AprilTag " + tagId + ": " + distance);
-            telemetry.log().add("Launcher power: " + robot.self.getLauncherSpeed() + " -> " + newPower);
-            robot.self.setLauncherSpeed(newPower);
-            robot.self.updateTelemetry(robot);
+            actions.updateLauncherSpeed();
         }
         catch (NoTagsDetectedException | TagNotFoundException e)
         {
             robot.telemetry.log().add("Could not find the AprilTag, so we will not automatically aim: " + e.getMessage());
         }
 
-        // TODO: Replace this with the code that automatically changes the launcher power based on distance
+        robot.hub.launcher.setPower(robot.self.getLauncherSpeed());
 
         actions.sleep(3);
         for (int i = 0; i < 4; i++)
         {
             robot.hub.loader.setPower(1);
-            actions.sleep(0.3);
+            actions.sleep(0.4);
             robot.hub.loader.setPower(0);
             if (i == 3)
             {
