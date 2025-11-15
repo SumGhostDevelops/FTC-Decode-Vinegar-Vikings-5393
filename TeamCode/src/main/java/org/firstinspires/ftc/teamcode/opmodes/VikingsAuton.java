@@ -47,7 +47,7 @@ public class VikingsAuton extends LinearOpMode
 
         waitForStart();
 
-        actions.sleep(2);
+        actions.sleep(2, "Waiting for camera to have a clear picture.");
 
         robot.webcam.updateDetections();
 
@@ -71,20 +71,20 @@ public class VikingsAuton extends LinearOpMode
         for (int i = 0; i < 4; i++)
         {
             robot.hub.loader.setPower(1);
-            actions.sleep(0.4);
+            actions.sleep(0.4, "Letting the loader move the ball.");
             robot.hub.loader.setPower(0);
             if (i == 3)
             {
                 actions.sleep(0.5);
                 break;
             }
-            actions.sleep(2);
+            actions.sleep(2, "Letting the launcher launch.");
         }
 
         robot.hub.launcher.setPower(0);
         robot.wheels.setAllPower(1);
         actions.move();
-        actions.sleep(0.4);
+        actions.sleep(0.4, "Letting the robot move.");
         robot.wheels.setAllPower(0);
         actions.move();
 

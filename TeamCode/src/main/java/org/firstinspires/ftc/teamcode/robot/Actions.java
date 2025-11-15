@@ -252,9 +252,21 @@ public class Actions
 
     public void sleep(double seconds)
     {
+        sleep(seconds, "");
+    }
+
+    public void sleep(double seconds, String reason)
+    {
         long milliseconds = (long) (seconds * 1000);
 
-        robot.telemetry.log().add("Sleeping for " + seconds + "seconds.");
+        String result = "Sleeping for " + seconds + "seconds.";
+
+        if (!reason.isEmpty())
+        {
+            result += " Reason: " + reason;
+        }
+
+        robot.telemetry.log().add(result);
         robot.telemetry.update();
 
         try
