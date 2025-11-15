@@ -97,12 +97,12 @@ public abstract class VikingsTeleOpBase extends LinearOpMode {
             {
                 case "blue":
                 {
-                    angleOffset = 1;
+                    angleOffset = 2;
                     break;
                 }
                 case "red":
                 {
-                    angleOffset = -1;
+                    angleOffset = -3;
                     break;
                 }
                 default:
@@ -112,7 +112,7 @@ public abstract class VikingsTeleOpBase extends LinearOpMode {
             }
 
             actions.aimToAprilTag(tagId, angleOffset);
-            actions.updateLauncherSpeed();
+            actions.updateLauncherSpeed(tagId);
         }
 
         if (gamepad.aWasPressed()) // Scan Obelisk

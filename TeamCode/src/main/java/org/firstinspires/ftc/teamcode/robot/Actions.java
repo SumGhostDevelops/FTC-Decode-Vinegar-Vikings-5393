@@ -191,14 +191,12 @@ public class Actions
         robot.telemetry.log().add("New Obelisk ID: " + tag.id);
     }
 
-    public void updateLauncherSpeed()
+    public void updateLauncherSpeed(int tagId)
     {
         robot.webcam.updateDetections();
 
         double distance;
         double newPower;
-
-        int tagId = robot.self.getGoalId();
 
         try
         {

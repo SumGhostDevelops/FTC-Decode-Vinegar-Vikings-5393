@@ -52,8 +52,11 @@ public class VikingsAuton extends LinearOpMode
         try
         {
             int tagId = robot.webcam.getAnyGoalId();
+            robot.telemetry.log().add("detected goal tag id (" + tagId + ")");
             actions.aimToAprilTag(tagId);
-            actions.updateLauncherSpeed();
+            robot.telemetry.log().add("aimed to april tag");
+            actions.updateLauncherSpeed(tagId);
+            robot.telemetry.log().add("adjusted launcher speed");
         }
         catch (NoTagsDetectedException | TagNotFoundException e)
         {
