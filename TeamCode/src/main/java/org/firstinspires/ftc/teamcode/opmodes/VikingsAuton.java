@@ -47,6 +47,8 @@ public class VikingsAuton extends LinearOpMode
 
         waitForStart();
 
+        actions.sleep(2);
+
         robot.webcam.updateDetections();
 
         try
