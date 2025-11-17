@@ -1,5 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
-public class RedVikingsTeleOp
+import org.firstinspires.ftc.teamcode.Team;
+
+public class RedVikingsTeleOp extends VikingsTeleOp
 {
+    @Override
+    public void runOpMode() throws InterruptedException
+    {
+        team = Team.RED;
+        super.runOpMode();
+    }
 }

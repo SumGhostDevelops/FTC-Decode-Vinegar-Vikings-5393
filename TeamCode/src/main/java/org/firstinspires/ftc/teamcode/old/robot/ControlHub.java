@@ -32,7 +32,8 @@ public class ControlHub
     public CRServo BasicServo;
     public Servo RegularServo;
 
-    public void init(HardwareMap map, Pose2d initialPose) {
+    public void init(HardwareMap map, Pose2d initialPose)
+    {
         leftFront = map.get(DcMotor.class, "leftFront");
         rightFront = map.get(DcMotor.class, "rightFront");
         leftBack = map.get(DcMotor.class, "leftBack");
