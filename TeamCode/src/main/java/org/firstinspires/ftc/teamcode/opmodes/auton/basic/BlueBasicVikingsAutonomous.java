@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Team;
 
-@Autonomous(name = "BlueBasicVikingsAutonomous", group = "Basic", preselectTeleOp = "BlueVikingsTeleOp")
+@Autonomous(name = "BlueBasicVikingsAutonomous", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
 public class BlueBasicVikingsAutonomous extends BasicVikingsAutonomous
 {
     @Override

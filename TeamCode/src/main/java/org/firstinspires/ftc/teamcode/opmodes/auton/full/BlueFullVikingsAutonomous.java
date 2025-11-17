@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Team;
 
-@Autonomous(name = "BlueFullVikingsAutonomous", group = "Full", preselectTeleOp = "BlueVikingsTeleOp")
+@Autonomous(name = "BlueFullVikingsAutonomous", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
 public class BlueFullVikingsAutonomous extends FullVikingsAutonomous
 {
     public void runOpMode() throws InterruptedException
