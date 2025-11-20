@@ -1,0 +1,37 @@
+package org.firstinspires.ftc.teamcode.definitions;
+
+import com.acmerobotics.dashboard.config.Config;
+
+@Config
+public class RobotConstants
+{
+    // Drive Constants
+    public static double DRIVE_SPEED_MULTIPLIER = 1.0;
+    public static double HYBRID_MODE_TURN_P = 0.02;
+    public static double HYBRID_MODE_TURN_D = 0.001;
+    public static double HYBRID_MODE_DEADBAND = 0.05;
+
+    // Launcher Constants
+    public static double LAUNCHER_TARGET_RPM = 1500; // Tune this
+    public static double LAUNCHER_RPM_TOLERANCE = 50;
+    public static double SHOT_DROP_THRESHOLD = 0.20; // 20% drop implies shot
+    public static double JAM_CLEAR_POWER = -0.3;
+    public static double JAM_CLEAR_DURATION = 1.0; // Seconds
+
+    // Loader & Intake Constants
+    public static double LOADER_POWER_LOAD = 1.0;
+    public static double LOADER_POWER_IDLE = 0.0;
+    public static double INTAKE_POWER_FWD = 0.8;
+    public static double INTAKE_POWER_REV = -0.8;
+
+    // Localization / Vision
+    public static double LENS_FX = 1424.38;
+    public static double LENS_FY = 1424.38;
+    public static double LENS_CX = 637.325;
+    public static double LENS_CY = 256.774;
+
+    // Dead Wheels (Two Wheel Config)
+    public static double PAR_Y_TICKS = 0.0; // Forward/Back offset
+    public static double PERP_X_TICKS = 0.0; // Left/Right offset
+    public static double IN_PER_TICK = 0.001; // Tune this
+}
