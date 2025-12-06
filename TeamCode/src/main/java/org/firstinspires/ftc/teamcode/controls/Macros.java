@@ -21,17 +21,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Macros
 {
-    // Subsystems
-    private Drive drive;
-    private Intake intake;
-    private Transfer transfer;
-    private Outtake outtake;
-    private Webcam webcam;
-    private Localization localization;
-    private Gamepad gamepad1;
+    private final Team team;
     private List<Event> events;
 
-    private Team team;
+    // Subsystems
+    private final Drive drive;
+    private final Intake intake;
+    private final Transfer transfer;
+    private final Outtake outtake;
+    private final Webcam webcam;
+    private final Localization localization;
+    private final Gamepad gamepad1;
 
     public Macros(RobotContext robot)
     {

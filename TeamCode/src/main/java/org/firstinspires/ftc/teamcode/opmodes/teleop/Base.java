@@ -21,6 +21,7 @@ public abstract class Base extends LinearOpMode
     // Change this manually or create a config selector OpMode
     protected Team team;
 
+    // Subsystems
     private RobotHardware robot;
     private Localization localization;
     private Drive drive;
@@ -30,8 +31,6 @@ public abstract class Base extends LinearOpMode
     private Webcam webcam;
     private Macros macros;
     private Gamepads gamepads;
-
-    private RobotContext robotContext;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -49,7 +48,7 @@ public abstract class Base extends LinearOpMode
 
         gamepads = new Gamepads(gamepad1, gamepad2);
 
-        robotContext = new RobotContext(team, robot, drive, intake, transfer, outtake, webcam, localization, gamepads, telemetry, this::opModeIsActive);
+        RobotContext robotContext = new RobotContext(team, robot, drive, intake, transfer, outtake, webcam, localization, gamepads, telemetry, this::opModeIsActive);
 
         macros = new Macros(robotContext);
 
