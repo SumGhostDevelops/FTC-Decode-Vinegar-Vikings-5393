@@ -12,6 +12,7 @@ public class UnexpectedTagIDException extends RuntimeException
 
     /**
      * "The AprilTag with ID " + expectedId + " is not a valid ID."
+     *
      * @param expectedId The expected ID of the AprilTag
      */
     public UnexpectedTagIDException(int expectedId)
@@ -21,8 +22,9 @@ public class UnexpectedTagIDException extends RuntimeException
 
     /**
      * "The AprilTag with ID " + id + " is not a valid ID."
+     *
      * @param expectedId The expected ID of the AprilTag
-     * @param actualId The actual ID of the AprilTag
+     * @param actualId   The actual ID of the AprilTag
      */
     public UnexpectedTagIDException(int expectedId, int actualId)
     {
