@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -14,8 +15,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 public class RobotHardware
 {
     public DcMotorEx leftFront, rightFront, leftBack, rightBack;
-    public DcMotorEx launcherMotor, intakeMotor;
-    public CRServo loaderServo;
+    public DcMotorEx outtakeMotor, intakeMotor;
+    public CRServo transferServo;
     public IMU imu;
     public WebcamName webcam;
 
@@ -46,9 +47,9 @@ public class RobotHardware
         // --- Mechanisms ---
         try
         {
-            launcherMotor = hardwareMap.get(DcMotorEx.class, "launcher");
-            launcherMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            launcherMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // For Velocity Control
+            outtakeMotor = hardwareMap.get(DcMotorEx.class, "launcher");
+            outtakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            outtakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // For Velocity Control
         }
         catch (Exception e)
         {
@@ -57,8 +58,8 @@ public class RobotHardware
 
         try
         {
-            loaderServo = hardwareMap.get(CRServo.class, "Loader");
-            loaderServo.setDirection(CRServo.Direction.REVERSE);
+            transferServo = hardwareMap.get(CRServo.class, "transfer");
+            transferServo.setDirection(CRServo.Direction.REVERSE);
         }
         catch (Exception e)
         {
@@ -81,7 +82,7 @@ public class RobotHardware
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         imu.initialize(parameters);
 
-        webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcam = hardwareMap.get(WebcamName.class, "webcam");
 
         // --- Odometry Encoders ---
         // Assuming they are plugged into specific slots, e.g., parallel on 'par', perpendicular on 'perp'

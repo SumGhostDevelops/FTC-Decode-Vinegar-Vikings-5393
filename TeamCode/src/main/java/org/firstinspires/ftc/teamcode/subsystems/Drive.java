@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
 
 public class Drive
 {
@@ -102,6 +103,24 @@ public class Drive
         robot.leftBack.setPower(backLeftPower * powerScale);
         robot.rightFront.setPower(frontRightPower * powerScale);
         robot.rightBack.setPower(backRightPower * powerScale);
+    }
+
+    // Inside Drive.java
+
+    public void setDrivePowers(double forward, double strafe, double turn) {
+        // Standard Mecanum Math
+        double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(turn), 1);
+
+        double fl = (forward + strafe + turn) / denominator;
+        double bl = (forward - strafe + turn) / denominator;
+        double fr = (forward - strafe - turn) / denominator;
+        double br = (forward + strafe - turn) / denominator;
+
+        // Apply to hardware
+        robot.leftFront.setPower(fl);
+        robot.leftBack.setPower(bl);
+        robot.rightFront.setPower(fr);
+        robot.rightBack.setPower(br);
     }
 
     public enum DriveMode

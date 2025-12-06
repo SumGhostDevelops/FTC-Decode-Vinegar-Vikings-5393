@@ -2,14 +2,19 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.controls.Macros;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.subsystems.Drive;
-import org.firstinspires.ftc.teamcode.subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.subsystems.LoaderIntake;
-import org.firstinspires.ftc.teamcode.subsystems.Localization;
+import org.firstinspires.ftc.teamcode.subsystems.Gamepads;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.RobotContext;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Webcam;
 
-abstract class Base extends LinearOpMode
+public abstract class Base extends LinearOpMode
 {
 
     // Change this manually or create a config selector OpMode
@@ -18,8 +23,14 @@ abstract class Base extends LinearOpMode
     private RobotHardware robot;
     private Localization localization;
     private Drive drive;
-    private Launcher launcher;
-    private LoaderIntake intake;
+    private Intake intake;
+    private Outtake outtake;
+    private Transfer transfer;
+    private Webcam webcam;
+    private Macros macros;
+    private Gamepads gamepads;
+
+    private RobotContext robotContext;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -27,11 +38,19 @@ abstract class Base extends LinearOpMode
         robot = new RobotHardware(hardwareMap, telemetry);
         localization = new Localization(robot);
         drive = new Drive(robot, localization);
-        launcher = new Launcher(robot);
-        intake = new LoaderIntake(robot);
+        outtake = new Outtake(robot);
+        intake = new Intake(robot);
+        transfer = new Transfer(robot);
+        webcam = new Webcam(robot);
 
         telemetry.addData("Status", "Initialized for " + team);
         telemetry.update();
+
+        gamepads = new Gamepads(gamepad1, gamepad2);
+
+        robotContext = new RobotContext(team, robot, drive, intake, transfer, outtake, webcam, localization, gamepads, telemetry, this::opModeIsActive);
+
+        macros = new Macros(robotContext);
 
         waitForStart();
 
@@ -74,27 +93,15 @@ abstract class Base extends LinearOpMode
             // Drive
             drive.drive(axial, lateral, yaw, 1.0);
 
-            // --- Gamepad 2: Mechanisms ---
-            if (gamepad2.right_trigger > 0.5) // TODO: Launcher should eventually be a toggle, and the right trigger only enables loading to happen, but we automatically handle if the loader should be on or off based on the launcher's RPM
+            if (gamepad1.right_trigger > 0.5) // Toggle fire when ready
             {
-                launcher.launch();
-                intake.loadBall(); // Feed into flywheel
-            }
-            else
-            {
-                launcher.idle();
-                intake.stopLoader();
+                macros.toggleFireWhenReady();
             }
 
-            if (gamepad2.xWasPressed())
+            if (gamepad2.xWasPressed()) // Reset transfer outtake
             {
-                launcher.clearJam();
+                macros.resetTransferOuttake();
             }
-
-            // Intake control
-            if (gamepad2.aWasPressed()) intake.intakeForward();
-            else if (gamepad2.bWasPressed()) intake.intakeReverse();
-            else intake.stopIntake();
 
             // --- Telemetry Toggle ---
             if (gamepad1.startWasPressed())
@@ -106,11 +113,14 @@ abstract class Base extends LinearOpMode
             {
                 telemetry.addData("Drive Mode", drive.getMode());
                 telemetry.addData("Heading", Math.toDegrees(localization.getHeading()));
-                telemetry.addData("Launcher RPM", launcher.getRPM());
+                telemetry.addData("Launcher RPM", outtake.getRPM());
                 telemetry.update();
             }
 
+            macros.update();
             localization.update();
+            transfer.update();
+            outtake.update();
         }
 
         localization.close();

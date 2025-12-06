@@ -11,18 +11,21 @@ public class RobotConstants
     public static double HYBRID_MODE_TURN_D = 0.001;
     public static double HYBRID_MODE_DEADBAND = 0.05;
 
-    // Launcher Constants
-    public static double LAUNCHER_TARGET_RPM = 1500; // Tune this
-    public static double LAUNCHER_RPM_TOLERANCE = 50;
+    // Outtake Constants
+    public static int OUTTAKE_PPR = 28;
+    public static double OUTTAKE_POWER_FWD = 1.0;
+    public static double OUTTAKE_POWER_REV = -0.7;
+    public static double OUTTAKE_POWER_IDLE = 0.0;
+    public static double OUTTAKE_TARGET_RPM = 3000; // Tune this
+    public static double OUTTAKE_RPM_TOLERANCE = 50;
     public static double SHOT_DROP_THRESHOLD = 0.20; // 20% drop implies shot
     public static double JAM_CLEAR_POWER = -0.3;
     public static double JAM_CLEAR_DURATION = 1.0; // Seconds
 
-    // Loader & Intake Constants
-    public static double LOADER_POWER_LOAD = 1.0;
-    public static double LOADER_POWER_IDLE = 0.0;
-    public static double INTAKE_POWER_FWD = 0.8;
-    public static double INTAKE_POWER_REV = -0.8;
+    // Transfer Constants
+    public static double TRANSFER_POWER_FWD = 0.8;
+    public static double TRANSFER_POWER_REV = -0.8;
+    public static double TRANSFER_POWER_IDLE = 0.0;
 
     // Localization / Vision
     public static double LENS_FX = 1424.38;
