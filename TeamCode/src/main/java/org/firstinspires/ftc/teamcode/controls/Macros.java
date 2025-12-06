@@ -21,17 +21,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Macros
 {
-    // Subsystems
-    private Drive drive;
-    private Intake intake;
-    private Transfer transfer;
-    private Outtake outtake;
-    private Webcam webcam;
-    private Localization localization;
-    private Gamepad gamepad1;
+    private final Team team;
     private List<Event> events;
 
-    private Team team;
+    // Subsystems
+    private final Drive drive;
+    private final Intake intake;
+    private final Transfer transfer;
+    private final Outtake outtake;
+    private final Webcam webcam;
+    private final Localization localization;
+    private Gamepads gamepads;
 
     public Macros(RobotContext robot)
     {
@@ -41,7 +41,7 @@ public class Macros
         this.outtake = robot.outtake;
         this.localization = robot.localization;
         this.webcam = robot.webcam;
-        this.gamepad1 = robot.gamepads.gamepad1;
+        this.gamepads = robot.gamepads;
         this.team = robot.team;
         this.events = new ArrayList<>();
     }
@@ -163,8 +163,8 @@ public class Macros
             // --- C. MIX INPUTS (Auto Turn + Manual Drive) ---
             // This allows you to strafe around the target while locked onto it!
 
-            double drive = -gamepad1.left_stick_y; // Forward/Back
-            double strafe = gamepad1.left_stick_x; // Left/Right
+            double drive = -gamepads.gamepad1.left_stick_y; // Forward/Back
+            double strafe = gamepads.gamepad1.left_stick_x; // Left/Right
             // notice we IGNORE right_stick_x and use 'turnPower' instead
 
             // Send to Drive Subsystem
