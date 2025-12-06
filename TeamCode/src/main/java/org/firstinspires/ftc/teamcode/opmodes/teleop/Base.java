@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.controls.Macros;
+import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.subsystems.Drive;
@@ -98,9 +99,21 @@ public abstract class Base extends LinearOpMode
                 macros.toggleFireWhenReady();
             }
 
-            if (gamepad2.xWasPressed()) // Reset transfer outtake
+            if (gamepad1.xWasPressed()) // Reset transfer outtake
             {
                 macros.resetTransferOuttake();
+            }
+
+            if (gamepad1.dpadUpWasPressed())
+            {
+                RobotConstants.OUTTAKE_TARGET_RPM += 100;
+                outtake.setRPM(RobotConstants.OUTTAKE_TARGET_RPM);
+            }
+
+            if (gamepad1.dpadDownWasPressed())
+            {
+                RobotConstants.OUTTAKE_TARGET_RPM -= 100;
+                outtake.setRPM(RobotConstants.OUTTAKE_TARGET_RPM);
             }
 
             // --- Telemetry Toggle ---
@@ -113,7 +126,8 @@ public abstract class Base extends LinearOpMode
             {
                 telemetry.addData("Drive Mode", drive.getMode());
                 telemetry.addData("Heading", Math.toDegrees(localization.getHeading()));
-                telemetry.addData("Launcher RPM", outtake.getRPM());
+                telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
+                telemetry.addData("Outtake RPM", outtake.getRPM());
                 telemetry.update();
             }
 
