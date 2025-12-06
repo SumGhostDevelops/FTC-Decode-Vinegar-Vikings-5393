@@ -1,7 +1,9 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop;
+package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.controls.Macros;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
@@ -10,16 +12,14 @@ import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.Gamepads;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
-import org.firstinspires.ftc.teamcode.subsystems.RobotContext;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Webcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-public abstract class Base extends LinearOpMode
+@TeleOp(name = "AprilTagComponentDistance", group = "Experiments")
+public class AprilTagComponentDistance extends LinearOpMode
 {
-    protected Team team;
-
     private RobotHardware robot;
     private Localization localization;
     private Drive drive;
@@ -39,16 +39,9 @@ public abstract class Base extends LinearOpMode
         outtake = new Outtake(robot);
         intake = new Intake(robot);
         transfer = new Transfer(robot);
-        webcam = new Webcam(robot);
-
-        telemetry.addData("Status", "Initialized for " + team);
-        telemetry.update();
+        webcam = new Webcam(robot, DistanceUnit.INCH);
 
         gamepads = new Gamepads(gamepad1, gamepad2);
-
-        RobotContext robotContext = new RobotContext(team, robot, drive, intake, transfer, outtake, webcam, localization, gamepads, telemetry, this::opModeIsActive);
-
-        macros = new Macros(robotContext);
 
         waitForStart();
 
@@ -60,9 +53,6 @@ public abstract class Base extends LinearOpMode
 
     private void run()
     {
-        telemetry.addData("Status", "Initialized for " + team);
-        telemetry.update();
-
         waitForStart();
 
         boolean telemetryEnabled = true;
@@ -83,13 +73,15 @@ public abstract class Base extends LinearOpMode
                 return;
             }
 
+            telemetry.log().add("Updated Displacements");
+
             AprilTagDetection tag = webcam.getSingleDetection(goalId);
 
             double xDisplacement = tag.ftcPose.x;
             double yDisplacement = tag.ftcPose.y;
 
-            telemetry.addData("x Displacement (meters)", xDisplacement);
-            telemetry.addData("y Displacement (meters)", yDisplacement);
+            telemetry.addData("x Displacement (inches)", xDisplacement);
+            telemetry.addData("y Displacement (inches)", yDisplacement);
         }
 
         // Reset Heading
@@ -106,26 +98,6 @@ public abstract class Base extends LinearOpMode
         // Drive
         drive.drive(axial, lateral, yaw, 1.0);
 
-        if (gamepad1.dpadUpWasPressed())
-        {
-            RobotConstants.OUTTAKE_TARGET_RPM += 100;
-        }
-
-        if (gamepad1.dpadDownWasPressed())
-        {
-            RobotConstants.OUTTAKE_TARGET_RPM -= 100;
-        }
-
-        if (gamepad1.right_trigger > 0.5) // Toggle fire when ready
-        {
-            macros.toggleFireWhenReady();
-        }
-
-        if (gamepad1.xWasPressed()) // Reset transfer outtake
-        {
-            macros.resetTransferOuttake();
-        }
-
         // --- Telemetry Toggle ---
         if (gamepad1.startWasPressed())
         {
@@ -140,12 +112,5 @@ public abstract class Base extends LinearOpMode
             telemetry.addData("Outtake RPM", outtake.getRPM());
             telemetry.update();
         }
-
-        macros.update();
-        localization.update();
-        transfer.update();
-        outtake.update();
-
-        localization.close();
     }
 }

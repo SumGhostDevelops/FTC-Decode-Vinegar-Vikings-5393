@@ -31,7 +31,7 @@ public class Macros
     private final Outtake outtake;
     private final Webcam webcam;
     private final Localization localization;
-    private final Gamepad gamepad1;
+    private Gamepads gamepads;
 
     public Macros(RobotContext robot)
     {
@@ -41,11 +41,10 @@ public class Macros
         this.outtake = robot.outtake;
         this.localization = robot.localization;
         this.webcam = robot.webcam;
-        this.gamepad1 = robot.gamepads.gamepad1;
+        this.gamepads = robot.gamepads;
         this.team = robot.team;
         this.events = new ArrayList<>();
     }
-
     public void resetTransferOuttake()
     {
         Event event = new Event(Macro.RESET_TRANSFER_OUTTAKE, 2.0, Subsystem.TRANSFER, Subsystem.OUTTAKE);
@@ -73,7 +72,8 @@ public class Macros
             if (outtake.isReadyToLaunch())
             {
                 transfer.setPower(RobotConstants.TRANSFER_POWER_FWD);
-            } else
+            }
+            else
             {
                 transfer.stop();
             }
@@ -88,15 +88,13 @@ public class Macros
         Event event = new Event(Macro.AIM_AT_TAG, -1.0, Subsystem.DRIVE); // Uses Drive
 
         // 2. Handle Toggling
-        if (!handleNewEvent(event))
-        {
+        if (!handleNewEvent(event)) {
             return;
         }
 
         // 3. Create a state container to hold "Memory" between loops
         // This effectively replaces the variables that used to be outside your do-while loop
-        class AimControlState
-        {
+        class AimControlState {
             ElapsedTime timer = new ElapsedTime();
             double lastError = 0;
             boolean targetFound = false;
@@ -105,8 +103,7 @@ public class Macros
         AimControlState state = new AimControlState();
 
         // 4. Set the Periodic Task
-        event.setPeriodicTask(() ->
-        {
+        event.setPeriodicTask(() -> {
             webcam.updateDetections();
             // --- A. GET VISION DATA ---
             double currentHeading = 0;
@@ -115,8 +112,7 @@ public class Macros
             // (Replace this line with your actual camera syntax)
             AprilTagDetection detection = webcam.getSingleDetection(team.goal.id);
 
-            if (detection != null)
-            {
+            if (detection != null) {
                 // In FTC AprilTag coordinates, 'Bearing' is usually the turning error
                 currentHeading = detection.ftcPose.bearing;
                 tagVisible = true;
@@ -125,8 +121,7 @@ public class Macros
             // --- B. CALCULATE PID (Only if tag is visible) ---
             double turnPower = 0;
 
-            if (tagVisible)
-            {
+            if (tagVisible) {
                 double targetAngle = 0; // We want 0 degrees bearing (centered)
 
                 // Calculate Error (Target - Current)
@@ -137,8 +132,7 @@ public class Macros
                 // Calculate Derivative
                 double currentTime = state.timer.seconds();
                 double derivative = 0;
-                if (currentTime > 0.001)
-                {
+                if (currentTime > 0.001) {
                     derivative = (error - state.lastError) / currentTime;
                 }
                 state.timer.reset(); // Reset for next loop
@@ -153,15 +147,14 @@ public class Macros
                 turnPower = (error * kP) + (derivative * kD);
 
                 // Apply Min Power Logic (Friction boost)
-                if (Math.abs(turnPower) < minTurn && Math.abs(error) > 1.0)
-                {
+                if (Math.abs(turnPower) < minTurn && Math.abs(error) > 1.0) {
                     turnPower = Math.signum(turnPower) * minTurn;
                 }
 
                 // Clamp
                 turnPower = Math.max(-1.0, Math.min(1.0, turnPower));
-            } else
-            {
+            }
+            else {
                 // Failsafe: If we lose the tag, stop turning (or hold last power)
                 turnPower = 0;
                 state.lastError = 0; // Reset derivative
@@ -170,8 +163,8 @@ public class Macros
             // --- C. MIX INPUTS (Auto Turn + Manual Drive) ---
             // This allows you to strafe around the target while locked onto it!
 
-            double drive = -gamepad1.left_stick_y; // Forward/Back
-            double strafe = gamepad1.left_stick_x; // Left/Right
+            double drive = -gamepads.gamepad1.left_stick_y; // Forward/Back
+            double strafe = gamepads.gamepad1.left_stick_x; // Left/Right
             // notice we IGNORE right_stick_x and use 'turnPower' instead
 
             // Send to Drive Subsystem
@@ -274,7 +267,7 @@ public class Macros
 
     private boolean eventIsActive(Macro event)
     {
-        for (Event e : events)
+        for (Event e: events)
         {
             if (e.name == event)
             {

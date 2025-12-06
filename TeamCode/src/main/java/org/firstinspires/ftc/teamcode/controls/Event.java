@@ -8,26 +8,20 @@ import java.util.List;
 
 public class Event
 {
-    public final BasicEnum name;
-    private final double duration;
-    public final List<Subsystem> subsystems;
+    public final BasicEnum name; // Identifier for the Macro type
+    private final double duration; // If this is less than 0, the Event runs indefinitely
+    public final List<Subsystem> subsystems; // Changed from BasicEnum to Subsystem
 
     private final ElapsedTime timer;
-    public boolean active = true; // If set inactive, the Event will be forcibly set for deletion
-    public Runnable periodicTask = null; // If not null, the Task has logic that needs to be rechecked
+    public boolean active = true;
+    private Runnable periodicTask = null;
 
     // Varargs (...) makes this easier to call
     public Event(BasicEnum name, Subsystem... subsystems)
     {
-        this(name, Double.MAX_VALUE, subsystems);
+        this(name, -1, subsystems);
     }
 
-    /**
-     *
-     * @param name The name of the Event
-     * @param duration How long the Event should run from the time it is initialized
-     * @param subsystems The subsystems used in the event
-     */
     public Event(BasicEnum name, double duration, Subsystem... subsystems)
     {
         this.name = name;

@@ -26,10 +26,15 @@ public class Webcam
 
     public Webcam(RobotHardware robot)
     {
-        this(robot, false);
+        this(robot, DistanceUnit.METER, false);
     }
 
-    public Webcam(RobotHardware robot, boolean showLiveView)
+    public Webcam(RobotHardware robot, DistanceUnit unit)
+    {
+        this(robot, unit, false);
+    }
+
+    public Webcam(RobotHardware robot, DistanceUnit unit, boolean showLiveView)
     {
         this.robot = robot;
 
@@ -39,7 +44,7 @@ public class Webcam
                 .setDrawTagID(showLiveView)
                 .setDrawTagOutline(showLiveView)
                 .setLensIntrinsics(RobotConstants.LENS_FX, RobotConstants.LENS_FY, RobotConstants.LENS_CX, RobotConstants.LENS_CY)
-                .setOutputUnits(DistanceUnit.METER, AngleUnit.DEGREES)
+                .setOutputUnits(unit, AngleUnit.DEGREES)
                 .build();
 
         visionPortal = new VisionPortal.Builder()
