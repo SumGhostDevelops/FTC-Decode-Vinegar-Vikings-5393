@@ -25,6 +25,7 @@ public abstract class Actuator
         REVERSE_ENABLED,
         FORWARD_TIMED,
         REVERSE_TIMED,
+        RESETTING,
         IDLE
     }
 
@@ -48,6 +49,10 @@ public abstract class Actuator
 
     public void stop()
     {
+        if (isResetting())
+        {
+            return;
+        }
 
         switch (type)
         {
@@ -73,6 +78,11 @@ public abstract class Actuator
 
     public void setPower(double power)
     {
+        if (isResetting())
+        {
+            return;
+        }
+
         if (power > 0)
         {
             status = Status.FORWARD_ENABLED;
@@ -87,6 +97,11 @@ public abstract class Actuator
 
     public void setDuration(double duration, double power)
     {
+        if (isResetting())
+        {
+            return;
+        }
+
         if (power > 0)
         {
             status = Status.FORWARD_TIMED;
@@ -102,9 +117,26 @@ public abstract class Actuator
         setPowerHelper(power);
     }
 
+    public void reset()
+    {
+        status = Status.RESETTING;
+        setPowerHelper(0.5);
+    }
+
+    public void stopResetting()
+    {
+        status = Status.IDLE;
+        stop();
+    }
+
     public boolean isIdle()
     {
         return status == Status.IDLE;
+    }
+
+    public boolean isResetting()
+    {
+        return status == Status.RESETTING;
     }
 
     public void update()

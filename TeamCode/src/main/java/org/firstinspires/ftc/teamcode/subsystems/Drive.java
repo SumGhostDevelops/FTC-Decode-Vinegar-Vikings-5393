@@ -41,7 +41,7 @@ public class Drive
         return currentMode;
     }
 
-    public void drive(double axial, double lateral, double yaw, double speedFactor)
+    public void drive(double axial, double lateral, double yaw)
     {
         double botHeading = localization.getHeading();
         double rotX = lateral;
@@ -98,7 +98,7 @@ public class Drive
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        double powerScale = RobotConstants.DRIVE_SPEED_MULTIPLIER * speedFactor;
+        double powerScale = RobotConstants.DRIVE_SPEED_MULTIPLIER;
         robot.leftFront.setPower(frontLeftPower * powerScale);
         robot.leftBack.setPower(backLeftPower * powerScale);
         robot.rightFront.setPower(frontRightPower * powerScale);
@@ -121,6 +121,26 @@ public class Drive
         robot.leftBack.setPower(bl);
         robot.rightFront.setPower(fr);
         robot.rightBack.setPower(br);
+    }
+
+    /**
+     *
+     * @param leftFront
+     * @param leftBack
+     * @param rightFront
+     * @param rightBack
+     */
+    public void setDrivePowers(double leftFront, double leftBack, double rightFront, double rightBack)
+    {
+        robot.leftFront.setPower(leftFront);
+        robot.leftBack.setPower(leftBack);
+        robot.rightFront.setPower(rightFront);
+        robot.rightBack.setPower(rightBack);
+    }
+
+    public void stop()
+    {
+        setDrivePowers(0, 0, 0, 0);
     }
 
     public enum DriveMode

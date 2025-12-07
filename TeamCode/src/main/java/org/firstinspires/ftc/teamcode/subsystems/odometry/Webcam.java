@@ -24,17 +24,17 @@ public class Webcam
 
     private List<AprilTagDetection> cachedTagDetections;
 
-    public Webcam(RobotHardware robot)
+    protected Webcam(RobotHardware robot)
     {
         this(robot, DistanceUnit.METER, false);
     }
 
-    public Webcam(RobotHardware robot, DistanceUnit unit)
+    protected Webcam(RobotHardware robot, DistanceUnit unit)
     {
         this(robot, unit, false);
     }
 
-    public Webcam(RobotHardware robot, DistanceUnit unit, boolean showLiveView)
+    protected Webcam(RobotHardware robot, DistanceUnit unit, boolean showLiveView)
     {
         this.robot = robot;
 
@@ -124,14 +124,14 @@ public class Webcam
         return null;
     }
 
-    public AprilTagDetection getAnyDetection()
+    public int getAnyTagID()
     {
         if (cachedTagDetections.isEmpty())
         {
-            return null;
+            return -1;
         }
 
-        return cachedTagDetections.get(0);
+        return cachedTagDetections.get(0).id;
     }
 
     public int getAnyGoalId()
@@ -152,13 +152,38 @@ public class Webcam
         throw new TagNotFoundException();
     }
 
-    public double getComponentDistanceToTag(int tagId)
+    /**
+     * Range, (Distance), from the Camera lens to the center of the Tag, as measured along the X-Y plane (across the ground).
+     * @param tagId
+     * @return Range
+     */
+    public double getRangeToTag(int tagId) // In meters
+    {
+        double[] rangeComponents = getRangeComponentsToTag(tagId);
+
+        if (rangeComponents == null)
+        {
+            return -1;
+        }
+
+        double trueRobotX = rangeComponents[0];
+        double trueRobotY = rangeComponents[1];
+
+        return Math.hypot(trueRobotX, trueRobotY);
+    }
+
+    /**
+     * Range, (Distance), from the Camera lens to the center of the Tag, as measured along the X-Y plane (across the ground).
+     * @param tagId
+     * @return Double[rangeX, rangeY]
+     */
+    public double[] getRangeComponentsToTag(int tagId)
     {
         AprilTagDetection tag = null;
 
         if (cachedTagDetections.isEmpty())
         {
-            return -1;
+            return null;
         }
 
         for (AprilTagDetection possibleTag : cachedTagDetections)
@@ -171,10 +196,13 @@ public class Webcam
 
         if (tag == null)
         {
-            return -1;
+            return null;
         }
 
-        return Math.sqrt(Math.pow(tag.ftcPose.z, 2) + Math.pow(tag.ftcPose.y, 2));
+        double trueRobotX = tag.ftcPose.y + RobotConstants.cameraOffsetX;
+        double trueRobotY = tag.ftcPose.y + RobotConstants.cameraOffsetY;
+
+        return new double[]{trueRobotX, trueRobotY};
     }
 
     /**

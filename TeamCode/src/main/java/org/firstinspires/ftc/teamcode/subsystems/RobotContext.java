@@ -12,30 +12,29 @@ import java.util.function.Supplier;
 
 public class RobotContext
 {
-    public Team team;
-    public RobotHardware hw;
-    public Webcam webcam;
-    public Telemetry telemetry;
-    public Gamepads gamepads;
-    public Supplier<Boolean> opModeIsActive;
+    public final RobotHardware hw;
+    public final Drive drive;
+    public final Intake intake;
+    public final Outtake outtake;
+    public final Transfer transfer;
 
-    public Drive drive;
-    public Intake intake;
-    public Outtake outtake;
-    public Transfer transfer;
-    public Localization localization;
+    public final Team team;
+    public final Localization localization;
+    public final Telemetry telemetry;
+    public final Gamepads gamepads;
+    public final Supplier<Boolean> opModeIsActive;
 
-    public RobotContext(Team team, RobotHardware hw, Drive drive, Intake intake, Transfer transfer, Outtake outtake, Webcam webcam, Localization localization, Gamepads gamepads, Telemetry telemetry, Supplier<Boolean> opModeIsActive)
+    public RobotContext(Team team, RobotHardware hw, Drive drive, Intake intake, Transfer transfer, Outtake outtake, Localization localization, Gamepads gamepads, Telemetry telemetry, Supplier<Boolean> opModeIsActive)
     {
         this.hw = hw;
+        this.team = team;
         this.drive = drive;
         this.intake = intake;
         this.transfer = transfer;
         this.outtake = outtake;
-        this.webcam = webcam;
+        this.localization = localization;
         this.gamepads = gamepads;
         this.telemetry = telemetry;
         this.opModeIsActive = opModeIsActive;
-        this.localization = localization;
     }
 }

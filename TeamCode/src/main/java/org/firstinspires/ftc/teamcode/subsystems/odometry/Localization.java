@@ -15,8 +15,7 @@ import java.util.List;
 public class Localization
 {
     private final RobotHardware robot;
-    private final AprilTagProcessor aprilTag;
-    private final VisionPortal visionPortal;
+    public final Webcam webcam;
 
     // Placeholder for PedroPath/RoadRunner pose
     private final Pose2d currentPose = new Pose2d(0, 0, 0);
@@ -25,17 +24,7 @@ public class Localization
     public Localization(RobotHardware robot)
     {
         this.robot = robot;
-
-        // Initialize Vision
-        aprilTag = new AprilTagProcessor.Builder()
-                .setLensIntrinsics(RobotConstants.LENS_FX, RobotConstants.LENS_FY, RobotConstants.LENS_CX, RobotConstants.LENS_CY)
-                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
-                .build();
-
-        visionPortal = new VisionPortal.Builder()
-                .setCamera(robot.webcam)
-                .addProcessor(aprilTag)
-                .build();
+        this.webcam = new Webcam(robot);
     }
 
     public void update()
@@ -55,48 +44,20 @@ public class Localization
 
     public double getHeading()
     {
-        return robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + headingOffset;
+        return robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + headingOffset;
     }
 
     public void resetHeading()
     {
         robot.imu.resetYaw();
         headingOffset = 0;
+        robot.telemetry.log().add("Reset heading!");
     }
 
     // --- Vision Logic ---
 
-    /**
-     * Returns the ID of the detected Obelisk tag (21, 22, or 23), or -1 if not found.
-     */
-    public int scanObelisk()
-    {
-        List<AprilTagDetection> detections = aprilTag.getDetections();
-        for (AprilTagDetection detection : detections)
-        {
-            if (detection.metadata != null)
-            {
-                if (detection.id >= 21 && detection.id <= 23)
-                {
-                    return detection.id;
-                }
-            }
-        }
-        return -1;
-    }
-
-    public AprilTagDetection getDetection(int id)
-    {
-        List<AprilTagDetection> detections = aprilTag.getDetections();
-        for (AprilTagDetection detection : detections)
-        {
-            if (detection.id == id) return detection;
-        }
-        return null;
-    }
-
     public void close()
     {
-        if (visionPortal != null) visionPortal.close();
+        webcam.close();
     }
 }

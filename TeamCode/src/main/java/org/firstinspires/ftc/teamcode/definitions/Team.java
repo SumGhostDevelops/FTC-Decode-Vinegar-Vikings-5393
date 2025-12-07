@@ -9,7 +9,8 @@ public enum Team
     // Enum constants.
     // You can change these default coordinates and IDs as needed.
     RED("red", new Goal(24, 100.0, 50.0), new Base(10.0, 50.0)),
-    BLUE("blue", new Goal(20, -100.0, 50.0), new Base(-10.0, 50.0));
+    BLUE("blue", new Goal(20, -100.0, 50.0), new Base(-10.0, 50.0)),
+    NONE("none", new Goal(-1, 0, 0), new Base(0, 0));
 
     // --- Enum Fields and Methods ---
     public final String color;

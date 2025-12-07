@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.controls;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.subsystems.Drive;
@@ -9,40 +11,24 @@ import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.RobotContext;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Webcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Macros
 {
-    private final Team team;
+    private final RobotContext robot;
     private List<Event> events;
-
-    // Subsystems
-    private final Drive drive;
-    private final Intake intake;
-    private final Transfer transfer;
-    private final Outtake outtake;
-    private final Webcam webcam;
-    private final Localization localization;
-    private Gamepads gamepads;
 
     public Macros(RobotContext robot)
     {
-        this.drive = robot.drive;
-        this.intake = robot.intake;
-        this.transfer = robot.transfer;
-        this.outtake = robot.outtake;
-        this.localization = robot.localization;
-        this.webcam = robot.webcam;
-        this.gamepads = robot.gamepads;
-        this.team = robot.team;
+        this.robot = robot;
         this.events = new ArrayList<>();
     }
     public void resetTransferOuttake()
@@ -54,8 +40,20 @@ public class Macros
             return;
         }
 
-        outtake.setPower(-0.5);
-        transfer.setPower(-0.5);
+        robot.outtake.setPower(-0.5);
+        robot.transfer.setPower(-0.5);
+    }
+
+    public void resetTransferOuttakeNonFSM()
+    {
+        robot.outtake.reset();
+        robot.transfer.reset();
+    }
+
+    public void stopResetTransferOuttakeNonFSM()
+    {
+        robot.outtake.stopResetting();
+        robot.transfer.stopResetting();
     }
 
     public void toggleFireWhenReady()
@@ -69,18 +67,16 @@ public class Macros
 
         event.setPeriodicTask(() ->
         {
-            if (outtake.isReadyToLaunch())
+            if (robot.outtake.isReadyToLaunch())
             {
-                transfer.setPower(RobotConstants.TRANSFER_POWER_FWD);
+                robot.transfer.setPower(RobotConstants.TRANSFER_POWER_FWD);
             }
             else
             {
-                transfer.stop();
+                robot.transfer.stop();
             }
         });
     }
-
-    // Inside Macros.java
 
     public void toggleAprilTagAim(int targetTagId)
     {
@@ -104,13 +100,13 @@ public class Macros
 
         // 4. Set the Periodic Task
         event.setPeriodicTask(() -> {
-            webcam.updateDetections();
+            robot.localization.webcam.updateDetections();
             // --- A. GET VISION DATA ---
             double currentHeading = 0;
             boolean tagVisible = false;
 
             // (Replace this line with your actual camera syntax)
-            AprilTagDetection detection = webcam.getSingleDetection(team.goal.id);
+            AprilTagDetection detection = robot.localization.webcam.getSingleDetection(robot.team.goal.id);
 
             if (detection != null) {
                 // In FTC AprilTag coordinates, 'Bearing' is usually the turning error
@@ -163,13 +159,116 @@ public class Macros
             // --- C. MIX INPUTS (Auto Turn + Manual Drive) ---
             // This allows you to strafe around the target while locked onto it!
 
-            double drive = -gamepads.gamepad1.left_stick_y; // Forward/Back
-            double strafe = gamepads.gamepad1.left_stick_x; // Left/Right
+            double drive = -robot.gamepads.gamepad1.left_stick_y; // Forward/Back
+            double strafe = robot.gamepads.gamepad1.left_stick_x; // Left/Right
             // notice we IGNORE right_stick_x and use 'turnPower' instead
 
             // Send to Drive Subsystem
-            this.drive.setDrivePowers(drive, strafe, turnPower);
+            robot.drive.setDrivePowers(drive, strafe, turnPower);
         });
+    }
+
+    public void aimToAprilTag(int id, double manualAngleOffset)
+    {
+        robot.telemetry.log().add("-aimToAprilTag---------");
+        robot.localization.webcam.updateDetections();
+
+        AprilTagDetection tag = robot.localization.webcam.getSingleDetection(id);
+
+        if (tag == null)
+        {
+            robot.telemetry.log().add("AprilTag with ID " + id + " was not found.");
+            return;
+        }
+
+        double offset = tag.ftcPose.bearing;
+        double currentAngle = robot.localization.getHeading();
+        double targetAngle = currentAngle + offset + manualAngleOffset; // No manual angleOffset
+
+        aimToAngle(targetAngle);
+    }
+
+    private void aimToAngle(double targetAngle) // Blocking action/non-FSM
+    {
+        robot.telemetry.log().add("-aimToAngle---------");
+        robot.telemetry.update();
+
+        double tolerance = 1.5; // Angle tolerance in degrees (e.g., 1 degree)
+
+        // Initialize variables outside the loop
+        double error;
+        double motorPower;
+        double lastError;
+        double derivative;
+
+        double kP = 0.01;
+        double kD = 0.002;
+        double minTurnPower = 0.1;
+
+        // CRITICAL FIX: Use a dedicated timer for derivative calculation
+        ElapsedTime loopTimer = new ElapsedTime();
+        double loopTime;
+
+        // Calculate initial error and save it
+        double currentAngle = robot.localization.getHeading();
+
+        // Assuming RobotMath.convert360AngleTo180 correctly wraps the error difference
+        error = targetAngle - currentAngle;
+        lastError = error;
+
+        // Reset timer to start measuring the first loop iteration time
+        loopTimer.reset();
+
+        do
+        {
+            // 1. Get new angle and calculate time elapsed
+            currentAngle = robot.localization.getHeading();
+            loopTime = loopTimer.seconds();
+            loopTimer.reset(); // Reset timer at the beginning of the loop
+
+            // 2. Calculate the error (difference between target and current)
+            error = targetAngle - currentAngle;
+
+            // 3. Calculate Derivative Term (Handle division by zero safety)
+            if (loopTime > 0.0001)
+            { // Check for near-zero time to prevent division by zero/oversize D-term
+                derivative = (error - lastError) / loopTime;
+            }
+            else
+            {
+                derivative = 0.0;
+            }
+
+            // 4. Calculate raw motor power (PD Control Law)
+            motorPower = (error * kP) + (derivative * kD);
+
+            // 5. Apply minTurnPower (Min Motor Power Logic Fix)
+            // Only apply min power if the error is still outside tolerance
+            if (Math.abs(error) > tolerance)
+            {
+                if (Math.abs(motorPower) < minTurnPower)
+                {
+                    // Boost power to minTurnPower to overcome friction, keeping the same sign/direction
+                    motorPower = Math.signum(motorPower) * minTurnPower;
+                }
+            }
+
+            // 6. Clamp power to the legal range [-1.0, 1.0]
+            motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
+
+            // 7. Apply power to motors (Assuming standard mecanum/tank drive)
+            robot.drive.setDrivePowers(-motorPower, -motorPower, motorPower, motorPower);
+
+            // 8. Update for next iteration
+            lastError = error;
+        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && robot.gamepads.gamepad1.yWasPressed());
+
+        // Stop and clean up
+        robot.drive.stop();
+
+        robot.telemetry.log().add("Finished turning.");
+        robot.telemetry.log().add("Final error: " + String.format("%.1f", error));
+        robot.telemetry.update();
     }
 
     public void update()
@@ -235,13 +334,13 @@ public class Macros
             switch (s)
             {
                 case INTAKE:
-                    if (!intake.isIdle()) intake.stop();
+                    if (!robot.intake.isIdle()) robot.intake.stop();
                     break;
                 case TRANSFER:
-                    if (!transfer.isIdle()) transfer.stop();
+                    if (!robot.transfer.isIdle()) robot.transfer.stop();
                     break;
                 case OUTTAKE:
-                    if (!outtake.isIdle()) outtake.stop();
+                    if (!robot.outtake.isIdle()) robot.outtake.stop();
                     break;
             }
         }

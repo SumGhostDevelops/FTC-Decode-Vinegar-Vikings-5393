@@ -30,6 +30,11 @@ public class Outtake extends Actuator
 
     public void setRPM(double rpm)
     {
+        if (isResetting())
+        {
+            return;
+        }
+
         status = Status.FORWARD_ENABLED;
 
         targetRPM = rpm;
@@ -38,7 +43,7 @@ public class Outtake extends Actuator
 
     public boolean isReadyToLaunch()
     {
-        return Math.abs(getRPM() - targetRPM) < RobotConstants.OUTTAKE_RPM_TOLERANCE;
+        return Math.abs(getRPM() - targetRPM) < RobotConstants.OUTTAKE_RPM_TOLERANCE && !isResetting();
     }
 
     private double ticksToRpm(double ticks)

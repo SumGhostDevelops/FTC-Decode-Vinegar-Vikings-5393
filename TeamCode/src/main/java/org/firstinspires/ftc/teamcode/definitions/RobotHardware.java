@@ -81,6 +81,7 @@ public class RobotHardware
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         imu.initialize(parameters);
+        imu.resetYaw();
 
         webcam = hardwareMap.get(WebcamName.class, "webcam");
 
