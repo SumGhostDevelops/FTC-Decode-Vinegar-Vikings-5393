@@ -105,14 +105,11 @@ public abstract class Base extends LinearOpMode
     {
         if (gamepad.aWasPressed())
         {
-            if (transfer.isResetting() || outtake.isResetting())
-            {
-                macros.stopResetTransferOuttakeNonFSM();
-            }
-            else
-            {
-                macros.resetTransferOuttakeNonFSM();
-            }
+            macros.resetTransferOuttakeNonFSM();
+        }
+        else if (gamepad.aWasReleased())
+        {
+            macros.stopResetTransferOuttakeNonFSM();
         }
     }
 
