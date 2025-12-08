@@ -120,7 +120,7 @@ public abstract class Actuator
     public void reset()
     {
         status = Status.RESETTING;
-        setPowerHelper(0.5);
+        setPowerHelper(-0.5);
     }
 
     public void stopResetting()
