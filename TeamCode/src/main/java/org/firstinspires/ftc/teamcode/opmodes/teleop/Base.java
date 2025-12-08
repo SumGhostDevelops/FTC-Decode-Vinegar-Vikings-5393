@@ -150,33 +150,10 @@ public abstract class Base extends LinearOpMode
                 return;
             }
 
-            double maxDistance = 3.5; // meters, used for scaling the offset
             double distanceToTag = localization.webcam.getRangeToTag(team.goal.id);
-            double angleOffset;
-
-            switch (team)
-            {
-                case BLUE:
-                {
-                    angleOffset = RobotConstants.FORCED_ANGLE_OFFSET;
-                    break;
-                }
-                case RED:
-                {
-                    angleOffset = -RobotConstants.FORCED_ANGLE_OFFSET;
-                    break;
-                }
-                default:
-                {
-                    angleOffset = 0.0;
-                }
-            }
-
-            telemetry.log().add("Robot is " + (distanceToTag/maxDistance)*100 + "% toward goal. (" + String.format("%.2f", distanceToTag) + "/" + String.format("%.2f", maxDistance) +" in meters) Programmers, remove this message if this looks correct.");
-            angleOffset *= distanceToTag / maxDistance; // Linearly reduce the angleOffset as we get closer to the AprilTag
 
             // Here we would add a thing for RobotConstants.OUTTAKE_TARGET_RPM to be set to a value using a regression.
-            macros.aimToAprilTag(team.goal.id, angleOffset);
+            macros.aimToAprilTag(team.goal.id);
         }
     }
 

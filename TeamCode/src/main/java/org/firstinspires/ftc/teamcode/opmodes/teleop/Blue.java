@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.definitions.Team;
 
-@TeleOp(name = "BlueVikingsTeleOp")
+@TeleOp(name = "BlueVikingsTeleOp", group = "Game")
 public class Blue extends Base
 {
     @Override

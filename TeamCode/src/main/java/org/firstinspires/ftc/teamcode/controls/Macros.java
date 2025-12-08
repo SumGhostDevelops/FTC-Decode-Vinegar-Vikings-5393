@@ -168,6 +168,35 @@ public class Macros
         });
     }
 
+    public void aimToAprilTag(int id)
+    {
+        double maxDistance = 3.5; // meters, used for scaling the offset
+        double distanceToTag = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
+        double angleOffset;
+
+        switch (robot.team)
+        {
+            case BLUE:
+            {
+                angleOffset = RobotConstants.FORCED_ANGLE_OFFSET;
+                break;
+            }
+            case RED:
+            {
+                angleOffset = -RobotConstants.FORCED_ANGLE_OFFSET;
+                break;
+            }
+            default:
+            {
+                angleOffset = 0.0;
+            }
+        }
+
+        angleOffset *= distanceToTag / maxDistance; // Linearly reduce the angleOffset as we get closer to the AprilTag
+
+        aimToAprilTag(id, angleOffset);
+    }
+
     public void aimToAprilTag(int id, double manualAngleOffset)
     {
         robot.telemetry.log().add("-aimToAprilTag---------");
@@ -269,6 +298,61 @@ public class Macros
         robot.telemetry.log().add("Finished turning.");
         robot.telemetry.log().add("Final error: " + String.format("%.1f", error));
         robot.telemetry.update();
+    }
+
+    /**
+     * Changes the value of the target RPM and turns the flywheel on.
+     * @param distanceToTag
+     */
+    public void autoSetOuttakeTargetRPM(double distanceToTag)
+    {
+        // RobotConstants.OUTTAKE_TARGET_RPM = regression
+        robot.outtake.setRPM(RobotConstants.OUTTAKE_TARGET_RPM);
+        robot.telemetry.log().add("Flywheel activated and set to a target RPM of " + RobotConstants.OUTTAKE_TARGET_RPM);
+        robot.telemetry.update();
+    }
+
+    public void sleep(double seconds)
+    {
+        sleep(seconds, robot.telemetry);
+    }
+
+    public void sleep(double seconds, String reason)
+    {
+        sleep(seconds, reason, robot.telemetry);
+    }
+
+    public static void sleep(double seconds, Telemetry telemetry)
+    {
+        sleep(seconds, "", telemetry);
+    }
+
+    public static void sleep(double seconds, String reason, Telemetry telemetry)
+    {
+        long milliseconds = (long) (seconds * 1000);
+
+        String result = "Sleeping for " + seconds + "seconds.";
+
+        if (!reason.isEmpty())
+        {
+            result += " Reason: " + reason;
+        }
+
+        telemetry.log().add(result);
+        telemetry.update();
+
+        try
+        {
+            Thread.sleep(milliseconds);
+        }
+        catch (InterruptedException e)
+        {
+            telemetry.log().add("Interrupted while sleeping: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+
+        telemetry.log().add("Done sleeping.");
+        telemetry.update();
     }
 
     public void update()
