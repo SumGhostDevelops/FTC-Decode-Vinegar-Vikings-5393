@@ -39,7 +39,7 @@ public abstract class Base extends LinearOpMode
         intake = new Intake(hw);
         transfer = new Transfer(hw);
 
-        telemetry.setAutoClear(false);
+        telemetry.setAutoClear(true);
         telemetry.addData("Status", "Initialized for " + team);
         telemetry.update();
 
@@ -89,7 +89,7 @@ public abstract class Base extends LinearOpMode
 
         telemetry.addData("Drive Mode", drive.getMode());
         telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
-        telemetry.addData("Heading", Math.toDegrees(localization.getHeading()));
+        telemetry.addData("Heading", localization.getHeading());
         telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
         telemetry.addData("Outtake RPM", outtake.getRPM());
 

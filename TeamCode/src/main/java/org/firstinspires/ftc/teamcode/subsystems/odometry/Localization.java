@@ -44,13 +44,12 @@ public class Localization
 
     public double getHeading()
     {
-        return robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + headingOffset;
+        return robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     public void resetHeading()
     {
         robot.imu.resetYaw();
-        headingOffset = 0;
         robot.telemetry.log().add("Reset heading!");
     }
 

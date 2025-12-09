@@ -43,7 +43,7 @@ public class Drive
 
     public void drive(double axial, double lateral, double yaw)
     {
-        double botHeading = localization.getHeading();
+        double botHeading = Math.toRadians(localization.getHeading());
         double rotX = lateral;
         double rotY = axial;
         double rx = yaw;
@@ -90,6 +90,8 @@ public class Drive
                 // Pass through
                 break;
         }
+
+        rotX *= 1.1; // Counteract imperfect strafing
 
         // Mecanum Math
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
