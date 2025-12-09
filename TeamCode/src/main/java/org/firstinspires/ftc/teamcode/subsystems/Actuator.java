@@ -147,7 +147,8 @@ public abstract class Actuator
     {
         switch (status)
         {
-            case FORWARD_TIMED, REVERSE_TIMED:
+            case FORWARD_TIMED:
+            case REVERSE_TIMED:
                 if (timer.seconds() >= targetTime)
                 {
                     switch (type)
@@ -163,7 +164,9 @@ public abstract class Actuator
                 status = Status.IDLE;
                 break;
 
-            case FORWARD_ENABLED, REVERSE_ENABLED, IDLE:
+            case FORWARD_ENABLED:
+            case REVERSE_ENABLED:
+            case IDLE:
                 break;
         }
     }
