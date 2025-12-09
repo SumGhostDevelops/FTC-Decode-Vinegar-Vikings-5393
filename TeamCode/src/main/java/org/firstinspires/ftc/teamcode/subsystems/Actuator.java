@@ -71,8 +71,12 @@ public abstract class Actuator
     {
         switch (type)
         {
-            case MOTOR -> motor.setPower(power);
-            case SERVO -> servo.setPower(power);
+            case MOTOR:
+                motor.setPower(power);
+                break;
+            case SERVO:
+                servo.setPower(power);
+                break;
         }
     }
 
@@ -148,8 +152,12 @@ public abstract class Actuator
                 {
                     switch (type)
                     {
-                        case MOTOR -> motor.setPower(0);
-                        case SERVO -> servo.setPower(0);
+                        case MOTOR:
+                            motor.setPower(0);
+                            break;
+                        case SERVO:
+                            servo.setPower(0);
+                            break;
                     }
                 }
                 status = Status.IDLE;
