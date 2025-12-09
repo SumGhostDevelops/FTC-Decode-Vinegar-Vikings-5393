@@ -24,6 +24,26 @@ public class Outtake extends Actuator
         return targetRPM;
     }
 
+    /**
+     * Changes the internal target RPM without turning the flywheel on
+     * @param rpm
+     */
+    public void modifyTargetRPM(double rpm)
+    {
+        if (rpm > 6000)
+        {
+            robot.telemetry.log().add("RPM was attempted to be set over the 6000 RPM limit (" + rpm + "). Capped to 6000.");
+            rpm = 6000;
+        }
+
+        targetRPM = rpm;
+    }
+
+    public void setRPM()
+    {
+        setRPM(targetRPM);
+    }
+
     public void setRPM(double rpm)
     {
         if (isResetting())

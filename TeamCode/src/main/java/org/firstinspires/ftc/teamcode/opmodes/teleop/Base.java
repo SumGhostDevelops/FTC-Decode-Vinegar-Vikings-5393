@@ -161,7 +161,8 @@ public abstract class Base extends LinearOpMode
     {
         if (gamepad.dpadUpWasPressed())
         {
-            RobotConstants.OUTTAKE_TARGET_RPM += 100;
+            RobotConstants.OUTTAKE_TARGET_RPM += 25;
+            outtake.modifyTargetRPM(RobotConstants.OUTTAKE_TARGET_RPM);
         }
     }
 
@@ -169,7 +170,8 @@ public abstract class Base extends LinearOpMode
     {
         if (gamepad.dpadDownWasPressed())
         {
-            RobotConstants.OUTTAKE_TARGET_RPM -= 100;
+            RobotConstants.OUTTAKE_TARGET_RPM -= 25;
+            outtake.modifyTargetRPM(RobotConstants.OUTTAKE_TARGET_RPM);
         }
     }
 

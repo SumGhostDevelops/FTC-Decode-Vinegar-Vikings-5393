@@ -170,7 +170,7 @@ public class Macros
 
     public void aimToAprilTag(int id)
     {
-        double maxDistance = 3.5; // meters, used for scaling the offset
+        double maxDistance = 4.5; // meters, used for scaling the offset
         double distanceToTag = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
         double angleOffset;
 
@@ -204,10 +204,20 @@ public class Macros
 
         AprilTagDetection tag = robot.localization.webcam.getSingleDetection(id);
 
-        if (tag == null)
+        for (int i = 0; i < 3; i++)
         {
+            if (tag != null)
+            {
+                break;
+            }
+
             robot.telemetry.log().add("AprilTag with ID " + id + " was not found.");
-            return;
+            sleep(0.5, "Waiting for camera to get a good view of the AprilTag");
+
+            if (i == 2 || robot.gamepads.gamepad1.yWasPressed())
+            {
+                return;
+            }
         }
 
         double offset = tag.ftcPose.bearing;
@@ -290,7 +300,7 @@ public class Macros
 
             // 8. Update for next iteration
             lastError = error;
-        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && robot.gamepads.gamepad1.yWasPressed());
+        } while (Math.abs(error) > tolerance && robot.opModeIsActive.get() && !robot.gamepads.gamepad1.yWasPressed());
 
         // Stop and clean up
         robot.drive.stop();
