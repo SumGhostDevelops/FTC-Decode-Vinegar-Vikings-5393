@@ -142,17 +142,6 @@ public abstract class Base extends LinearOpMode
     {
         if (gamepad.yWasPressed())
         {
-            localization.webcam.updateDetections();
-
-            if (!localization.webcam.tagIdExists(team.goal.id))
-            {
-                telemetry.log().add("Goal ID not found. Cancelling autoaim.");
-                return;
-            }
-
-            double distanceToTag = localization.webcam.getRangeToTag(team.goal.id);
-
-            // Here we would add a thing for RobotConstants.OUTTAKE_TARGET_RPM to be set to a value using a regression.
             macros.aimToAprilTag(team.goal.id);
         }
     }
@@ -161,8 +150,7 @@ public abstract class Base extends LinearOpMode
     {
         if (gamepad.dpadUpWasPressed())
         {
-            RobotConstants.OUTTAKE_TARGET_RPM += 25;
-            outtake.modifyTargetRPM(RobotConstants.OUTTAKE_TARGET_RPM);
+            outtake.varyTargetRPM(25);
         }
     }
 
@@ -170,8 +158,7 @@ public abstract class Base extends LinearOpMode
     {
         if (gamepad.dpadDownWasPressed())
         {
-            RobotConstants.OUTTAKE_TARGET_RPM -= 25;
-            outtake.modifyTargetRPM(RobotConstants.OUTTAKE_TARGET_RPM);
+            outtake.varyTargetRPM(-25);
         }
     }
 
@@ -229,7 +216,7 @@ public abstract class Base extends LinearOpMode
     {
         if (gamepad.right_trigger > 0.25)
         {
-            outtake.setRPM(RobotConstants.OUTTAKE_TARGET_RPM);
+            outtake.setRPM();
         }
         else
         {

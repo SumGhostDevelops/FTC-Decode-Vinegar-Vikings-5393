@@ -200,25 +200,30 @@ public class Macros
     public void aimToAprilTag(int id, double manualAngleOffset)
     {
         robot.telemetry.log().add("-aimToAprilTag---------");
-        robot.localization.webcam.updateDetections();
 
-        AprilTagDetection tag = robot.localization.webcam.getSingleDetection(id);
+        ElapsedTime searchTimer = new ElapsedTime();
+        AprilTagDetection tag = null;
+        double timeLimit = 2; // seconds max to search
 
-        for (int i = 0; i < 3; i++)
+        searchTimer.reset();
+
+        while (tag == null && searchTimer.seconds() < timeLimit)
         {
-            if (tag != null)
-            {
-                break;
-            }
+            robot.localization.webcam.updateDetections();
+            tag = robot.localization.webcam.getSingleDetection(id);
 
-            robot.telemetry.log().add("AprilTag with ID " + id + " was not found.");
-            sleep(0.5, "Waiting for camera to get a good view of the AprilTag");
-
-            if (i == 2 || robot.gamepads.gamepad1.yWasPressed())
-            {
-                return;
-            }
+            robot.telemetry.addData("Status", "Searching for Tag " + id);
+            robot.telemetry.update();
         }
+
+        if (tag == null)
+        {
+            robot.telemetry.log().add("Cancelling auto-aim command: Could not find Tag " + id);
+            return;
+        }
+
+        double distanceToTag = robot.localization.webcam.getRangeToTag(id);
+        robot.outtake.modifyTargetRPMBasedOnDistance(distanceToTag);
 
         double offset = tag.ftcPose.bearing;
         double currentAngle = robot.localization.getHeading();
@@ -307,18 +312,6 @@ public class Macros
 
         robot.telemetry.log().add("Finished turning.");
         robot.telemetry.log().add("Final error: " + String.format("%.1f", error));
-        robot.telemetry.update();
-    }
-
-    /**
-     * Changes the value of the target RPM and turns the flywheel on.
-     * @param distanceToTag
-     */
-    public void autoSetOuttakeTargetRPM(double distanceToTag)
-    {
-        // RobotConstants.OUTTAKE_TARGET_RPM = regression
-        robot.outtake.setRPM(RobotConstants.OUTTAKE_TARGET_RPM);
-        robot.telemetry.log().add("Flywheel activated and set to a target RPM of " + RobotConstants.OUTTAKE_TARGET_RPM);
         robot.telemetry.update();
     }
 
