@@ -126,15 +126,15 @@ public abstract class Base extends LinearOpMode
         if (gamepad.xWasPressed())
         {
             localization.webcam.updateDetections();
-            int tagId = localization.webcam.getAnyTagID();
-            if (tagId < 0)
+            boolean tagExists = localization.webcam.tagIdExists(team.goal.id);
+            if (!tagExists)
             {
                 telemetry.log().add("No AprilTags were found.");
                 return;
             }
 
-            double distance = localization.webcam.getRangeToTag(tagId);
-            telemetry.log().add("Distance to " + tagId + ":" + distance + " meters");
+            double distance = localization.webcam.getRangeToTag(team.goal.id);
+            telemetry.log().add("Distance to " + team.goal.id + ": " + distance + " meters");
         }
     }
 
@@ -143,6 +143,21 @@ public abstract class Base extends LinearOpMode
         if (gamepad.yWasPressed())
         {
             macros.aimToAprilTag(team.goal.id);
+
+            double distanceToTag = localization.webcam.getRangeToTag(team.goal.id);
+            outtake.modifyTargetRPMBasedOnDistance(distanceToTag);
+
+            localization.webcam.updateDetections();
+            if (localization.webcam.tagIdExists(team.goal.id))
+            {
+                if (localization.webcam.tagIsOnLeft(team.goal.id))
+                {
+                    telemetry.log().add("Tag is on the left.");
+                } else if (localization.webcam.tagIsOnRight(team.goal.id))
+                {
+                    telemetry.log().add("Tag is on the right");
+                }
+            }
         }
     }
 

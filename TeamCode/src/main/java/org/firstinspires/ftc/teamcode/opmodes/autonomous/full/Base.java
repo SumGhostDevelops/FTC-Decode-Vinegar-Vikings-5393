@@ -34,16 +34,18 @@ public abstract class Base extends LinearOpMode
         Macros macros = new Macros(robot);
 
         waitForStart();
+        localization.webcam.updateDetections();
 
         while (!localization.webcam.tagIdExists(team.goal.id))
         {
+            localization.webcam.updateDetections();
             macros.sleep(1, "AprilTag (ID " + team.goal.id + " ) not found. Waiting 1 seocnd.");
         }
 
         telemetry.log().add("AprilTag (ID " + team.goal.id + " )found!");
 
         double distanceToTag = localization.webcam.getRangeToTag(team.goal.id);
-        macros.autoSetOuttakeTargetRPM(distanceToTag);
+        outtake.setRPMBasedOnDistance(distanceToTag);
         macros.aimToAprilTag(team.goal.id);
 
         for (int i = 0; i < 3; i++)

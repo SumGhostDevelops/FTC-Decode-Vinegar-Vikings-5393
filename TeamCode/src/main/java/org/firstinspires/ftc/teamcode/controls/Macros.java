@@ -222,9 +222,6 @@ public class Macros
             return;
         }
 
-        double distanceToTag = robot.localization.webcam.getRangeToTag(id);
-        robot.outtake.modifyTargetRPMBasedOnDistance(distanceToTag);
-
         double offset = tag.ftcPose.bearing;
         double currentAngle = robot.localization.getHeading();
         double targetAngle = currentAngle + offset + manualAngleOffset; // No manual angleOffset

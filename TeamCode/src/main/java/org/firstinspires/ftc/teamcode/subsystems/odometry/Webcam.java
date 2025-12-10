@@ -14,6 +14,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Webcam
@@ -22,7 +23,7 @@ public class Webcam
     private final AprilTagProcessor tagProcessor;
     private final VisionPortal visionPortal;
 
-    private List<AprilTagDetection> cachedTagDetections;
+    private List<AprilTagDetection> cachedTagDetections = new ArrayList<>();
 
     protected Webcam(RobotHardware robot)
     {
@@ -159,17 +160,16 @@ public class Webcam
      */
     public double getRangeToTag(int tagId) // In meters
     {
-        double[] rangeComponents = getRangeComponentsToTag(tagId);
-
-        if (rangeComponents == null)
+        if (!tagIdExists(tagId))
         {
-            return -1;
+            return -1.0;
         }
 
-        double trueRobotX = rangeComponents[0];
-        double trueRobotY = rangeComponents[1];
+        AprilTagDetection tag = getSingleDetection(tagId);
+        double range = tag.ftcPose.range;
 
-        return Math.hypot(trueRobotX, trueRobotY);
+        robot.telemetry.log().add("Range of " + tagId + ": " + range + " meters");
+        return range;
     }
 
     /**
@@ -199,7 +199,7 @@ public class Webcam
             return null;
         }
 
-        double trueRobotX = tag.ftcPose.y + RobotConstants.cameraOffsetX;
+        double trueRobotX = tag.ftcPose.x + RobotConstants.cameraOffsetX;
         double trueRobotY = tag.ftcPose.y + RobotConstants.cameraOffsetY;
 
         return new double[]{trueRobotX, trueRobotY};
@@ -225,6 +225,40 @@ public class Webcam
         }
 
         return null;
+    }
+
+    public boolean tagIsOnLeft(int id)
+    {
+        AprilTagDetection tag = getSingleDetection(id);
+
+        if (tag == null)
+        {
+            return false;
+        }
+
+        if (tag.ftcPose.yaw <= 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean tagIsOnRight(int id)
+    {
+        AprilTagDetection tag = getSingleDetection(id);
+
+        if (tag == null)
+        {
+            return false;
+        }
+
+        if (tag.ftcPose.yaw > 0)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**

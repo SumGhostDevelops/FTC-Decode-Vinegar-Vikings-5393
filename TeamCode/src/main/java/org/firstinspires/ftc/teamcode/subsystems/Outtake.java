@@ -60,7 +60,7 @@ public class Outtake extends Actuator
 
     public void modifyTargetRPMBasedOnDistance(double distance)
     {
-        setRPM(Math.toIntExact(Math.round(246.08237 * Math.pow(distance, 2) - 1653.96882 * distance + 6579.05937)));
+        modifyTargetRPM(calculateTargetRPMFromDistance(distance));
         robot.telemetry.log().add("Auto-adjusted the RPM to " + targetRPM);
     }
 
@@ -98,13 +98,12 @@ public class Outtake extends Actuator
      */
     public void setRPMBasedOnDistance(double distance)
     {
-        setRPM(Math.toIntExact(Math.round(246.08237 * Math.pow(distance, 2) - 1653.96882 * distance + 6579.05937)));
+        setRPM(calculateTargetRPMFromDistance(distance));
     }
 
     public boolean isReadyToLaunch()
     {
         double msSinceLastCheck = stabilityTimer.milliseconds();
-        stabilityTimer.reset();
 
         if (msSinceLastCheck < 50)
         {
@@ -115,9 +114,11 @@ public class Outtake extends Actuator
         double delta_rpm = newRPM - lastRPM;
         lastRPM = newRPM;
 
+        stabilityTimer.reset();
+
         robot.telemetry.addData("Delta RPM", delta_rpm);
 
-        boolean rpm_is_stable = (Math.abs(delta_rpm) < 10);
+        boolean rpm_is_stable = true; //(Math.abs(delta_rpm) < 10);
         boolean rpm_within_tolerance = Math.abs(getRPM() - targetRPM) < RobotConstants.OUTTAKE_RPM_TOLERANCE;
 
         return rpm_is_stable && rpm_within_tolerance && !isResetting();
@@ -132,5 +133,10 @@ public class Outtake extends Actuator
     private double rpmToTps(double rpm)
     {
         return (rpm * RobotConstants.OUTTAKE_PPR) / 60.0;
+    }
+
+    private int calculateTargetRPMFromDistance(double distance)
+    {
+        return Math.toIntExact(Math.round(93.48178 * Math.pow(distance, 3) - 807.53481 * Math.pow(distance, 2) + 2786.50082 * distance + 450.60475));
     }
 }
