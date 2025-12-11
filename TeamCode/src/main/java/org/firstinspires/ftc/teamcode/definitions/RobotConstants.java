@@ -25,7 +25,7 @@ public class RobotConstants
     public static double OUTTAKE_POWER_IDLE = 0.0;
     public static int OUTTAKE_INITIAL_TARGET_RPM = 3900; // Tune this
     public static int OUTTAKE_RPM_TOLERANCE = 30;
-    public static int OUTTAKE_STABILITY_TOLERANCE = 200;
+    public static int OUTTAKE_STABILITY_TOLERANCE = 250;
     public static double SHOT_DROP_THRESHOLD = 0.20; // 20% drop implies shot
     public static double JAM_CLEAR_POWER = -0.3;
     public static double JAM_CLEAR_DURATION = 1.0; // Seconds

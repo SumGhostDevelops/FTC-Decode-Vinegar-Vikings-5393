@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.controls.Macros;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
@@ -91,6 +93,8 @@ public abstract class Base extends LinearOpMode
         telemetry.addData("Heading", localization.getHeading());
         telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
         telemetry.addData("Outtake RPM", outtake.getRPM());
+        PIDFCoefficients coefficients = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.addData("PIDF", coefficients.p + " " + coefficients.i + " " + coefficients.d + " " + coefficients.f);
         telemetry.addData("Outtake RPM Acceleration", outtake.getRPMAcceleration());
 
         macros.update();

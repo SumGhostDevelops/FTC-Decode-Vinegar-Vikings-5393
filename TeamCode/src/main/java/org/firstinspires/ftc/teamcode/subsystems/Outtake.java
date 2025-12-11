@@ -21,10 +21,6 @@ public class Outtake extends Actuator
     // A buffer size of 7 is a good balance between smoothing and responsiveness
     private final OuttakeTracker tracker = new OuttakeTracker(7);
 
-    // Stability Threshold: If acceleration is less than 500 RPM/s^2, we consider it stable.
-    // You can lower this (e.g., 200) for more precision, or raise it (e.g., 800) for faster shots.
-    private final double STABILITY_THRESHOLD = RobotConstants.OUTTAKE_STABILITY_TOLERANCE;
-
     public Outtake(RobotHardware robot)
     {
         super(robot.outtakeMotor);
@@ -113,6 +109,12 @@ public class Outtake extends Actuator
             rpm = 6000;
         }
 
+        // Check we are just trying to spin at the same speed; keeps tracker from being reset
+        if (rpm == targetRPM && status == Status.FORWARD_ENABLED)
+        {
+            return;
+        }
+
         status = Status.FORWARD_ENABLED;
         targetRPM = rpm;
 
@@ -121,6 +123,7 @@ public class Outtake extends Actuator
         tracker.reset();
 
         robot.outtakeMotor.setVelocity(rpmToTps(targetRPM));
+        getRPM();
     }
 
     /**
@@ -133,17 +136,23 @@ public class Outtake extends Actuator
 
     public boolean isReadyToLaunch()
     {
-        // 1. Get the current RPM (This also internally updates currentAcceleration)
+        // Get the current RPM (also updates acceleration)
         double actualRPM = getRPM();
 
-        // 3. Check Stability
         // We are stable if the acceleration (slope) is flat (near zero)
-        boolean rpm_is_stable = Math.abs(currentAcceleration) < STABILITY_THRESHOLD;
+        boolean rpm_is_stable = Math.abs(currentAcceleration) < RobotConstants.OUTTAKE_STABILITY_TOLERANCE;
 
-        // 4. Check Tolerance
+        // Check Tolerance
         boolean rpm_within_tolerance = Math.abs(actualRPM - targetRPM) < RobotConstants.OUTTAKE_RPM_TOLERANCE;
 
-        return rpm_is_stable && rpm_within_tolerance && !isResetting();
+        boolean isReadyToLaunch = rpm_is_stable && rpm_within_tolerance && !isResetting();
+
+        if (isReadyToLaunch)
+        {
+            robot.telemetry.log().add("Current acceleration: " + currentAcceleration + " | Actual RPM: " + actualRPM);
+        }
+
+        return isReadyToLaunch;
     }
 
     // tps = Ticks per Second; rpm = Revolutions per Minute
