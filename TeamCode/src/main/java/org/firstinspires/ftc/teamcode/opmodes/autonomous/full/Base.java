@@ -50,12 +50,15 @@ public abstract class Base extends LinearOpMode
 
         for (int i = 0; i < 3; i++)
         {
+            // Wait for the outtake to be ready
             while (!outtake.isReadyToLaunch())
             {
                 macros.sleep(0.5, "Outtake is not ready.");
             }
             telemetry.log().add("Outtake is ready.");
             transfer.setPower(1);
+
+            // Wait for the outtake to shoot
             while (outtake.isReadyToLaunch())
             {
                 macros.sleep(0.1);
