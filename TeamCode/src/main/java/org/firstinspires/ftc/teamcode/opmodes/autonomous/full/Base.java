@@ -52,11 +52,13 @@ public abstract class Base extends LinearOpMode
         {
             while (!outtake.isReadyToLaunch())
             {
-                macros.sleep(0.5, "Waiting for the outtake to reach its target RPM (" + outtake.getRPM() + "/" + outtake.getTargetRPM());
+                macros.sleep(0.5, "Outtake is not ready.");
             }
+            telemetry.log().add("Outtake is ready.");
+            transfer.setPower(1);
             while (outtake.isReadyToLaunch())
             {
-                transfer.setPower(1);
+                macros.sleep(0.1);
             }
             transfer.stop();
         }

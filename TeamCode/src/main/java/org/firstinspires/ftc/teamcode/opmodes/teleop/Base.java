@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.teamcode.controls.Macros;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
@@ -92,6 +91,7 @@ public abstract class Base extends LinearOpMode
         telemetry.addData("Heading", localization.getHeading());
         telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
         telemetry.addData("Outtake RPM", outtake.getRPM());
+        telemetry.addData("Outtake RPM Acceleration", outtake.getRPMAcceleration());
 
         macros.update();
         localization.update();
