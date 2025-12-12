@@ -63,12 +63,6 @@ public class FlywheelPIDFTuning extends Base
     {
         super.bindKeys();
 
-        PIDFCoefficients current = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-        p = current.p;
-        i = current.i;
-        d = current.d;
-        f = current.f;
-
         input.bind
                 (
                         () -> gamepad2.yWasPressed(),
