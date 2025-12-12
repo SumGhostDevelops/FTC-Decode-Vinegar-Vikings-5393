@@ -26,31 +26,12 @@ public class FlywheelPIDFTuning extends Base
     @Override
     protected void run() throws InterruptedException
     {
-        input.update();
+        super.run();
 
-        double axial = -gamepad1.left_stick_y;
-        double lateral = gamepad1.left_stick_x;
-        double yaw = gamepad1.right_stick_x;
-
-        // Drive
-        drive.drive(axial, lateral, yaw);
-
-        telemetry.addData("Team", team.color);
-        telemetry.addData("Drive Mode", drive.getMode());
-        telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
-        telemetry.addData("Heading", localization.getHeading());
-        telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
-        telemetry.addData("Outtake RPM", outtake.getRPM());
-        telemetry.addData("Outtake RPM Acceleration", outtake.getRPMAcceleration());
         telemetry.addData("Modifying Coefficient", coefficient);
         PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         hw.outtakeMotor.setVelocityPIDFCoefficients(p, i, d, f);
         telemetry.addData("PIDF (Expected/Actual)", "(" + p + "/" + cfs.p + ") (" + i + "/" + cfs.i + ") (" + d + "/" + cfs.d + ") (" + f + "/" + cfs.f + ") (");
-
-        macros.update();
-        localization.update();
-        transfer.update();
-        outtake.update();
 
         telemetry.update();
     }
