@@ -90,8 +90,10 @@ public abstract class Base extends LinearOpMode
         telemetry.update();
     }
 
-    public static double getGoalOffset(double xDist, double yDist, int id, Telemetry telemetry)
+    public static double getGoalOffset(double range, double bearing, int id, Telemetry telemetry)
     {
+        double xDist;
+        double yDist;
         double xTargetDist;
         double yTargetDist;
         double degreesToTarget;
@@ -99,6 +101,8 @@ public abstract class Base extends LinearOpMode
         double degreesToAdd;
         if(id==24)
         {
+            xDist = Math.cos(bearing)*range;
+            yDist = Math.sin(bearing)*range;
             xTargetDist = xDist + 14;
             yTargetDist = yDist + 12;
             degreesToTarget = Math.tan((yTargetDist /xTargetDist));
