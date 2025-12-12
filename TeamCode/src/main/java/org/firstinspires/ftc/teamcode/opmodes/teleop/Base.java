@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.controls.Macros;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
@@ -30,6 +31,8 @@ public abstract class Base extends LinearOpMode
     private Macros macros;
     private Gamepads gamepads;
 
+    private InputHandler input;
+
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -50,6 +53,9 @@ public abstract class Base extends LinearOpMode
 
         macros = new Macros(robotContext);
 
+        input = new InputHandler();
+        bindKeys();
+
         waitForStart();
 
         while (opModeIsActive())
@@ -62,28 +68,11 @@ public abstract class Base extends LinearOpMode
 
     private void run() throws InterruptedException
     {
+        input.update();
+
         double axial = -gamepad1.left_stick_y;
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
-
-        handleA(gamepad1);
-        handleB(gamepad1);
-        handleX(gamepad1);
-        handleY(gamepad1);
-
-        handleDpadUp(gamepad1);
-        handleDpadDown(gamepad1);
-        handleDpadLeft(gamepad1);
-        handleDpadRight(gamepad1);
-
-        handleLeftBumper(gamepad1);
-        handleRightBumper(gamepad1);
-        handleLeftTrigger(gamepad1);
-        handleRightTrigger(gamepad1);
-
-        handleStart(gamepad1);
-        handleBack(gamepad1);
-        handleMode(gamepad1);
 
         // Drive
         drive.drive(axial, lateral, yaw);
@@ -105,169 +94,97 @@ public abstract class Base extends LinearOpMode
         telemetry.update();
     }
 
-    private void handleA(Gamepad gamepad) // Reset transfer outtake
+    private void bindKeys()
     {
-        if (gamepad.aWasPressed())
-        {
-            macros.resetTransferOuttakeNonFSM();
-        }
-        else if (gamepad.aWasReleased())
-        {
-            macros.stopResetTransferOuttakeNonFSM();
-        }
-    }
+        // Handle A
+        input.bind
+                (
+                        () -> gamepad1.aWasPressed(),
+                        () -> macros.resetTransferOuttakeNonFSM()
+                );
+        input.bind
+                (
+                        () -> gamepad1.aWasReleased(),
+                        () -> macros.stopResetTransferOuttakeNonFSM()
+                );
 
-    private void handleB(Gamepad gamepad) // Reset IMU Yaw
-    {
-        if (gamepad.bWasPressed())
-        {
-            localization.resetHeading();
-        }
-    }
+        // Handle B
+        input.bind
+                (
+                        () -> gamepad1.bWasPressed(),
+                        () -> localization.resetHeading()
+                );
 
-    private void handleX(Gamepad gamepad) // Debugging, get distance to tag
-    {
-        if (gamepad.xWasPressed())
-        {
-            localization.webcam.updateDetections();
-            boolean tagExists = localization.webcam.tagIdExists(team.goal.id);
-            if (!tagExists)
-            {
-                telemetry.log().add("No AprilTags were found.");
-                return;
-            }
+        input.bind
+                (
+                        () -> gamepad1.xWasPressed(),
+                        () -> macros.printRangeToAprilTag()
+                );
 
-            double distance = localization.webcam.getRangeToTag(team.goal.id);
-            telemetry.log().add("Distance to " + team.goal.id + ": " + distance + " meters");
-        }
-    }
+        input.bind
+                (
+                        () -> gamepad1.yWasPressed(),
+                        () -> macros.aimToTeamAprilTag()
+                );
 
-    private void handleY(Gamepad gamepad) // Auto Aim
-    {
-        if (gamepad.yWasPressed())
-        {
-            macros.aimToAprilTag(team.goal.id);
+        input.bind
+                (
+                        () -> gamepad1.dpadLeftWasPressed(),
+                        () -> RobotConstants.FORCED_ANGLE_OFFSET -= 0.25
+                );
 
-            double distanceToTag = localization.webcam.getRangeToTag(team.goal.id);
-            outtake.modifyTargetRPMBasedOnDistance(distanceToTag);
+        input.bind
+                (
+                        () -> gamepad1.dpadRightWasPressed(),
+                        () -> RobotConstants.FORCED_ANGLE_OFFSET += 0.25
+                );
 
-            localization.webcam.updateDetections();
-            if (localization.webcam.tagIdExists(team.goal.id))
-            {
-                if (localization.webcam.tagIsOnLeft(team.goal.id))
-                {
-                    telemetry.log().add("Tag is on the left.");
-                } else if (localization.webcam.tagIsOnRight(team.goal.id))
-                {
-                    telemetry.log().add("Tag is on the right");
-                }
-            }
-        }
-    }
+        input.bind
+                (
+                        () -> gamepad1.leftBumperWasPressed(),
+                        () ->
+                        {
+                            double newMultiplier = RobotConstants.DRIVE_SPEED_MULTIPLIER - RobotConstants.DRIVE_SPEED_CHANGE;
 
-    private void handleDpadUp(Gamepad gamepad)
-    {
-        if (gamepad.dpadUpWasPressed())
-        {
-            outtake.varyTargetRPM(25);
-        }
-    }
+                            RobotConstants.DRIVE_SPEED_MULTIPLIER = Math.max(RobotConstants.DRIVE_SPEED_MINIMUM, newMultiplier);
+                            telemetry.log().add("New Speed: " + RobotConstants.DRIVE_SPEED_MULTIPLIER);
+                        }
+                );
 
-    private void handleDpadDown(Gamepad gamepad)
-    {
-        if (gamepad.dpadDownWasPressed())
-        {
-            outtake.varyTargetRPM(-25);
-        }
-    }
+        input.bind
+                (
+                        () -> gamepad1.rightBumperWasPressed(),
+                        () ->
+                        {
+                            double newMultiplier = RobotConstants.DRIVE_SPEED_MULTIPLIER + RobotConstants.DRIVE_SPEED_CHANGE;
 
-    private void handleDpadLeft(Gamepad gamepad)
-    {
-        if (gamepad.dpadLeftWasPressed())
-        {
-            RobotConstants.FORCED_ANGLE_OFFSET -= 0.25;
-        }
-    }
+                            RobotConstants.DRIVE_SPEED_MULTIPLIER = Math.min(RobotConstants.DRIVE_SPEED_MAXIMUM, newMultiplier);
+                            telemetry.log().add("New Speed: " + RobotConstants.DRIVE_SPEED_MULTIPLIER);
+                        }
+                );
 
-    private void handleDpadRight(Gamepad gamepad)
-    {
-        if (gamepad.dpadRightWasPressed())
-        {
-            RobotConstants.FORCED_ANGLE_OFFSET += 0.25;
-        }
-    }
+        input.bind
+                (
+                        () -> gamepad1.left_trigger > 0.25 && outtake.isReadyToLaunch(),
+                        () -> transfer.setPower(1)
+                );
 
-    private void handleLeftBumper(Gamepad gamepad)
-    {
-        if (gamepad.leftBumperWasPressed())
-        {
-            double newMultiplier = RobotConstants.DRIVE_SPEED_MULTIPLIER - RobotConstants.DRIVE_SPEED_CHANGE;
+        input.bind
+                (
+                        () -> gamepad1.left_trigger < 0.25 || !outtake.isReadyToLaunch(),
+                        () -> transfer.stop()
+                );
 
-            RobotConstants.DRIVE_SPEED_MULTIPLIER = Math.max(RobotConstants.DRIVE_SPEED_MINIMUM, newMultiplier);
-            telemetry.log().add("New Speed: " + RobotConstants.DRIVE_SPEED_MULTIPLIER);
-        }
-    }
+        input.bind
+                (
+                        () -> gamepad1.right_trigger > 0.25,
+                        () -> outtake.setRPM()
+                );
 
-    private void handleRightBumper(Gamepad gamepad)
-    {
-        if (gamepad.rightBumperWasPressed())
-        {
-            double newMultiplier = RobotConstants.DRIVE_SPEED_MULTIPLIER + RobotConstants.DRIVE_SPEED_CHANGE;
-
-            RobotConstants.DRIVE_SPEED_MULTIPLIER = Math.min(RobotConstants.DRIVE_SPEED_MAXIMUM, newMultiplier);
-            telemetry.log().add("New Speed: " + RobotConstants.DRIVE_SPEED_MULTIPLIER);
-        }
-    }
-
-    private void handleLeftTrigger(Gamepad gamepad)
-    {
-        if (gamepad.left_trigger > 0.25 && outtake.isReadyToLaunch())
-        {
-            transfer.setPower(1);
-        }
-        else
-        {
-            transfer.stop();
-        }
-    }
-
-    private void handleRightTrigger(Gamepad gamepad)
-    {
-        if (gamepad.right_trigger > 0.25)
-        {
-            outtake.setRPM();
-        }
-        else
-        {
-            outtake.stop();
-        }
-    }
-
-    private void handleStart(Gamepad gamepad)
-    {
-        if (gamepad.startWasPressed())
-        {
-
-        }
-    }
-
-    private void handleBack(Gamepad gamepad)
-    {
-        if (gamepad.backWasPressed())
-        {
-
-        }
-    }
-
-    private void handleMode(Gamepad gamepad) // Not sure what Mode on the G310 maps to in software
-    {
-        if (gamepad.guideWasPressed())
-        {
-            telemetry.log().add("Mode = Guide");
-        }
-        if (gamepad.optionsWasPressed())
-        {
-            telemetry.log().add("Mode = Options");
-        }
+        input.bind
+                (
+                        () -> gamepad1.right_trigger < 0.25,
+                        () -> outtake.stop()
+                );
     }
 }

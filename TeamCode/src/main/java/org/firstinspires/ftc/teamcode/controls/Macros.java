@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.controls;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
@@ -310,6 +312,41 @@ public class Macros
         robot.telemetry.log().add("Finished turning.");
         robot.telemetry.log().add("Final error: " + String.format("%.1f", error));
         robot.telemetry.update();
+    }
+
+    public void printRangeToAprilTag()
+    {
+        robot.localization.webcam.updateDetections();
+        boolean tagExists = robot.localization.webcam.tagIdExists(robot.team.goal.id);
+        if (!tagExists)
+        {
+            robot.telemetry.log().add("No AprilTags were found.");
+            return;
+        }
+
+        double distance = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
+        robot.telemetry.log().add("Distance to " + robot.team.goal.id + ": " + distance + " meters");
+    }
+
+    public void aimToTeamAprilTag()
+    {
+        aimToAprilTag(robot.team.goal.id);
+
+        double distanceToTag = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
+        robot.outtake.modifyTargetRPMBasedOnDistance(distanceToTag);
+
+        robot.localization.webcam.updateDetections();
+        if (robot.localization.webcam.tagIdExists(robot.team.goal.id))
+        {
+            if (robot.localization.webcam.tagIsOnLeft(robot.team.goal.id))
+            {
+                telemetry.log().add("Tag is on the left.");
+            }
+            else if (robot.localization.webcam.tagIsOnRight(robot.team.goal.id))
+            {
+                telemetry.log().add("Tag is on the right");
+            }
+        }
     }
 
     public void sleep(double seconds)
