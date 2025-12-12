@@ -21,6 +21,8 @@ public class FlywheelPIDFTuning extends Base
     {
         team = Team.BLUE;
         super.runOpMode();
+
+        hw.outtakeMotor.setVelocityPIDFCoefficients(0, 0, 0, 1);
     }
 
     @Override
