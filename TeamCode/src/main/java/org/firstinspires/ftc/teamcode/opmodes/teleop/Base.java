@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.controls.Macros;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
@@ -91,6 +90,28 @@ public abstract class Base extends LinearOpMode
         telemetry.update();
     }
 
+    public static double getGoalOffset(double xDist, double yDist, int id, Telemetry telemetry)
+    {
+        double xTargetDist;
+        double yTargetDist;
+        double degreesToTarget;
+        double degreesToTag;
+        double degreesToAdd;
+        if(id==24)
+        {
+            xTargetDist = xDist + 14;
+            yTargetDist = yDist + 12;
+            degreesToTarget = Math.tan((yTargetDist /xTargetDist));
+            degreesToTag = Math.tan((yDist/xDist));
+            degreesToAdd = degreesToTarget-degreesToTag;
+        }
+        else
+        {
+            telemetry.log().add("Cancelling auto-aim command: Could not find Tag " + id);
+            return 0.0;
+        }
+        return degreesToAdd;
+    }
     protected void bindKeys()
     {
         // Handle A

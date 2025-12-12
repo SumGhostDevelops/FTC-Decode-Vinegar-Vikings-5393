@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
+import org.firstinspires.ftc.teamcode.opmodes.teleop.Base;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
@@ -221,8 +222,9 @@ public class Macros
         }
 
         double offset = tag.get().ftcPose.bearing;
+        double goalOffset = Base.getGoalOffset(tag.get().ftcPose.x,tag.get().ftcPose.y,id, robot.telemetry);
         double currentAngle = robot.localization.getHeading();
-        double targetAngle = currentAngle + offset + manualAngleOffset; // No manual angleOffset
+        double targetAngle = currentAngle + offset + goalOffset; // No manual angleOffset
 
         aimToAngle(targetAngle);
     }
