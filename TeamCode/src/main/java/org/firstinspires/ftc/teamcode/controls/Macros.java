@@ -326,27 +326,29 @@ public class Macros
 
     public void aimToTeamAprilTag()
     {
+        robot.localization.webcam.updateDetections();
         aimToAprilTag(robot.team.goal.id);
 
+        robot.localization.webcam.updateDetections();
         Optional<Double> distanceToTag = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
 
         if (distanceToTag.isEmpty())
         {
+            robot.telemetry.log().add("Tag not found.");
             return;
         }
 
         robot.outtake.modifyTargetRPMBasedOnDistance(distanceToTag.get());
 
-        robot.localization.webcam.updateDetections();
         if (robot.localization.webcam.tagIdExists(robot.team.goal.id))
         {
             if (robot.localization.webcam.tagIsOnLeft(robot.team.goal.id))
             {
-                telemetry.log().add("Tag is on the left.");
+                robot.telemetry.log().add("Tag is on the left.");
             }
             else if (robot.localization.webcam.tagIsOnRight(robot.team.goal.id))
             {
-                telemetry.log().add("Tag is on the right");
+                robot.telemetry.log().add("Tag is on the right");
             }
         }
     }

@@ -163,6 +163,8 @@ public class Outtake extends Actuator
 
     private int calculateTargetRPMFromDistance(double distance)
     {
-        return Math.toIntExact(Math.round(93.48178 * Math.pow(distance, 3) - 807.53481 * Math.pow(distance, 2) + 2786.50082 * distance + 450.60475));
+        //double regression = 93.48178 * Math.pow(distance, 3) - 807.53481 * Math.pow(distance, 2) + 2786.50082 * distance + 450.60475;
+        double regression = 106.1782 * Math.pow(distance, 2) - 154.14128 * distance + 3567.62889;
+        return Math.toIntExact(Math.round(regression));
     }
 }

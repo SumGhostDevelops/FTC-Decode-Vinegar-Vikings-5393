@@ -87,11 +87,12 @@ public abstract class Base extends LinearOpMode
             transfer.setPower(1);
             macros.sleep(0.4, "Letting the transfer move the ball."); // Move the ball into the outtake
             transfer.stop();
+            macros.sleep(2);
         }
 
         outtake.stop();
         drive.setDrivePowers(1, 0, 0);
-        macros.sleep(0.6, "Letting the robot move out of the scoring zone");
+        macros.sleep(0.4, "Letting the robot move out of the scoring zone");
         drive.stop();
     }
 }
