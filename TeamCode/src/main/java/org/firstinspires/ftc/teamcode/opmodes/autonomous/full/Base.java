@@ -77,7 +77,7 @@ public abstract class Base extends LinearOpMode
 
         macros.aimToAprilTag(team.goal.id);
 
-        for (int i = 0; opModeIsActive() && i < 3; i++)
+        for (int i = 0; opModeIsActive() && i < 4; i++)
         {
             while (!outtake.isReadyToLaunch()) // Wait for the outtake to be ready
             {

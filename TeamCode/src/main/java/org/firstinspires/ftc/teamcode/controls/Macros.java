@@ -224,7 +224,7 @@ public class Macros
         double offset = tag.get().ftcPose.bearing;
         double goalOffset = Base.getGoalOffset(tag.get().ftcPose.range,offset,id, robot.telemetry);
         double currentAngle = robot.localization.getHeading();
-        double targetAngle = currentAngle + offset + goalOffset; // No manual angleOffset
+        double targetAngle = currentAngle + offset + manualAngleOffset; // No manual angleOffset
 
         aimToAngle(targetAngle);
     }

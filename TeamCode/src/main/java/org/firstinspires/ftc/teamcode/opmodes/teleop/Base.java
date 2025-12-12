@@ -114,7 +114,9 @@ public abstract class Base extends LinearOpMode
             telemetry.log().add("Cancelling auto-aim command: Could not find Tag " + id);
             return 0.0;
         }
-        return degreesToAdd;
+
+        telemetry.log().add("Goal offset: " + -degreesToAdd);
+        return -degreesToAdd;
     }
     protected void bindKeys()
     {

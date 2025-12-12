@@ -144,7 +144,7 @@ public class Outtake extends Actuator
 
         if (isReadyToLaunch)
         {
-            robot.telemetry.log().add("Current acceleration: " + currentAcceleration + " | Actual RPM: " + actualRPM);
+            //robot.telemetry.log().add("Current acceleration: " + currentAcceleration + " | Actual RPM: " + actualRPM);
         }
 
         return isReadyToLaunch;
