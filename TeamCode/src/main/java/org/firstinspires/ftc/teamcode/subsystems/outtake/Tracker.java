@@ -1,8 +1,9 @@
-package org.firstinspires.ftc.teamcode.controls;
+package org.firstinspires.ftc.teamcode.subsystems.outtake;
 
 import java.util.ArrayList;
 
-public class OuttakeTracker {
+public class Tracker
+{
 
     private static class DataPoint {
         double time;
@@ -26,7 +27,7 @@ public class OuttakeTracker {
     // we ensure we never capture the same "stale" frame twice.
     private final double MIN_UPDATE_INTERVAL = 0.025; // Seconds
 
-    public OuttakeTracker(int bufferSize) {
+    public Tracker(int bufferSize) {
         this.capacity = bufferSize;
         this.buffer = new ArrayList<>();
     }

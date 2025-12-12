@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.outtake;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 // Make sure this import points to where you saved the helper class I wrote earlier
-import org.firstinspires.ftc.teamcode.controls.OuttakeTracker;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
+import org.firstinspires.ftc.teamcode.subsystems.Actuator;
 
 public class Outtake extends Actuator
 {
@@ -15,7 +15,7 @@ public class Outtake extends Actuator
     private int targetRPM = RobotConstants.OUTTAKE_INITIAL_TARGET_RPM;
     private double currentAcceleration = 0.0; // Stores the calculated acceleration (slope)
 
-    private final OuttakeTracker tracker = new OuttakeTracker(7);
+    private final Tracker tracker = new Tracker(7);
 
     public Outtake(RobotHardware robot)
     {

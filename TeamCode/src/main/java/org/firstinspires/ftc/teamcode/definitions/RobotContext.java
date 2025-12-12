@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.subsystems;
-
-import com.qualcomm.robotcore.hardware.Gamepad;
+package org.firstinspires.ftc.teamcode.definitions;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.definitions.Team;
+import org.firstinspires.ftc.teamcode.subsystems.Drive;
+import org.firstinspires.ftc.teamcode.subsystems.Gamepads;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Webcam;
+import org.firstinspires.ftc.teamcode.subsystems.outtake.Outtake;
 
 import java.util.function.Supplier;
 
