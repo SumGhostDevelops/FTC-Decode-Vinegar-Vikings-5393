@@ -15,6 +15,7 @@ public class FlywheelPIDFTuning extends Base
 
     private Coefficient coefficient = Coefficient.P;
     private double p, i, d, f;
+    private double coefficentChange = 1;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -30,6 +31,7 @@ public class FlywheelPIDFTuning extends Base
     {
         super.run();
 
+        telemetry.addData("Coefficient Change", coefficient);
         telemetry.addData("Modifying Coefficient", coefficient);
         PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         hw.outtakeMotor.setVelocityPIDFCoefficients(p, i, d, f);
@@ -92,13 +94,25 @@ public class FlywheelPIDFTuning extends Base
         input.bind
                 (
                         () -> gamepad2.dpadUpWasPressed(),
-                        () -> varyPIDF(0.05)
+                        () -> varyPIDF(coefficentChange)
                 );
 
         input.bind
                 (
                         () -> gamepad2.dpadDownWasPressed(),
-                        () -> varyPIDF(-0.05)
+                        () -> varyPIDF(-coefficentChange)
+                );
+
+        input.bind
+                (
+                        () -> gamepad2.dpadLeftWasPressed(),
+                        () -> coefficentChange -= 0.05
+                );
+
+        input.bind
+                (
+                        () -> gamepad2.dpadRightWasPressed(),
+                        () -> coefficentChange += 0.05
                 );
     }
 }
