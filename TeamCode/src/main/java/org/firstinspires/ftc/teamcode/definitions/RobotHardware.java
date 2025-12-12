@@ -50,7 +50,7 @@ public class RobotHardware
             outtakeMotor = hardwareMap.get(DcMotorEx.class, "launcher");
             outtakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             outtakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // For Velocity Control
-            outtakeMotor.setVelocityPIDFCoefficients(0.5, 1, 10, 1);
+            //outtakeMotor.setVelocityPIDFCoefficients(1, 1, 1, 1);
         }
         catch (Exception e)
         {

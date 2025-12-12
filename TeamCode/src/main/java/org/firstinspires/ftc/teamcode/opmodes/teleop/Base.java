@@ -21,16 +21,16 @@ public abstract class Base extends LinearOpMode
 {
     protected Team team;
 
-    private RobotHardware hw;
-    private Localization localization;
-    private Drive drive;
-    private Intake intake;
-    private Outtake outtake;
-    private Transfer transfer;
-    private Macros macros;
-    private Gamepads gamepads;
+    protected RobotHardware hw;
+    protected Localization localization;
+    protected Drive drive;
+    protected Intake intake;
+    protected Outtake outtake;
+    protected Transfer transfer;
+    protected Macros macros;
+    protected Gamepads gamepads;
 
-    private InputHandler input;
+    protected InputHandler input;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -65,7 +65,7 @@ public abstract class Base extends LinearOpMode
         localization.close();
     }
 
-    private void run() throws InterruptedException
+    protected void run() throws InterruptedException
     {
         input.update();
 
@@ -81,8 +81,6 @@ public abstract class Base extends LinearOpMode
         telemetry.addData("Heading", localization.getHeading());
         telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
         telemetry.addData("Outtake RPM", outtake.getRPM());
-        PIDFCoefficients coefficients = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-        telemetry.addData("PIDF", coefficients.p + " " + coefficients.i + " " + coefficients.d + " " + coefficients.f);
         telemetry.addData("Outtake RPM Acceleration", outtake.getRPMAcceleration());
 
         macros.update();
@@ -93,7 +91,7 @@ public abstract class Base extends LinearOpMode
         telemetry.update();
     }
 
-    private void bindKeys()
+    protected void bindKeys()
     {
         // Handle A
         input.bind
