@@ -168,7 +168,7 @@ public abstract class Base extends LinearOpMode
 
         input.bind
                 (
-                        () -> gamepad1.left_trigger < 0.25 || !outtake.isReadyToLaunch(),
+                        () -> gamepad1.left_trigger <= 0.25 || !outtake.isReadyToLaunch(),
                         () -> transfer.stop()
                 );
 
@@ -180,7 +180,7 @@ public abstract class Base extends LinearOpMode
 
         input.bind
                 (
-                        () -> gamepad1.right_trigger < 0.25,
+                        () -> gamepad1.right_trigger <= 0.25,
                         () -> outtake.stop()
                 );
     }
