@@ -10,15 +10,11 @@ import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 public class Outtake extends Actuator
 {
     private final RobotHardware robot;
-
-    // Timer runs continuously to provide a timeline for the regression math.
-    // Do not reset this timer inside the loop.
     private final ElapsedTime stabilityTimer = new ElapsedTime();
 
     private int targetRPM = RobotConstants.OUTTAKE_INITIAL_TARGET_RPM;
     private double currentAcceleration = 0.0; // Stores the calculated acceleration (slope)
 
-    // A buffer size of 7 is a good balance between smoothing and responsiveness
     private final OuttakeTracker tracker = new OuttakeTracker(7);
 
     public Outtake(RobotHardware robot)
@@ -33,7 +29,6 @@ public class Outtake extends Actuator
      */
     public double getRPM()
     {
-        // FIX: Removed the double tpsToRpm call.
         double currentRPM = tpsToRpm(robot.outtakeMotor.getVelocity());
 
         // Update the tracker with the current time and speed to get true acceleration
