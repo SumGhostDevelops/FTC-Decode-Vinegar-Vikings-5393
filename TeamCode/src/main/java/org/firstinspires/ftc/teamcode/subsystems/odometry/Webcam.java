@@ -6,16 +6,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.exceptions.NoTagsDetectedException;
-import org.firstinspires.ftc.teamcode.exceptions.TagNotFoundException;
-import org.firstinspires.ftc.teamcode.exceptions.TooManyTagsDetectedException;
-import org.firstinspires.ftc.teamcode.exceptions.UnexpectedTagIDException;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Webcam
 {
@@ -88,18 +85,14 @@ public class Webcam
      * Returns the first AprilTagDetection found and throws an error otherwise.
      * @return The first AprilTagDetection found.
      */
-    public AprilTagDetection getSingleDetection()
+    public Optional<AprilTagDetection> getSingleDetection()
     {
         if (cachedTagDetections.isEmpty())
         {
             return null;
         }
-        else if (cachedTagDetections.size() > 1)
-        {
-            return null;
-        }
 
-        return cachedTagDetections.get(0);
+        return Optional.of(cachedTagDetections.get(0));
     }
 
     /**
@@ -107,50 +100,50 @@ public class Webcam
      * @param id The ID of the AprilTag to return.
      * @return The AprilTagDetection with the requested ID.
      */
-    public AprilTagDetection getSingleDetection(int id)
+    public Optional<AprilTagDetection> getSingleDetection(int id)
     {
         if (cachedTagDetections.isEmpty())
         {
-            return null;
+            return Optional.empty();
         }
 
         for (AprilTagDetection tag: cachedTagDetections)
         {
             if (tag.id == id)
             {
-                return tag;
+                return Optional.of(tag);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
-    public int getAnyTagID()
+    public Optional<Integer> getAnyTagID()
     {
         if (cachedTagDetections.isEmpty())
         {
-            return -1;
+            return Optional.empty();
         }
 
-        return cachedTagDetections.get(0).id;
+        return Optional.of(cachedTagDetections.get(0).id);
     }
 
-    public int getAnyGoalId()
+    public Optional<Integer> getAnyGoalId()
     {
         if (cachedTagDetections.isEmpty())
         {
-            return -1;
+            return Optional.empty();
         }
 
         for (AprilTagDetection tag : cachedTagDetections)
         {
             if (tag.id == 20 || tag.id == 24)
             {
-                return tag.id;
+                return Optional.of(tag.id);
             }
         }
 
-        throw new TagNotFoundException();
+        return Optional.empty();
     }
 
     /**
@@ -158,18 +151,24 @@ public class Webcam
      * @param tagId
      * @return Range
      */
-    public double getRangeToTag(int tagId) // In meters
+    public Optional<Double> getRangeToTag(int tagId) // In meters
     {
         if (!tagIdExists(tagId))
         {
-            return -1.0;
+            return Optional.empty();
         }
 
-        AprilTagDetection tag = getSingleDetection(tagId);
-        double range = tag.ftcPose.range;
+        Optional<AprilTagDetection> tag = getSingleDetection(tagId);
+
+        if (!tag.isPresent())
+        {
+            return Optional.empty();
+        }
+
+        double range = tag.get().ftcPose.range;
 
         robot.telemetry.log().add("Range of " + tagId + ": " + range + " meters");
-        return range;
+        return Optional.of(range);
     }
 
     /**
@@ -177,13 +176,13 @@ public class Webcam
      * @param tagId
      * @return Double[rangeX, rangeY]
      */
-    public double[] getRangeComponentsToTag(int tagId)
+    public Optional<double[]> getRangeComponentsToTag(int tagId)
     {
         AprilTagDetection tag = null;
 
         if (cachedTagDetections.isEmpty())
         {
-            return null;
+            return Optional.empty();
         }
 
         for (AprilTagDetection possibleTag : cachedTagDetections)
@@ -196,47 +195,47 @@ public class Webcam
 
         if (tag == null)
         {
-            return null;
+            return Optional.empty();
         }
 
         double trueRobotX = tag.ftcPose.x + RobotConstants.cameraOffsetX;
         double trueRobotY = tag.ftcPose.y + RobotConstants.cameraOffsetY;
 
-        return new double[]{trueRobotX, trueRobotY};
+        return Optional.of(new double[]{trueRobotX, trueRobotY});
     }
 
     /**
      * Returns the first AprilTagDetection with an obelisk ID and returns an error otherwise.
      * @return The first AprilTagDetection with an obelisk ID.
      */
-    public AprilTagDetection scanObelisk()
+    public Optional<AprilTagDetection> scanObelisk()
     {
         if (cachedTagDetections.isEmpty())
         {
-            return null;
+            return Optional.empty();
         }
 
         for (AprilTagDetection tag: cachedTagDetections)
         {
             if (tag.id == 21 || tag.id == 22 || tag.id == 23)
             {
-                return tag;
+                return Optional.of(tag);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     public boolean tagIsOnLeft(int id)
     {
-        AprilTagDetection tag = getSingleDetection(id);
+        Optional<AprilTagDetection> tag = getSingleDetection(id);
 
-        if (tag == null)
+        if (tag.isEmpty())
         {
             return false;
         }
 
-        if (tag.ftcPose.yaw <= 0)
+        if (tag.get().ftcPose.yaw <= 0)
         {
             return true;
         }
@@ -246,14 +245,14 @@ public class Webcam
 
     public boolean tagIsOnRight(int id)
     {
-        AprilTagDetection tag = getSingleDetection(id);
+        Optional<AprilTagDetection> tag = getSingleDetection(id);
 
-        if (tag == null)
+        if (tag.isEmpty())
         {
             return false;
         }
 
-        if (tag.ftcPose.yaw > 0)
+        if (tag.get().ftcPose.yaw > 0)
         {
             return true;
         }

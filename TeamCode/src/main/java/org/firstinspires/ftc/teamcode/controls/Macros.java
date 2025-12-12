@@ -3,30 +3,21 @@ package org.firstinspires.ftc.teamcode.controls;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
-import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.subsystems.Drive;
-import org.firstinspires.ftc.teamcode.subsystems.Gamepads;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Outtake;
-import org.firstinspires.ftc.teamcode.subsystems.RobotContext;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
+import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Optional;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Macros
 {
     private final RobotContext robot;
-    private List<Event> events;
+    private final List<Event> events;
 
     public Macros(RobotContext robot)
     {
@@ -93,7 +84,7 @@ public class Macros
         // 3. Create a state container to hold "Memory" between loops
         // This effectively replaces the variables that used to be outside your do-while loop
         class AimControlState {
-            ElapsedTime timer = new ElapsedTime();
+            final ElapsedTime timer = new ElapsedTime();
             double lastError = 0;
             boolean targetFound = false;
         }
@@ -108,11 +99,11 @@ public class Macros
             boolean tagVisible = false;
 
             // (Replace this line with your actual camera syntax)
-            AprilTagDetection detection = robot.localization.webcam.getSingleDetection(robot.team.goal.id);
+            Optional<AprilTagDetection> detection = robot.localization.webcam.getSingleDetection(robot.team.goal.id);
 
-            if (detection != null) {
+            if (detection.isPresent()) {
                 // In FTC AprilTag coordinates, 'Bearing' is usually the turning error
-                currentHeading = detection.ftcPose.bearing;
+                currentHeading = detection.get().ftcPose.bearing;
                 tagVisible = true;
             }
 
@@ -173,8 +164,13 @@ public class Macros
     public void aimToAprilTag(int id)
     {
         double maxDistance = 4.5; // meters, used for scaling the offset
-        double distanceToTag = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
+        Optional<Double> distanceToTag = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
         double angleOffset;
+
+        if (distanceToTag.isEmpty())
+        {
+            return;
+        }
 
         switch (robot.team)
         {
@@ -194,7 +190,7 @@ public class Macros
             }
         }
 
-        angleOffset *= distanceToTag / maxDistance; // Linearly reduce the angleOffset as we get closer to the AprilTag
+        angleOffset *= distanceToTag.get() / maxDistance; // Linearly reduce the angleOffset as we get closer to the AprilTag
 
         aimToAprilTag(id, angleOffset);
     }
@@ -204,12 +200,12 @@ public class Macros
         robot.telemetry.log().add("-aimToAprilTag---------");
 
         ElapsedTime searchTimer = new ElapsedTime();
-        AprilTagDetection tag = null;
+        Optional<AprilTagDetection> tag = Optional.empty();
         double timeLimit = 2; // seconds max to search
 
         searchTimer.reset();
 
-        while (tag == null && searchTimer.seconds() < timeLimit)
+        while (tag.isEmpty() && searchTimer.seconds() < timeLimit)
         {
             robot.localization.webcam.updateDetections();
             tag = robot.localization.webcam.getSingleDetection(id);
@@ -218,13 +214,13 @@ public class Macros
             robot.telemetry.update();
         }
 
-        if (tag == null)
+        if (!tag.isPresent())
         {
             robot.telemetry.log().add("Cancelling auto-aim command: Could not find Tag " + id);
             return;
         }
 
-        double offset = tag.ftcPose.bearing;
+        double offset = tag.get().ftcPose.bearing;
         double currentAngle = robot.localization.getHeading();
         double targetAngle = currentAngle + offset + manualAngleOffset; // No manual angleOffset
 
@@ -317,23 +313,29 @@ public class Macros
     public void printRangeToAprilTag()
     {
         robot.localization.webcam.updateDetections();
-        boolean tagExists = robot.localization.webcam.tagIdExists(robot.team.goal.id);
-        if (!tagExists)
+        Optional<Double> distance = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
+
+        if (distance.isEmpty())
         {
             robot.telemetry.log().add("No AprilTags were found.");
             return;
         }
 
-        double distance = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
-        robot.telemetry.log().add("Distance to " + robot.team.goal.id + ": " + distance + " meters");
+        robot.telemetry.log().add("Distance to " + robot.team.goal.id + ": " + distance.get() + " meters");
     }
 
     public void aimToTeamAprilTag()
     {
         aimToAprilTag(robot.team.goal.id);
 
-        double distanceToTag = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
-        robot.outtake.modifyTargetRPMBasedOnDistance(distanceToTag);
+        Optional<Double> distanceToTag = robot.localization.webcam.getRangeToTag(robot.team.goal.id);
+
+        if (distanceToTag.isEmpty())
+        {
+            return;
+        }
+
+        robot.outtake.modifyTargetRPMBasedOnDistance(distanceToTag.get());
 
         robot.localization.webcam.updateDetections();
         if (robot.localization.webcam.tagIdExists(robot.team.goal.id))
