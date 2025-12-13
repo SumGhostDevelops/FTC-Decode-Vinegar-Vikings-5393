@@ -21,7 +21,7 @@ public class FlywheelPIDFTuning extends Base
     public void runOpMode() throws InterruptedException
     {
         team = Team.BLUE;
-        RobotConstants.TELEMETRY_SET_AUTOCLEAR = false;
+        //RobotConstants.TELEMETRY_SET_AUTOCLEAR = false;
         super.runOpMode();
     }
 
@@ -47,7 +47,9 @@ public class FlywheelPIDFTuning extends Base
 
         telemetry.addData("Current PIDF", "P:%.4f  I:%.4f  D:%.4f  F:%.4f", p, i, d, f);
 
-        telemetry.clear();
+        telemetry.update();
+
+        //telemetry.clear();
     }
 
     private void varyPIDF(double change)

@@ -22,10 +22,11 @@ public class RobotConstants
     public final static int OUTTAKE_PPR = 28;
     public final static int OUTTAKE_INITIAL_TARGET_RPM = 4150; // Tune this
     public static int OUTTAKE_RPM_TOLERANCE = 100;
-    public static int OUTTAKE_STABILITY_TOLERANCE = 250;
+    public static int OUTTAKE_STABILITY_TOLERANCE = 150;
     public static double SHOT_DROP_THRESHOLD = 0.20; // 20% drop implies shot
     public static double JAM_CLEAR_POWER = -0.3;
     public static double JAM_CLEAR_DURATION = 1.0; // Seconds
+    public static double OUTTAKE_F_OFFSET = 0.0;
 
     // Transfer Constants
     public static double TRANSFER_POWER_FWD = 0.8;
@@ -46,6 +47,9 @@ public class RobotConstants
     // Camera Offsets
     public final static double cameraOffsetX = 0.0;
     public final static double cameraOffsetY = 0.0;
+
+    public static boolean toggleOffset = false;
+    public static boolean useFastAim = false;
 
     public static boolean TELEMETRY_SET_AUTOCLEAR = true;
 }

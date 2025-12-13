@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
@@ -80,8 +82,11 @@ public abstract class Base extends LinearOpMode
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
 
-        // Drive
-        drive.drive(axial, lateral, yaw);
+        // Drive - only send manual commands if no blocking macro is running
+        if (!macros.isBlockingOperationActive())
+        {
+            drive.drive(axial, lateral, yaw);
+        }
 
         //telemetry.addData("Drive Mode", drive.getMode());
         telemetry.addData("Team", team);
@@ -90,6 +95,7 @@ public abstract class Base extends LinearOpMode
         telemetry.addData("Heading", localization.getHeading());
         telemetry.addLine("\n-----Outtake-----");
         telemetry.addData("Toggled", outtake.isToggled());
+        telemetry.addData("F Offset", RobotConstants.OUTTAKE_F_OFFSET);
         telemetry.addData("Target RPM", outtake.getTargetRPM());
         telemetry.addData("RPM", outtake.getRPM());
         telemetry.addData("RPM Acceleration", outtake.getRPMAcceleration());
@@ -115,8 +121,27 @@ public abstract class Base extends LinearOpMode
             yDist = Math.sin(bearingRadians) * range;
 
             // Convert inch offsets to meters (14 inches = 0.3556m, 12 inches = 0.3048m)
-            xTargetDist = xDist + 0.3556;
-            yTargetDist = yDist + 0.3048;
+            xTargetDist = xDist + 0.3048;
+            yTargetDist = yDist - 0.3556;
+
+            // Use atan2 to correctly calculate angles from x/y coordinates
+            degreesToTarget = Math.toDegrees(Math.atan2(yTargetDist, xTargetDist));
+            degreesToTag = Math.toDegrees(Math.atan2(yDist, xDist));
+
+            degreesToAdd = degreesToTarget - degreesToTag;
+        }
+        else if(id==20)
+        {
+            // Convert bearing from degrees to radians for trigonometric functions
+            double bearingRadians = Math.toRadians(bearing);
+
+            // Calculate distance to AprilTag in meters
+            xDist = Math.cos(bearingRadians) * range;
+            yDist = Math.sin(bearingRadians) * range;
+
+            // Convert inch offsets to meters (14 inches = 0.3556m, 12 inches = 0.3048m)
+            xTargetDist = xDist + 0.3048;
+            yTargetDist = yDist + 0.3556;
 
             // Use atan2 to correctly calculate angles from x/y coordinates
             degreesToTarget = Math.toDegrees(Math.atan2(yTargetDist, xTargetDist));
@@ -132,6 +157,12 @@ public abstract class Base extends LinearOpMode
 
         telemetry.log().add("Goal offset: " + -degreesToAdd);
         return -degreesToAdd;
+    }
+
+    private void updatePIDF(double change)
+    {
+        PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        hw.outtakeMotor.setVelocityPIDFCoefficients(cfs.p, cfs.i, cfs.d, cfs.f + change);
     }
 
 
@@ -224,6 +255,44 @@ public abstract class Base extends LinearOpMode
                 (
                         () -> gamepad1.right_trigger <= 0.25,
                         () -> outtake.stop()
+                );
+
+        input.bind
+                (
+                        () -> gamepad1.dpadUpWasPressed(),
+                        () ->
+                        {
+                            RobotConstants.OUTTAKE_F_OFFSET += 0.25;
+                            updatePIDF(RobotConstants.OUTTAKE_F_OFFSET);
+                        }
+                );
+
+        input.bind
+                (
+                        () -> gamepad1.dpadDownWasPressed(),
+                        () ->
+                        {
+                            RobotConstants.OUTTAKE_F_OFFSET -= 0.25;
+                            updatePIDF(RobotConstants.OUTTAKE_F_OFFSET);
+                        }
+                );
+
+        input.bind
+                (
+                        () -> gamepad2.aWasPressed(),
+                        () -> {
+                            RobotConstants.toggleOffset = !RobotConstants.toggleOffset;
+                            telemetry.log().add("Toggle Offset: " + RobotConstants.toggleOffset);
+                        }
+                );
+
+        input.bind
+                (
+                        () -> gamepad2.bWasPressed(),
+                        () -> {
+                            RobotConstants.useFastAim = !RobotConstants.useFastAim;
+                            telemetry.log().add("Use Fast Aim: " + RobotConstants.useFastAim);
+                        }
                 );
     }
 }

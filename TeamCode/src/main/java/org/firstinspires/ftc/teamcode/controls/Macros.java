@@ -20,10 +20,22 @@ public class Macros
     private final RobotContext robot;
     private final List<Event> events;
 
+    // Flag to indicate when a blocking operation (like aimToAngleFast) is running
+    private boolean isBlockingOperationActive = false;
+
     public Macros(RobotContext robot)
     {
         this.robot = robot;
         this.events = new ArrayList<>();
+    }
+
+    /**
+     * Check if a blocking operation is currently running.
+     * When true, the main TeleOp loop should NOT send drive commands.
+     */
+    public boolean isBlockingOperationActive()
+    {
+        return isBlockingOperationActive;
     }
     public void resetTransferOuttake()
     {
@@ -173,6 +185,7 @@ public class Macros
             return;
         }
 
+        /*
         switch (robot.team)
         {
             case BLUE:
@@ -193,7 +206,9 @@ public class Macros
 
         angleOffset *= distanceToTag.get() / maxDistance; // Linearly reduce the angleOffset as we get closer to the AprilTag
 
-        aimToAprilTag(id, angleOffset);
+         */
+
+        aimToAprilTag(id, 0);
     }
 
     public void aimToAprilTag(int id, double manualAngleOffset)
@@ -222,11 +237,26 @@ public class Macros
         }
 
         double offset = tag.get().ftcPose.bearing;
-        double goalOffset = Base.getGoalOffset(tag.get().ftcPose.range, offset, id, robot.telemetry);
+        double goalOffset;
+        if (RobotConstants.toggleOffset)
+        {
+            goalOffset = Base.getGoalOffset(tag.get().ftcPose.range, offset, id, robot.telemetry);
+        }
+        else
+        {
+            goalOffset = 0;
+        }
         double currentAngle = robot.localization.getHeading();
         double targetAngle = currentAngle + offset + goalOffset + manualAngleOffset;
 
-        aimToAngleFast(targetAngle);
+        if (RobotConstants.useFastAim)
+        {
+            aimToAngleFast(targetAngle); // Use the fast version with blocking protection
+        }
+        else
+        {
+            aimToAngle(targetAngle);
+        }
     }
 
     private void aimToAngle(double targetAngle) // Blocking action/non-FSM
@@ -473,50 +503,55 @@ public class Macros
      */
     private void aimToAngleFast(double targetAngle)
     {
-        robot.telemetry.log().add("-aimToAngleFast (Two-Stage)---------");
-        robot.telemetry.update();
+        // Set blocking flag to prevent main loop from interfering
+        isBlockingOperationActive = true;
 
-        // === STAGE THRESHOLDS ===
-        double coarseThreshold = 12.0;      // Switch to fine stage when error < this (degrees)
-        double fineTolerance = 0.5;         // Final position tolerance (degrees)
-        double angularRateThreshold = 3.0;  // Must have low rotation rate to finish (deg/s)
-        int requiredSettledLoops = 3;       // Reduced from 5 for faster settling
+        try
+        {
+            robot.telemetry.log().add("-aimToAngleFast (Two-Stage)---------");
+            robot.telemetry.update();
 
-        // === COARSE STAGE (Fast approach) ===
-        double kP_coarse = 0.025;           // Higher P gain for faster response
-        double kD_coarse = 0.001;           // Lower D to allow aggressive movement
-        double maxPower_coarse = 0.85;      // High power for speed
-        double minPower_coarse = 0.12;      // Overcome static friction
+            // === STAGE THRESHOLDS ===
+            double coarseThreshold = 15.0;      // Switch to fine stage when error < this (degrees)
+            double fineTolerance = 1.5;         // Final position tolerance (degrees) - relaxed for speed
+            double angularRateThreshold = 8.0;  // Must have low rotation rate to finish (deg/s)
+            int requiredSettledLoops = 2;       // Reduced for faster exit
 
-        // === FINE STAGE (Precision) ===
-        double kP_fine = 0.008;             // Lower P for gentle corrections
-        double kD_fine = 0.003;             // Higher D for damping
-        double maxPower_fine = 0.25;        // Low power to prevent overshoot
+            // === COARSE STAGE (Fast approach) ===
+            double kP_coarse = 0.05;            // DOUBLED from 0.025 for much faster response
+            double kD_coarse = 0.003;           // Tripled for better stability at high speed
+            double maxPower_coarse = 1.0;       // FULL POWER for maximum speed
+            double minPower_coarse = 0.18;      // Increased to overcome friction better
 
-        // === DERIVATIVE FILTERING ===
-        double derivativeFilterAlpha = 0.6; // Moderate filtering (less than improved version)
+            // === FINE STAGE (Precision) ===
+            double kP_fine = 0.02;              // 2.5x increase from 0.008 for faster fine corrections
+            double kD_fine = 0.005;             // Increased damping for stability
+            double maxPower_fine = 0.4;         // Increased from 0.25 for faster fine approach
 
-        // === TIMEOUT SAFETY ===
-        double maxTimeSeconds = 3.0;        // Maximum time to attempt alignment
-        ElapsedTime totalTimer = new ElapsedTime();
+            // === DERIVATIVE FILTERING ===
+            double derivativeFilterAlpha = 0.5; // Less filtering for faster response
 
-        // Initialize variables
-        double error;
-        double motorPower;
-        double lastError;
-        double rawDerivative;
-        double filteredDerivative = 0.0;
-        double angularRate;                 // deg/s - rotation speed
-        int settledLoopCount = 0;
-        boolean inFineStage = false;
+            // === TIMEOUT SAFETY ===
+            double maxTimeSeconds = 3.0;        // Maximum time to attempt alignment
+            ElapsedTime totalTimer = new ElapsedTime();
 
-        // Timer for derivative calculation
-        ElapsedTime loopTimer = new ElapsedTime();
-        double loopTime;
+            // Initialize variables
+            double error;
+            double motorPower;
+            double lastError;
+            double rawDerivative;
+            double filteredDerivative = 0.0;
+            double angularRate;                 // deg/s - rotation speed
+            int settledLoopCount = 0;
+            boolean inFineStage = false;
 
-        // Calculate initial error
-        double currentAngle = robot.localization.getHeading();
-        error = targetAngle - currentAngle;
+            // Timer for derivative calculation
+            ElapsedTime loopTimer = new ElapsedTime();
+            double loopTime;
+
+            // Calculate initial error
+            double currentAngle = robot.localization.getHeading();
+            error = targetAngle - currentAngle;
         lastError = error;
 
         // Reset timers
@@ -620,6 +655,12 @@ public class Macros
             robot.telemetry.log().add("WARNING: Timed out before fully settling!");
         }
         robot.telemetry.update();
+        }
+        finally
+        {
+            // Always clear the blocking flag when done, even if interrupted
+            isBlockingOperationActive = false;
+        }
     }
 
     public void printRangeToAprilTag()

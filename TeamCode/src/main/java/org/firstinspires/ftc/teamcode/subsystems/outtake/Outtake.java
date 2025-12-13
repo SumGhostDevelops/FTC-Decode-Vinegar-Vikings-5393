@@ -95,7 +95,7 @@ public class Outtake extends Actuator
     public void setRPM(int rpm)
     {
         // Check we are just trying to spin at the same speed; keeps tracker from being reset
-        if (rpm == targetRPM && status == Status.FORWARD_ENABLED)
+        if (rpm == targetRPM && ((status == Status.FORWARD_ENABLED) || isToggled()))
         {
             return;
         }
@@ -127,10 +127,12 @@ public class Outtake extends Actuator
         {
             setRPM();
             status = Status.TOGGLED;
+            robot.telemetry.log().add("Outtake toggled ON");
         }
         else
         {
             stop(true);
+            robot.telemetry.log().add("Outtake toggled OFF");
         }
     }
 
@@ -164,7 +166,7 @@ public class Outtake extends Actuator
         {
             setRPM();
         }
-        if (isToggled() || !isIdle())
+        if (!isIdle())
         {
             getRPM();
         }

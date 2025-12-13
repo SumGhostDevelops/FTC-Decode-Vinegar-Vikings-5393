@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous.full;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.controls.Macros;
+import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.subsystems.Drive;
@@ -43,6 +44,8 @@ public abstract class Base extends LinearOpMode
         RobotContext robot = new RobotContext(team, hw, drive, intake, transfer, outtake, localization, gamepads, telemetry, this::opModeIsActive);
         macros = new Macros(robot);
 
+        RobotConstants.OUTTAKE_RPM_TOLERANCE = 75;
+
         waitForStart();
         if (opModeIsActive())
         {
@@ -75,7 +78,7 @@ public abstract class Base extends LinearOpMode
             telemetry.log().add("Could not find the distance for some reason.");
         }
 
-        macros.aimToAprilTag(team.goal.id);
+        //macros.aimToAprilTag(team.goal.id);
 
         for (int i = 0; opModeIsActive() && i < 4; i++)
         {

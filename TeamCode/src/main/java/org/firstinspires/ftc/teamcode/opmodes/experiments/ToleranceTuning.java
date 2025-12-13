@@ -19,7 +19,7 @@ public class ToleranceTuning extends Base
     public void runOpMode() throws InterruptedException
     {
         team = Team.BLUE;
-        RobotConstants.TELEMETRY_SET_AUTOCLEAR = false;
+        //RobotConstants.TELEMETRY_SET_AUTOCLEAR = false;
         super.runOpMode();
     }
 
@@ -36,7 +36,9 @@ public class ToleranceTuning extends Base
         telemetry.addData("OUTTAKE_RPM_TOLERANCE", RobotConstants.OUTTAKE_RPM_TOLERANCE);
         telemetry.addData("OUTTAKE_STABILITY_TOLERANCE", RobotConstants.OUTTAKE_STABILITY_TOLERANCE);
 
-        telemetry.clear();
+        telemetry.update();
+
+        //telemetry.clear();
     }
 
     private void switchToleranceMode()
