@@ -95,7 +95,7 @@ public abstract class Base extends LinearOpMode
         telemetry.addData("RPM Acceleration", outtake.getRPMAcceleration());
     }
 
-    /*
+
     public static double getGoalOffset(double range, double bearing, int id, Telemetry telemetry)
     {
         double xDist;
@@ -107,13 +107,22 @@ public abstract class Base extends LinearOpMode
         double degreesToAdd;
         if(id==24)
         {
-            xDist = Math.cos(bearing)*range;
-            yDist = Math.sin(bearing)*range;
-            xTargetDist = xDist + 14;
-            yTargetDist = yDist + 12;
-            degreesToTarget = Math.tan((yTargetDist /xTargetDist));
-            degreesToTag = Math.tan((yDist/xDist));
-            degreesToAdd = degreesToTarget-degreesToTag;
+            // Convert bearing from degrees to radians for trigonometric functions
+            double bearingRadians = Math.toRadians(bearing);
+
+            // Calculate distance to AprilTag in meters
+            xDist = Math.cos(bearingRadians) * range;
+            yDist = Math.sin(bearingRadians) * range;
+
+            // Convert inch offsets to meters (14 inches = 0.3556m, 12 inches = 0.3048m)
+            xTargetDist = xDist + 0.3556;
+            yTargetDist = yDist + 0.3048;
+
+            // Use atan2 to correctly calculate angles from x/y coordinates
+            degreesToTarget = Math.toDegrees(Math.atan2(yTargetDist, xTargetDist));
+            degreesToTag = Math.toDegrees(Math.atan2(yDist, xDist));
+
+            degreesToAdd = degreesToTarget - degreesToTag;
         }
         else
         {
@@ -124,7 +133,7 @@ public abstract class Base extends LinearOpMode
         telemetry.log().add("Goal offset: " + -degreesToAdd);
         return -degreesToAdd;
     }
-     */
+
 
     protected void bindKeys()
     {

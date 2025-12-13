@@ -222,11 +222,11 @@ public class Macros
         }
 
         double offset = tag.get().ftcPose.bearing;
-        //double goalOffset = Base.getGoalOffset(tag.get().ftcPose.range,offset,id, robot.telemetry);
+        double goalOffset = Base.getGoalOffset(tag.get().ftcPose.range, offset, id, robot.telemetry);
         double currentAngle = robot.localization.getHeading();
-        double targetAngle = currentAngle + offset + manualAngleOffset; // No manual angleOffset
+        double targetAngle = currentAngle + offset + goalOffset + manualAngleOffset;
 
-        aimToAngle(targetAngle);
+        aimToAngleFast(targetAngle);
     }
 
     private void aimToAngle(double targetAngle) // Blocking action/non-FSM
@@ -309,6 +309,316 @@ public class Macros
 
         robot.telemetry.log().add("Finished turning.");
         robot.telemetry.log().add("Final error: " + String.format("%.1f", error));
+        robot.telemetry.update();
+    }
+
+    /**
+     * Improved version of aimToAngle with anti-jitter features for tighter tolerances.
+     * This version includes:
+     * - Damping zone to reduce minimum power near target
+     * - Settling detection requiring multiple stable readings
+     * - Power scaling zone to prevent overshooting
+     * - Low-pass filtered derivative to reduce noise
+     *
+     * @param targetAngle The target heading angle to aim towards
+     */
+    private void aimToAngleImproved(double targetAngle)
+    {
+        robot.telemetry.log().add("-aimToAngleImproved---------");
+        robot.telemetry.update();
+
+        // Tunable parameters - adjust these for your robot
+        double tolerance = 0.5; // Can now use much tighter tolerance
+        double settlingTolerance = 0.3; // Even tighter for settling check
+        int requiredSettledLoops = 5; // Must be stable for this many loops
+
+        // PD Control gains
+        double kP = 0.01;
+        double kD = 0.002;
+
+        // Power limits and zones
+        double minTurnPower = 0.1; // Minimum power for overcoming friction
+        double dampingZoneThreshold = 5.0; // Degrees - disable minPower within this zone
+        double powerScalingZoneThreshold = 10.0; // Degrees - reduce max power within this zone
+        double maxPowerInScalingZone = 0.3; // Max power when in scaling zone
+
+        // Derivative filtering
+        double derivativeFilterAlpha = 0.7; // 0 = no filtering, 1 = full filtering (smoothing)
+
+        // Initialize variables
+        double error;
+        double motorPower;
+        double lastError;
+        double rawDerivative;
+        double filteredDerivative = 0.0;
+        int settledLoopCount = 0;
+
+        // Timer for derivative calculation
+        ElapsedTime loopTimer = new ElapsedTime();
+        double loopTime;
+
+        // Calculate initial error
+        double currentAngle = robot.localization.getHeading();
+        error = targetAngle - currentAngle;
+        lastError = error;
+
+        // Reset timer
+        loopTimer.reset();
+
+        do
+        {
+            // 1. Get new angle and calculate time elapsed
+            currentAngle = robot.localization.getHeading();
+            loopTime = loopTimer.seconds();
+            loopTimer.reset();
+
+            // 2. Calculate error
+            error = targetAngle - currentAngle;
+
+            // 3. Calculate Derivative with low-pass filter
+            if (loopTime > 0.0001)
+            {
+                rawDerivative = (error - lastError) / loopTime;
+                // Apply exponential moving average filter to smooth out noise
+                filteredDerivative = (derivativeFilterAlpha * filteredDerivative) +
+                                    ((1.0 - derivativeFilterAlpha) * rawDerivative);
+            }
+            else
+            {
+                filteredDerivative = 0.0;
+            }
+
+            // 4. Calculate raw motor power (PD Control)
+            motorPower = (error * kP) + (filteredDerivative * kD);
+
+            // 5. Apply damping zone logic - disable minPower when close to target
+            boolean inDampingZone = Math.abs(error) <= dampingZoneThreshold;
+
+            if (!inDampingZone && Math.abs(error) > tolerance)
+            {
+                // Only apply minimum power when outside damping zone
+                if (Math.abs(motorPower) < minTurnPower)
+                {
+                    motorPower = Math.signum(motorPower) * minTurnPower;
+                }
+            }
+
+            // 6. Apply power scaling zone - reduce max power when getting close
+            boolean inPowerScalingZone = Math.abs(error) <= powerScalingZoneThreshold;
+
+            if (inPowerScalingZone)
+            {
+                // Gradually scale down max power as we approach target
+                double scaleFactor = Math.abs(error) / powerScalingZoneThreshold;
+                double adjustedMaxPower = maxPowerInScalingZone * scaleFactor;
+                adjustedMaxPower = Math.max(adjustedMaxPower, 0.05); // Minimum cap
+
+                motorPower = Math.max(-adjustedMaxPower, Math.min(adjustedMaxPower, motorPower));
+            }
+            else
+            {
+                // Normal clamping to [-1.0, 1.0]
+                motorPower = Math.max(-1.0, Math.min(1.0, motorPower));
+            }
+
+            // 7. Apply power to motors
+            robot.drive.setDrivePowers(-motorPower, -motorPower, motorPower, motorPower);
+
+            // 8. Settling detection - check if we're stable within tolerance
+            if (Math.abs(error) <= settlingTolerance)
+            {
+                settledLoopCount++;
+                robot.telemetry.addData("Settling", settledLoopCount + "/" + requiredSettledLoops);
+            }
+            else
+            {
+                settledLoopCount = 0; // Reset if we leave tolerance
+            }
+
+            // 9. Update telemetry for debugging
+            robot.telemetry.addData("Error", String.format("%.2f°", error));
+            robot.telemetry.addData("Power", String.format("%.3f", motorPower));
+            robot.telemetry.addData("In Damping Zone", inDampingZone);
+            robot.telemetry.addData("In Scaling Zone", inPowerScalingZone);
+            robot.telemetry.update();
+
+            // 10. Update for next iteration
+            lastError = error;
+
+        } while (settledLoopCount < requiredSettledLoops &&
+                 robot.opModeIsActive.get() &&
+                 !robot.gamepads.gamepad1.yWasPressed());
+
+        // Stop and clean up
+        robot.drive.stop();
+
+        robot.telemetry.log().add("Finished turning (Improved).");
+        robot.telemetry.log().add("Final error: " + String.format("%.2f°", error));
+        robot.telemetry.log().add("Settled for " + settledLoopCount + " loops");
+        robot.telemetry.update();
+    }
+
+    /**
+     * Fast and accurate version using two-stage adaptive control.
+     * Maximizes speed without compromising accuracy through:
+     * - Two-stage control: aggressive coarse stage, precise fine stage
+     * - Adaptive gain scheduling (different PD gains per stage)
+     * - Angular velocity-based settling (checks rotation rate, not just position)
+     * - Intelligent minimum power application (only in coarse stage)
+     * - Reduced settling requirements (faster exit when stable)
+     *
+     * This is the FASTEST accurate implementation - use this for competition!
+     *
+     * @param targetAngle The target heading angle to aim towards
+     */
+    private void aimToAngleFast(double targetAngle)
+    {
+        robot.telemetry.log().add("-aimToAngleFast (Two-Stage)---------");
+        robot.telemetry.update();
+
+        // === STAGE THRESHOLDS ===
+        double coarseThreshold = 12.0;      // Switch to fine stage when error < this (degrees)
+        double fineTolerance = 0.5;         // Final position tolerance (degrees)
+        double angularRateThreshold = 3.0;  // Must have low rotation rate to finish (deg/s)
+        int requiredSettledLoops = 3;       // Reduced from 5 for faster settling
+
+        // === COARSE STAGE (Fast approach) ===
+        double kP_coarse = 0.025;           // Higher P gain for faster response
+        double kD_coarse = 0.001;           // Lower D to allow aggressive movement
+        double maxPower_coarse = 0.85;      // High power for speed
+        double minPower_coarse = 0.12;      // Overcome static friction
+
+        // === FINE STAGE (Precision) ===
+        double kP_fine = 0.008;             // Lower P for gentle corrections
+        double kD_fine = 0.003;             // Higher D for damping
+        double maxPower_fine = 0.25;        // Low power to prevent overshoot
+
+        // === DERIVATIVE FILTERING ===
+        double derivativeFilterAlpha = 0.6; // Moderate filtering (less than improved version)
+
+        // === TIMEOUT SAFETY ===
+        double maxTimeSeconds = 3.0;        // Maximum time to attempt alignment
+        ElapsedTime totalTimer = new ElapsedTime();
+
+        // Initialize variables
+        double error;
+        double motorPower;
+        double lastError;
+        double rawDerivative;
+        double filteredDerivative = 0.0;
+        double angularRate;                 // deg/s - rotation speed
+        int settledLoopCount = 0;
+        boolean inFineStage = false;
+
+        // Timer for derivative calculation
+        ElapsedTime loopTimer = new ElapsedTime();
+        double loopTime;
+
+        // Calculate initial error
+        double currentAngle = robot.localization.getHeading();
+        error = targetAngle - currentAngle;
+        lastError = error;
+
+        // Reset timers
+        loopTimer.reset();
+        totalTimer.reset();
+
+        do
+        {
+            // 1. Get new angle and calculate time elapsed
+            currentAngle = robot.localization.getHeading();
+            loopTime = loopTimer.seconds();
+            loopTimer.reset();
+
+            // 2. Calculate error
+            error = targetAngle - currentAngle;
+
+            // 3. Calculate angular rate (approximate derivative in deg/s)
+            if (loopTime > 0.0001)
+            {
+                rawDerivative = (error - lastError) / loopTime;
+                // Apply exponential moving average filter
+                filteredDerivative = (derivativeFilterAlpha * filteredDerivative) +
+                                    ((1.0 - derivativeFilterAlpha) * rawDerivative);
+                angularRate = Math.abs(filteredDerivative);
+            }
+            else
+            {
+                filteredDerivative = 0.0;
+                angularRate = 0.0;
+            }
+
+            // 4. Determine control stage based on error magnitude
+            inFineStage = Math.abs(error) <= coarseThreshold;
+
+            // 5. Select gains based on stage
+            double kP = inFineStage ? kP_fine : kP_coarse;
+            double kD = inFineStage ? kD_fine : kD_coarse;
+            double maxPower = inFineStage ? maxPower_fine : maxPower_coarse;
+
+            // 6. Calculate motor power using stage-appropriate PD control
+            motorPower = (error * kP) + (filteredDerivative * kD);
+
+            // 7. Apply minimum power ONLY in coarse stage to overcome friction
+            if (!inFineStage && Math.abs(error) > fineTolerance)
+            {
+                if (Math.abs(motorPower) < minPower_coarse)
+                {
+                    motorPower = Math.signum(motorPower) * minPower_coarse;
+                }
+            }
+
+            // 8. Clamp to stage-appropriate max power
+            motorPower = Math.max(-maxPower, Math.min(maxPower, motorPower));
+
+            // 9. Apply power to motors
+            robot.drive.setDrivePowers(-motorPower, -motorPower, motorPower, motorPower);
+
+            // 10. Advanced settling detection - requires BOTH low error AND low angular rate
+            // This prevents premature exit while still rotating
+            boolean isPositionSettled = Math.abs(error) <= fineTolerance;
+            boolean isRotationSettled = angularRate <= angularRateThreshold;
+
+            if (isPositionSettled && isRotationSettled)
+            {
+                settledLoopCount++;
+                robot.telemetry.addData("Settling", settledLoopCount + "/" + requiredSettledLoops);
+            }
+            else
+            {
+                settledLoopCount = 0; // Reset if we leave settled state
+            }
+
+            // 11. Update telemetry for debugging
+            robot.telemetry.addData("Stage", inFineStage ? "FINE (Precision)" : "COARSE (Fast)");
+            robot.telemetry.addData("Error", String.format("%.2f°", error));
+            robot.telemetry.addData("Angular Rate", String.format("%.1f°/s", angularRate));
+            robot.telemetry.addData("Power", String.format("%.3f", motorPower));
+            robot.telemetry.addData("Position OK", isPositionSettled);
+            robot.telemetry.addData("Rotation OK", isRotationSettled);
+            robot.telemetry.update();
+
+            // 12. Update for next iteration
+            lastError = error;
+
+        } while (settledLoopCount < requiredSettledLoops &&
+                 robot.opModeIsActive.get() &&
+                 !robot.gamepads.gamepad1.yWasPressed() &&
+                 totalTimer.seconds() < maxTimeSeconds);
+
+        // Stop and clean up
+        robot.drive.stop();
+
+        // Final telemetry
+        boolean timedOut = totalTimer.seconds() >= maxTimeSeconds;
+        robot.telemetry.log().add("Finished turning (Fast 2-Stage).");
+        robot.telemetry.log().add("Final error: " + String.format("%.2f°", error));
+        robot.telemetry.log().add("Time taken: " + String.format("%.2fs", totalTimer.seconds()));
+        robot.telemetry.log().add("Settled loops: " + settledLoopCount);
+        if (timedOut)
+        {
+            robot.telemetry.log().add("WARNING: Timed out before fully settling!");
+        }
         robot.telemetry.update();
     }
 
