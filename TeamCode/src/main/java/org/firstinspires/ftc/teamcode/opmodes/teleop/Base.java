@@ -37,7 +37,6 @@ public abstract class Base extends LinearOpMode
         initSystems();
 
         waitForStart();
-
         while (opModeIsActive())
         {
             run();
@@ -78,8 +77,11 @@ public abstract class Base extends LinearOpMode
         drive.drive(axial, lateral, yaw);
 
         //telemetry.addData("Drive Mode", drive.getMode());
+        telemetry.addData("Team", team);
+        telemetry.addLine("\n-----Velocity-----");
         telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
         telemetry.addData("Heading", localization.getHeading());
+        telemetry.addLine("\n-----Outtake-----");
         telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
         telemetry.addData("Outtake RPM", outtake.getRPM());
         telemetry.addData("Outtake RPM Acceleration", outtake.getRPMAcceleration());

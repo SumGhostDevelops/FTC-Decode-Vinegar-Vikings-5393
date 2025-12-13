@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.opmodes.teleop.Base;
 
@@ -15,35 +16,35 @@ public class FlywheelPIDFTuning extends Base
     private Coefficient coefficient = Coefficient.P;
     private double p, i, d, f;
     private double coefficientChange = 1;
-    private boolean firstRun = true;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
         team = Team.BLUE;
+        RobotConstants.TELEMETRY_SET_AUTOCLEAR = false;
         super.runOpMode();
+    }
+
+    @Override
+    protected void initSystems()
+    {
+        super.initSystems();
+        PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        p = cfs.p;
+        i = cfs.i;
+        d = cfs.d;
+        f = cfs.f;
     }
 
     @Override
     protected void run() throws InterruptedException
     {
-        input.update();
-        if (firstRun)
-        {
-            //hw.outtakeMotor.setVelocityPIDFCoefficients(1, 1, 1, 1);
-            PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-            p = cfs.p;
-            i = cfs.i;
-            d = cfs.d;
-            f = cfs.f;
-            firstRun = false;
-        }
+        super.run();
+        telemetry.addLine("\n-----Flywheel PIDF Tuning-----");
 
-        telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
-        telemetry.addData("Outtake RPM", outtake.getRPM());
-        telemetry.addData("Outtake RPM Acceleration", outtake.getRPMAcceleration());
-        telemetry.addData("Coefficient Change", coefficientChange);
         telemetry.addData("Modifying Coefficient", coefficient);
+        telemetry.addData("Coefficient Change", coefficientChange);
+
         PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         hw.outtakeMotor.setVelocityPIDFCoefficients(p, i, d, f);
         telemetry.addData("PIDF (Expected/Actual)", "(" + p + "/" + cfs.p + ") (" + i + "/" + cfs.i + ") (" + d + "/" + cfs.d + ") (" + f + "/" + cfs.f + ")");
@@ -74,6 +75,24 @@ public class FlywheelPIDFTuning extends Base
         telemetry.log().add("Changed " + coefficient + " by " + change);
     }
 
+    private void switchCoefficient()
+    {
+        int currentOrdinal = coefficient.ordinal();
+        Coefficient[] values = Coefficient.values();
+        int length = values.length;
+        int nextOrdinal = (currentOrdinal + 1) % length;
+        coefficient = values[nextOrdinal];
+    }
+
+    private void switchTeam()
+    {
+        int currentOrdinal = team.ordinal();
+        Team[] values = Team.values();
+        int length = values.length;
+        int nextOrdinal = (currentOrdinal + 1) % length;
+        team = values[nextOrdinal];
+    }
+
     @Override
     protected void bindKeys()
     {
@@ -81,60 +100,42 @@ public class FlywheelPIDFTuning extends Base
 
         input.bind
                 (
-                        () -> gamepad1.yWasPressed(),
-                        () -> coefficient = Coefficient.P
+                        () -> gamepad2.aWasPressed(),
+                        this::switchCoefficient
                 );
 
         input.bind
                 (
-                        () -> gamepad1.xWasPressed(),
-                        () -> coefficient = Coefficient.I
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.bWasPressed(),
-                        () -> coefficient = Coefficient.D
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.aWasPressed(),
-                        () -> coefficient = Coefficient.F
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.dpadUpWasPressed(),
+                        () -> gamepad2.dpadUpWasPressed(),
                         () -> varyPIDF(coefficientChange)
                 );
 
         input.bind
                 (
-                        () -> gamepad1.dpadDownWasPressed(),
+                        () -> gamepad2.dpadDownWasPressed(),
                         () -> varyPIDF(-coefficientChange)
                 );
 
         input.bind
                 (
-                        () -> gamepad1.dpadLeftWasPressed(),
+                        () -> gamepad2.dpadLeftWasPressed(),
                         () -> coefficientChange -= 0.05
                 );
 
         input.bind
                 (
-                        () -> gamepad1.dpadRightWasPressed(),
+                        () -> gamepad2.dpadRightWasPressed(),
                         () -> coefficientChange += 0.05
                 );
         input.bind
                 (
-                        () -> gamepad1.right_trigger > 0.25,
+                        () -> gamepad2.right_trigger > 0.25,
                         () -> outtake.setRPM()
                 );
 
         input.bind
                 (
-                        () -> gamepad1.right_trigger <= 0.25,
+                        () -> gamepad2.right_trigger <= 0.25,
                         () -> outtake.stop()
                 );
     }

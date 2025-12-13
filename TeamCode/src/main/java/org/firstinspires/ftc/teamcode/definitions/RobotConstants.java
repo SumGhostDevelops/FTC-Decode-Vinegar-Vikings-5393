@@ -46,4 +46,6 @@ public class RobotConstants
     // Camera Offsets
     public static double cameraOffsetX = 0.0;
     public static double cameraOffsetY = 0.0;
+
+    public static boolean TELEMETRY_SET_AUTOCLEAR = true;
 }
