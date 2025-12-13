@@ -40,19 +40,16 @@ public abstract class Base extends LinearOpMode
         outtake = new Outtake(hw);
         intake = new Intake(hw);
         transfer = new Transfer(hw);
-
-        telemetry.setAutoClear(true);
-        telemetry.addData("Status", "Initialized for " + team);
-        telemetry.update();
-
         gamepads = new Gamepads(gamepad1, gamepad2);
-
         RobotContext robotContext = new RobotContext(team, hw, drive, intake, transfer, outtake, localization, gamepads, telemetry, this::opModeIsActive);
-
         macros = new Macros(robotContext);
 
         input = new InputHandler();
         bindKeys();
+
+        telemetry.setAutoClear(true);
+        telemetry.addData("Status", "Initialized for " + team);
+        telemetry.update();
 
         waitForStart();
 
@@ -75,7 +72,7 @@ public abstract class Base extends LinearOpMode
         // Drive
         drive.drive(axial, lateral, yaw);
 
-        telemetry.addData("Drive Mode", drive.getMode());
+        //telemetry.addData("Drive Mode", drive.getMode());
         telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
         telemetry.addData("Heading", localization.getHeading());
         telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
@@ -90,6 +87,7 @@ public abstract class Base extends LinearOpMode
         telemetry.update();
     }
 
+    /*
     public static double getGoalOffset(double range, double bearing, int id, Telemetry telemetry)
     {
         double xDist;
@@ -118,20 +116,10 @@ public abstract class Base extends LinearOpMode
         telemetry.log().add("Goal offset: " + -degreesToAdd);
         return -degreesToAdd;
     }
+     */
+
     protected void bindKeys()
     {
-        // Handle A
-        input.bind
-                (
-                        () -> gamepad1.aWasPressed(),
-                        () -> macros.resetTransferOuttakeNonFSM()
-                );
-        input.bind
-                (
-                        () -> gamepad1.aWasReleased(),
-                        () -> macros.stopResetTransferOuttakeNonFSM()
-                );
-
         // Handle B
         input.bind
                 (
@@ -139,11 +127,13 @@ public abstract class Base extends LinearOpMode
                         () -> localization.resetHeading()
                 );
 
+        /*
         input.bind
                 (
                         () -> gamepad1.xWasPressed(),
                         () -> macros.printRangeToAprilTag()
                 );
+         */
 
         input.bind
                 (
@@ -151,6 +141,7 @@ public abstract class Base extends LinearOpMode
                         () -> macros.aimToTeamAprilTag()
                 );
 
+        /*
         input.bind
                 (
                         () -> gamepad1.dpadLeftWasPressed(),
@@ -162,6 +153,7 @@ public abstract class Base extends LinearOpMode
                         () -> gamepad1.dpadRightWasPressed(),
                         () -> RobotConstants.FORCED_ANGLE_OFFSET += 0.25
                 );
+         */
 
         input.bind
                 (
