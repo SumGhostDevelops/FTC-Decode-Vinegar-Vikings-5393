@@ -34,6 +34,20 @@ public abstract class Base extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
+        initSystems();
+
+        waitForStart();
+
+        while (opModeIsActive())
+        {
+            run();
+        }
+
+        localization.close();
+    }
+
+    protected void initSystems()
+    {
         hw = new RobotHardware(hardwareMap, telemetry);
         localization = new Localization(hw);
         drive = new Drive(hw, localization);
@@ -47,18 +61,9 @@ public abstract class Base extends LinearOpMode
         input = new InputHandler();
         bindKeys();
 
-        telemetry.setAutoClear(true);
+        telemetry.setAutoClear(RobotConstants.TELEMETRY_SET_AUTOCLEAR);
         telemetry.addData("Status", "Initialized for " + team);
         telemetry.update();
-
-        waitForStart();
-
-        while (opModeIsActive())
-        {
-            run();
-        }
-
-        localization.close();
     }
 
     protected void run() throws InterruptedException
