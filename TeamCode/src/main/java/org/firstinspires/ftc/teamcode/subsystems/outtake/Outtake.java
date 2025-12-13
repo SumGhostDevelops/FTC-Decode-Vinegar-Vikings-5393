@@ -140,14 +140,7 @@ public class Outtake extends Actuator
         // Check Tolerance
         boolean rpm_within_tolerance = Math.abs(actualRPM - targetRPM) < RobotConstants.OUTTAKE_RPM_TOLERANCE;
 
-        boolean isReadyToLaunch = rpm_is_stable && rpm_within_tolerance && !isResetting();
-
-        if (isReadyToLaunch)
-        {
-            //robot.telemetry.log().add("Current acceleration: " + currentAcceleration + " | Actual RPM: " + actualRPM);
-        }
-
-        return isReadyToLaunch;
+        return rpm_is_stable && rpm_within_tolerance && !isResetting();
     }
 
     // tps = Ticks per Second; rpm = Revolutions per Minute
