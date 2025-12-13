@@ -30,7 +30,7 @@ public class FlywheelPIDFTuning extends Base
         input.update();
         if (firstRun)
         {
-            hw.outtakeMotor.setVelocityPIDFCoefficients(1, 1, 1, 1);
+            //hw.outtakeMotor.setVelocityPIDFCoefficients(1, 1, 1, 1);
             PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
             p = cfs.p;
             i = cfs.i;
@@ -46,7 +46,7 @@ public class FlywheelPIDFTuning extends Base
         telemetry.addData("Modifying Coefficient", coefficient);
         PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         hw.outtakeMotor.setVelocityPIDFCoefficients(p, i, d, f);
-        telemetry.addData("PIDF (Expected/Actual)", "(" + p + "/" + cfs.p + ") (" + i + "/" + cfs.i + ") (" + d + "/" + cfs.d + ") (" + f + "/" + cfs.f + ") (");
+        telemetry.addData("PIDF (Expected/Actual)", "(" + p + "/" + cfs.p + ") (" + i + "/" + cfs.i + ") (" + d + "/" + cfs.d + ") (" + f + "/" + cfs.f + ")");
 
         telemetry.update();
     }
