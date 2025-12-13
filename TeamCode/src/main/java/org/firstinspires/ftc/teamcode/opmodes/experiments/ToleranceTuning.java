@@ -36,7 +36,6 @@ public class ToleranceTuning extends Base
         telemetry.addData("OUTTAKE_RPM_TOLERANCE", RobotConstants.OUTTAKE_RPM_TOLERANCE);
         telemetry.addData("OUTTAKE_STABILITY_TOLERANCE", RobotConstants.OUTTAKE_STABILITY_TOLERANCE);
 
-        telemetry.update();
         telemetry.clear();
     }
 

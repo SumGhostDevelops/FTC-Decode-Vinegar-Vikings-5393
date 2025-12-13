@@ -47,7 +47,7 @@ public class FlywheelPIDFTuning extends Base
 
         telemetry.addData("Current PIDF", "P:%.4f  I:%.4f  D:%.4f  F:%.4f", p, i, d, f);
 
-        telemetry.update();
+        telemetry.clear();
     }
 
     private void varyPIDF(double change)

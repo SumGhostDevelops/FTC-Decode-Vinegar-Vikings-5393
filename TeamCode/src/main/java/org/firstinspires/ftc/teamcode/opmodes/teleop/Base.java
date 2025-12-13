@@ -39,7 +39,16 @@ public abstract class Base extends LinearOpMode
         waitForStart();
         while (opModeIsActive())
         {
+            input.update();
+
             run();
+
+            macros.update();
+            localization.update();
+            transfer.update();
+            outtake.update();
+
+            telemetry.update();
         }
 
         localization.close();
@@ -67,8 +76,6 @@ public abstract class Base extends LinearOpMode
 
     protected void run() throws InterruptedException
     {
-        input.update();
-
         double axial = -gamepad1.left_stick_y;
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
@@ -86,13 +93,6 @@ public abstract class Base extends LinearOpMode
         telemetry.addData("Target RPM", outtake.getTargetRPM());
         telemetry.addData("RPM", outtake.getRPM());
         telemetry.addData("RPM Acceleration", outtake.getRPMAcceleration());
-
-        macros.update();
-        localization.update();
-        transfer.update();
-        outtake.update();
-
-        telemetry.update();
     }
 
     /*
