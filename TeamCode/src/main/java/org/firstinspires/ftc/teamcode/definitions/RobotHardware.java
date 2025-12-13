@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -21,7 +20,7 @@ public class RobotHardware
     public WebcamName webcam;
 
     // Dead wheel encoders (often accessed via specific motor ports)
-    public DcMotorEx parEncoder, perpEncoder;
+    public DcMotorEx xEncoder, yEncoder;
 
     public Telemetry telemetry;
 
@@ -91,8 +90,8 @@ public class RobotHardware
         // Note: In many configs these are just specific drive motor ports.
         try
         {
-            parEncoder = hardwareMap.get(DcMotorEx.class, "par");
-            perpEncoder = hardwareMap.get(DcMotorEx.class, "perp");
+            xEncoder = hardwareMap.get(DcMotorEx.class, "x");
+            yEncoder = hardwareMap.get(DcMotorEx.class, "y");
         }
         catch (Exception e)
         {
