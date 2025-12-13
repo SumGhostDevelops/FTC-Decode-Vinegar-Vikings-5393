@@ -25,6 +25,7 @@ public abstract class Actuator
         REVERSE_ENABLED,
         FORWARD_TIMED,
         REVERSE_TIMED,
+        TOGGLED,
         RESETTING,
         IDLE
     }
@@ -49,7 +50,12 @@ public abstract class Actuator
 
     public void stop()
     {
-        if (isResetting())
+        stop(false);
+    }
+
+    public void stop(boolean force)
+    {
+        if ((isResetting() || isToggled()) && !force)
         {
             return;
         }
@@ -142,6 +148,8 @@ public abstract class Actuator
     {
         return status == Status.RESETTING;
     }
+
+    public boolean isToggled() { return status == Status.TOGGLED;}
 
     public void update()
     {

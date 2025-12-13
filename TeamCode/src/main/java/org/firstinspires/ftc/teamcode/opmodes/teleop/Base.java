@@ -82,9 +82,10 @@ public abstract class Base extends LinearOpMode
         telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
         telemetry.addData("Heading", localization.getHeading());
         telemetry.addLine("\n-----Outtake-----");
-        telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
-        telemetry.addData("Outtake RPM", outtake.getRPM());
-        telemetry.addData("Outtake RPM Acceleration", outtake.getRPMAcceleration());
+        telemetry.addData("Toggled", outtake.isToggled());
+        telemetry.addData("Target RPM", outtake.getTargetRPM());
+        telemetry.addData("RPM", outtake.getRPM());
+        telemetry.addData("RPM Acceleration", outtake.getRPMAcceleration());
 
         macros.update();
         localization.update();
@@ -141,6 +142,12 @@ public abstract class Base extends LinearOpMode
                         () -> macros.printRangeToAprilTag()
                 );
          */
+
+        input.bind
+                (
+                        () -> gamepad1.xWasPressed(),
+                        () -> outtake.toggleRPM()
+                );
 
         input.bind
                 (

@@ -121,6 +121,19 @@ public class Outtake extends Actuator
         getRPM();
     }
 
+    public void toggleRPM()
+    {
+        if (!isToggled())
+        {
+            setRPM();
+            status = Status.TOGGLED;
+        }
+        else
+        {
+            stop(true);
+        }
+    }
+
     /**
      * Sets the target RPM based on a distance regression and turns the flywheel on
      */
@@ -141,6 +154,16 @@ public class Outtake extends Actuator
         boolean rpm_within_tolerance = Math.abs(actualRPM - targetRPM) < RobotConstants.OUTTAKE_RPM_TOLERANCE;
 
         return rpm_is_stable && rpm_within_tolerance && !isResetting();
+    }
+
+    @Override
+    public void update()
+    {
+        super.update();
+        if (isToggled())
+        {
+            setRPM();
+        }
     }
 
     // tps = Ticks per Second; rpm = Revolutions per Minute
