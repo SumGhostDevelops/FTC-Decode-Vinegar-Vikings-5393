@@ -164,6 +164,10 @@ public class Outtake extends Actuator
         {
             setRPM();
         }
+        if (isToggled() || !isIdle())
+        {
+            getRPM();
+        }
     }
 
     // tps = Ticks per Second; rpm = Revolutions per Minute

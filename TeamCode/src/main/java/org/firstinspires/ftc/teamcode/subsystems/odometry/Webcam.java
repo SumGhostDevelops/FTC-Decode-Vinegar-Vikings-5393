@@ -89,7 +89,7 @@ public class Webcam
     {
         if (cachedTagDetections.isEmpty())
         {
-            return null;
+            return Optional.empty();
         }
 
         return Optional.of(cachedTagDetections.get(0));
