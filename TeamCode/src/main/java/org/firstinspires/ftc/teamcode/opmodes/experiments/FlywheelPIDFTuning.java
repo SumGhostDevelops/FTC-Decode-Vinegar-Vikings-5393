@@ -45,9 +45,7 @@ public class FlywheelPIDFTuning extends Base
         telemetry.addData("Modifying Coefficient", coefficient);
         telemetry.addData("Coefficient Change", coefficientChange);
 
-        PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-        hw.outtakeMotor.setVelocityPIDFCoefficients(p, i, d, f);
-        telemetry.addData("PIDF (Expected/Actual)", "(" + p + "/" + cfs.p + ") (" + i + "/" + cfs.i + ") (" + d + "/" + cfs.d + ") (" + f + "/" + cfs.f + ")");
+        telemetry.addData("Current PIDF", "P:%.4f  I:%.4f  D:%.4f  F:%.4f", p, i, d, f);
 
         telemetry.update();
     }
@@ -70,8 +68,7 @@ public class FlywheelPIDFTuning extends Base
                 break;
         }
 
-        PIDFCoefficients newCoeffs = new PIDFCoefficients(p, i, d, f);
-        hw.outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, newCoeffs);
+        hw.outtakeMotor.setVelocityPIDFCoefficients(p, i, d, f);
         telemetry.log().add("Changed " + coefficient + " by " + change);
     }
 
@@ -102,6 +99,12 @@ public class FlywheelPIDFTuning extends Base
                 (
                         () -> gamepad2.aWasPressed(),
                         this::switchCoefficient
+                );
+
+        input.bind
+                (
+                        () -> gamepad2.yWasPressed(),
+                        this::switchTeam
                 );
 
         input.bind
@@ -137,6 +140,18 @@ public class FlywheelPIDFTuning extends Base
                 (
                         () -> gamepad2.right_trigger <= 0.25,
                         () -> outtake.stop()
+                );
+
+        input.bind
+                (
+                        () -> gamepad2.leftBumperWasPressed(),
+                        () -> outtake.varyTargetRPM(-100)
+                );
+
+        input.bind
+                (
+                        () -> gamepad2.rightBumperWasPressed(),
+                        () -> outtake.varyTargetRPM(100)
                 );
     }
 }
