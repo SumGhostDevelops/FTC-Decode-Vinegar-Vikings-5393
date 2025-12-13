@@ -94,6 +94,12 @@ public class Outtake extends Actuator
 
     public void setRPM(int rpm)
     {
+        // Check we are just trying to spin at the same speed; keeps tracker from being reset
+        if (rpm == targetRPM && status == Status.FORWARD_ENABLED)
+        {
+            return;
+        }
+
         if (isResetting())
         {
             return;
@@ -102,12 +108,6 @@ public class Outtake extends Actuator
         if (rpm > 6000)
         {
             rpm = 6000;
-        }
-
-        // Check we are just trying to spin at the same speed; keeps tracker from being reset
-        if (rpm == targetRPM && status == Status.FORWARD_ENABLED)
-        {
-            return;
         }
 
         status = Status.FORWARD_ENABLED;
