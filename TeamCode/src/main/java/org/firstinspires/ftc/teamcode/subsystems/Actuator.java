@@ -4,10 +4,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.controls.BasicEnum;
-import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
-import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-
 public abstract class Actuator
 {
     protected final ElapsedTime timer = new ElapsedTime();

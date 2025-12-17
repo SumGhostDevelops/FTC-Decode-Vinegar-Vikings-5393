@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
-import org.firstinspires.ftc.teamcode.controls.Macros;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
@@ -28,7 +27,6 @@ public abstract class Base extends LinearOpMode
     protected Intake intake;
     protected Outtake outtake;
     protected Transfer transfer;
-    protected Macros macros;
     protected Gamepads gamepads;
 
     protected InputHandler input;
@@ -45,7 +43,6 @@ public abstract class Base extends LinearOpMode
 
             run();
 
-            macros.update();
             localization.update();
             transfer.update();
             outtake.update();
@@ -66,9 +63,6 @@ public abstract class Base extends LinearOpMode
         transfer = new Transfer(hw);
         gamepads = new Gamepads(gamepad1, gamepad2);
         RobotContext robotContext = new RobotContext(team, hw, drive, intake, transfer, outtake, localization, gamepads, telemetry, this::opModeIsActive);
-        macros = new Macros(robotContext);
-
-        input = new InputHandler();
         bindKeys();
 
         telemetry.setAutoClear(RobotConstants.TELEMETRY_SET_AUTOCLEAR);
@@ -83,10 +77,7 @@ public abstract class Base extends LinearOpMode
         double yaw = gamepad1.right_stick_x;
 
         // Drive - only send manual commands if no blocking macro is running
-        if (!macros.isBlockingOperationActive())
-        {
-            drive.drive(axial, lateral, yaw);
-        }
+        drive.drive(axial, lateral, yaw);
 
         //telemetry.addData("Drive Mode", drive.getMode());
         telemetry.addData("Team", team);
@@ -175,39 +166,11 @@ public abstract class Base extends LinearOpMode
                         () -> localization.resetHeading()
                 );
 
-        /*
-        input.bind
-                (
-                        () -> gamepad1.xWasPressed(),
-                        () -> macros.printRangeToAprilTag()
-                );
-         */
-
         input.bind
                 (
                         () -> gamepad1.xWasPressed(),
                         () -> outtake.toggleRPM()
                 );
-
-        input.bind
-                (
-                        () -> gamepad1.yWasPressed(),
-                        () -> macros.aimToTeamAprilTag()
-                );
-
-        /*
-        input.bind
-                (
-                        () -> gamepad1.dpadLeftWasPressed(),
-                        () -> RobotConstants.FORCED_ANGLE_OFFSET -= 0.25
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.dpadRightWasPressed(),
-                        () -> RobotConstants.FORCED_ANGLE_OFFSET += 0.25
-                );
-         */
 
         input.bind
                 (
