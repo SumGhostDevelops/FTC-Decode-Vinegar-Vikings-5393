@@ -3,31 +3,27 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.subsystems.Drive;
-import org.firstinspires.ftc.teamcode.subsystems.Gamepads;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Drive;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Gamepads;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.modules.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Transfer;
+import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
 
 public abstract class Base extends LinearOpMode
 {
     protected Team team;
 
-    protected RobotHardware hw;
-    protected Odometry localization;
-    protected Drive drive;
-    protected Intake intake;
-    protected Outtake outtake;
-    protected Transfer transfer;
-    protected Gamepads gamepads;
+    protected RobotContext robot;
 
     protected InputHandler input;
 
@@ -43,26 +39,21 @@ public abstract class Base extends LinearOpMode
 
             run();
 
-            localization.update();
-            transfer.update();
-            outtake.update();
+            robot.localization.update();
+            robot.intake.update();
+            robot.transfer.update();
+            robot.outtake.update();
 
             telemetry.update();
         }
 
-        localization.close();
+        robot.localization.close();
     }
 
     protected void initSystems()
     {
-        hw = new RobotHardware(hardwareMap, telemetry);
-        localization = new Odometry(hw);
-        drive = new Drive(hw, localization);
-        outtake = new Outtake(hw);
-        intake = new Intake(hw);
-        transfer = new Transfer(hw);
-        gamepads = new Gamepads(gamepad1, gamepad2);
-        RobotContext robotContext = new RobotContext(team, hw, drive, intake, transfer, outtake, localization, gamepads, telemetry, this::opModeIsActive);
+        Gamepads gamepads = new Gamepads(gamepad1, gamepad2);
+        RobotContext robot = new RobotContext(team, hardwareMap, telemetry, gamepads);
         bindKeys();
 
         telemetry.setAutoClear(RobotConstants.TELEMETRY_SET_AUTOCLEAR);
@@ -77,104 +68,39 @@ public abstract class Base extends LinearOpMode
         double yaw = gamepad1.right_stick_x;
 
         // Drive - only send manual commands if no blocking macro is running
-        drive.drive(axial, lateral, yaw);
+        robot.drive.drive(axial, lateral, yaw);
 
         //telemetry.addData("Drive Mode", drive.getMode());
         telemetry.addData("Team", team);
         telemetry.addLine("\n-----Velocity-----");
         telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
-        telemetry.addData("Heading", localization.getHeading());
+        telemetry.addData("Heading", robot.localization.getHeading(AngleUnit.DEGREES, Odometry.AngleType.UNSIGNED));
         telemetry.addLine("\n-----Outtake-----");
-        telemetry.addData("Toggled", outtake.isToggled());
+        telemetry.addData("Toggled", robot.outtake.isToggled());
         telemetry.addData("F Offset", RobotConstants.OUTTAKE_F_OFFSET);
-        telemetry.addData("Target RPM", outtake.getTargetRPM());
-        telemetry.addData("RPM", outtake.getRPM());
-        telemetry.addData("RPM Acceleration", outtake.getRPMAcceleration());
+        telemetry.addData("Target RPM", robot.outtake.getTargetRPM());
+        telemetry.addData("RPM", robot.outtake.getRPM());
+        telemetry.addData("RPM Acceleration", robot.outtake.getRPMAcceleration());
     }
-
-
-    public static double getGoalOffset(double range, double bearing, int id, Telemetry telemetry)
-    {
-        double xDist;
-        double yDist;
-        double xTargetDist;
-        double yTargetDist;
-        double degreesToTarget;
-        double degreesToTag;
-        double degreesToAdd;
-        if(id==24)
-        {
-            // Convert bearing from degrees to radians for trigonometric functions
-            double bearingRadians = Math.toRadians(bearing);
-
-            // Calculate distance to AprilTag in meters
-            xDist = Math.cos(bearingRadians) * range;
-            yDist = Math.sin(bearingRadians) * range;
-
-            // Convert inch offsets to meters (14 inches = 0.3556m, 12 inches = 0.3048m)
-            xTargetDist = xDist + 0.3048;
-            yTargetDist = yDist - 0.3556;
-
-            // Use atan2 to correctly calculate angles from x/y coordinates
-            degreesToTarget = Math.toDegrees(Math.atan2(yTargetDist, xTargetDist));
-            degreesToTag = Math.toDegrees(Math.atan2(yDist, xDist));
-
-            degreesToAdd = degreesToTarget - degreesToTag;
-        }
-        else if(id==20)
-        {
-            // Convert bearing from degrees to radians for trigonometric functions
-            double bearingRadians = Math.toRadians(bearing);
-
-            // Calculate distance to AprilTag in meters
-            xDist = Math.cos(bearingRadians) * range;
-            yDist = Math.sin(bearingRadians) * range;
-
-            // Convert inch offsets to meters (14 inches = 0.3556m, 12 inches = 0.3048m)
-            xTargetDist = xDist + 0.3048;
-            yTargetDist = yDist + 0.3556;
-
-            // Use atan2 to correctly calculate angles from x/y coordinates
-            degreesToTarget = Math.toDegrees(Math.atan2(yTargetDist, xTargetDist));
-            degreesToTag = Math.toDegrees(Math.atan2(yDist, xDist));
-
-            degreesToAdd = degreesToTarget - degreesToTag;
-        }
-        else
-        {
-            telemetry.log().add("Cancelling auto-aim command: Could not find Tag " + id);
-            return 0.0;
-        }
-
-        telemetry.log().add("Goal offset: " + -degreesToAdd);
-        return -degreesToAdd;
-    }
-
-    private void updatePIDF(double change)
-    {
-        PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-        hw.outtakeMotor.setVelocityPIDFCoefficients(cfs.p, cfs.i, cfs.d, cfs.f + change);
-    }
-
 
     protected void bindKeys()
     {
         // Handle B
         input.bind
                 (
-                        () -> gamepad1.bWasPressed(),
-                        () -> localization.resetHeading()
+                        () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.B),
+                        () -> robot.localization.resetHeading()
                 );
 
         input.bind
                 (
-                        () -> gamepad1.xWasPressed(),
-                        () -> outtake.toggleRPM()
+                        () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.X),
+                        () -> robot.outtake.toggleRPM()
                 );
 
         input.bind
                 (
-                        () -> gamepad1.leftBumperWasPressed(),
+                        () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER),
                         () ->
                         {
                             double newMultiplier = RobotConstants.DRIVE_SPEED_MULTIPLIER - RobotConstants.DRIVE_SPEED_CHANGE;
@@ -186,7 +112,7 @@ public abstract class Base extends LinearOpMode
 
         input.bind
                 (
-                        () -> gamepad1.rightBumperWasPressed(),
+                        () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER),
                         () ->
                         {
                             double newMultiplier = RobotConstants.DRIVE_SPEED_MULTIPLIER + RobotConstants.DRIVE_SPEED_CHANGE;
@@ -198,64 +124,26 @@ public abstract class Base extends LinearOpMode
 
         input.bind
                 (
-                        () -> gamepad1.left_trigger > 0.25 && outtake.isReadyToLaunch(),
-                        () -> transfer.setPower(1)
+                        () -> gamepad1.left_trigger > 0.25 && robot.outtake.isReadyToLaunch(),
+                        () -> robot.transfer.setPower(1)
                 );
 
         input.bind
                 (
-                        () -> gamepad1.left_trigger <= 0.25 || !outtake.isReadyToLaunch(),
-                        () -> transfer.stop()
+                        () -> gamepad1.left_trigger <= 0.25 || !robot.outtake.isReadyToLaunch(),
+                        () -> robot.transfer.stop()
                 );
 
         input.bind
                 (
                         () -> gamepad1.right_trigger > 0.25,
-                        () -> outtake.setRPM()
+                        () -> robot.outtake.setRPM()
                 );
 
         input.bind
                 (
                         () -> gamepad1.right_trigger <= 0.25,
-                        () -> outtake.stop()
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.dpadUpWasPressed(),
-                        () ->
-                        {
-                            RobotConstants.OUTTAKE_F_OFFSET += 0.25;
-                            updatePIDF(RobotConstants.OUTTAKE_F_OFFSET);
-                        }
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.dpadDownWasPressed(),
-                        () ->
-                        {
-                            RobotConstants.OUTTAKE_F_OFFSET -= 0.25;
-                            updatePIDF(RobotConstants.OUTTAKE_F_OFFSET);
-                        }
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.aWasPressed(),
-                        () -> {
-                            RobotConstants.toggleOffset = !RobotConstants.toggleOffset;
-                            telemetry.log().add("Toggle Offset: " + RobotConstants.toggleOffset);
-                        }
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.bWasPressed(),
-                        () -> {
-                            RobotConstants.useFastAim = !RobotConstants.useFastAim;
-                            telemetry.log().add("Use Fast Aim: " + RobotConstants.useFastAim);
-                        }
+                        () -> robot.outtake.stop()
                 );
     }
 }

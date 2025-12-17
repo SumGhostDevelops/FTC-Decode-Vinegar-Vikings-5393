@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.modules;
 
-import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Transfer extends Actuator
 {

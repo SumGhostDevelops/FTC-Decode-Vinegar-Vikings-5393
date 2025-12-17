@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.outtake;
+package org.firstinspires.ftc.teamcode.subsystems.modules.outtake;
 
 import java.util.ArrayList;
 

@@ -5,13 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.subsystems.Drive;
-import org.firstinspires.ftc.teamcode.subsystems.Gamepads;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Drive;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Gamepads;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.modules.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Transfer;
+import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
 
 import java.util.Optional;
 

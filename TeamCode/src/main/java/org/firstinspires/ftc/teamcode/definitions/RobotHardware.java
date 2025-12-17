@@ -1,34 +1,25 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.GoBildaPinpointDriver;
+import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.Pinpoint;
 
 public class RobotHardware
 {
     public DcMotorEx frontLeft, frontRight, backLeft, backRight;
     public DcMotorEx outtakeLeftMotor, outtakeRightMotor, turretMotor, intakeMotor;
     public CRServo transferServo;
-    public GoBildaPinpointDriver pinpoint;
+    public Pinpoint pinpoint;
     public WebcamName webcam;
 
-    // Dead wheel encoders (often accessed via specific motor ports)
-    public DcMotorEx xEncoder, yEncoder;
-
-    public Telemetry telemetry;
-
-    public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry)
+    public RobotHardware(HardwareMap hardwareMap)
     {
-        this.telemetry = telemetry;
-
         // --- Drive Motors ---
         frontLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_LEFT);
         frontRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_RIGHT);
@@ -94,7 +85,16 @@ public class RobotHardware
         // Odometry
         try
         {
-            pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, RobotConstants.Odometry.PINPOINT);
+            pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.PINPOINT);
+
+            pinpoint.setOffsets(RobotConstants.Odometry.Pinpoint.xOffset, RobotConstants.Odometry.Pinpoint.yOffset, RobotConstants.Odometry.Pinpoint.offsetUnit);
+
+            double counts_per_unit = (double) RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION / RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE;
+            pinpoint.setEncoderResolution(counts_per_unit, RobotConstants.Odometry.Deadwheels.circumferenceUnit);
+
+            pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.FORWARD);
+
+            pinpoint.resetPosAndIMU();
         }
         catch (Exception e)
         {
@@ -103,21 +103,11 @@ public class RobotHardware
 
         try
         {
-            webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.WEBCAM);
+            webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.Webcam.WEBCAM);
         }
         catch (Exception e)
         {
             telemetry.log().add("Warning: Webcam not found");
-        }
-
-        try
-        {
-            xEncoder = hardwareMap.get(DcMotorEx.class, RobotConstants.Odometry.Deadwheels.PAR_X);
-            yEncoder = hardwareMap.get(DcMotorEx.class, RobotConstants.Odometry.Deadwheels.PERP_Y);
-        }
-        catch (Exception e)
-        {
-            telemetry.log().add("Warning: Dead wheel encoders not found");
         }
     }
 

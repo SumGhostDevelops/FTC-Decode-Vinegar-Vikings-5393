@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsystems.Drive;
-import org.firstinspires.ftc.teamcode.subsystems.Gamepads;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Drive;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Gamepads;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Transfer;
+import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.subsystems.modules.outtake.Outtake;
 
 import java.util.function.Supplier;
 
@@ -22,19 +24,18 @@ public class RobotContext
     public final Odometry localization;
     public final Telemetry telemetry;
     public final Gamepads gamepads;
-    public final Supplier<Boolean> opModeIsActive;
 
-    public RobotContext(Team team, RobotHardware hw, Drive drive, Intake intake, Transfer transfer, Outtake outtake, Odometry localization, Gamepads gamepads, Telemetry telemetry, Supplier<Boolean> opModeIsActive)
+    public RobotContext(Team team, HardwareMap hardwareMap, Telemetry telemetry, Gamepads gamepads)
     {
-        this.hw = hw;
+        this.hw = new RobotHardware(hardwareMap);
+        this.localization = new Odometry(hw, telemetry);
+        this.drive = new Drive(hw, localization, telemetry);
+        this.intake = new Intake(hw);
+        this.outtake = new Outtake(hw);
+        this.transfer = new Transfer(hw);
+
         this.team = team;
-        this.drive = drive;
-        this.intake = intake;
-        this.transfer = transfer;
-        this.outtake = outtake;
-        this.localization = localization;
-        this.gamepads = gamepads;
         this.telemetry = telemetry;
-        this.opModeIsActive = opModeIsActive;
+        this.gamepads = gamepads;
     }
 }

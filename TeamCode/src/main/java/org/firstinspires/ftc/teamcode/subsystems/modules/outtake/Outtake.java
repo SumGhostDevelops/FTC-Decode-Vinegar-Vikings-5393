@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.subsystems.outtake;
+package org.firstinspires.ftc.teamcode.subsystems.modules.outtake;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 // Make sure this import points to where you saved the helper class I wrote earlier
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.subsystems.Actuator;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Actuator;
 
 public class Outtake extends Actuator
 {

@@ -1,22 +1,27 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.modules;
 
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
 
 public class Drive
 {
-    private final RobotHardware robot;
+    private final Telemetry telemetry;
+    private final RobotHardware hw;
     private final Odometry localization;
+
     private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
 
-    public Drive(RobotHardware robot, Odometry localization)
+    public Drive(RobotHardware hw, Odometry localization, Telemetry telemetry)
     {
-        this.robot = robot;
+        this.hw = hw;
         this.localization = localization;
+        this.telemetry = telemetry;
     }
 
     public void toggleDriveMode()
@@ -33,7 +38,7 @@ public class Drive
                 currentMode = DriveMode.FIELD_CENTRIC;
                 break;
         }
-        robot.telemetry.addData("Drive Mode", currentMode.toString());
+        telemetry.addData("Drive Mode", currentMode.toString());
     }
 
     public DriveMode getMode()
@@ -43,7 +48,7 @@ public class Drive
 
     public void drive(double axial, double lateral, double yaw)
     {
-        double botHeading = Math.toRadians(localization.getHeading());
+        double botHeading = localization.getHeading(AngleUnit.RADIANS, Odometry.AngleType.SIGNED);
         double rotX = lateral;
         double rotY = axial;
         double rx = yaw;
@@ -56,34 +61,36 @@ public class Drive
                 break;
 
             case ROBOT_CENTRIC_HYBRID:
-                // Hybrid Logic: Point robot front towards input vector
+                // Agar.io / Slither.io style: Robot faces the direction the joystick points,
+                // and drives forward based on joystick magnitude.
                 double magnitude = Math.hypot(axial, lateral);
                 if (magnitude > RobotConstants.HYBRID_MODE_DEADBAND)
                 {
-                    // Angle of the joystick input
-                    double moveAngle = Math.atan2(lateral, axial);
+                    // Target heading = direction joystick is pointing (field-relative)
+                    // atan2(lateral, axial) gives angle where axial=forward, lateral=right
+                    double targetHeading = Math.atan2(lateral, axial);
 
-                    // Calculate error between move angle and current robot heading
-                    // Note: Inputs need to be rotated by heading to be field relative first
-                    // if we want "stick points North, robot turns North".
-                    // Assuming axial/lateral are Field Centric inputs here:
+                    // Calculate shortest angle error to target heading
+                    double error = AngleUnit.normalizeRadians(targetHeading - botHeading);
 
-                    double error = AngleUnit.normalizeRadians(moveAngle - botHeading);
-
-                    // Apply P control to turn robot
+                    // Auto-turn to face target direction (unless driver is manually turning)
                     if (Math.abs(yaw) < 0.05)
-                    { // Only auto-turn if driver isn't manually turning
-                        rx = Range.clip(error * RobotConstants.HYBRID_MODE_TURN_P, -0.6, 0.6);
+                    {
+                        rx = Range.clip(error * RobotConstants.HYBRID_MODE_TURN_P, -1.0, 1.0);
                     }
-                }
-                // Drive vectors remain relative to field input for movement,
-                // but since we are rotating the bot to face it, we might want simple robot centric drive
-                // usually Hybrid means: Push stick up, robot turns North and drives North.
 
-                // Standard Field Centric translation to ensure movement matches stick direction
-                // regardless of current rotation
-                rotX = lateral * Math.cos(-botHeading) - axial * Math.sin(-botHeading);
-                rotY = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
+                    // Drive forward (robot-centric) based on joystick magnitude
+                    // Since robot is turning to face the joystick direction, driving forward
+                    // will move the robot in that direction
+                    rotY = magnitude;  // Forward
+                    rotX = 0;          // No strafing
+                }
+                else
+                {
+                    // Below deadband: no movement, allow rotation in place
+                    rotX = 0;
+                    rotY = 0;
+                }
                 break;
 
             case RAW_ROBOT_CENTRIC:
@@ -101,10 +108,10 @@ public class Drive
         double backRightPower = (rotY + rotX - rx) / denominator;
 
         double powerScale = RobotConstants.DRIVE_SPEED_MULTIPLIER;
-        robot.frontLeft.setPower(frontLeftPower * powerScale);
-        robot.backLeft.setPower(backLeftPower * powerScale);
-        robot.frontRight.setPower(frontRightPower * powerScale);
-        robot.backRight.setPower(backRightPower * powerScale);
+        hw.frontLeft.setPower(frontLeftPower * powerScale);
+        hw.backLeft.setPower(backLeftPower * powerScale);
+        hw.frontRight.setPower(frontRightPower * powerScale);
+        hw.backRight.setPower(backRightPower * powerScale);
     }
 
     // Inside Drive.java
@@ -119,10 +126,10 @@ public class Drive
         double br = (forward + strafe - turn) / denominator;
 
         // Apply to hardware
-        robot.frontLeft.setPower(fl);
-        robot.backLeft.setPower(bl);
-        robot.frontRight.setPower(fr);
-        robot.backRight.setPower(br);
+        hw.frontLeft.setPower(fl);
+        hw.backLeft.setPower(bl);
+        hw.frontRight.setPower(fr);
+        hw.backRight.setPower(br);
     }
 
     /**
@@ -134,10 +141,10 @@ public class Drive
      */
     public void setDrivePowers(double leftFront, double leftBack, double rightFront, double rightBack)
     {
-        robot.frontLeft.setPower(leftFront);
-        robot.backLeft.setPower(leftBack);
-        robot.frontRight.setPower(rightFront);
-        robot.backRight.setPower(rightBack);
+        hw.frontLeft.setPower(leftFront);
+        hw.backLeft.setPower(leftBack);
+        hw.frontRight.setPower(rightFront);
+        hw.backRight.setPower(rightBack);
     }
 
     public void stop()

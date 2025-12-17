@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.definitions;
 
 import com.acmerobotics.dashboard.config.Config;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 @Config
 public class RobotConstants
 {
@@ -26,25 +28,17 @@ public class RobotConstants
     public static double SHOT_DROP_THRESHOLD = 0.20; // 20% drop implies shot
     public static double OUTTAKE_F_OFFSET = 0.0;
 
-    // Localization / Vision
-    public final static double LENS_FX = 1424.38;
-    public final static double LENS_FY = 1424.38;
-    public final static double LENS_CX = 637.325;
-    public final static double LENS_CY = 256.774;
-
-    // Dead Wheels (Two Wheel Config)
-    public final static double PAR_Y_TICKS = 0.0; // Forward/Back offset
-    public final static double PERP_X_TICKS = 0.0; // Left/Right offset
-    public final static double IN_PER_TICK = 0.001; // Tune this
-
     // Camera Offsets
     public final static double cameraOffsetX = 0.0;
     public final static double cameraOffsetY = 0.0;
 
-    public static boolean toggleOffset = false;
-    public static boolean useFastAim = false;
-
     public static boolean TELEMETRY_SET_AUTOCLEAR = true;
+
+    public static class AprilTags
+    {
+        public final static int[] GOAL_IDS = new int[]{20, 24};
+        public final static int[] OBELISK_IDS = new int[]{21, 22, 23};
+    }
 
     // Hardware Names
     public static class Drive
@@ -75,13 +69,28 @@ public class RobotConstants
 
     public static class Odometry
     {
-        public final static String WEBCAM = "webcam";
-        public final static String PINPOINT = "pinpoint";
-        public static class Deadwheels
+        public static class Pinpoint
         {
-            public final static String PAR_X = "parX";
-            public final static String PERP_Y = "perpY";
+            public final static String PINPOINT = "pinpoint";
+            public final static double xOffset = 0;
+            public final static double yOffset = 0;
+            public final static DistanceUnit offsetUnit = DistanceUnit.INCH;
+        }
+        public static class Webcam
+        {
 
+            public final static String WEBCAM = "webcam";
+            public final static double LENS_FX = 1424.38;
+            public final static double LENS_FY = 1424.38;
+            public final static double LENS_CX = 637.325;
+            public final static double LENS_CY = 256.774;
+        }
+
+        public static class Deadwheels // These are plugged in directly to the Pinpoint
+        {
+            public final static int COUNTS_PER_REVOLUTION = 8192;
+            public final static int WHEEL_CIRCUMFERENCE = 35; // fix this number
+            public final static DistanceUnit circumferenceUnit = DistanceUnit.MM;
         }
     }
 }
