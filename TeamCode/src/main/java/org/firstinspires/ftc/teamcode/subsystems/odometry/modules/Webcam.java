@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.odometry;
+package org.firstinspires.ftc.teamcode.subsystems.odometry.modules;
 
 import android.util.Size;
 

@@ -5,15 +5,15 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 
 public class Drive
 {
     private final RobotHardware robot;
-    private final Localization localization;
+    private final Odometry localization;
     private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
 
-    public Drive(RobotHardware robot, Localization localization)
+    public Drive(RobotHardware robot, Odometry localization)
     {
         this.robot = robot;
         this.localization = localization;
@@ -101,10 +101,10 @@ public class Drive
         double backRightPower = (rotY + rotX - rx) / denominator;
 
         double powerScale = RobotConstants.DRIVE_SPEED_MULTIPLIER;
-        robot.leftFront.setPower(frontLeftPower * powerScale);
-        robot.leftBack.setPower(backLeftPower * powerScale);
-        robot.rightFront.setPower(frontRightPower * powerScale);
-        robot.rightBack.setPower(backRightPower * powerScale);
+        robot.frontLeft.setPower(frontLeftPower * powerScale);
+        robot.backLeft.setPower(backLeftPower * powerScale);
+        robot.frontRight.setPower(frontRightPower * powerScale);
+        robot.backRight.setPower(backRightPower * powerScale);
     }
 
     // Inside Drive.java
@@ -119,10 +119,10 @@ public class Drive
         double br = (forward + strafe - turn) / denominator;
 
         // Apply to hardware
-        robot.leftFront.setPower(fl);
-        robot.leftBack.setPower(bl);
-        robot.rightFront.setPower(fr);
-        robot.rightBack.setPower(br);
+        robot.frontLeft.setPower(fl);
+        robot.backLeft.setPower(bl);
+        robot.frontRight.setPower(fr);
+        robot.backRight.setPower(br);
     }
 
     /**
@@ -134,10 +134,10 @@ public class Drive
      */
     public void setDrivePowers(double leftFront, double leftBack, double rightFront, double rightBack)
     {
-        robot.leftFront.setPower(leftFront);
-        robot.leftBack.setPower(leftBack);
-        robot.rightFront.setPower(rightFront);
-        robot.rightBack.setPower(rightBack);
+        robot.frontLeft.setPower(leftFront);
+        robot.backLeft.setPower(leftBack);
+        robot.frontRight.setPower(rightFront);
+        robot.backRight.setPower(rightBack);
     }
 
     public void stop()

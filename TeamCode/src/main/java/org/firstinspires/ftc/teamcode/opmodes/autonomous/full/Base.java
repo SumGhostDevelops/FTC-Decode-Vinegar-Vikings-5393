@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 
 import java.util.Optional;
 
@@ -20,7 +20,7 @@ public abstract class Base extends LinearOpMode
     protected Team team;
 
     RobotHardware hw;
-    Localization localization;
+    Odometry localization;
     Drive drive;
     Intake intake;
     Outtake outtake;
@@ -33,7 +33,7 @@ public abstract class Base extends LinearOpMode
     public void runOpMode() throws InterruptedException
     {
         hw = new RobotHardware(hardwareMap, telemetry);
-        localization = new Localization(hw);
+        localization = new Odometry(hw);
         drive = new Drive(hw, localization);
         intake = new Intake(hw);
         outtake = new Outtake(hw);

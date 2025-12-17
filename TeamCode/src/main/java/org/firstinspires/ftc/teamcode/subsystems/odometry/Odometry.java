@@ -3,16 +3,10 @@ package org.firstinspires.ftc.teamcode.subsystems.odometry;
 import com.acmerobotics.roadrunner.Pose2d;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 
-import java.util.List;
-
-public class Localization
+public class Odometry
 {
     private final RobotHardware robot;
     public final Webcam webcam;
@@ -21,7 +15,7 @@ public class Localization
     private final Pose2d currentPose = new Pose2d(0, 0, 0);
     private double headingOffset = 0;
 
-    public Localization(RobotHardware robot)
+    public Odometry(RobotHardware robot)
     {
         this.robot = robot;
         this.webcam = new Webcam(robot);

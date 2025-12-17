@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.opmodes.teleop.Base;
@@ -20,9 +19,9 @@ public class DeadwheelTesting extends Base
     public void run()
     {
         telemetry.addData("Deadwheel Position", hw.xEncoder.getCurrentPosition());
-        telemetry.addData("Front Left Motor Position", hw.leftFront.getCurrentPosition());
-        telemetry.addData("Front Right Motor Position", hw.rightFront.getCurrentPosition());
-        telemetry.addData("Back Left Motor Position", hw.leftBack.getCurrentPosition());
-        telemetry.addData("Back Right Motor Position", hw.rightBack.getCurrentPosition());
+        telemetry.addData("Front Left Motor Position", hw.frontLeft.getCurrentPosition());
+        telemetry.addData("Front Right Motor Position", hw.frontRight.getCurrentPosition());
+        telemetry.addData("Back Left Motor Position", hw.backLeft.getCurrentPosition());
+        telemetry.addData("Back Right Motor Position", hw.backRight.getCurrentPosition());
     }
 }

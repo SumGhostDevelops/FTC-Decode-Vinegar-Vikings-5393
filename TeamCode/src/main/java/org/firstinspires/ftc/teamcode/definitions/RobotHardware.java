@@ -10,13 +10,14 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.GoBildaPinpointDriver;
 
 public class RobotHardware
 {
-    public DcMotorEx leftFront, rightFront, leftBack, rightBack;
-    public DcMotorEx outtakeMotor, intakeMotor;
+    public DcMotorEx frontLeft, frontRight, backLeft, backRight;
+    public DcMotorEx outtakeLeftMotor, outtakeRightMotor, turretMotor, intakeMotor;
     public CRServo transferServo;
-    public IMU imu;
+    public GoBildaPinpointDriver pinpoint;
     public WebcamName webcam;
 
     // Dead wheel encoders (often accessed via specific motor ports)
@@ -29,73 +30,94 @@ public class RobotHardware
         this.telemetry = telemetry;
 
         // --- Drive Motors ---
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+        frontLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_LEFT);
+        frontRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_RIGHT);
+        backLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_LEFT);
+        backRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_RIGHT);
 
         // Directions (Adjust to ensure all wheels spin forward when commanded positive)
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, leftFront, rightFront, leftBack, rightBack);
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, leftFront, rightFront, leftBack, rightBack);
+        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, frontLeft, frontRight, backLeft, backRight);
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, frontLeft, frontRight, backLeft, backRight);
 
         // --- Mechanisms ---
         try
         {
-            outtakeMotor = hardwareMap.get(DcMotorEx.class, "launcher");
-            outtakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            outtakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // For Velocity Control
-            outtakeMotor.setVelocityPIDFCoefficients(10, 4, 5, -4.5);
+            outtakeLeftMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.LAUNCHER_LEFT);
+            outtakeLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            outtakeLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // For Velocity Control
+            outtakeLeftMotor.setVelocityPIDFCoefficients(10, 4, 5, -4.5);
+
+            outtakeRightMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.LAUNCHER_RIGHT);
+            outtakeRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            outtakeRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // For Velocity Control
+            outtakeRightMotor.setVelocityPIDFCoefficients(10, 4, 5, -4.5);
         }
         catch (Exception e)
         {
-            telemetry.log().add("Warning: Launcher not found");
+            telemetry.log().add("Warning: Outtake motors not found");
         }
 
         try
         {
-            transferServo = hardwareMap.get(CRServo.class, "transfer");
+            turretMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.TURRET);
+            outtakeRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        catch (Exception e)
+        {
+            telemetry.log().add("Warning: Turret motor not found");
+        }
+
+        try
+        {
+            transferServo = hardwareMap.get(CRServo.class, RobotConstants.Transfer.TRANSFER);
             transferServo.setDirection(CRServo.Direction.REVERSE);
         }
         catch (Exception e)
         {
-            telemetry.log().add("Warning: Loader not found");
+            telemetry.log().add("Warning: Transfer servo not found");
         }
 
         try
         {
-            intakeMotor = hardwareMap.get(DcMotorEx.class, "intake");
+            intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.INTAKE);
         }
         catch (Exception e)
         {
-            telemetry.log().add("Warning: Intake placeholder not found");
+            telemetry.log().add("Warning: Intake motor not found");
         }
 
-        // --- Sensors ---
-        imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
-        imu.initialize(parameters);
-        imu.resetYaw();
-
-        webcam = hardwareMap.get(WebcamName.class, "webcam");
-
-        // --- Odometry Encoders ---
-        // Assuming they are plugged into specific slots, e.g., parallel on 'par', perpendicular on 'perp'
-        // Note: In many configs these are just specific drive motor ports.
+        // Odometry
         try
         {
-            xEncoder = hardwareMap.get(DcMotorEx.class, "x");
-            yEncoder = hardwareMap.get(DcMotorEx.class, "y");
+            pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, RobotConstants.Odometry.PINPOINT);
         }
         catch (Exception e)
         {
-            telemetry.log().add("Warning: Dead wheel encoders not mapped");
+            telemetry.log().add("Warning: goBilda Pinpoint not found");
+        }
+
+        try
+        {
+            webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.WEBCAM);
+        }
+        catch (Exception e)
+        {
+            telemetry.log().add("Warning: Webcam not found");
+        }
+
+        try
+        {
+            xEncoder = hardwareMap.get(DcMotorEx.class, RobotConstants.Odometry.Deadwheels.PAR_X);
+            yEncoder = hardwareMap.get(DcMotorEx.class, RobotConstants.Odometry.Deadwheels.PERP_Y);
+        }
+        catch (Exception e)
+        {
+            telemetry.log().add("Warning: Dead wheel encoders not found");
         }
     }
 

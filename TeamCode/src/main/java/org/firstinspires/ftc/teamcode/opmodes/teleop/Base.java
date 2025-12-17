@@ -15,14 +15,14 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Localization;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 
 public abstract class Base extends LinearOpMode
 {
     protected Team team;
 
     protected RobotHardware hw;
-    protected Localization localization;
+    protected Odometry localization;
     protected Drive drive;
     protected Intake intake;
     protected Outtake outtake;
@@ -56,7 +56,7 @@ public abstract class Base extends LinearOpMode
     protected void initSystems()
     {
         hw = new RobotHardware(hardwareMap, telemetry);
-        localization = new Localization(hw);
+        localization = new Odometry(hw);
         drive = new Drive(hw, localization);
         outtake = new Outtake(hw);
         intake = new Intake(hw);

@@ -24,14 +24,7 @@ public class RobotConstants
     public static int OUTTAKE_RPM_TOLERANCE = 100;
     public static int OUTTAKE_STABILITY_TOLERANCE = 150;
     public static double SHOT_DROP_THRESHOLD = 0.20; // 20% drop implies shot
-    public static double JAM_CLEAR_POWER = -0.3;
-    public static double JAM_CLEAR_DURATION = 1.0; // Seconds
     public static double OUTTAKE_F_OFFSET = 0.0;
-
-    // Transfer Constants
-    public static double TRANSFER_POWER_FWD = 0.8;
-    public static double TRANSFER_POWER_REV = -0.8;
-    public static double TRANSFER_POWER_IDLE = 0.0;
 
     // Localization / Vision
     public final static double LENS_FX = 1424.38;
@@ -52,4 +45,43 @@ public class RobotConstants
     public static boolean useFastAim = false;
 
     public static boolean TELEMETRY_SET_AUTOCLEAR = true;
+
+    // Hardware Names
+    public static class Drive
+    {
+        public final static String FRONT_LEFT = "frontLeft";
+        public final static String FRONT_RIGHT = "frontRight";
+        public final static String BACK_LEFT = "backLeft";
+        public final static String BACK_RIGHT = "backRight";
+    }
+
+    public static class Outtake
+    {
+        // Outtake Motors
+        public final static String LAUNCHER_LEFT = "leftOuttake";
+        public final static String LAUNCHER_RIGHT = "rightOuttake";
+        public final static String TURRET = "turret";
+    }
+
+    public static class Transfer
+    {
+        public final static String TRANSFER = "transfer";
+    }
+
+    public static class Intake
+    {
+        public final static String INTAKE = "intake";
+    }
+
+    public static class Odometry
+    {
+        public final static String WEBCAM = "webcam";
+        public final static String PINPOINT = "pinpoint";
+        public static class Deadwheels
+        {
+            public final static String PAR_X = "parX";
+            public final static String PERP_Y = "perpY";
+
+        }
+    }
 }
