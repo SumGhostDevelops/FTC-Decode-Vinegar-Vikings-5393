@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.subsystems.modules.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.modules.Gamepads;
 import org.firstinspires.ftc.teamcode.subsystems.modules.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.modules.outtake.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Turret.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.modules.Transfer;
 import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
 

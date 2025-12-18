@@ -1,23 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
-import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.subsystems.modules.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.modules.Gamepads;
-import org.firstinspires.ftc.teamcode.subsystems.modules.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.modules.outtake.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.EncompassingPose;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
-import org.firstinspires.ftc.teamcode.subsystems.modules.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
 
 public abstract class Base extends LinearOpMode
 {
@@ -74,7 +66,7 @@ public abstract class Base extends LinearOpMode
         telemetry.addData("Team", team);
         telemetry.addLine("\n-----Velocity-----");
         telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
-        telemetry.addData("Heading", robot.localization.getHeading(AngleUnit.DEGREES, Odometry.AngleType.UNSIGNED));
+        telemetry.addData("Heading", robot.localization.getHeading(AngleUnit.DEGREES, EncompassingPose.AngleType.UNSIGNED));
         telemetry.addLine("\n-----Outtake-----");
         telemetry.addData("Toggled", robot.outtake.isToggled());
         telemetry.addData("F Offset", RobotConstants.OUTTAKE_F_OFFSET);

@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems.modules.outtake;
+package org.firstinspires.ftc.teamcode.subsystems.modules.Turret;
 
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 // Make sure this import points to where you saved the helper class I wrote earlier
@@ -9,7 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystems.modules.Actuator;
 
 public class Outtake extends Actuator
 {
-    private final RobotHardware robot;
+    private final DcMotorEx leftMotor, rightMotor;
     private final ElapsedTime stabilityTimer = new ElapsedTime();
 
     private int targetRPM = RobotConstants.OUTTAKE_INITIAL_TARGET_RPM;

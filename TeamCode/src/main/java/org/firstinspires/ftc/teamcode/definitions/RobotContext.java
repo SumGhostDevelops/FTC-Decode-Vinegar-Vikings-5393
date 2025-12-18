@@ -8,9 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.modules.Gamepads;
 import org.firstinspires.ftc.teamcode.subsystems.modules.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.modules.Transfer;
 import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
-import org.firstinspires.ftc.teamcode.subsystems.modules.outtake.Outtake;
-
-import java.util.function.Supplier;
+import org.firstinspires.ftc.teamcode.subsystems.modules.Turret.Outtake;
 
 public class RobotContext
 {
