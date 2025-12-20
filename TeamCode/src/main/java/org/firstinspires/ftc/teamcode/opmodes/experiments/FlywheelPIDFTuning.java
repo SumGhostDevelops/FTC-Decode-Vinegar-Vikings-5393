@@ -29,7 +29,7 @@ public class FlywheelPIDFTuning extends Base
     protected void initSystems()
     {
         super.initSystems();
-        PIDFCoefficients cfs = hw.outtakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        PIDFCoefficients cfs = robot.hw.outtakeLeftMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         p = cfs.p;
         i = cfs.i;
         d = cfs.d;
@@ -70,7 +70,7 @@ public class FlywheelPIDFTuning extends Base
                 break;
         }
 
-        hw.outtakeMotor.setVelocityPIDFCoefficients(p, i, d, f);
+        robot.hw.outtakeLeftMotor.setVelocityPIDFCoefficients(p, i, d, f);
         telemetry.log().add("Changed " + coefficient + " by " + change);
     }
 
