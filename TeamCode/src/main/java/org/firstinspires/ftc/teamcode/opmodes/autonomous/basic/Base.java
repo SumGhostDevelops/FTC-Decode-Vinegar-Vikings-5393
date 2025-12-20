@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous.basic;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.controls.BlockingCommands;
+import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
@@ -23,7 +24,6 @@ public abstract class Base extends LinearOpMode
     protected Intake intake;
     protected Outtake outtake;
     protected Transfer transfer;
-    protected Macros macros;
     protected Gamepads gamepads;
 
     protected InputHandler input;
@@ -35,8 +35,8 @@ public abstract class Base extends LinearOpMode
     public void runOpMode() throws InterruptedException
     {
         hw = new RobotHardware(hardwareMap, telemetry);
-        localization = new Odometry(hw);
-        drive = new Drive(hw, localization);
+        localization = new Odometry(hw, telemetry);
+        drive = new Drive(hw, localization, telemetry);
         outtake = new Outtake(hw);
         intake = new Intake(hw);
         transfer = new Transfer(hw);
@@ -47,7 +47,7 @@ public abstract class Base extends LinearOpMode
 
         gamepads = new Gamepads(gamepad1, gamepad2);
 
-        RobotContext robotContext = new RobotContext(team, hw, drive, intake, transfer, outtake, localization, gamepads, telemetry, this::opModeIsActive);
+        RobotContext robotContext = new RobotContext(team, hardwareMap, telemetry, gamepads);
 
         // follower = new Follower(hardwareMap); // PedroPath init
 
@@ -55,9 +55,10 @@ public abstract class Base extends LinearOpMode
 
         if (opModeIsActive())
         {
-            BlockingCommands.sleep(25, "Waiting 25 seconds before moving.");
+            telemetry.log().add("Waiting 25 seconds before moving.");
+            BlockingCommands.sleep(25);
             drive.setDrivePowers(1, 0, 0);
-            macros.sleep(0.4);
+            //macros.sleep(0.4);
             drive.stop();
         }
 

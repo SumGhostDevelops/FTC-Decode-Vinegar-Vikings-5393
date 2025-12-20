@@ -194,6 +194,21 @@ public class Odometry
 
     // --- Vision Logic ---
 
+    public void updateWebcamDetections()
+    {
+        webcam.updateDetections();
+    }
+
+    public boolean tagIdExists(int id)
+    {
+        return webcam.tagIdExists(id);
+    }
+
+    public Optional<Double> getRangeToTag(int id)
+    {
+        return webcam.getDetection(id).map(detection -> detection.ftcPose.range);
+    }
+
     public Optional<Integer> findObeliskId()
     {
         webcam.updateDetections();

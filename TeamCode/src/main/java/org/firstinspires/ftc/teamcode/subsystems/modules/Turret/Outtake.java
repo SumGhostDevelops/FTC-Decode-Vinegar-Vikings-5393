@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystems.modules.Actuator;
 
 public class Outtake extends Actuator
 {
-    private final DcMotorEx leftMotor, rightMotor;
+    private final RobotHardware robot;
     private final ElapsedTime stabilityTimer = new ElapsedTime();
 
     private int targetRPM = RobotConstants.OUTTAKE_INITIAL_TARGET_RPM;
@@ -18,10 +18,10 @@ public class Outtake extends Actuator
 
     private final Tracker tracker = new Tracker(7);
 
-    public Outtake(RobotHardware robot)
+    public Outtake(RobotHardware hw)
     {
-        super(robot.outtakeMotor);
-        this.robot = robot;
+        super(hw.outtakeLeftMotor);
+        this.robot = hw;
     }
 
     /**
@@ -30,7 +30,7 @@ public class Outtake extends Actuator
      */
     public double getRPM()
     {
-        double currentRPM = tpsToRpm(robot.outtakeMotor.getVelocity());
+        double currentRPM = tpsToRpm(robot.outtakeLeftMotor.getVelocity());
 
         // Update the tracker with the current time and speed to get true acceleration
         currentAcceleration = tracker.updateAndGetAcceleration(stabilityTimer.seconds(), currentRPM);
@@ -57,7 +57,6 @@ public class Outtake extends Actuator
 
         if (newRpm > 6000)
         {
-            robot.telemetry.log().add("RPM capped at 6000.");
             newRpm = 6000;
         }
 
@@ -71,7 +70,6 @@ public class Outtake extends Actuator
     {
         if (rpm > 6000)
         {
-            robot.telemetry.log().add("RPM capped at 6000.");
             rpm = 6000;
         }
 
@@ -82,7 +80,6 @@ public class Outtake extends Actuator
     {
         int newRpm = calculateTargetRPMFromDistance(distance);
         modifyTargetRPM(newRpm);
-        robot.telemetry.log().add("Auto-adjusted RPM to " + newRpm);
     }
 
     /**
@@ -118,7 +115,8 @@ public class Outtake extends Actuator
         // We don't want history from the previous speed affecting the new acceleration calculation.
         tracker.reset();
 
-        robot.outtakeMotor.setVelocity(rpmToTps(targetRPM));
+        robot.outtakeLeftMotor.setVelocity(rpmToTps(targetRPM));
+        robot.outtakeRightMotor.setVelocity(rpmToTps(targetRPM));
         getRPM();
     }
 
@@ -128,12 +126,10 @@ public class Outtake extends Actuator
         {
             setRPM();
             status = Status.TOGGLED;
-            robot.telemetry.log().add("Outtake toggled ON");
         }
         else
         {
             stop(true);
-            robot.telemetry.log().add("Outtake toggled OFF");
         }
     }
 

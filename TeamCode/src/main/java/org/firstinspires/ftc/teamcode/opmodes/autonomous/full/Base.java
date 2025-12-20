@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous.full;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.controls.BlockingCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
@@ -27,21 +28,17 @@ public abstract class Base extends LinearOpMode
     Transfer transfer;
     Gamepads gamepads;
 
-    Macros macros;
-
     @Override
     public void runOpMode() throws InterruptedException
     {
         hw = new RobotHardware(hardwareMap, telemetry);
-        localization = new Odometry(hw);
-        drive = new Drive(hw, localization);
+        localization = new Odometry(hw, telemetry);
+        drive = new Drive(hw, localization, telemetry);
         intake = new Intake(hw);
         outtake = new Outtake(hw);
         transfer = new Transfer(hw);
         gamepads = new Gamepads(gamepad1, gamepad2);
 
-        RobotContext robot = new RobotContext(team, hw, drive, intake, transfer, outtake, localization, gamepads, telemetry, this::opModeIsActive);
-        macros = new Macros(robot);
 
         RobotConstants.OUTTAKE_RPM_TOLERANCE = 75;
 
@@ -56,17 +53,18 @@ public abstract class Base extends LinearOpMode
 
     public void run()
     {
-        localization.webcam.updateDetections();
+        localization.updateWebcamDetections();
 
-        while (!localization.webcam.tagIdExists(team.goal.id))
+        while (!localization.tagIdExists(team.goal.id))
         {
-            localization.webcam.updateDetections();
-            macros.sleep(1, "AprilTag (ID " + team.goal.id + " ) not found. Waiting 1 seocnd.");
+            localization.updateWebcamDetections();
+            telemetry.log().add("AprilTag (ID " + team.goal.id + " ) not found. Waiting 1 second.");
+            BlockingCommands.sleep(1);
         }
 
-        telemetry.log().add("AprilTag (ID " + team.goal.id + " )found!");
+        telemetry.log().add("AprilTag (ID " + team.goal.id + " ) found!");
 
-        Optional<Double> distanceToTag = localization.webcam.getRangeToTag(team.goal.id);
+        Optional<Double> distanceToTag = localization.getRangeToTag(team.goal.id);
 
         if (distanceToTag.isPresent())
         {
@@ -83,18 +81,21 @@ public abstract class Base extends LinearOpMode
         {
             while (!outtake.isReadyToLaunch()) // Wait for the outtake to be ready
             {
-                macros.sleep(1, "Outtake is not ready.");
+                telemetry.log().add("Outtake is not ready.");
+                BlockingCommands.sleep(1);
             }
             telemetry.log().add("Outtake is ready.");
             transfer.setPower(1);
-            macros.sleep(0.4, "Letting the transfer move the ball."); // Move the ball into the outtake
+            telemetry.log().add("Letting the transfer move the ball.");
+            BlockingCommands.sleep(0.4); // Move the ball into the outtake
             transfer.stop();
-            macros.sleep(2);
+            BlockingCommands.sleep(2);
         }
 
         outtake.stop();
         drive.setDrivePowers(1, 0, 0);
-        macros.sleep(0.4, "Letting the robot move out of the scoring zone");
+        telemetry.log().add("Letting the robot move out of the scoring zone");
+        BlockingCommands.sleep(0.4);
         drive.stop();
     }
 }

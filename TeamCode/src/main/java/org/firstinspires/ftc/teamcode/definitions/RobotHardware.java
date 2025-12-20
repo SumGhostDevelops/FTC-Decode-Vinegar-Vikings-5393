@@ -18,7 +18,7 @@ public class RobotHardware
     public Pinpoint pinpoint;
     public WebcamName webcam;
 
-    public RobotHardware(HardwareMap hardwareMap)
+    public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry)
     {
         // --- Drive Motors ---
         frontLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_LEFT);

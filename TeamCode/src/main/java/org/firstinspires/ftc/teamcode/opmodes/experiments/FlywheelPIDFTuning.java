@@ -135,25 +135,25 @@ public class FlywheelPIDFTuning extends Base
         input.bind
                 (
                         () -> gamepad2.right_trigger > 0.25,
-                        () -> outtake.setRPM()
+                        () -> robot.outtake.setRPM()
                 );
 
         input.bind
                 (
                         () -> gamepad2.right_trigger <= 0.25,
-                        () -> outtake.stop()
+                        () -> robot.outtake.stop()
                 );
 
         input.bind
                 (
                         () -> gamepad2.leftBumperWasPressed(),
-                        () -> outtake.varyTargetRPM(-100)
+                        () -> robot.outtake.varyTargetRPM(-100)
                 );
 
         input.bind
                 (
                         () -> gamepad2.rightBumperWasPressed(),
-                        () -> outtake.varyTargetRPM(100)
+                        () -> robot.outtake.varyTargetRPM(100)
                 );
     }
 }

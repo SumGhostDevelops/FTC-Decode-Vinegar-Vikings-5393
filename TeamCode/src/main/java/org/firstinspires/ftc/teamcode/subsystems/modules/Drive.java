@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.EncompassingPose;
 
 public class Drive
 {
@@ -48,7 +49,7 @@ public class Drive
 
     public void drive(double axial, double lateral, double yaw)
     {
-        double botHeading = localization.getHeading(AngleUnit.RADIANS, Odometry.AngleType.SIGNED);
+        double botHeading = localization.getHeading(AngleUnit.RADIANS, EncompassingPose.AngleType.SIGNED);
         double rotX = lateral;
         double rotY = axial;
         double rx = yaw;
