@@ -44,8 +44,9 @@ public abstract class Base extends LinearOpMode
 
     protected void initSystems()
     {
+        input = new InputHandler();
         Gamepads gamepads = new Gamepads(gamepad1, gamepad2);
-        RobotContext robot = new RobotContext(team, hardwareMap, telemetry, gamepads);
+        robot = new RobotContext(team, hardwareMap, telemetry, gamepads);
         bindKeys();
 
         telemetry.setAutoClear(RobotConstants.TELEMETRY_SET_AUTOCLEAR);
