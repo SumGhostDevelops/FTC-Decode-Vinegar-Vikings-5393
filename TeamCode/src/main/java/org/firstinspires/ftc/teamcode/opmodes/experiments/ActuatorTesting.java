@@ -21,7 +21,18 @@ public class ActuatorTesting extends Base
     public void runOpMode() throws InterruptedException
     {
         team = Team.BLUE;
-        super.runOpMode();
+
+        initSystems();
+
+        waitForStart();
+        while (opModeIsActive())
+        {
+            input.update();
+
+            run();
+
+            telemetry.update();
+        }
     }
 
     @Override
