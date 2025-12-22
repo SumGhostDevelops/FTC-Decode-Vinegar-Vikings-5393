@@ -23,22 +23,66 @@ public class RobotHardware
         try
         {
             // --- Drive Motors ---
-            frontLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_LEFT);
-            frontRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_RIGHT);
-            backLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_LEFT);
-            backRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_RIGHT);
+            // Split initialization so a missing/failed motor doesn't prevent others from initializing.
+            boolean driveOk = true;
 
-            // Directions (Adjust to ensure all wheels spin forward when commanded positive)
-            frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-            backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-            frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-            backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            try
+            {
+                frontLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_LEFT);
+                frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+            }
+            catch (Exception e)
+            {
+                driveOk = false;
+                frontLeft = null;
+            }
 
-            setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, frontLeft, frontRight, backLeft, backRight);
-            setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, frontLeft, frontRight, backLeft, backRight);
+            try
+            {
+                frontRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_RIGHT);
+                frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            catch (Exception e)
+            {
+                driveOk = false;
+                frontRight = null;
+            }
+
+            try
+            {
+                backLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_LEFT);
+                backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            catch (Exception e)
+            {
+                driveOk = false;
+                backLeft = null;
+            }
+
+            try
+            {
+                backRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_RIGHT);
+                backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            catch (Exception e)
+            {
+                driveOk = false;
+                backRight = null;
+            }
+
+            if (driveOk)
+            {
+                setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, frontLeft, frontRight, backLeft, backRight);
+                setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, frontLeft, frontRight, backLeft, backRight);
+            }
+            else
+            {
+                telemetry.log().add("Warning: One or more drive motors not found");
+            }
         }
         catch (Exception e)
         {
+            // This outer catch is retained as a safeguard; specific failures are handled above.
             telemetry.log().add("Warning: One or more drive motors not found");
         }
 
