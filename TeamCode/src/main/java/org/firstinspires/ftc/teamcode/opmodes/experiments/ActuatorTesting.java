@@ -40,6 +40,7 @@ public class ActuatorTesting extends LinearOpMode
     protected void initSystems()
     {
         input = new InputHandler();
+        bindKeys();
         backRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_RIGHT);
         backRight.setDirection(DcMotorSimple.Direction.FORWARD);
     }
