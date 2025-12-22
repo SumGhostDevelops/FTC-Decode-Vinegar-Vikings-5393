@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.opmodes.teleop.Base;
+import org.firstinspires.ftc.teamcode.opmodes.teleop.BaseLOL;
 
 @TeleOp(name = "Tolerance Tuning", group = "Experiments")
-public class ToleranceTuning extends Base
+public class ToleranceTuning extends BaseLOL
 {
     private enum Tolerance {RPM_TOLERANCE, STABILITY_TOLERANCE};
 

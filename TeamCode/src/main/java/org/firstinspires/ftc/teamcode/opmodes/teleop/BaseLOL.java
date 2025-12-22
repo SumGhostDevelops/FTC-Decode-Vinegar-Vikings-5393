@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.modules.Gamepads;
 import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.EncompassingPose;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 
-public abstract class Base extends LinearOpMode
+public abstract class BaseLOL extends LinearOpMode
 {
     protected Team team;
 

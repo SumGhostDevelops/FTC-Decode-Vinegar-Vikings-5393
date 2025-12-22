@@ -4,12 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.opmodes.teleop.Base;
+import org.firstinspires.ftc.teamcode.opmodes.teleop.BaseLOL;
 
 @TeleOp(name = "Flywheel PIDF Tuning", group = "Experiments")
-public class FlywheelPIDFTuning extends Base
+public class FlywheelPIDFTuning extends BaseLOL
 {
     private enum Coefficient {P, I, D, F}
 
