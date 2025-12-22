@@ -107,7 +107,7 @@ public class RobotHardware
         try
         {
             turretMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.TURRET);
-            outtakeRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
         catch (Exception e)
         {
