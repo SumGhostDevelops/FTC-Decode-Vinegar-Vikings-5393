@@ -20,20 +20,27 @@ public class RobotHardware
 
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry)
     {
-        // --- Drive Motors ---
-        frontLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_LEFT);
-        frontRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_RIGHT);
-        backLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_LEFT);
-        backRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_RIGHT);
+        try
+        {
+            // --- Drive Motors ---
+            frontLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_LEFT);
+            frontRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_RIGHT);
+            backLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_LEFT);
+            backRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_RIGHT);
 
-        // Directions (Adjust to ensure all wheels spin forward when commanded positive)
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            // Directions (Adjust to ensure all wheels spin forward when commanded positive)
+            frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+            backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+            frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, frontLeft, frontRight, backLeft, backRight);
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, frontLeft, frontRight, backLeft, backRight);
+            setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, frontLeft, frontRight, backLeft, backRight);
+            setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, frontLeft, frontRight, backLeft, backRight);
+        }
+        catch (Exception e)
+        {
+            telemetry.log().add("Warning: One or more drive motors not found");
+        }
 
         // --- Mechanisms ---
         try
@@ -50,7 +57,7 @@ public class RobotHardware
         }
         catch (Exception e)
         {
-            telemetry.log().add("Warning: Outtake motors not found");
+            telemetry.log().add("Warning: One or more outtake motors not found");
         }
 
         try
