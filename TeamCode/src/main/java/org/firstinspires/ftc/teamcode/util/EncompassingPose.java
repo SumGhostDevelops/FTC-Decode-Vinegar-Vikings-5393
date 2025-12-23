@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.odometry.modules;
+package org.firstinspires.ftc.teamcode.util;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;

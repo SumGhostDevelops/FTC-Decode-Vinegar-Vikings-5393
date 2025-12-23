@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.EncompassingPose;
+import org.firstinspires.ftc.teamcode.util.EncompassingPose;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;

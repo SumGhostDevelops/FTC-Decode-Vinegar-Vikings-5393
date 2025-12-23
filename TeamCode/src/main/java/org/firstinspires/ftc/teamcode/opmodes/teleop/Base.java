@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.controls.Gamepads;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.EncompassingPose;
+import org.firstinspires.ftc.teamcode.util.EncompassingPose;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 
 public abstract class Base extends LinearOpMode
