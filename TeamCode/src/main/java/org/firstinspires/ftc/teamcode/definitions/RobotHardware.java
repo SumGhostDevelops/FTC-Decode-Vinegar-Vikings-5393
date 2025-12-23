@@ -1,20 +1,20 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
+import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.Pinpoint;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 
 public class RobotHardware
 {
-    public DcMotorEx frontLeft, frontRight, backLeft, backRight;
-    public DcMotorEx outtakeLeftMotor, outtakeRightMotor, turretMotor, intakeMotor;
-    public CRServo transferServo;
+    public MotorEx frontLeft, frontRight, backLeft, backRight, intake, turret, outtakeLeft, outtakeRight;
+    public ServoEx transfer;
     public Pinpoint pinpoint;
     public WebcamName webcam;
 
@@ -28,8 +28,8 @@ public class RobotHardware
 
             try
             {
-                frontLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_LEFT);
-                frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                frontLeft = new MotorEx(hardwareMap, RobotConstants.Drive.FRONT_LEFT, Motor.GoBILDA.RPM_312);
+                frontLeft.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
             {
@@ -39,8 +39,8 @@ public class RobotHardware
 
             try
             {
-                frontRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.FRONT_RIGHT);
-                frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+                frontRight = new MotorEx(hardwareMap, RobotConstants.Drive.FRONT_RIGHT, Motor.GoBILDA.RPM_312);
+                frontRight.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
             }
             catch (Exception e)
             {
@@ -50,8 +50,8 @@ public class RobotHardware
 
             try
             {
-                backLeft = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_LEFT);
-                backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                backLeft = new MotorEx(hardwareMap, RobotConstants.Drive.BACK_LEFT, Motor.GoBILDA.RPM_312);
+                backLeft.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
             }
             catch (Exception e)
             {
@@ -61,8 +61,8 @@ public class RobotHardware
 
             try
             {
-                backRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_RIGHT);
-                backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+                backRight = new MotorEx(hardwareMap, RobotConstants.Drive.BACK_RIGHT, Motor.GoBILDA.RPM_312);
+                backRight.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
             }
             catch (Exception e)
             {
@@ -72,8 +72,9 @@ public class RobotHardware
 
             if (driveOk)
             {
-                setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER, frontLeft, frontRight, backLeft, backRight);
-                setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, frontLeft, frontRight, backLeft, backRight);
+                MotorGroup driveGroup = getDriveMotorGroup();
+                driveGroup.setRunMode(Motor.RunMode.RawPower);
+                driveGroup.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             }
             else
             {
@@ -87,27 +88,44 @@ public class RobotHardware
         }
 
         // --- Mechanisms ---
+        boolean outtakeOk = true;
         try
         {
-            outtakeLeftMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.LAUNCHER_LEFT);
-            outtakeLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            outtakeLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // For Velocity Control
-            outtakeLeftMotor.setVelocityPIDFCoefficients(10, 4, 5, -4.5);
-
-            outtakeRightMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.LAUNCHER_RIGHT);
-            outtakeRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            outtakeRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // For Velocity Control
-            outtakeRightMotor.setVelocityPIDFCoefficients(10, 4, 5, -4.5);
+            outtakeLeft = new MotorEx(hardwareMap, RobotConstants.Outtake.LAUNCHER_LEFT, Motor.GoBILDA.BARE);
         }
         catch (Exception e)
         {
-            telemetry.log().add("Warning: One or more outtake motors not found");
+            telemetry.log().add("Warning: Left outtake motor not found");
+            outtakeOk = false;
         }
 
         try
         {
-            turretMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.TURRET);
-            turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            outtakeRight = new MotorEx(hardwareMap, RobotConstants.Outtake.LAUNCHER_RIGHT, Motor.GoBILDA.BARE);
+        }
+        catch (Exception e)
+        {
+            telemetry.log().add("Warning: Right outtake motor not found");
+            outtakeOk = false;
+        }
+
+        if (outtakeOk)
+        {
+            MotorGroup outtakeGroup = getOuttakeMotorGroup();
+            outtakeGroup.setRunMode(Motor.RunMode.VelocityControl);
+            outtakeGroup.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
+            double[] veloCoeffs = RobotConstants.Outtake.veloCoeffs;
+            double[] ffCoeffs = RobotConstants.Outtake.ffCoeffs;
+
+            outtakeGroup.setVeloCoefficients(veloCoeffs[0], veloCoeffs[1], veloCoeffs[2]);
+            outtakeGroup.setFeedforwardCoefficients(ffCoeffs[0], ffCoeffs[1], ffCoeffs[2]);
+        }
+
+        try
+        {
+            turret = new MotorEx(hardwareMap, RobotConstants.Outtake.TURRET, Motor.GoBILDA.RPM_312);
+            turret.setRunMode(Motor.RunMode.PositionControl);
         }
         catch (Exception e)
         {
@@ -116,8 +134,7 @@ public class RobotHardware
 
         try
         {
-            transferServo = hardwareMap.get(CRServo.class, RobotConstants.Transfer.TRANSFER);
-            transferServo.setDirection(CRServo.Direction.REVERSE);
+            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, 0, 30);
         }
         catch (Exception e)
         {
@@ -126,7 +143,8 @@ public class RobotHardware
 
         try
         {
-            intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.INTAKE);
+            intake = new MotorEx(hardwareMap, RobotConstants.Intake.INTAKE, Motor.GoBILDA.RPM_1620);
+            intake.setRunMode(Motor.RunMode.RawPower);
         }
         catch (Exception e)
         {
@@ -162,13 +180,23 @@ public class RobotHardware
         }
     }
 
-    private void setMotorMode(DcMotor.RunMode mode, DcMotor... motors)
+    public MotorGroup getDriveMotorGroup()
     {
-        for (DcMotor motor : motors) motor.setMode(mode);
+        return new MotorGroup(frontLeft, frontRight, backLeft, backRight);
     }
 
-    private void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior, DcMotor... motors)
+    public MotorEx[] getDriveArray()
     {
-        for (DcMotor motor : motors) motor.setZeroPowerBehavior(behavior);
+        return new MotorEx[]{frontLeft, frontRight, backLeft, backRight};
+    }
+
+    public MotorGroup getOuttakeMotorGroup()
+    {
+        return new MotorGroup(outtakeLeft, outtakeRight);
+    }
+
+    public MotorEx[] getOuttakeArray()
+    {
+        return new MotorEx[]{outtakeLeft, outtakeRight};
     }
 }

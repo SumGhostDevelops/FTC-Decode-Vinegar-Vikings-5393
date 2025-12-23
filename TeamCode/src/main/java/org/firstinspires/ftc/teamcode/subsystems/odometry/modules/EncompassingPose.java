@@ -1,9 +1,8 @@
-package org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules;
+package org.firstinspires.ftc.teamcode.subsystems.odometry.modules;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
 
 public class EncompassingPose
 {

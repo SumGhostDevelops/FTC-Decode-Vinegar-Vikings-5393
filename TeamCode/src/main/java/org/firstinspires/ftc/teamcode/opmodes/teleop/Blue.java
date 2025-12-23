@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 
 @TeleOp(name = "BlueVikingsTeleOp", group = "Game")
-public class Blue extends BaseLOL
+public class Blue extends Base
 {
     @Override
     public void runOpMode() throws InterruptedException

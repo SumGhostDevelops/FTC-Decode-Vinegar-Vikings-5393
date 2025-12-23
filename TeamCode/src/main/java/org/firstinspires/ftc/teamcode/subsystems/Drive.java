@@ -1,28 +1,66 @@
-package org.firstinspires.ftc.teamcode.subsystems.modules;
+package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.Range;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
-import org.firstinspires.ftc.teamcode.definitions.RobotContext;
-import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.Odometry;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.EncompassingPose;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Drive
 {
-    private final Telemetry telemetry;
-    private final RobotHardware hw;
-    private final Odometry localization;
+    private final MotorEx frontLeft, frontRight, backLeft, backRight;
 
     private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
 
-    public Drive(RobotHardware hw, Odometry localization, Telemetry telemetry)
+    public Drive(MotorEx[] driveMotors)
     {
-        this.hw = hw;
-        this.localization = localization;
-        this.telemetry = telemetry;
+        frontLeft = driveMotors[0];
+        frontRight = driveMotors[1];
+        backLeft = driveMotors[2];
+        backRight = driveMotors[3];
+    }
+
+    public DriveMode getMode()
+    {
+        return currentMode;
+    }
+
+    public boolean motorEnabled(DriveMotor motor)
+    {
+        switch (motor)
+        {
+            case FRONT_LEFT:
+                return frontLeft != null;
+            case FRONT_RIGHT:
+                return frontRight != null;
+            case BACK_LEFT:
+                return backLeft != null;
+            case BACK_RIGHT:
+                return backRight != null;
+            default:
+                return false;
+        }
+    }
+
+    public boolean motorEnabled(MotorEx motor)
+    {
+        return motor != null;
+    }
+
+    public List<DriveMotor> enabledMotors()
+    {
+        List<DriveMotor> enabledMotors = new ArrayList<>();
+
+        if (motorEnabled(frontLeft)) enabledMotors.add(DriveMotor.FRONT_LEFT);
+        if (motorEnabled(frontRight)) enabledMotors.add(DriveMotor.FRONT_RIGHT);
+        if (motorEnabled(backLeft)) enabledMotors.add(DriveMotor.BACK_LEFT);
+        if (motorEnabled(backRight)) enabledMotors.add(DriveMotor.BACK_RIGHT);
+
+        return enabledMotors;
     }
 
     public void toggleDriveMode()
@@ -39,17 +77,10 @@ public class Drive
                 currentMode = DriveMode.FIELD_CENTRIC;
                 break;
         }
-        telemetry.addData("Drive Mode", currentMode.toString());
     }
 
-    public DriveMode getMode()
+    public void drive(double axial, double lateral, double yaw, double botHeading)
     {
-        return currentMode;
-    }
-
-    public void drive(double axial, double lateral, double yaw)
-    {
-        double botHeading = localization.getHeading(AngleUnit.RADIANS, EncompassingPose.AngleType.SIGNED);
         double rotX = lateral;
         double rotY = axial;
         double rx = yaw;
@@ -109,10 +140,11 @@ public class Drive
         double backRightPower = (rotY + rotX - rx) / denominator;
 
         double powerScale = RobotConstants.DRIVE_SPEED_MULTIPLIER;
-        hw.frontLeft.setPower(frontLeftPower * powerScale);
-        hw.backLeft.setPower(backLeftPower * powerScale);
-        hw.frontRight.setPower(frontRightPower * powerScale);
-        hw.backRight.setPower(backRightPower * powerScale);
+
+        safeSetPower(frontLeft, frontLeftPower * powerScale);
+        safeSetPower(frontRight, frontRightPower * powerScale);
+        safeSetPower(backLeft, backLeftPower * powerScale);
+        safeSetPower(backRight, backRightPower * powerScale);
     }
 
     // Inside Drive.java
@@ -127,25 +159,29 @@ public class Drive
         double br = (forward + strafe - turn) / denominator;
 
         // Apply to hardware
-        hw.frontLeft.setPower(fl);
-        hw.backLeft.setPower(bl);
-        hw.frontRight.setPower(fr);
-        hw.backRight.setPower(br);
+        safeSetPower(frontLeft, fl);
+        safeSetPower(backLeft, bl);
+        safeSetPower(frontRight, fr);
+        safeSetPower(backRight, br);
     }
 
-    /**
-     *
-     * @param leftFront
-     * @param leftBack
-     * @param rightFront
-     * @param rightBack
-     */
-    public void setDrivePowers(double leftFront, double leftBack, double rightFront, double rightBack)
+
+    public void setDrivePowers(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower)
     {
-        hw.frontLeft.setPower(leftFront);
-        hw.backLeft.setPower(leftBack);
-        hw.frontRight.setPower(rightFront);
-        hw.backRight.setPower(rightBack);
+        safeSetPower(frontLeft, frontLeftPower);
+        safeSetPower(frontRight, frontRightPower);
+        safeSetPower(backLeft, backLeftPower);
+        safeSetPower(backRight, backRightPower);
+    }
+
+    public void safeSetPower(MotorEx motor, double power)
+    {
+        if (!motorEnabled(motor))
+        {
+            return;
+        }
+
+        motor.set(power);
     }
 
     public void stop()
@@ -158,5 +194,13 @@ public class Drive
         FIELD_CENTRIC,
         ROBOT_CENTRIC_HYBRID,
         RAW_ROBOT_CENTRIC
+    }
+
+    public enum DriveMotor
+    {
+        FRONT_LEFT,
+        FRONT_RIGHT,
+        BACK_LEFT,
+        BACK_RIGHT
     }
 }

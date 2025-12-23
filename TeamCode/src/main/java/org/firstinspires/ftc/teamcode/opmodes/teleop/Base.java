@@ -7,11 +7,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.subsystems.modules.Gamepads;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.EncompassingPose;
+import org.firstinspires.ftc.teamcode.controls.Gamepads;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.EncompassingPose;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 
-public abstract class BaseLOL extends LinearOpMode
+public abstract class Base extends LinearOpMode
 {
     protected Team team;
 
@@ -32,9 +32,6 @@ public abstract class BaseLOL extends LinearOpMode
             run();
 
             robot.localization.update();
-            robot.intake.update();
-            robot.transfer.update();
-            robot.outtake.update();
 
             telemetry.update();
         }
@@ -61,19 +58,13 @@ public abstract class BaseLOL extends LinearOpMode
         double yaw = gamepad1.right_stick_x;
 
         // Drive - only send manual commands if no blocking macro is running
-        robot.drive.drive(axial, lateral, yaw);
+        robot.drive.drive(axial, lateral, yaw, robot.localization.getHeading(AngleUnit.RADIANS, EncompassingPose.AngleType.SIGNED));
 
         //telemetry.addData("Drive Mode", drive.getMode());
         telemetry.addData("Team", team);
         telemetry.addLine("\n-----Velocity-----");
         telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
         telemetry.addData("Heading", robot.localization.getHeading(AngleUnit.DEGREES, EncompassingPose.AngleType.UNSIGNED));
-        telemetry.addLine("\n-----Outtake-----");
-        telemetry.addData("Toggled", robot.outtake.isToggled());
-        telemetry.addData("F Offset", RobotConstants.OUTTAKE_F_OFFSET);
-        telemetry.addData("Target RPM", robot.outtake.getTargetRPM());
-        telemetry.addData("RPM", robot.outtake.getRPM());
-        telemetry.addData("RPM Acceleration", robot.outtake.getRPMAcceleration());
     }
 
     protected void bindKeys()
@@ -83,12 +74,6 @@ public abstract class BaseLOL extends LinearOpMode
                 (
                         () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.B),
                         () -> robot.localization.resetHeading()
-                );
-
-        input.bind
-                (
-                        () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.X),
-                        () -> robot.outtake.toggleRPM()
                 );
 
         input.bind
@@ -113,30 +98,6 @@ public abstract class BaseLOL extends LinearOpMode
                             RobotConstants.DRIVE_SPEED_MULTIPLIER = Math.min(RobotConstants.DRIVE_SPEED_MAXIMUM, newMultiplier);
                             telemetry.log().add("New Speed: " + RobotConstants.DRIVE_SPEED_MULTIPLIER);
                         }
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.left_trigger > 0.25 && robot.outtake.isReadyToLaunch(),
-                        () -> robot.transfer.setPower(1)
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.left_trigger <= 0.25 || !robot.outtake.isReadyToLaunch(),
-                        () -> robot.transfer.stop()
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.right_trigger > 0.25,
-                        () -> robot.outtake.setRPM()
-                );
-
-        input.bind
-                (
-                        () -> gamepad1.right_trigger <= 0.25,
-                        () -> robot.outtake.stop()
                 );
     }
 }

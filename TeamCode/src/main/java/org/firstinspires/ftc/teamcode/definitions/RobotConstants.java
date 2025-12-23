@@ -52,9 +52,12 @@ public class RobotConstants
     public static class Outtake
     {
         // Outtake Motors
+        public final static int PPR = 28;
         public final static String LAUNCHER_LEFT = "leftOuttake";
         public final static String LAUNCHER_RIGHT = "rightOuttake";
         public final static String TURRET = "turret";
+        public final static double[] veloCoeffs = new double[]{1.0, 1.0, 1.0};
+        public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
     }
 
     public static class Transfer

@@ -4,15 +4,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 
-@TeleOp(name = "Actuator Testing", group = "Experiments")
-public class ActuatorTesting extends LinearOpMode
+@TeleOp(name = "Intake Testing", group = "Experiments")
+public class IntakeTesting extends LinearOpMode
 {
     protected InputHandler input;
-    DcMotorEx backRight;
+    double power = 0.5;
+    MotorEx intake;
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -33,31 +36,42 @@ public class ActuatorTesting extends LinearOpMode
     protected void initSystems()
     {
         input = new InputHandler();
+        RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
+        intake = hw.intake;
         bindKeys();
-        backRight = hardwareMap.get(DcMotorEx.class, RobotConstants.Drive.BACK_RIGHT);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     protected void bindKeys()
     {
         input.bind(
                 () -> gamepad1.right_trigger > 0.25,
-                () -> backRight.setPower(0.25)
+                () -> intake.set(power)
         );
 
         input.bind(
                 () -> gamepad1.left_trigger > 0.25,
-                () -> backRight.setPower(-0.25)
+                () -> intake.set(-power)
         );
 
         input.bind(
                 () -> gamepad1.left_trigger > 0.25 && gamepad1.right_trigger > 0.25 || gamepad1.left_trigger < 0.25 && gamepad1.right_trigger < 0.25,
-                () -> backRight.setPower(0)
+                () -> intake.set(0)
+        );
+
+        input.bind(
+                () -> gamepad1.dpadUpWasPressed(),
+                () -> power += 0.1
+        );
+
+        input.bind(
+                () -> gamepad1.dpadDownWasPressed(),
+                () -> power -= 0.1
         );
     }
 
     protected void run() throws InterruptedException
     {
-        telemetry.addData("Motor Power", backRight.getPower());
+        telemetry.addData("Power", power);
+        telemetry.addData("Motor Velocity", intake.getVelocity());
     }
 }

@@ -1,158 +1,208 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
-import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.opmodes.teleop.BaseLOL;
+import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 
 @TeleOp(name = "Flywheel PIDF Tuning", group = "Experiments")
-public class FlywheelPIDFTuning extends BaseLOL
+public class FlywheelPIDFTuning extends LinearOpMode
 {
-    private enum Coefficient {P, I, D, F}
+    private RobotHardware robot;
+    private MotorGroup outtakeGroup;
 
-    private Coefficient coefficient = Coefficient.P;
-    private double p, i, d, f;
-    private double coefficientChange = 1;
+    // Tuning Parameters
+    private double kS = 0.0;
+    private double kV = 0.0;
+    private double kA = 0.0;
+    private double kP = 0.0;
+    private double kI = 0.0;
+    private double kD = 0.0;
+
+    private double targetRPM = 5000;
+    private double testPower = 0.8;
+
+    // Menu Navigation
+    private enum Param {
+        TEST_POWER,
+        KS,
+        KV,
+        KA,
+        KP,
+        KI,
+        KD,
+        TARGET_RPM
+    }
+
+    private final Param[] params = Param.values();
+    private int paramIndex = 0;
+
+    // Input State
+    private boolean lastUp = false;
+    private boolean lastDown = false;
+    private boolean lastLeft = false;
+    private boolean lastRight = false;
+    private boolean lastY = false;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
-        team = Team.BLUE;
-        //RobotConstants.TELEMETRY_SET_AUTOCLEAR = false;
-        super.runOpMode();
-    }
+        // Initialize Telemetry with Dashboard
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-    @Override
-    protected void initSystems()
-    {
-        super.initSystems();
-        PIDFCoefficients cfs = robot.hw.outtakeLeftMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-        p = cfs.p;
-        i = cfs.i;
-        d = cfs.d;
-        f = cfs.f;
-    }
+        initSystems();
 
-    @Override
-    protected void run() throws InterruptedException
-    {
-        super.run();
-        telemetry.addLine("\n-----Flywheel PIDF Tuning-----");
-
-        telemetry.addData("Modifying Coefficient", coefficient);
-        telemetry.addData("Coefficient Change", coefficientChange);
-
-        telemetry.addData("Current PIDF", "P:%.4f  I:%.4f  D:%.4f  F:%.4f", p, i, d, f);
-
+        telemetry.addLine("Ready to tune.");
+        telemetry.addLine("Controls:");
+        telemetry.addLine("D-Pad Up/Down: Adjust Value");
+        telemetry.addLine("D-Pad Left/Right: Select Parameter");
+        telemetry.addLine("Hold A: Run Motor");
+        telemetry.addLine("Y: Copy Calculated Value (Context Sensitive)");
         telemetry.update();
 
-        //telemetry.clear();
+        waitForStart();
+
+        while (opModeIsActive())
+        {
+            handleInput();
+            updateMotorConfig();
+            runLogic();
+            displayTelemetry();
+        }
     }
 
-    private void varyPIDF(double change)
+    public void initSystems()
     {
-        switch (coefficient)
-        {
-            case P:
-                p += change;
-                break;
-            case I:
-                i += change;
-                break;
-            case D:
-                d += change;
-                break;
-            case F:
-                f += change;
-                break;
+        robot = new RobotHardware(hardwareMap, telemetry);
+        outtakeGroup = robot.getOuttakeMotorGroup();
+    }
+
+    private void handleInput() {
+        // Navigation
+        if (gamepad1.dpad_right && !lastRight) {
+            paramIndex = (paramIndex + 1) % params.length;
+        }
+        if (gamepad1.dpad_left && !lastLeft) {
+            paramIndex = (paramIndex - 1 + params.length) % params.length;
+        }
+        lastRight = gamepad1.dpad_right;
+        lastLeft = gamepad1.dpad_left;
+
+        Param current = params[paramIndex];
+        double increment = getIncrement(current);
+
+        // Value Adjustment
+        if (gamepad1.dpad_up && !lastUp) {
+            adjustValue(current, increment);
+        }
+        if (gamepad1.dpad_down && !lastDown) {
+            adjustValue(current, -increment);
+        }
+        lastUp = gamepad1.dpad_up;
+        lastDown = gamepad1.dpad_down;
+
+        // Copy Value (Y button)
+        if (gamepad1.y && !lastY) {
+            if (current == Param.KS) {
+                kS = testPower;
+            } else if (current == Param.KV) {
+                double currentRPM = getAverageRPM();
+                if (Math.abs(currentRPM) > 10) {
+                    kV = testPower / currentRPM;
+                }
+            }
+        }
+        lastY = gamepad1.y;
+    }
+
+    private double getIncrement(Param param) {
+        switch (param) {
+            case TEST_POWER: return 0.01;
+            case KS: return 0.001;
+            case KV: return 0.00001;
+            case KA: return 0.00001;
+            case KP: return 0.0001;
+            case KI: return 0.0001;
+            case KD: return 0.0001;
+            case TARGET_RPM: return 50;
+            default: return 0;
+        }
+    }
+
+    private void adjustValue(Param param, double delta) {
+        switch (param) {
+            case TEST_POWER: testPower += delta; break;
+            case KS: kS += delta; break;
+            case KV: kV += delta; break;
+            case KA: kA += delta; break;
+            case KP: kP += delta; break;
+            case KI: kI += delta; break;
+            case KD: kD += delta; break;
+            case TARGET_RPM: targetRPM += delta; break;
+        }
+    }
+
+    private void updateMotorConfig() {
+        if (outtakeGroup != null) {
+            outtakeGroup.setVeloCoefficients(kP, kI, kD);
+            outtakeGroup.setFeedforwardCoefficients(kS, kV, kA);
+        }
+    }
+
+    private void runLogic() {
+        if (outtakeGroup == null) return;
+
+        Param current = params[paramIndex];
+        boolean runOpenLoop = (current == Param.TEST_POWER || current == Param.KS || current == Param.KV);
+
+        if (gamepad1.a) {
+            if (runOpenLoop) {
+                outtakeGroup.setRunMode(Motor.RunMode.RawPower);
+                outtakeGroup.set(testPower);
+            } else {
+                outtakeGroup.setRunMode(Motor.RunMode.VelocityControl);
+                outtakeGroup.set(targetRPM);
+            }
+        } else {
+            outtakeGroup.set(0);
+            outtakeGroup.setRunMode(Motor.RunMode.RawPower);
+        }
+    }
+
+    private double getAverageRPM() {
+        if (robot.outtakeLeft == null || robot.outtakeRight == null) return 0;
+        double v1 = robot.outtakeLeft.getVelocity();
+        double v2 = robot.outtakeRight.getVelocity();
+        double averageTicksPerSecond = (v1 + v2) / 2.0;
+        return (averageTicksPerSecond / RobotConstants.Outtake.PPR) * 60.0;
+    }
+
+    private void displayTelemetry() {
+        telemetry.addData("Selected", params[paramIndex]);
+        telemetry.addLine("-----------------");
+        telemetry.addData("Test Power", "%.2f", testPower);
+        telemetry.addData("Target RPM", "%.0f", targetRPM);
+        telemetry.addLine("-----------------");
+        telemetry.addData("kS", "%.5f", kS);
+        telemetry.addData("kV", "%.6f", kV);
+        telemetry.addData("kA", "%.6f", kA);
+        telemetry.addData("kP", "%.5f", kP);
+        telemetry.addData("kI", "%.5f", kI);
+        telemetry.addData("kD", "%.5f", kD);
+        telemetry.addLine("-----------------");
+
+        double rpm = getAverageRPM();
+        telemetry.addData("Actual RPM", "%.1f", rpm);
+
+        if (params[paramIndex] == Param.KV && Math.abs(rpm) > 10) {
+             telemetry.addData("Calc kV (Power/RPM)", "%.6f", testPower / rpm);
         }
 
-        robot.hw.outtakeLeftMotor.setVelocityPIDFCoefficients(p, i, d, f);
-        telemetry.log().add("Changed " + coefficient + " by " + change);
-    }
-
-    private void switchCoefficient()
-    {
-        int currentOrdinal = coefficient.ordinal();
-        Coefficient[] values = Coefficient.values();
-        int length = values.length;
-        int nextOrdinal = (currentOrdinal + 1) % length;
-        coefficient = values[nextOrdinal];
-    }
-
-    private void switchTeam()
-    {
-        int currentOrdinal = team.ordinal();
-        Team[] values = Team.values();
-        int length = values.length;
-        int nextOrdinal = (currentOrdinal + 1) % length;
-        team = values[nextOrdinal];
-    }
-
-    @Override
-    protected void bindKeys()
-    {
-        telemetry.log().add("Bind keys ran.");
-
-        input.bind
-                (
-                        () -> gamepad2.aWasPressed(),
-                        this::switchCoefficient
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.yWasPressed(),
-                        this::switchTeam
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.dpadUpWasPressed(),
-                        () -> varyPIDF(coefficientChange)
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.dpadDownWasPressed(),
-                        () -> varyPIDF(-coefficientChange)
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.dpadLeftWasPressed(),
-                        () -> coefficientChange -= 0.05
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.dpadRightWasPressed(),
-                        () -> coefficientChange += 0.05
-                );
-        input.bind
-                (
-                        () -> gamepad2.right_trigger > 0.25,
-                        () -> robot.outtake.setRPM()
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.right_trigger <= 0.25,
-                        () -> robot.outtake.stop()
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.leftBumperWasPressed(),
-                        () -> robot.outtake.varyTargetRPM(-100)
-                );
-
-        input.bind
-                (
-                        () -> gamepad2.rightBumperWasPressed(),
-                        () -> robot.outtake.varyTargetRPM(100)
-                );
+        telemetry.update();
     }
 }

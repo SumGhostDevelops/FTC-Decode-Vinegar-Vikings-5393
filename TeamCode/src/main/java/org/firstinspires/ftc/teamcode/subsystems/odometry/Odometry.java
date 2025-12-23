@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.modules.odometry;
-
-import com.qualcomm.robotcore.util.ElapsedTime;
+package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -8,9 +6,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.EncompassingPose;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.Pinpoint;
-import org.firstinspires.ftc.teamcode.subsystems.modules.odometry.modules.Webcam;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.EncompassingPose;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagMetadata;
