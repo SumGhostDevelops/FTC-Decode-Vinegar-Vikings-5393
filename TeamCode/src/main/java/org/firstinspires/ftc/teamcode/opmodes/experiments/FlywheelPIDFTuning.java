@@ -5,16 +5,15 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
-import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
-import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
+import org.firstinspires.ftc.teamcode.util.MotorExPlusGroup;
 
 @TeleOp(name = "Flywheel PIDF Tuning", group = "Experiments")
 public class FlywheelPIDFTuning extends LinearOpMode
 {
     private RobotHardware robot;
-    private MotorGroup outtakeGroup;
+    private MotorExPlusGroup outtakeGroup;
 
     // Tuning Parameters
     private double kS = 0.0;
@@ -79,7 +78,7 @@ public class FlywheelPIDFTuning extends LinearOpMode
     public void initSystems()
     {
         robot = new RobotHardware(hardwareMap, telemetry);
-        outtakeGroup = robot.getOuttakeMotorGroup();
+        outtakeGroup = robot.getOuttakeMotorExPlusGroup();
     }
 
     private void handleInput() {
@@ -166,7 +165,7 @@ public class FlywheelPIDFTuning extends LinearOpMode
                 outtakeGroup.set(testPower);
             } else {
                 outtakeGroup.setRunMode(Motor.RunMode.VelocityControl);
-                outtakeGroup.set(targetRPM);
+                outtakeGroup.setRPM(targetRPM);
             }
         } else {
             outtakeGroup.set(0);
@@ -176,10 +175,9 @@ public class FlywheelPIDFTuning extends LinearOpMode
 
     private double getAverageRPM() {
         if (robot.outtakeLeft == null || robot.outtakeRight == null) return 0;
-        double v1 = robot.outtakeLeft.getVelocity();
-        double v2 = robot.outtakeRight.getVelocity();
-        double averageTicksPerSecond = (v1 + v2) / 2.0;
-        return (averageTicksPerSecond / RobotConstants.Outtake.PPR) * 60.0;
+        double v1 = robot.outtakeLeft.getRPM();
+        double v2 = robot.outtakeRight.getRPM();
+        return (v1 + v2) / 2.0;
     }
 
     private void displayTelemetry() {

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -44,6 +43,7 @@ public class MotorExPlus extends MotorEx
         super(hMap, id, cpr, rpm);
     }
 
+
     public void setRPM(double rpm)
     {
         super.setVelocity(MotorMath.rpmToTps(rpm, super.getCPR()));
@@ -51,7 +51,7 @@ public class MotorExPlus extends MotorEx
 
     public double getRPM()
     {
-        return MotorMath.tpsToRpm(super.getVelocity(), super.getCPR());
+        return MotorMath.tpsToRpm(super.getCorrectedVelocity(), super.getCPR());
     }
 
     public double getRPMAcceleration()

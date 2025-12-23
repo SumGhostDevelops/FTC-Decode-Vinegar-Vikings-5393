@@ -29,7 +29,7 @@ public class RobotContext
         this.localization = new Odometry(hw, telemetry);
         this.drive = new Drive(hw.getDriveArray());
         this.intake = new Intake(hw.intake);
-        this.outtake = new Outtake(hw.getOuttakeMotorGroup());
+        this.outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());
         this.transfer = new Transfer(hw.transfer);
 
         this.team = team;
