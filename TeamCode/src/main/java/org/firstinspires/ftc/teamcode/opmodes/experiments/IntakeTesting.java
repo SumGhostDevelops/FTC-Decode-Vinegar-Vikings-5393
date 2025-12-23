@@ -9,13 +9,14 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
+import org.firstinspires.ftc.teamcode.util.MotorExPlus;
 
 @TeleOp(name = "Intake Testing", group = "Experiments")
 public class IntakeTesting extends LinearOpMode
 {
     protected InputHandler input;
     double power = 0.5;
-    MotorEx intake;
+    MotorExPlus intake;
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -72,6 +73,6 @@ public class IntakeTesting extends LinearOpMode
     protected void run() throws InterruptedException
     {
         telemetry.addData("Power", power);
-        telemetry.addData("Motor Velocity", intake.getVelocity());
+        telemetry.addData("Motor RPM", intake.getRPM());
     }
 }
