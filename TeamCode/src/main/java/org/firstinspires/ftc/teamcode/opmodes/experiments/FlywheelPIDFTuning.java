@@ -176,8 +176,7 @@ public class FlywheelPIDFTuning extends LinearOpMode
   //will currently only work for one motor
     private double getAverageRPM() {
         if (robot.outtakeLeft == null) return 0;
-        double v1 = robot.outtakeLeft.getRPM();
-        return (v1);
+        return (robot.outtakeLeft.getRPM());
     }
 
     private void displayTelemetry() {
