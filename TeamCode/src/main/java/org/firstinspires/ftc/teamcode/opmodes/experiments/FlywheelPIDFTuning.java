@@ -194,7 +194,10 @@ public class FlywheelPIDFTuning extends LinearOpMode
         telemetry.addLine("-----------------");
 
         double rpm = getAverageRPM();
-        telemetry.addData("Actual RPM", "%.1f", rpm);
+        telemetry.addData("Actual RPM", "%.1f", robot.outtakeLeft.getRPM());
+
+
+        telemetry.addData("Actual RPM", "%.1f", robot.outtakeLeft.getVelocity());
 
         if (params[paramIndex] == Param.KV && Math.abs(rpm) > 10) {
              telemetry.addData("Calc kV (Power/RPM)", "%.6f", testPower / rpm);
