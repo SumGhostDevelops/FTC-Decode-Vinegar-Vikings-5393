@@ -9,7 +9,7 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.util.MotorExPlusGroup;
 
-@TeleOp(name = "Flywheel PIDFLKSPNOS Tuning", group = "Experiments")
+@TeleOp(name = "Flywheel PIDF Tuning", group = "Experiments")
 public class FlywheelPIDFTuning extends LinearOpMode
 {
     private RobotHardware robot;
@@ -194,10 +194,7 @@ public class FlywheelPIDFTuning extends LinearOpMode
         telemetry.addLine("-----------------");
 
         double rpm = getAverageRPM();
-        telemetry.addData("Actual RPM", "%.1f", robot.outtakeLeft.getRPM());
-
-
-        telemetry.addData("Outtake Velocity", "%.1f", robot.outtakeLeft.getVelocity());
+        telemetry.addData("Actual RPM", "%.1f", rpm);
 
         if (params[paramIndex] == Param.KV && Math.abs(rpm) > 10) {
              telemetry.addData("Calc kV (Power/RPM)", "%.6f", testPower / rpm);
