@@ -11,33 +11,14 @@ import org.firstinspires.ftc.teamcode.controls.Gamepads;
 import org.firstinspires.ftc.teamcode.util.EncompassingPose;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 
+/**
+ * This class is for only using verified, stable features (like driving)
+ */
 public abstract class Base extends LinearOpMode
 {
     protected Team team;
-
     protected RobotContext robot;
-
     protected InputHandler input;
-
-    @Override
-    public void runOpMode() throws InterruptedException
-    {
-        initSystems();
-
-        waitForStart();
-        while (opModeIsActive())
-        {
-            input.update();
-
-            run();
-
-            robot.localization.update();
-
-            telemetry.update();
-        }
-
-        robot.localization.close();
-    }
 
     protected void initSystems()
     {
@@ -51,20 +32,31 @@ public abstract class Base extends LinearOpMode
         telemetry.update();
     }
 
-    protected void run() throws InterruptedException
+    /**
+     * For customizing what shows up in the telemetry
+     */
+    protected void displayTelemetry()
     {
-        double axial = -gamepad1.left_stick_y;
-        double lateral = gamepad1.left_stick_x;
-        double yaw = gamepad1.right_stick_x;
-
-        // Drive - only send manual commands if no blocking macro is running
-        robot.drive.drive(axial, lateral, yaw, robot.localization.getHeading(AngleUnit.RADIANS, EncompassingPose.AngleType.SIGNED));
-
-        //telemetry.addData("Drive Mode", drive.getMode());
         telemetry.addData("Team", team);
-        telemetry.addLine("\n-----Velocity-----");
-        telemetry.addData("Speed", RobotConstants.DRIVE_SPEED_MULTIPLIER);
         telemetry.addData("Heading", robot.localization.getHeading(AngleUnit.DEGREES, EncompassingPose.AngleType.UNSIGNED));
+    }
+
+    /**
+     * For updating important systems, like the Telemetry or Localization
+     */
+    protected void update()
+    {
+        robot.localization.update();
+        telemetry.update();
+        input.update();
+    }
+
+    /**
+     * For controlling what things need to be properly ended
+     */
+    protected void close()
+    {
+        robot.localization.close();
     }
 
     protected void bindKeys()
@@ -99,5 +91,34 @@ public abstract class Base extends LinearOpMode
                             telemetry.log().add("New Speed: " + RobotConstants.DRIVE_SPEED_MULTIPLIER);
                         }
                 );
+    }
+
+    /**
+     * Runs initSystems(), displayTelemetry(), update(), run(), and eventually close()
+     * @throws InterruptedException
+     */
+    @Override
+    public void runOpMode() throws InterruptedException
+    {
+        initSystems();
+
+        waitForStart();
+        while (opModeIsActive())
+        {
+            displayTelemetry();
+            update();
+            run();
+        }
+
+        close();
+    }
+
+    protected void run() throws InterruptedException
+    {
+        double axial = -gamepad1.left_stick_y;
+        double lateral = gamepad1.left_stick_x;
+        double yaw = gamepad1.right_stick_x;
+
+        robot.drive.drive(axial, lateral, yaw, robot.localization.getHeading(AngleUnit.RADIANS, EncompassingPose.AngleType.SIGNED));
     }
 }
