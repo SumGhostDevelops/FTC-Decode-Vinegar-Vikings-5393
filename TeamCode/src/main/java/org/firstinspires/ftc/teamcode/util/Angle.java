@@ -10,7 +10,7 @@ public class Angle
     public Angle(double angle, AngleUnit unit)
     {
         this.unit = unit;
-        this.angle = angle;
+        this.angle = unit.normalize(angle); // Always normalize the angle because that is what AngleUnit indicates
     }
 
     public Angle toUnit(AngleUnit newUnit)
