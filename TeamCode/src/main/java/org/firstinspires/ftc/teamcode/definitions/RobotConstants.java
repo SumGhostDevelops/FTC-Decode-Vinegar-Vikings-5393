@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.definitions;
 import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.util.Distance;
 
 @Config
 public class RobotConstants
@@ -34,6 +35,7 @@ public class RobotConstants
 
     public static boolean TELEMETRY_SET_AUTOCLEAR = true;
 
+    @Config
     public static class AprilTags
     {
         public final static int[] GOAL_IDS = new int[]{20, 24};
@@ -41,6 +43,7 @@ public class RobotConstants
     }
 
     // Hardware Names
+    @Config
     public static class Drive
     {
         public final static String FRONT_LEFT = "frontLeft";
@@ -49,6 +52,7 @@ public class RobotConstants
         public final static String BACK_RIGHT = "backRight";
     }
 
+    @Config
     public static class Outtake
     {
         // Outtake Motors
@@ -60,25 +64,28 @@ public class RobotConstants
         public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
     }
 
+    @Config
     public static class Transfer
     {
         public final static String TRANSFER = "transfer";
     }
 
+    @Config
     public static class Intake
     {
         public final static String INTAKE = "intake";
     }
 
+    @Config
     public static class Odometry
     {
+        @Config
         public static class Pinpoint
         {
             public final static String PINPOINT = "pinpoint";
-            public final static double xOffset = 0;
-            public final static double yOffset = 0;
-            public final static DistanceUnit offsetUnit = DistanceUnit.INCH;
         }
+
+        @Config
         public static class Webcam
         {
 
@@ -89,11 +96,23 @@ public class RobotConstants
             public final static double LENS_CY = 256.774;
         }
 
+        @Config
         public static class Deadwheels // These are plugged in directly to the Pinpoint
         {
             public final static int COUNTS_PER_REVOLUTION = 8192;
-            public final static int WHEEL_CIRCUMFERENCE = 35; // fix this number
-            public final static DistanceUnit circumferenceUnit = DistanceUnit.MM;
+            public final static Distance WHEEL_CIRCUMFERENCE = new Distance(35, DistanceUnit.MM);
+
+            @Config
+            public static class Forward
+            {
+                public final static Distance OFFSET = new Distance(0, DistanceUnit.INCH);
+            }
+
+            @Config
+            public static class Strafe
+            {
+                public final static Distance OFFSET = new Distance(0, DistanceUnit.INCH);
+            }
         }
     }
 }

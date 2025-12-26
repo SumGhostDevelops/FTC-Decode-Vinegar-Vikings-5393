@@ -157,10 +157,10 @@ public class RobotHardware
         {
             pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.PINPOINT);
 
-            pinpoint.setOffsets(RobotConstants.Odometry.Pinpoint.xOffset, RobotConstants.Odometry.Pinpoint.yOffset, RobotConstants.Odometry.Pinpoint.offsetUnit);
+            pinpoint.setOffsets(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.distance, RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.distance, RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit);
 
-            double counts_per_unit = (double) RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION / RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE;
-            pinpoint.setEncoderResolution(counts_per_unit, RobotConstants.Odometry.Deadwheels.circumferenceUnit);
+            double counts_per_unit = (double) RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION / RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.distance;
+            pinpoint.setEncoderResolution(counts_per_unit, RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.unit);
 
             pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.FORWARD);
 
