@@ -46,16 +46,16 @@ public class MotorExPlus extends MotorEx
 
     public void setRPM(double rpm)
     {
-        super.setVelocity(MotorMath.rpmToTps(rpm, super.getCPR()));
+        super.setVelocity(RobotMath.Motor.rpmToTps(rpm, super.getCPR()));
     }
 
     public double getRPM()
     {
-        return MotorMath.tpsToRpm(super.getCorrectedVelocity(), super.getCPR());
+        return RobotMath.Motor.tpsToRpm(super.getCorrectedVelocity(), super.getCPR());
     }
 
     public double getRPMAcceleration()
     {
-        return MotorMath.tps2ToRpm2(super.getAcceleration(), super.getCPR());
+        return RobotMath.Motor.tps2ToRpm2(super.getAcceleration(), super.getCPR());
     }
 }

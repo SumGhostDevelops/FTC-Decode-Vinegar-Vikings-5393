@@ -4,27 +4,50 @@ import com.seattlesolvers.solverslib.util.InterpLUT;
 
 public class RobotMath
 {
-
     public static class Motor
     {
-        public double tpsToRpm(double tps, double ppr)
+        /**
+         * Convert ticks per second (TPS) to revolutions per minute (RPM)
+         * @param tps The ticks per second
+         * @param ppr The PPR of the motor
+         * @return
+         */
+        public static double tpsToRpm(double tps, double ppr)
         {
             return (tps / ppr) * 60.0;
         }
 
-        public double rpmToTps(double rpm, double ppr)
+        /**
+         * Convert revolutions per minute (RPM) to ticks per second
+         * @param rpm The revolutions per minute
+         * @param ppr The PPR of the motor
+         * @return
+         */
+        public static double rpmToTps(double rpm, double ppr)
         {
             return (rpm * ppr) / 60.0;
         }
 
-        public double tps2ToRpm2(double tps2, double ppr)
+        /**
+         * Convert ticks per second squared (T/S^2) to revolutions per minute squared (R/M^2). Acceleration -> acceleration.
+         * @param tps2 The ticks per second squared
+         * @param ppr The PPR of the motor
+         * @return
+         */
+        public static double tps2ToRpm2(double tps2, double ppr)
         {
             // Square the conversion factor (60/ppr)
             double factor = 60.0 / ppr;
             return tps2 * (factor * factor);
         }
 
-        public double rpm2ToTps2(double rpm2, double ppr)
+        /**
+         * Convert revolutions per minute squared (R/M^2) to ticks per second squared (T/S^2). Acceleration -> acceleration.
+         * @param rpm2 The revolutions per minute squared
+         * @param ppr The PPR of the motor
+         * @return
+         */
+        public static double rpm2ToTps2(double rpm2, double ppr)
         {
             // Square the inverse conversion factor (ppr/60)
             double factor = ppr / 60.0;
@@ -34,10 +57,13 @@ public class RobotMath
 
     public static class Outtake
     {
-        private final InterpLUT lut = new InterpLUT();
-        private boolean lutInited = false;
+        private static final InterpLUT lut = new InterpLUT();
+        private static boolean lutInitialized = false;
 
-        public void initLUT()
+        /**
+         * Initialize the look up table.
+         */
+        public static void initLUT()
         {
             /* example stuff
             //Adding each val with a key
@@ -49,11 +75,17 @@ public class RobotMath
             //generating final equation
             lut.createLUT();
              */
+            lutInitialized = true;
         }
 
-        public double rpmLUT(double distance)
+        /**
+         * Get
+         * @param distance
+         * @return
+         */
+        public static double rpmLUT(double distance)
         {
-            if (!lutInited)
+            if (!lutInitialized)
             {
                 initLUT();
             }
