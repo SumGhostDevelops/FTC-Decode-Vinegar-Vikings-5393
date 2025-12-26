@@ -12,21 +12,21 @@ import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 
 public class RobotContext
 {
-    public final RobotHardware hw;
-    public final Drive drive;
-    public final Intake intake;
-    public final Outtake outtake;
-    public final Transfer transfer;
+    public final RobotHardware hw; // Raw interface of the robot's hardware
+    public final Drive drive; // Drive subsystem
+    public final Intake intake; // Intake subsystem
+    public final Outtake outtake; // Outtake subsystem
+    public final Transfer transfer; // Transfer subsystem
 
-    public final Team team;
-    public final Odometry localization;
-    public final Telemetry telemetry;
-    public final Gamepads gamepads;
+    public final Team team; // Team color the robot is initialized to
+    public final Odometry odometry; // Odometry of the robot
+    public final Telemetry telemetry; // The robot's telemetry interface
+    public final Gamepads gamepads; // A custom class for easily sharing access to the robot's gamepads
 
     public RobotContext(Team team, HardwareMap hardwareMap, Telemetry telemetry, Gamepads gamepads)
     {
         this.hw = new RobotHardware(hardwareMap, telemetry);
-        this.localization = new Odometry(hw, telemetry);
+        this.odometry = new Odometry(hw, telemetry);
         this.drive = new Drive(hw.getDriveArray());
         this.intake = new Intake(hw.intake);
         this.outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());

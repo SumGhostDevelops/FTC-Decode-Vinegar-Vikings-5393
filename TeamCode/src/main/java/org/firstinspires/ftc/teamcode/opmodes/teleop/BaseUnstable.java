@@ -38,7 +38,7 @@ public abstract class BaseUnstable extends LinearOpMode
     protected void displayTelemetry()
     {
         telemetry.addData("Team", team);
-        telemetry.addData("Heading", robot.localization.getHeading(AngleUnit.DEGREES, EncompassingPose.AngleType.UNSIGNED));
+        telemetry.addData("Heading", robot.odometry.getHeading(AngleUnit.DEGREES, EncompassingPose.AngleType.UNSIGNED));
     }
 
     /**
@@ -46,7 +46,7 @@ public abstract class BaseUnstable extends LinearOpMode
      */
     protected void update()
     {
-        robot.localization.update();
+        robot.odometry.update();
         telemetry.update();
         input.update();
     }
@@ -56,7 +56,7 @@ public abstract class BaseUnstable extends LinearOpMode
      */
     protected void close()
     {
-        robot.localization.close();
+        robot.odometry.close();
     }
 
     protected void bindKeys()
@@ -65,7 +65,7 @@ public abstract class BaseUnstable extends LinearOpMode
         input.bind
                 (
                         () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.B),
-                        () -> robot.localization.resetHeading()
+                        () -> robot.odometry.resetHeading()
                 );
 
         input.bind
@@ -119,6 +119,6 @@ public abstract class BaseUnstable extends LinearOpMode
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
 
-        robot.drive.drive(axial, lateral, yaw, robot.localization.getHeading(AngleUnit.RADIANS, EncompassingPose.AngleType.SIGNED));
+        robot.drive.drive(axial, lateral, yaw, robot.odometry.getHeading(AngleUnit.RADIANS, EncompassingPose.AngleType.SIGNED));
     }
 }
