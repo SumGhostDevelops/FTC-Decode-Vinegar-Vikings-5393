@@ -59,9 +59,24 @@ public class RobotConstants
         public final static int PPR = 28;
         public final static String LAUNCHER_LEFT = "leftOuttake";
         public final static String LAUNCHER_RIGHT = "rightOuttake";
-        public final static String TURRET = "turret";
         public final static double[] veloCoeffs = new double[]{1.0, 1.0, 1.0};
         public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
+    }
+
+    @Config
+    public static class Turret
+    {
+        public final static int PPR = 28;
+        public final static String TURRET = "turret";
+        public final static double mRevsPerTRev = 1.0; // motor revolutions per turret revolution
+        public final static double posCoeff = 1.0;
+        public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
+
+        public static class LazySusan
+        {
+            public final static Distance radius = new Distance(1.0, DistanceUnit.CM);
+            public final static Distance circumference = radius.multiply(2 * Math.PI);
+        }
     }
 
     @Config

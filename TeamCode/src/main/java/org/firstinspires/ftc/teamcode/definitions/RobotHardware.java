@@ -125,7 +125,7 @@ public class RobotHardware
 
         try
         {
-            turret = new MotorExPlus(hardwareMap, RobotConstants.Outtake.TURRET, Motor.GoBILDA.RPM_312);
+            turret = new MotorExPlus(hardwareMap, RobotConstants.Turret.TURRET, Motor.GoBILDA.RPM_312);
             turret.setRunMode(Motor.RunMode.PositionControl);
         }
         catch (Exception e)
