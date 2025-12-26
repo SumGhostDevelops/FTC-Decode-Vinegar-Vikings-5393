@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.definitions;
 import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.util.Distance;
+import org.firstinspires.ftc.teamcode.util.measure.Distance;
 
 @Config
 public class RobotConstants
