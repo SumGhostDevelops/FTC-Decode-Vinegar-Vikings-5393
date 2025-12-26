@@ -56,10 +56,10 @@ public class Distance
      */
     public Distance add(Distance b, DistanceUnit finalUnit)
     {
-        Distance a = this.toUnit(finalUnit);
-        b = b.toUnit(finalUnit);
+        double aDist = this.toUnitOnlyDistance(finalUnit);
+        double bDist = b.toUnitOnlyDistance(finalUnit);
 
-        return new Distance(a.distance + b.distance, finalUnit);
+        return new Distance(aDist + bDist, finalUnit);
     }
 
     /**
@@ -80,9 +80,14 @@ public class Distance
      */
     public Distance subtract(Distance b, DistanceUnit finalUnit)
     {
-        Distance a = this.toUnit(finalUnit);
-        b = b.toUnit(finalUnit);
+        double aDist = this.toUnitOnlyDistance(finalUnit);
+        double bDist = b.toUnitOnlyDistance(finalUnit);
 
-        return new Distance(a.distance - b.distance, finalUnit);
+        return new Distance(aDist - bDist, finalUnit);
+    }
+
+    public Distance multiply(double scalar)
+    {
+        return new Distance(this.distance * scalar, this.unit);
     }
 }

@@ -58,10 +58,10 @@ public class Angle
      */
     public Angle add(Angle b, AngleUnit finalUnit)
     {
-        Angle a = this.toUnit(finalUnit);
-        b = b.toUnit(finalUnit);
+        double aAngle = this.toUnitOnlyAngle(finalUnit);
+        double bAngle = b.toUnitOnlyAngle(finalUnit);
 
-        return new Angle(a.angle + b.angle, finalUnit);
+        return new Angle(aAngle + bAngle, finalUnit);
     }
 
     /**
@@ -82,9 +82,9 @@ public class Angle
      */
     public Angle subtract(Angle b, AngleUnit finalUnit)
     {
-        Angle a = this.toUnit(finalUnit);
-        b = b.toUnit(finalUnit);
+        double aAngle = this.toUnitOnlyAngle(finalUnit);
+        double bAngle = b.toUnitOnlyAngle(finalUnit);
 
-        return new Angle(a.angle - b.angle, finalUnit);
+        return new Angle(aAngle - bAngle, finalUnit);
     }
 }
