@@ -99,4 +99,48 @@ public class UnnormalizedAngle
 
         return new UnnormalizedAngle(aAngle - bAngle, finalUnit);
     }
+
+    // Convenience aliases
+
+    /**
+     * Calculates THIS angle + b
+     * @param b The second Angle
+     * @return The result in THIS angle's unit
+     */
+    public UnnormalizedAngle plus(UnnormalizedAngle b)
+    {
+        return add(b);
+    }
+
+    /**
+     * Calculates THIS angle + b
+     * @param b The second Angle
+     * @param finalUnit The unit to return the result in
+     * @return The result in the specified unit
+     */
+    public UnnormalizedAngle plus(UnnormalizedAngle b, UnnormalizedAngleUnit finalUnit)
+    {
+        return add(b, finalUnit);
+    }
+
+    /**
+     * Calculates THIS angle - b
+     * @param b The second angle
+     * @return The result in THIS angle's unit
+     */
+    public UnnormalizedAngle minus(UnnormalizedAngle b)
+    {
+        return subtract(b);
+    }
+
+    /**
+     * Calculates THIS angle - b
+     * @param b The second angle
+     * @param finalUnit The unit to return the result in
+     * @return The result in the specified unit
+     */
+    public UnnormalizedAngle minus(UnnormalizedAngle b, UnnormalizedAngleUnit finalUnit)
+    {
+        return subtract(b, finalUnit);
+    }
 }
