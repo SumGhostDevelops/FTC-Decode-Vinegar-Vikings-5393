@@ -71,8 +71,9 @@ public class RobotConstants
         public final static String TURRET = "turret";
         public final static int PPR = 28;
         public final static int TOLERANCE = 0; // in ticks
-        public final static double GEAR_RATIO = 20.0; // 1:1 = 1, 3.7:1 = 3.7
-        public final static Angle TURN_LIMIT = new Angle(270, AngleUnit.DEGREES);
+        public final static double GEAR_RATIO = 19.2 * 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
+        public final static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES); // should be the same as the IMU
+        public final static Angle TURN_LIMIT = new Angle(270, AngleUnit.DEGREES); // in both directions, so if 90 is forward, [-180, 360]
         public final static double posCoeff = 1.0;
         public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
 
