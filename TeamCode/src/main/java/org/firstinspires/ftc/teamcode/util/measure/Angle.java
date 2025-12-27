@@ -114,4 +114,48 @@ public class Angle
 
         return new Angle(aAngle - bAngle, finalUnit);
     }
+
+    // Convenience aliases
+
+    /**
+     * Calculates THIS angle + b
+     * @param b The second Angle
+     * @return The result in THIS angle's unit
+     */
+    public Angle plus(Angle b)
+    {
+        return add(b);
+    }
+
+    /**
+     * Calculates THIS angle + b
+     * @param b The second Angle
+     * @param finalUnit The unit to return the result in
+     * @return The result in the specified unit
+     */
+    public Angle plus(Angle b, AngleUnit finalUnit)
+    {
+        return add(b, finalUnit);
+    }
+
+    /**
+     * Calculates THIS angle - b
+     * @param b The second angle
+     * @return The result in THIS angle's unit
+     */
+    public Angle minus(Angle b)
+    {
+        return subtract(b);
+    }
+
+    /**
+     * Calculates THIS angle - b
+     * @param b The second angle
+     * @param finalUnit The unit to return the result in
+     * @return The result in the specified unit
+     */
+    public Angle minus(Angle b, AngleUnit finalUnit)
+    {
+        return subtract(b, finalUnit);
+    }
 }
