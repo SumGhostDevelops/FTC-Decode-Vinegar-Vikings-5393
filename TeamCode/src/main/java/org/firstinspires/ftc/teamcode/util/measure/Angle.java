@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.measure;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 
 public class Angle
 {
@@ -31,11 +32,24 @@ public class Angle
     /**
      * Converts THIS angle to the final unit
      * @param finalUnit
-     * @return This final angle (quantity)
+     * @return The final angle (quantity)
      */
     public double toUnitOnlyAngle(AngleUnit finalUnit)
     {
         return finalUnit.fromUnit(this.unit, angle);
+    }
+
+    /**
+     * Converts THIS angle to the final Unnormalized unit
+     * @param finalUnit
+     * @return The final UnnormalizedAngle
+     */
+    public UnnormalizedAngle toUnnormalizedAngle(UnnormalizedAngleUnit finalUnit)
+    {
+        UnnormalizedAngleUnit unnormalizedUnit = unit.getUnnormalized(); // get unnormalized unit
+        double unnormalizedAngle = unnormalizedUnit.fromUnit(this.unit, this.angle); // convert to unnormalized angle
+
+        return new UnnormalizedAngle(unnormalizedAngle, unnormalizedUnit).toUnit(finalUnit); // create unnormalizedangle, convert to final unit
     }
 
     // These calculations may need to be optimized because of the number of conversion steps
