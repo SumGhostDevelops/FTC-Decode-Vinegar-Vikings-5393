@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.util.MathUtils;
@@ -73,6 +75,11 @@ public class Turret extends SubsystemBase
     public void reset()
     {
         initialRelativeHeading = RobotConstants.Turret.FORWARD_ANGLE;
+    }
+
+    public Command turnToCommand(Angle angle)
+    {
+        return new InstantCommand(() -> this.aimRelative(angle), this);
     }
 
     private boolean validSolution(Angle angle)

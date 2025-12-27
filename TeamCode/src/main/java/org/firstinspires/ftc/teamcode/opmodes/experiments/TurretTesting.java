@@ -6,24 +6,18 @@ import com.seattlesolvers.solverslib.command.button.Button;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.controls.Gamepads;
-import org.firstinspires.ftc.teamcode.controls.commands.turret.Aim0;
-import org.firstinspires.ftc.teamcode.controls.commands.turret.Aim180;
-import org.firstinspires.ftc.teamcode.controls.commands.turret.Aim270;
-import org.firstinspires.ftc.teamcode.controls.commands.turret.Aim90;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.util.measure.Angle;
 
 @TeleOp(name = "Turret Testing", group = "Experimental")
 public class TurretTesting extends CommandOpMode
 {
     private Turret turret;
-    private Aim0 aim0;
-    private Aim90 aim90;
-    private Aim180 aim180;
-    private Aim270 aim270;
 
     @Override
     public void initialize()
@@ -33,20 +27,16 @@ public class TurretTesting extends CommandOpMode
 
         register(turret);
 
-        aim0 = new Aim0(turret);
-        aim90 = new Aim90(turret);
-        aim180 = new Aim180(turret);
-        aim270 = new Aim270(turret);
-
         Gamepads gamepads = new Gamepads(gamepad1, gamepad2);
-        Button dpadUp = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_UP
-        ).whenPressed(aim0);
-        Button dpadDown = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_DOWN
-        ).whenPressed(aim180);
-        Button dpadLeft = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_LEFT
-        ).whenPressed(aim90);
-        Button dpadRight = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_RIGHT
-        ).whenPressed(aim270);
+        Button dpadUp = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_UP);
+        Button dpadLeft = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_LEFT);
+        Button dpadDown = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_DOWN);
+        Button dpadRight = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_RIGHT);
+
+        dpadUp.whenPressed(turret.turnToCommand(new Angle(0, AngleUnit.DEGREES)));
+        dpadLeft.whenPressed(turret.turnToCommand(new Angle(90, AngleUnit.DEGREES)));
+        dpadDown.whenPressed(turret.turnToCommand(new Angle(180, AngleUnit.DEGREES)));
+        dpadRight.whenPressed(turret.turnToCommand(new Angle(270, AngleUnit.DEGREES)));
     }
 
     @Override
