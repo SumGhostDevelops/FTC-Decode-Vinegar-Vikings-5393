@@ -5,12 +5,12 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
 public class Gamepads
 {
-    public GamepadEx gamepad1;
-    public GamepadEx gamepad2;
+    public GamepadEx driver;
+    public GamepadEx coDriver;
 
-    public Gamepads(Gamepad gamepad1, Gamepad gamepad2)
+    public Gamepads(Gamepad driver, Gamepad coDriver)
     {
-        this.gamepad1 = new GamepadEx(gamepad1);
-        this.gamepad2 = new GamepadEx(gamepad2);
+        this.driver = new GamepadEx(driver);
+        this.coDriver = new GamepadEx(coDriver);
     }
 }

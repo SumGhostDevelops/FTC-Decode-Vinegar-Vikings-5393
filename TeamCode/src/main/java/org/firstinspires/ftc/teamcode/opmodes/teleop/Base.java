@@ -64,13 +64,13 @@ public abstract class Base extends LinearOpMode
         // Handle B
         input.bind
                 (
-                        () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.B),
+                        () -> robot.gamepads.driver.wasJustPressed(GamepadKeys.Button.B),
                         () -> robot.odometry.resetHeading()
                 );
 
         input.bind
                 (
-                        () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER),
+                        () -> robot.gamepads.driver.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER),
                         () ->
                         {
                             double newMultiplier = RobotConstants.DRIVE_SPEED_MULTIPLIER - RobotConstants.DRIVE_SPEED_CHANGE;
@@ -82,7 +82,7 @@ public abstract class Base extends LinearOpMode
 
         input.bind
                 (
-                        () -> robot.gamepads.gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER),
+                        () -> robot.gamepads.driver.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER),
                         () ->
                         {
                             double newMultiplier = RobotConstants.DRIVE_SPEED_MULTIPLIER + RobotConstants.DRIVE_SPEED_CHANGE;

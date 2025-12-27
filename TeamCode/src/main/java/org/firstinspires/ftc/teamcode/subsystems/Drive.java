@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.Range;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -10,7 +11,7 @@ import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Drive
+public class Drive extends SubsystemBase
 {
     private final MotorEx frontLeft, frontRight, backLeft, backRight;
 
