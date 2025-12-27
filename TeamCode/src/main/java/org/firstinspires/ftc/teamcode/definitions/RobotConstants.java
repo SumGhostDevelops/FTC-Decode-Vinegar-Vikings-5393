@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.definitions;
 
 import com.acmerobotics.dashboard.config.Config;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.util.measure.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.Distance;
 
 @Config
@@ -66,12 +68,15 @@ public class RobotConstants
     @Config
     public static class Turret
     {
-        public final static int PPR = 28;
         public final static String TURRET = "turret";
-        public final static double mRevsPerTRev = 1.0; // motor revolutions per turret revolution
+        public final static int PPR = 28;
+        public final static int TOLERANCE = 0; // in ticks
+        public final static double GEAR_RATIO = 20.0; // 1:1 = 1, 3.7:1 = 3.7
+        public final static Angle TURN_LIMIT = new Angle(270, AngleUnit.DEGREES);
         public final static double posCoeff = 1.0;
         public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
 
+        @Config
         public static class LazySusan
         {
             public final static Distance radius = new Distance(1.0, DistanceUnit.CM);

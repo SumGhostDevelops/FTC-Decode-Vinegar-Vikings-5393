@@ -127,6 +127,11 @@ public class RobotHardware
         {
             turret = new MotorExPlus(hardwareMap, RobotConstants.Turret.TURRET, Motor.GoBILDA.RPM_312);
             turret.setRunMode(Motor.RunMode.PositionControl);
+            turret.setPositionCoefficient(RobotConstants.Turret.posCoeff);
+
+            double[] ffCoeffs = RobotConstants.Turret.ffCoeffs;
+            turret.setFeedforwardCoefficients(ffCoeffs[0], ffCoeffs[1], ffCoeffs[2]);
+            turret.setPositionTolerance(RobotConstants.Turret.TOLERANCE);
         }
         catch (Exception e)
         {
