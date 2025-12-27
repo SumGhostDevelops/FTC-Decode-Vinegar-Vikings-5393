@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.measure;
 
+import com.seattlesolvers.solverslib.util.MathUtils;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 
@@ -59,18 +61,8 @@ public class Angle
      */
     public double toNormalUnnormal(AngleUnit finalUnit)
     {
-        UnnormalizedAngle unnormal = toUnit(finalUnit.getUnnormalized());
-
-        switch (finalUnit)
-        {
-            case DEGREES:
-                return (unnormal.angle % 360 + 360) % 360;
-            case RADIANS:
-                double twoPi = 2 * Math.PI;
-                return (unnormal.angle % twoPi + twoPi) % twoPi;
-            default:
-                throw new IllegalArgumentException(finalUnit.toString() + " is not a valid AngleUnit");
-        }
+        double convertedAngle = toUnitOnlyAngle(finalUnit);
+        return MathUtils.normalizeAngle(convertedAngle, true, finalUnit);
     }
 
     // These calculations may need to be optimized because of the number of conversion steps
