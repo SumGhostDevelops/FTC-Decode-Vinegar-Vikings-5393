@@ -30,6 +30,19 @@ public class Angle
     }
 
     /**
+     * Converts THIS angle to the final Unnormalized unit
+     * @param finalUnit
+     * @return The final UnnormalizedAngle
+     */
+    public UnnormalizedAngle toUnit(UnnormalizedAngleUnit finalUnit)
+    {
+        UnnormalizedAngleUnit unnormalizedUnit = unit.getUnnormalized(); // get unnormalized unit
+        double unnormalizedAngle = unnormalizedUnit.fromUnit(this.unit, this.angle); // convert to unnormalized angle
+
+        return new UnnormalizedAngle(unnormalizedAngle, unnormalizedUnit).toUnit(finalUnit); // create unnormalizedangle, convert to final unit
+    }
+
+    /**
      * Converts THIS angle to the final unit
      * @param finalUnit
      * @return The final angle (quantity)
@@ -40,16 +53,24 @@ public class Angle
     }
 
     /**
-     * Converts THIS angle to the final Unnormalized unit
+     * Converts THIS angle to the normalized unnormalized [0, 360) / [0, 2pi) angle and final unit
      * @param finalUnit
-     * @return The final UnnormalizedAngle
+     * @return The final normalized unnormalized angle (quantity) in the specified unit
      */
-    public UnnormalizedAngle toUnnormalizedAngle(UnnormalizedAngleUnit finalUnit)
+    public double toNormalUnnormal(AngleUnit finalUnit)
     {
-        UnnormalizedAngleUnit unnormalizedUnit = unit.getUnnormalized(); // get unnormalized unit
-        double unnormalizedAngle = unnormalizedUnit.fromUnit(this.unit, this.angle); // convert to unnormalized angle
+        UnnormalizedAngle unnormal = toUnit(finalUnit.getUnnormalized());
 
-        return new UnnormalizedAngle(unnormalizedAngle, unnormalizedUnit).toUnit(finalUnit); // create unnormalizedangle, convert to final unit
+        switch (finalUnit)
+        {
+            case DEGREES:
+                return (unnormal.angle % 360 + 360) % 360;
+            case RADIANS:
+                double twoPi = 2 * Math.PI;
+                return (unnormal.angle % twoPi + twoPi) % twoPi;
+            default:
+                throw new IllegalArgumentException(finalUnit.toString() + " is not a valid AngleUnit");
+        }
     }
 
     // These calculations may need to be optimized because of the number of conversion steps
