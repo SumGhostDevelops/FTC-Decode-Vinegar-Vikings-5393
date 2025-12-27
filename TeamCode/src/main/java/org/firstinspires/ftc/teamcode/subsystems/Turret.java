@@ -67,7 +67,7 @@ public class Turret extends SubsystemBase
         double motorPosition = turretMotor.getCurrentPosition(); // in ticks
         double angle = degreePerTick * motorPosition; // in degrees
 
-        return initialRelativeHeading.toUnit(UnnormalizedAngleUnit.DEGREES).plus(new UnnormalizedAngle(angle, UnnormalizedAngleUnit.DEGREES)); // add unnormalized angle to the initial heading
+        return initialRelativeHeading.toUnit(UnnormalizedAngleUnit.DEGREES).plus(new UnnormalizedAngle(angle, UnnormalizedAngleUnit.DEGREES)).toUnit(finalUnit); // add unnormalized angle to the initial heading
     }
 
     public void reset()
