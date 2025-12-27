@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.seattlesolvers.solverslib.util.InterpLUT;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.util.measure.Angle;
+
 public class RobotMath
 {
     public static class Motor
@@ -52,6 +56,22 @@ public class RobotMath
             // Square the inverse conversion factor (ppr/60)
             double factor = ppr / 60.0;
             return rpm2 * (factor * factor);
+        }
+
+        /**
+         * Converts an angle to the # of ticks necessary to turn that angle
+         * @param angle
+         * @param PPR Pulses per Revolution
+         * @param gearRatio Ratio from input to Output (ex: 20:1 = 20.0)
+         * @return
+         */
+        public static int angleToTicks(Angle angle, int PPR, double gearRatio)
+        {
+            angle = angle.toUnit(AngleUnit.DEGREES);
+
+            double tickPerDegree = (PPR * gearRatio) / 360.0;
+
+            return Math.toIntExact(Math.round(angle.angle * tickPerDegree));
         }
     }
 

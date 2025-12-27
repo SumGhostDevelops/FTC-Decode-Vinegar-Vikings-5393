@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.util.MathUtils;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.teamcode.util.measure.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
 
@@ -141,10 +142,6 @@ public class Turret extends SubsystemBase
 
     private int angleToTicks(Angle angle)
     {
-        angle = angle.toUnit(AngleUnit.DEGREES);
-
-        double tickPerDegree = (RobotConstants.Turret.PPR * RobotConstants.Turret.GEAR_RATIO) / 360.0;
-
-        return Math.toIntExact(Math.round(angle.angle * tickPerDegree));
+        return RobotMath.Motor.angleToTicks(angle, RobotConstants.Turret.PPR, RobotConstants.Turret.GEAR_RATIO);
     }
 }
