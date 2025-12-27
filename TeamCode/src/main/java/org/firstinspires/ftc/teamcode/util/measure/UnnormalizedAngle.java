@@ -34,7 +34,7 @@ public class UnnormalizedAngle
      * @param finalUnit
      * @return The final normalized Angle
      */
-    public Angle toNormalizedAngle(AngleUnit finalUnit)
+    public Angle toUnit(AngleUnit finalUnit)
     {
         AngleUnit normalizedUnit = this.unit.getNormalized(); // get the normalized version of the current unit
         Angle normalized = new Angle(this.angle, normalizedUnit); // create a new angle, constructor handles normalization
