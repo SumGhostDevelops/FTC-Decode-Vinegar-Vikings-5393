@@ -10,8 +10,8 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.MotorExPlus;
-import org.firstinspires.ftc.teamcode.util.MotorExPlusGroup;
+import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
+import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 
 @TeleOp(name = "Intake + Outtake Testing", group = "Experiments")
 

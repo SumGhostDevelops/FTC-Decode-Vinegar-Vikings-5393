@@ -1,10 +1,12 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.motors;
 
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+
+import org.firstinspires.ftc.teamcode.util.RobotMath;
 
 public class MotorExPlus extends MotorEx
 {

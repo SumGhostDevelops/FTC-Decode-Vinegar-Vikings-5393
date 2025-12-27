@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.MotorExPlusGroup;
+import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 
 @TeleOp(name = "Flywheel PIDF Tuning", group = "Experiments")
 public class FlywheelPIDFTuning extends LinearOpMode

@@ -2,14 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
-import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.MotorExPlus;
+import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 
 @TeleOp(name = "Intake Testing", group = "Experiments")
 public class IntakeTesting extends LinearOpMode

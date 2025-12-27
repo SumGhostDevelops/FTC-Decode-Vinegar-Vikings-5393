@@ -9,8 +9,8 @@ import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
-import org.firstinspires.ftc.teamcode.util.MotorExPlus;
-import org.firstinspires.ftc.teamcode.util.MotorExPlusGroup;
+import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
+import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 
 public class RobotHardware
 {
