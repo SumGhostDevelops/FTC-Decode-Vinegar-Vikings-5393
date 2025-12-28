@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
@@ -126,12 +127,15 @@ public class RobotHardware
         try
         {
             turret = new MotorExPlus(hardwareMap, RobotConstants.Turret.TURRET, Motor.GoBILDA.RPM_312);
+            turret.motorEx.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            turret.motorEx.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             turret.setRunMode(Motor.RunMode.PositionControl);
-            turret.setPositionCoefficient(RobotConstants.Turret.posCoeff);
+            turret.setPositionTolerance(10); // Allow 10 ticks tolerance for atTargetPosition()
+            //turret.setPositionCoefficient(RobotConstants.Turret.posCoeff);
 
-            double[] ffCoeffs = RobotConstants.Turret.ffCoeffs;
-            turret.setFeedforwardCoefficients(ffCoeffs[0], ffCoeffs[1], ffCoeffs[2]);
-            turret.setPositionTolerance(RobotConstants.Turret.TOLERANCE);
+            //double[] ffCoeffs = RobotConstants.Turret.ffCoeffs;
+            //turret.setFeedforwardCoefficients(ffCoeffs[0], ffCoeffs[1], ffCoeffs[2]);
+            //turret.setPositionTolerance(RobotConstants.Turret.TOLERANCE);
         }
         catch (Exception e)
         {
@@ -140,7 +144,7 @@ public class RobotHardware
 
         try
         {
-            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, 0, 30);
+            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, -30, 30);
         }
         catch (Exception e)
         {
@@ -151,6 +155,7 @@ public class RobotHardware
         {
             intake = new MotorExPlus(hardwareMap, RobotConstants.Intake.INTAKE, Motor.GoBILDA.RPM_1620);
             intake.setRunMode(Motor.RunMode.RawPower);
+            intake.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
         }
         catch (Exception e)
         {

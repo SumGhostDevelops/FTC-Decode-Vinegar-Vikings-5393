@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.util;
 import com.seattlesolvers.solverslib.util.InterpLUT;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.measure.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
 
 public class RobotMath
 {
@@ -68,6 +70,22 @@ public class RobotMath
         public static int angleToTicks(Angle angle, int PPR, double gearRatio)
         {
             angle = angle.toUnit(AngleUnit.DEGREES);
+
+            double tickPerDegree = (PPR * gearRatio) / 360.0;
+
+            return Math.toIntExact(Math.round(angle.angle * tickPerDegree));
+        }
+
+        /**
+         * Converts an unnormalized angle to the # of ticks necessary to turn that angle
+         * @param angle
+         * @param PPR Pulses per Revolution
+         * @param gearRatio Ratio from input to Output (ex: 20:1 = 20.0)
+         * @return
+         */
+        public static int angleToTicks(UnnormalizedAngle angle, int PPR, double gearRatio)
+        {
+            angle = angle.toUnit(UnnormalizedAngleUnit.DEGREES);
 
             double tickPerDegree = (PPR * gearRatio) / 360.0;
 

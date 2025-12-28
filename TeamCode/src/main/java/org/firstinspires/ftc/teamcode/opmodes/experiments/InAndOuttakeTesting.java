@@ -19,7 +19,7 @@ public class InAndOuttakeTesting extends LinearOpMode {
 
     //Intake Variables
     protected InputHandler input;
-    double power = 0.5;
+    double power = 0.8;
     MotorExPlus intake;
 
 
@@ -38,7 +38,7 @@ public class InAndOuttakeTesting extends LinearOpMode {
     private double kD = 0.0;
 
     private double targetRPM = 5000;
-    private double testPower = 0.8;
+    private double testPower = 0.4;
 
     // Menu Navigation
     private enum Param {

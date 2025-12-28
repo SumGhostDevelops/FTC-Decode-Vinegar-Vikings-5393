@@ -23,7 +23,7 @@ public class TurretTesting extends CommandOpMode
     public void initialize()
     {
         RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
-        turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
+        turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, telemetry);
 
         register(turret);
 

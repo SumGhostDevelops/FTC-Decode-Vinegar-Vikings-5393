@@ -5,10 +5,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.util.EncompassingPose;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
+import org.firstinspires.ftc.teamcode.util.measure.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagMetadata;
@@ -152,9 +155,14 @@ public class Odometry
         });
     }
 
-    public double getHeading(AngleUnit angleUnit, EncompassingPose.AngleType angleType)
+    public Angle getHeading(AngleUnit angleUnit)
     {
-        return currentPose.getHeading(angleUnit, angleType);
+        return new Angle(pinpoint.getHeading(angleUnit), angleUnit);
+    }
+
+    public UnnormalizedAngle getHeading(UnnormalizedAngleUnit angleUnit)
+    {
+        return new UnnormalizedAngle(pinpoint.getHeading(angleUnit), angleUnit);
     }
 
     /**

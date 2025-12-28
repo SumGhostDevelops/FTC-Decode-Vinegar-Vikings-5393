@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.util.MathUtils;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
@@ -18,11 +21,14 @@ public class Turret extends SubsystemBase
     private final MotorEx turretMotor;
     private Angle initialRelativeHeading;
     private final double degreePerTick = 360.0 / (RobotConstants.Turret.PPR * RobotConstants.Turret.GEAR_RATIO);
+    private int targetPosition = 0;
+    private Telemetry telemetry;
 
-    public Turret(MotorEx turretMotor, Angle initialRelativeHeading)
+    public Turret(MotorEx turretMotor, Angle initialRelativeHeading, Telemetry telemetry)
     {
         this.turretMotor = turretMotor;
         this.initialRelativeHeading = initialRelativeHeading;
+        this.telemetry = telemetry;
     }
 
     public void aimAbsolute(Angle targetAngle, Angle robotHeading)
@@ -32,16 +38,66 @@ public class Turret extends SubsystemBase
 
     public void aimRelative(Angle targetAngle)
     {
-        Angle currentHeading = getRelativeHeading(AngleUnit.DEGREES);
+        // Get current position in ticks and convert to unnormalized degrees
+        int currentTicks = turretMotor.getCurrentPosition();
+        double currentDegrees = degreePerTick * currentTicks;
 
-        // Find how much we should move from our current heading
-        Angle headingDelta = findBestTurretSolution(currentHeading, targetAngle);
+        // Get target in degrees (normalized [-180, 180))
+        double targetDegrees = targetAngle.toUnitOnlyAngle(AngleUnit.DEGREES);
 
-        // Convert to ticks (the quantity of the motor)
-        int ticksDelta = angleToTicks(headingDelta);
+        // Get turn limits in degrees
+        UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
+        double minDegrees = turnLimits[0].toUnitOnlyAngle(UnnormalizedAngleUnit.DEGREES);
+        double maxDegrees = turnLimits[1].toUnitOnlyAngle(UnnormalizedAngleUnit.DEGREES);
 
-        int solution = turretMotor.getCurrentPosition() + ticksDelta;
-        turretMotor.setTargetPosition(solution);
+        // Clamp current degrees to within limits for path calculation
+        // This prevents getting stuck when slightly past a limit due to overshoot
+        double clampedCurrentDegrees = Math.max(minDegrees, Math.min(maxDegrees, currentDegrees));
+
+        // Find the best target position considering turn limits
+        // Check equivalent angles (target + n*360) and pick the closest valid one
+        // where the ENTIRE PATH from current to target stays within limits
+        double bestTarget = clampedCurrentDegrees; // Default to staying in place if no valid target
+        double bestDistance = Double.MAX_VALUE;
+
+        for (int n = -2; n <= 2; n++) {
+            double candidate = targetDegrees + (n * 360);
+
+            // Check if this candidate is within turn limits
+            if (candidate >= minDegrees && candidate <= maxDegrees) {
+                // Also check that the path from current to candidate stays within limits
+                double pathMin = Math.min(clampedCurrentDegrees, candidate);
+                double pathMax = Math.max(clampedCurrentDegrees, candidate);
+
+                // Path is valid if it doesn't go outside turn limits
+                if (pathMin >= minDegrees && pathMax <= maxDegrees) {
+                    double distance = Math.abs(candidate - clampedCurrentDegrees);
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestTarget = candidate;
+                    }
+                }
+            }
+        }
+
+        // Convert best target to ticks
+        int targetTicks = (int) Math.round(bestTarget / degreePerTick);
+
+        // Final safety clamp (should not be needed if logic above is correct)
+        int minTicks = angleToTicks(turnLimits[0]);
+        int maxTicks = angleToTicks(turnLimits[1]);
+        targetTicks = Math.max(minTicks, Math.min(maxTicks, targetTicks));
+
+        targetPosition = targetTicks;
+
+        // Debug telemetry
+        telemetry.log().add("targetDeg=" + targetDegrees + " bestTarget=" + bestTarget + " currentDeg=" + currentDegrees);
+        telemetry.log().add("Target: " + targetPosition + " current: " + currentTicks + " limits:[" + minTicks + "," + maxTicks + "]");
+
+        // Use SDK's RUN_TO_POSITION for built-in deceleration and position holding
+        turretMotor.motorEx.setTargetPosition(targetTicks);
+        turretMotor.motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turretMotor.motorEx.setPower(1.0);
     }
 
     public Angle getAbsoluteHeading(Angle robotHeading, AngleUnit finalUnit)
@@ -57,6 +113,12 @@ public class Turret extends SubsystemBase
     public Angle getRelativeHeading(AngleUnit finalUnit)
     {
         return getRelativeHeading(finalUnit.getUnnormalized()).toUnit(finalUnit); // convert the unnormalized angle to the final unit
+    }
+
+    public void setPower(double power)
+    {
+        turretMotor.setRunMode(Motor.RunMode.RawPower);
+        turretMotor.set(power);
     }
 
     /**
@@ -84,10 +146,10 @@ public class Turret extends SubsystemBase
 
     private boolean validSolution(Angle angle)
     {
-        Angle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
-        angle = angle.toUnit(turnLimits[0].unit);
+        UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
+        UnnormalizedAngle unnormAngle = angle.toUnit(turnLimits[0].unit);
 
-        return turnLimits[0].angle <= angle.angle && angle.angle <= turnLimits[1].angle;
+        return turnLimits[0].angle <= unnormAngle.angle && unnormAngle.angle <= turnLimits[1].angle;
     }
 
     /**
@@ -140,15 +202,35 @@ public class Turret extends SubsystemBase
         // Return a max angle if for some reason no solution is valid
         else
         {
-            Angle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
-            AngleUnit unit = turnLimits[0].unit;
-            double clampedAngle = MathUtils.clamp(shortAngle.toUnitOnlyAngle(unit), turnLimits[0].angle, turnLimits[1].angle);
-            return new Angle(clampedAngle - currentAngle.toUnitOnlyAngle(unit), unit);
+            UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
+            UnnormalizedAngleUnit unit = turnLimits[0].unit;
+            double clampedAngle = MathUtils.clamp(shortAngle.toUnit(unit).angle, turnLimits[0].angle, turnLimits[1].angle);
+            return new Angle(clampedAngle - currentAngle.toUnit(unit).angle, unit.getNormalized());
         }
     }
 
     private int angleToTicks(Angle angle)
     {
         return RobotMath.Motor.angleToTicks(angle, RobotConstants.Turret.PPR, RobotConstants.Turret.GEAR_RATIO);
+    }
+
+    private int angleToTicks(UnnormalizedAngle angle)
+    {
+        return RobotMath.Motor.angleToTicks(angle, RobotConstants.Turret.PPR, RobotConstants.Turret.GEAR_RATIO);
+    }
+
+    public int getTargetPosition()
+    {
+        return targetPosition;
+    }
+
+    @Override
+    public void periodic()
+    {
+        // RUN_TO_POSITION mode: check if motor has reached target
+        if (!turretMotor.motorEx.isBusy())
+        {
+            turretMotor.motorEx.setPower(0);
+        }
     }
 }
