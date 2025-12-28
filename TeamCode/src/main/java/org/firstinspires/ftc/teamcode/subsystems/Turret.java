@@ -29,11 +29,22 @@ public class Turret extends SubsystemBase
         this.initialRelativeAngle = initialRelativeAngle;
     }
 
-    public void aimAbsolute(Angle targetAngle, Angle robotHeading)
+    /**
+     * Aim absolutely to the field, around the reported {@code iniitalRelativeAngle}
+     * @param targetAngle
+     * @param robotAngle
+     * @see #aimRelative(Angle targetAngle)
+     */
+    public void aimAbsolute(Angle targetAngle, Angle robotAngle)
     {
-        aimRelative(targetAngle.minus(robotHeading));
+        aimRelative(targetAngle.minus(robotAngle));
     }
 
+    /**
+     * Aim relatively to the robot, around the reported {@code initialRelativeAngle}
+     * @param targetAngle
+     * @see #aimAbsolute(Angle targetAngle, Angle robotAngle)
+     */
     public void aimRelative(Angle targetAngle)
     {
         // Get current position in ticks and convert to unnormalized degrees
@@ -94,16 +105,31 @@ public class Turret extends SubsystemBase
         turretMotor.motorEx.setPower(1.0);
     }
 
-    public Angle getAbsoluteAngle(Odometry odometry)
+    /**
+     * @param robotAngle
+     * @return The absolute {@link Angle} of the turret based on the relative {@link Angle} and the robot's {@link Angle}
+     * @see #getAbsoluteUnnormalizedAngle(UnnormalizedAngle)
+     */
+    public Angle getAbsoluteAngle(Angle robotAngle)
     {
-        return getRelativeAngle().plus(odometry.getAngle());
+        return getRelativeAngle().plus(robotAngle);
     }
 
-    public UnnormalizedAngle getAbsoluteUnnormalizedAngle(Odometry odometry)
+    /**
+     *
+     * @param robotAngle
+     * @return The absolute {@link UnnormalizedAngle} of the turret based on the relative {@link UnnormalizedAngle} and the robot's {@link UnnormalizedAngle}
+     * @see #getAbsoluteAngle(Angle)
+     */
+    public UnnormalizedAngle getAbsoluteUnnormalizedAngle(UnnormalizedAngle robotAngle)
     {
-        return getRelativeUnnormalizedAngle().plus(odometry.getUnnormalizedAngle());
+        return getRelativeUnnormalizedAngle().plus(robotAngle);
     }
 
+    /**
+     * @return The relative {@link Angle} of the turret
+     * @see #getRelativeUnnormalizedAngle()
+     */
     public Angle getRelativeAngle()
     {
         return getRelativeUnnormalizedAngle().toNormalized();
@@ -111,6 +137,7 @@ public class Turret extends SubsystemBase
 
     /**
      * @return The {@link UnnormalizedAngle} of the relative turret heading in the raw {@code UnnormalizedAngleUnit.DEGREES}
+     * @see #getRelativeAngle()
      */
     public UnnormalizedAngle getRelativeUnnormalizedAngle()
     {

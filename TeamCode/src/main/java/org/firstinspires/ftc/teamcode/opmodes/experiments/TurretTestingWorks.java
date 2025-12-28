@@ -129,7 +129,7 @@ public class TurretTestingWorks extends LinearOpMode
         turret.periodic();
         if (holding)
         {
-            turret.aimAbsolute(holdingAngle, odometry.getAngle().toUnit(AngleUnit.DEGREES));
+            turret.aimAbsolute(holdingAngle, odometry.getAngle());
         }
     }
 }

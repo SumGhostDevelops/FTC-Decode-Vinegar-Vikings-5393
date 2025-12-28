@@ -5,6 +5,9 @@ import com.seattlesolvers.solverslib.util.MathUtils;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 
+/**
+ * {@link UnnormalizedAngle} represents an unnormalized angle ({@code (-infinity, infinity) based on a full circle}) and its unit of measure.
+ */
 public class UnnormalizedAngle
 {
     public final double angle;
@@ -99,6 +102,10 @@ public class UnnormalizedAngle
         return new UnnormalizedAngle(this.angle - bAngle, this.unit);
     }
 
+    /**
+     * @param angleUnit
+     * @return The normalized {@link AngleUnit} version of the {@link UnnormalizedAngleUnit}
+     */
     public static AngleUnit getNormalizedUnit(UnnormalizedAngleUnit angleUnit)
     {
         switch (angleUnit)

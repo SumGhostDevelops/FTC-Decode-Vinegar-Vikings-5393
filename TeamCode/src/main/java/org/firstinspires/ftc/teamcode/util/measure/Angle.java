@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 
 /**
- * {@link Angle} represents an angle and its unit of measure.
+ * {@link Angle} represents a normalized angle ({@code [-half circle, half circle)}) and its unit of measure.
  */
 public class Angle
 {
@@ -47,6 +47,10 @@ public class Angle
         return new UnnormalizedAngle(unnormalizedAngle, unnormalizedUnit).toUnit(newUnit); // create unnormalizedangle, convert to final unit
     }
 
+    /**
+     * @see #toUnit(UnnormalizedAngleUnit)
+     * @return The {@link UnnormalizedAngle} in the {@link Angle}'s equivalent {@link UnnormalizedAngleUnit}
+     */
     public UnnormalizedAngle toUnnormalized()
     {
         return toUnit(getUnnormalizedUnit(this.unit));
@@ -112,6 +116,11 @@ public class Angle
         return new Angle(this.angle - bAngle, this.unit);
     }
 
+    /**
+     * @see AngleUnit#getUnnormalized()
+     * @param angleUnit
+     * @return The unnormalized {@link UnnormalizedAngleUnit} version of the {@link AngleUnit}
+     */
     public static UnnormalizedAngleUnit getUnnormalizedUnit(AngleUnit angleUnit)
     {
         return angleUnit.getUnnormalized();

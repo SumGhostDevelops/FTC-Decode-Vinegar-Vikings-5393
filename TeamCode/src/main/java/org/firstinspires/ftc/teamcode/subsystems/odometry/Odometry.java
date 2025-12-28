@@ -155,21 +155,39 @@ public class Odometry
         });
     }
 
+    /**
+     * @return The {@link Angle} of the robot
+     * @see #getUnnormalizedAngle()
+     */
     public Angle getAngle()
     {
         return getUnnormalizedAngle().toNormalized();
     }
 
+    /**
+     * @return The {@link UnnormalizedAngle} of the robot
+     * @see #getAngle()
+     */
     public UnnormalizedAngle getUnnormalizedAngle()
     {
         return new UnnormalizedAngle(pinpoint.getHeading(UnnormalizedAngleUnit.RADIANS), UnnormalizedAngleUnit.DEGREES);
     }
 
+    /**
+     * @param angleUnit
+     * @return The {@link Angle} quantity of the robot in the specified {@link AngleUnit}
+     * @see #getHeading(UnnormalizedAngleUnit)
+     */
     public double getHeading(AngleUnit angleUnit)
     {
         return getAngle().toUnit(angleUnit).angle;
     }
 
+    /**
+     * @param angleUnit
+     * @return The {@link UnnormalizedAngle} quantity of the robot in the specified {@link UnnormalizedAngleUnit}
+     * @see #getHeading(AngleUnit)
+     */
     public double getHeading(UnnormalizedAngleUnit angleUnit)
     {
         return getUnnormalizedAngle().toUnit(angleUnit).angle;
