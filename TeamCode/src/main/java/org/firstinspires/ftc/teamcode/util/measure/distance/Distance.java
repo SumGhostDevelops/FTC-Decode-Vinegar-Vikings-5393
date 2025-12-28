@@ -22,7 +22,7 @@ public class Distance
      */
     public Distance toUnit(DistanceUnit newUnit)
     {
-        if (this.unit == newUnit)
+        if (isUnit(newUnit))
         {
             return this;
         }
@@ -81,6 +81,11 @@ public class Distance
     public Distance divide(double scalar)
     {
         return new Distance(this.magnitude / scalar, this.unit);
+    }
+
+    public boolean isUnit(DistanceUnit distanceUnit)
+    {
+        return (this.unit == distanceUnit);
     }
 
     @Override

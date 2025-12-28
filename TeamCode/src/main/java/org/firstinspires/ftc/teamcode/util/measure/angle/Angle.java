@@ -128,6 +128,11 @@ public class Angle
         return angleUnit.getUnnormalized();
     }
 
+    public boolean isUnit(AngleUnit angleUnit)
+    {
+        return this.unit == angleUnit;
+    }
+
     @Override
     public String toString()
     {

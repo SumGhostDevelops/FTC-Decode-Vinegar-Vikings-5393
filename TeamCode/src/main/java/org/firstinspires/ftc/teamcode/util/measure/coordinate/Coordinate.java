@@ -24,7 +24,7 @@ public class Coordinate
      */
     public Distance distanceTo(Coordinate otherCoord)
     {
-        return resultantTo(otherCoord).getDistance();
+        return vectorTo(otherCoord).getDistance();
     }
 
     /**
@@ -33,14 +33,14 @@ public class Coordinate
      */
     public Angle angleTo(Coordinate otherCoord)
     {
-        return resultantTo(otherCoord).getAngle();
+        return vectorTo(otherCoord).getDirection();
     }
 
     /**
      * @param otherCoord
      * @return The {@link Vector2d} vector to the other {@link Coordinate}
      */
-    private Vector2d resultantTo(Coordinate otherCoord)
+    public Vector2d vectorTo(Coordinate otherCoord)
     {
         DistanceUnit unit = DistanceUnit.METER;
 

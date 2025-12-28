@@ -33,7 +33,7 @@ public class FieldCoordinate
      */
     public FieldCoordinate toDistanceUnit(DistanceUnit distanceUnit)
     {
-        if (coord.isDistanceUnit(distanceUnit))
+        if (isDistanceUnit(distanceUnit))
         {
             return this;
         }
@@ -47,7 +47,7 @@ public class FieldCoordinate
      */
     public FieldCoordinate toCoordinateSystem(CoordinateSystem coordSys)
     {
-        if (this.coordSys == coordSys)
+        if (isCoordinateSystem(coordSys))
         {
             return this;
         }
@@ -91,5 +91,15 @@ public class FieldCoordinate
         otherCoord = otherCoord.toCoordinateSystem(this.coordSys);
 
         return this.coord.angleTo(otherCoord.coord);
+    }
+
+    public boolean isDistanceUnit(DistanceUnit distanceUnit)
+    {
+        return this.coord.isDistanceUnit(distanceUnit);
+    }
+
+    public boolean isCoordinateSystem(CoordinateSystem coordSys)
+    {
+        return this.coordSys == coordSys;
     }
 }

@@ -6,9 +6,8 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 /**
- * Describes the {@code x} and {@code y} components which form a {@link Vector2d}.
- * {@code DistanceUnit.METER} and {@code AngleUnit.RADIANS} by default,
- * and there shouldn't be any reason to change them (because you can always change their unit after the fact), though you have the option to.
+ * Describes the {@link Vector2d#x} and {@link Vector2d#y} components which form a {@link Vector2d}.
+ * Enforces the {@link DistanceUnit} of {@link Vector2d#x} and {@link AngleUnit#RADIANS} of {@link Vector2d#x} by default.
  */
 public class Vector2d
 {
@@ -20,7 +19,7 @@ public class Vector2d
 
     public Vector2d(Distance x, Distance y)
     {
-        this(x, y, DistanceUnit.METER);
+        this(x, y, x.unit);
     }
 
     public Vector2d(Distance x, Distance y, DistanceUnit distUnit)
@@ -30,7 +29,7 @@ public class Vector2d
 
     public Vector2d(Distance x, Distance y, AngleUnit angUnit)
     {
-        this(x, y, DistanceUnit.METER, angUnit);
+        this(x, y, x.unit, angUnit);
     }
 
     public Vector2d(Distance x, Distance y, DistanceUnit distUnit, AngleUnit angUnit)
@@ -38,6 +37,7 @@ public class Vector2d
         this.distUnit = distUnit;
         this.angUnit = angUnit;
 
+        // x and y will always be the same set DistanceUnit
         this.x = x.toUnit(distUnit);
         this.y = y.toUnit(distUnit);
     }
@@ -53,7 +53,7 @@ public class Vector2d
     /**
      * @return The {@link Angle} of the {@link Vector2d} vector
      */
-    public Angle getAngle()
+    public Angle getDirection()
     {
         Angle angleRads = new Angle(Math.atan2(y.magnitude, x.magnitude), AngleUnit.RADIANS);
 
@@ -66,6 +66,11 @@ public class Vector2d
      */
     public Vector2d toDistanceUnit(DistanceUnit distanceUnit)
     {
+        if (isDistanceUnit(distanceUnit))
+        {
+            return this;
+        }
+
         return new Vector2d(x, y, distanceUnit);
     }
 
@@ -75,6 +80,11 @@ public class Vector2d
      */
     public Vector2d toAngleUnit(AngleUnit angleUnit)
     {
+        if (isAngleUnit(angleUnit))
+        {
+            return this;
+        }
+
         return new Vector2d(x, y, angleUnit);
     }
 
@@ -107,5 +117,15 @@ public class Vector2d
     public Vector2d minus(Vector2d b)
     {
         return plus(b.inverse());
+    }
+
+    public boolean isDistanceUnit(DistanceUnit distanceUnit)
+    {
+        return (this.distUnit == distanceUnit);
+    }
+
+    public boolean isAngleUnit(AngleUnit angleUnit)
+    {
+        return (this.angUnit == angleUnit);
     }
 }
