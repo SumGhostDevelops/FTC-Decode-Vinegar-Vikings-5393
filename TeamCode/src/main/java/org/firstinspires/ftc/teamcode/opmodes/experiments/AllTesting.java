@@ -38,10 +38,13 @@ public class AllTesting extends LinearOpMode
         turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, telemetry);
         bindKeys();
 
+        transfer.set(RobotConstants.Transfer.MID_ANGLE);
+
         telemetry.addData("Intake RPM", intake.getRPM());
         telemetry.addData("Servo State", transferState.toString());
         telemetry.addData("Relative Turret Heading", turret.getRelativeHeading(AngleUnit.DEGREES).toNormalUnnormal(AngleUnit.DEGREES));
         telemetry.addData("Outtake RPM", outtake.getRPM());
+        telemetry.addData("Servo Raw Position", transfer.getRawPosition());
     }
 
     public enum TransferState
@@ -109,15 +112,23 @@ public class AllTesting extends LinearOpMode
                     {
                         case MIN:
                             transferState = TransferState.MID;
-                            transfer.set(0.5);
+                            transfer.set(RobotConstants.Transfer.MID_ANGLE);
+                            break;
                         case MID:
                             transferState = TransferState.MAX;
-                            transfer.set(1);
+                            transfer.set(RobotConstants.Transfer.MAX_ANGLE);
+                            break;
                         case MAX:
                             transferState = TransferState.MIN;
-                            transfer.set(0);
+                            transfer.set(RobotConstants.Transfer.MIN_ANGLE);
+                            break;
                     }
                 }
+        );
+
+        input.bind(
+                () -> gamepad1.bWasPressed(),
+                () -> transfer.set(0)
         );
     }
 
@@ -131,6 +142,7 @@ public class AllTesting extends LinearOpMode
         while (opModeIsActive())
         {
             input.update();
+            telemetry.update();
             run();
         }
     }
@@ -141,6 +153,7 @@ public class AllTesting extends LinearOpMode
         telemetry.addData("Servo State", transferState.toString());
         telemetry.addData("Relative Turret Heading", turret.getRelativeHeading(AngleUnit.DEGREES).toNormalUnnormal(AngleUnit.DEGREES));
         telemetry.addData("Outtake RPM", outtake.getRPM());
+        telemetry.addData("Servo Raw Position", transfer.getRawPosition());
         turret.periodic();
     }
 }

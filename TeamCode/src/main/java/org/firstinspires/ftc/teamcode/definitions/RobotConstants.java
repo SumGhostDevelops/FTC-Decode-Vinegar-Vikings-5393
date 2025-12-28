@@ -91,6 +91,10 @@ public class RobotConstants
     public static class Transfer
     {
         public final static String TRANSFER = "transfer";
+        public final static double SERVO_RANGE = 360.0; // Physical servo range in degrees
+        public final static double MIN_ANGLE = 0;
+        public final static double MID_ANGLE = 30;
+        public final static double MAX_ANGLE = 60;
     }
 
     @Config

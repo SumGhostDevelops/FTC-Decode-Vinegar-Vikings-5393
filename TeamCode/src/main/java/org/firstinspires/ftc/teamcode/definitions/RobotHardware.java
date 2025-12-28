@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.definitions;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
@@ -140,15 +142,18 @@ public class RobotHardware
         catch (Exception e)
         {
             telemetry.log().add("Warning: Turret motor not found");
+            telemetry.log().add(e.getMessage());
         }
 
         try
         {
-            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, -30, 30);
+            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, RobotConstants.Transfer.SERVO_RANGE, AngleUnit.DEGREES);
+            //Servo transfer = hardwareMap.get(Servo.class, RobotConstants.Transfer.TRANSFER);
         }
         catch (Exception e)
         {
             telemetry.log().add("Warning: Transfer servo not found");
+            telemetry.log().add(e.getMessage());
         }
 
         try
