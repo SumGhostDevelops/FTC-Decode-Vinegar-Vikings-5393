@@ -5,9 +5,9 @@ import com.acmerobotics.dashboard.config.Config;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
-import org.firstinspires.ftc.teamcode.util.measure.Angle;
-import org.firstinspires.ftc.teamcode.util.measure.Distance;
-import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 
 @Config
 public class RobotConstants

@@ -11,8 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
-import org.firstinspires.ftc.teamcode.util.measure.Angle;
-import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 
 public class Turret extends SubsystemBase
 {

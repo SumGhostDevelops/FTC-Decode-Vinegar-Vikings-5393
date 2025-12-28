@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
-import org.firstinspires.ftc.teamcode.util.measure.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 import java.util.ArrayList;
 import java.util.List;

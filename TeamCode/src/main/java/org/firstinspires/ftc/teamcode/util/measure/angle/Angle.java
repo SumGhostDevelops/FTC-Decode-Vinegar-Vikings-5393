@@ -1,9 +1,11 @@
-package org.firstinspires.ftc.teamcode.util.measure;
+package org.firstinspires.ftc.teamcode.util.measure.angle;
 
 import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
+
+import java.util.Locale;
 
 /**
  * {@link Angle} represents a normalized angle ({@code [-half circle, half circle)}) and its unit of measure.
@@ -124,5 +126,16 @@ public class Angle
     public static UnnormalizedAngleUnit getUnnormalizedUnit(AngleUnit angleUnit)
     {
         return angleUnit.getUnnormalized();
+    }
+
+    @Override
+    public String toString()
+    {
+        switch (this.unit)
+        {
+            default:
+            case DEGREES: return String.format(Locale.getDefault(), "%.3f degrees", measure);
+            case RADIANS: return String.format(Locale.getDefault(), "%.3f radians", measure);
+        }
     }
 }

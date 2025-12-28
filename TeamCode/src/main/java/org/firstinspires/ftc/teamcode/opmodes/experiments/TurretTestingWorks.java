@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
-import org.firstinspires.ftc.teamcode.util.measure.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 @TeleOp(name = "Turret Testing (Works)", group = "Experiments")
 public class TurretTestingWorks extends LinearOpMode

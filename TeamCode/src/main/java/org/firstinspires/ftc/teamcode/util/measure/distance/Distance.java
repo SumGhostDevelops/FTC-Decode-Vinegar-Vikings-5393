@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.measure;
+package org.firstinspires.ftc.teamcode.util.measure.distance;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -58,7 +58,7 @@ public class Distance
      */
     public Distance minus(Distance b)
     {
-        double bDist = b.getDistance(b.unit);
+        double bDist = b.getDistance(this.unit);
 
         return new Distance(this.magnitude - bDist, this.unit);
     }
@@ -81,5 +81,11 @@ public class Distance
     public Distance divide(double scalar)
     {
         return new Distance(this.magnitude / scalar, this.unit);
+    }
+
+    @Override
+    public String toString()
+    {
+        return unit.toString(magnitude);
     }
 }
