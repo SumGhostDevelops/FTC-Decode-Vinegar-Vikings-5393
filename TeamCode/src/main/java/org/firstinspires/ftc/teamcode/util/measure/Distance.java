@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.util.measure;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+/**
+ * {@link Distance} represents a distance and its unit of measure.
+ */
 public class Distance
 {
     public final double distance;
@@ -14,80 +17,69 @@ public class Distance
     }
 
     /**
-     * Converts THIS distance to the final unit
-     * @param finalUnit
-     * @return The final Distance
+     * @param newUnit
+     * @return The {@link Distance} in the new {@link DistanceUnit}
      */
-    public Distance toUnit(DistanceUnit finalUnit)
+    public Distance toUnit(DistanceUnit newUnit)
     {
-        if (this.unit == finalUnit)
+        if (this.unit == newUnit)
         {
             return this;
         }
 
-        return new Distance(toUnitOnlyDistance(finalUnit), finalUnit);
+        return new Distance(getDistance(newUnit), newUnit);
     }
 
     /**
-     * Converts THIS distance to the final unit
-     * @param finalUnit
-     * @return The final distance (quantity)
+     * @param newUnit
+     * @return The quantity of the {@link Distance} in the specified {@link DistanceUnit}
      */
-    public double toUnitOnlyDistance(DistanceUnit finalUnit)
+    public double getDistance(DistanceUnit newUnit)
     {
-        return finalUnit.fromUnit(this.unit, distance);
+        return newUnit.fromUnit(this.unit, distance);
     }
 
     /**
-     * Calculates THIS distance + b
+     * Calculates this {@link Distance} + another {@link Distance}
      * @param b The second Distance
-     * @return The result in THIS distance's unit
+     * @return The resulting {@link Distance}, in this {@link Distance}'s {@link DistanceUnit}
      */
-    public Distance add(Distance b)
+    public Distance plus(Distance b)
     {
-        return add(b, this.unit);
+        double bDist = b.getDistance(this.unit);
+
+        return new Distance(this.distance + bDist, this.unit);
     }
 
     /**
-     * Calculates THIS distance + b
+     * Calculates this {@link Distance} - another {@link Distance}
      * @param b The second Distance
-     * @param finalUnit The unit to return the result in
-     * @return The result in the specified unit
+     * @return The resulting {@link Distance}, in this {@link Distance}'s {@link DistanceUnit}
      */
-    public Distance add(Distance b, DistanceUnit finalUnit)
+    public Distance minus(Distance b)
     {
-        double aDist = this.toUnitOnlyDistance(finalUnit);
-        double bDist = b.toUnitOnlyDistance(finalUnit);
+        double bDist = b.getDistance(b.unit);
 
-        return new Distance(aDist + bDist, finalUnit);
+        return new Distance(this.distance - bDist, this.unit);
     }
 
     /**
-     * Calculates THIS distance - b
-     * @param b The second Distance
-     * @return The result in the specified unit
+     * Calculates this {@link Distance} * a scalar
+     * @param scalar The scalar to multiply by
+     * @return The resulting {@link Distance}
      */
-    public Distance subtract(Distance b)
-    {
-        return subtract(b, this.unit);
-    }
-
-    /**
-     * Calculates THIS distance - b
-     * @param b The second Distance
-     * @param finalUnit The unit to return the result in
-     * @return The result in the specified unit
-     */
-    public Distance subtract(Distance b, DistanceUnit finalUnit)
-    {
-        double aDist = this.toUnitOnlyDistance(finalUnit);
-        double bDist = b.toUnitOnlyDistance(finalUnit);
-
-        return new Distance(aDist - bDist, finalUnit);
-    }
-
     public Distance multiply(double scalar)
     {
         return new Distance(this.distance * scalar, this.unit);
+    }
+
+    /**
+     * Calculates this {@link Distance} / a scalar
+     * @param scalar The scalar to divide by
+     * @return The resulting {@link Distance}
+     */
+    public Distance divide(double scalar)
+    {
+        return new Distance(this.distance / scalar, this.unit);
     }
 }

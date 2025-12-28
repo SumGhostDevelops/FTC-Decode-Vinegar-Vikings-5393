@@ -23,7 +23,7 @@ public class TurretTesting extends CommandOpMode
     public void initialize()
     {
         RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
-        turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, telemetry);
+        turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
 
         register(turret);
 
@@ -43,6 +43,6 @@ public class TurretTesting extends CommandOpMode
     public void run()
     {
         super.run();
-        telemetry.addData("Relative Heading", turret.getRelativeHeading(UnnormalizedAngleUnit.DEGREES));
+        telemetry.addData("Relative Heading", turret.getRelativeUnnormalizedAngle().toUnit(UnnormalizedAngleUnit.DEGREES));
     }
 }

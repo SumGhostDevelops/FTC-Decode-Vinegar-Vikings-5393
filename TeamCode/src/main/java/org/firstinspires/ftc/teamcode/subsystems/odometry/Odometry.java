@@ -155,14 +155,24 @@ public class Odometry
         });
     }
 
-    public Angle getHeading(AngleUnit angleUnit)
+    public Angle getAngle()
     {
-        return new Angle(pinpoint.getHeading(angleUnit), angleUnit);
+        return getUnnormalizedAngle().toNormalized();
     }
 
-    public UnnormalizedAngle getHeading(UnnormalizedAngleUnit angleUnit)
+    public UnnormalizedAngle getUnnormalizedAngle()
     {
-        return new UnnormalizedAngle(pinpoint.getHeading(angleUnit), angleUnit);
+        return new UnnormalizedAngle(pinpoint.getHeading(UnnormalizedAngleUnit.RADIANS), UnnormalizedAngleUnit.DEGREES);
+    }
+
+    public double getHeading(AngleUnit angleUnit)
+    {
+        return getAngle().toUnit(angleUnit).angle;
+    }
+
+    public double getHeading(UnnormalizedAngleUnit angleUnit)
+    {
+        return getUnnormalizedAngle().toUnit(angleUnit).angle;
     }
 
     /**

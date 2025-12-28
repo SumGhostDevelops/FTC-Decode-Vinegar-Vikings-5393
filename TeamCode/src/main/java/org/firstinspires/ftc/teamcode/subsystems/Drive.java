@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.util.measure.Angle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,11 +81,13 @@ public class Drive extends SubsystemBase
         }
     }
 
-    public void drive(double axial, double lateral, double yaw, double botHeading)
+    public void drive(double axial, double lateral, double yaw, Angle botAngle)
     {
         double rotX = lateral;
         double rotY = axial;
         double rx = yaw;
+
+        double botHeading = botAngle.toUnit(AngleUnit.RADIANS).angle; // ensure angle is always in radians
 
         switch (currentMode)
         {

@@ -9,9 +9,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Outtake;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.measure.Angle;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
@@ -35,14 +32,14 @@ public class AllTesting extends LinearOpMode
         intake = hw.intake;
         transfer = hw.transfer;
         outtake = hw.getOuttakeMotorExPlusGroup();
-        turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, telemetry);
+        turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
         bindKeys();
 
         transfer.set(RobotConstants.Transfer.MID_ANGLE);
 
         telemetry.addData("Intake RPM", intake.getRPM());
         telemetry.addData("Servo State", transferState.toString());
-        telemetry.addData("Relative Turret Heading", turret.getRelativeHeading(AngleUnit.DEGREES).toNormalUnnormal(AngleUnit.DEGREES));
+        telemetry.addData("Relative Turret Heading", turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Outtake RPM", outtake.getRPM());
         telemetry.addData("Servo Raw Position", transfer.getRawPosition());
     }
@@ -151,7 +148,7 @@ public class AllTesting extends LinearOpMode
     {
         telemetry.addData("Intake RPM", intake.getRPM());
         telemetry.addData("Servo State", transferState.toString());
-        telemetry.addData("Relative Turret Heading", turret.getRelativeHeading(AngleUnit.DEGREES).toNormalUnnormal(AngleUnit.DEGREES));
+        telemetry.addData("Relative Turret Heading", turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Outtake RPM", outtake.getRPM());
         telemetry.addData("Servo Raw Position", transfer.getRawPosition());
         turret.periodic();

@@ -5,6 +5,9 @@ import com.seattlesolvers.solverslib.util.MathUtils;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 
+/**
+ * {@link Angle} represents an angle and its unit of measure.
+ */
 public class Angle
 {
     public final double angle;
@@ -16,146 +19,101 @@ public class Angle
         this.unit = unit;
     }
 
+    // Converters
     /**
-     * Converts THIS angle to the final unit
-     * @param finalUnit
-     * @return The final Angle
+     * @param newUnit
+     * @return The {@link Angle} in the new {@link AngleUnit}
      */
-    public Angle toUnit(AngleUnit finalUnit)
+    public Angle toUnit(AngleUnit newUnit)
     {
-        if (this.unit == finalUnit)
+        if (this.unit == newUnit)
         {
             return this;
         }
 
-        return new Angle(toUnitOnlyAngle(finalUnit), finalUnit);
+        return new Angle(getAngle(newUnit), newUnit);
     }
 
     /**
-     * Converts THIS angle to the final Unnormalized unit
-     * @param finalUnit
-     * @return The final UnnormalizedAngle
+     * Converts an {@link Angle} to an {@link UnnormalizedAngle}
+     * @param newUnit
+     * @return The {@link UnnormalizedAngle} in the new {@link UnnormalizedAngleUnit}
      */
-    public UnnormalizedAngle toUnit(UnnormalizedAngleUnit finalUnit)
+    public UnnormalizedAngle toUnit(UnnormalizedAngleUnit newUnit)
     {
         UnnormalizedAngleUnit unnormalizedUnit = unit.getUnnormalized(); // get unnormalized unit
         double unnormalizedAngle = unnormalizedUnit.fromUnit(this.unit, this.angle); // convert to unnormalized angle
 
-        return new UnnormalizedAngle(unnormalizedAngle, unnormalizedUnit).toUnit(finalUnit); // create unnormalizedangle, convert to final unit
+        return new UnnormalizedAngle(unnormalizedAngle, unnormalizedUnit).toUnit(newUnit); // create unnormalizedangle, convert to final unit
     }
 
-    /**
-     * Converts THIS angle to the final unit
-     * @param finalUnit
-     * @return The final angle (quantity)
-     */
-    public double toUnitOnlyAngle(AngleUnit finalUnit)
+    public UnnormalizedAngle toUnnormalized()
     {
-        return finalUnit.fromUnit(this.unit, angle);
+        return toUnit(getUnnormalizedUnit(this.unit));
     }
 
     /**
-     * Converts THIS angle to the normalized unnormalized [0, 360) / [0, 2pi) angle and final unit
-     * @param finalUnit
-     * @return The final normalized unnormalized angle (quantity) in the specified unit
+     * @param newUnit
+     * @return The quantity of the {@link Angle} in the specified {@link AngleUnit}
      */
-    public double toNormalUnnormal(AngleUnit finalUnit)
+    public double getAngle(AngleUnit newUnit)
     {
-        double convertedAngle = toUnitOnlyAngle(finalUnit);
-        return MathUtils.normalizeAngle(convertedAngle, true, finalUnit);
+        if (this.unit == newUnit)
+        {
+            return this.angle;
+        }
+
+        return newUnit.fromUnit(this.unit, angle);
     }
 
-    // These calculations may need to be optimized because of the number of conversion steps
-
     /**
-     * Calculates THIS angle + b
-     * @param b The second Angle
-     * @return The result in THIS angle's unit
+     * Converts the {@link Angle}'s signed quantity to an unsigned quantity [0, 360) / [0, 2Pi)
+     * @return The unsigned quantity of the {@link Angle} in the {@link Angle}'s {@link AngleUnit}
      */
-    public Angle add(Angle b)
+    public double getUnsignedAngle()
     {
-        return add(b, this.unit);
+        return getUnsignedAngle(this.unit);
     }
 
     /**
-     * Calculates THIS angle + b
-     * @param b The second Angle
-     * @param finalUnit The unit to return the result in
-     * @return The result in the specified unit
+     * Converts the {@link Angle}'s signed quantity to an unsigned quantity [0, 360) / [0, 2Pi)
+     * @param newUnit
+     * @return The unsigned quantity of the {@link Angle} in the specified {@link AngleUnit}
      */
-    public Angle add(Angle b, AngleUnit finalUnit)
+    public double getUnsignedAngle(AngleUnit newUnit)
     {
-        double aAngle = this.toUnitOnlyAngle(finalUnit);
-        double bAngle = b.toUnitOnlyAngle(finalUnit);
-
-        return new Angle(aAngle + bAngle, finalUnit);
+        double convertedAngle = getAngle(newUnit);
+        return MathUtils.normalizeAngle(convertedAngle, true, newUnit);
     }
 
-    /**
-     * Calculates THIS angle - b
-     * @param b The second angle
-     * @return The result in THIS angle's unit
-     */
-    public Angle subtract(Angle b)
-    {
-        return subtract(b, this.unit);
-    }
+    // Calculations
 
     /**
-     * Calculates THIS angle - b
-     * @param b The second angle
-     * @param finalUnit The unit to return the result in
-     * @return The result in the specified unit
-     */
-    public Angle subtract(Angle b, AngleUnit finalUnit)
-    {
-        double aAngle = this.toUnitOnlyAngle(finalUnit);
-        double bAngle = b.toUnitOnlyAngle(finalUnit);
-
-        return new Angle(aAngle - bAngle, finalUnit);
-    }
-
-    // Convenience aliases
-
-    /**
-     * Calculates THIS angle + b
-     * @param b The second Angle
-     * @return The result in THIS angle's unit
+     * Calculates this {@link Angle} + another {@link Angle}
+     * @param b The second {@link Angle}
+     * @return The resulting {@link Angle}, in this {@link Angle}'s {@link AngleUnit}
      */
     public Angle plus(Angle b)
     {
-        return add(b);
+        double bAngle = b.getAngle(this.unit);
+
+        return new Angle(this.angle + bAngle, this.unit);
     }
 
     /**
-     * Calculates THIS angle + b
-     * @param b The second Angle
-     * @param finalUnit The unit to return the result in
-     * @return The result in the specified unit
-     */
-    public Angle plus(Angle b, AngleUnit finalUnit)
-    {
-        return add(b, finalUnit);
-    }
-
-    /**
-     * Calculates THIS angle - b
-     * @param b The second angle
-     * @return The result in THIS angle's unit
+     * Calculates this {@link Angle} - another {@link Angle}
+     * @param b The second {@link Angle}
+     * @return The resulting {@link Angle}, in this {@link Angle}'s {@link AngleUnit}
      */
     public Angle minus(Angle b)
     {
-        return subtract(b);
+        double bAngle = b.getAngle(this.unit);
+
+        return new Angle(this.angle - bAngle, this.unit);
     }
 
-    /**
-     * Calculates THIS angle - b
-     * @param b The second angle
-     * @param finalUnit The unit to return the result in
-     * @return The result in the specified unit
-     */
-    public Angle minus(Angle b, AngleUnit finalUnit)
+    public static UnnormalizedAngleUnit getUnnormalizedUnit(AngleUnit angleUnit)
     {
-        return subtract(b, finalUnit);
+        return angleUnit.getUnnormalized();
     }
 }

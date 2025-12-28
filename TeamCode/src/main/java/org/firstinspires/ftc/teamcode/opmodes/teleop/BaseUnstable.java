@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.controls.Gamepads;
-import org.firstinspires.ftc.teamcode.util.EncompassingPose;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 
 /**
@@ -38,7 +37,7 @@ public abstract class BaseUnstable extends LinearOpMode
     protected void displayTelemetry()
     {
         telemetry.addData("Team", team);
-        telemetry.addData("Heading", robot.odometry.getHeading(AngleUnit.DEGREES).toNormalUnnormal(AngleUnit.DEGREES));
+        telemetry.addData("Heading", robot.odometry.getAngle().toUnit(AngleUnit.DEGREES).getUnsignedAngle(AngleUnit.DEGREES));
     }
 
     /**
@@ -119,6 +118,6 @@ public abstract class BaseUnstable extends LinearOpMode
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
 
-        robot.drive.drive(axial, lateral, yaw, robot.odometry.getHeading(AngleUnit.RADIANS).angle);
+        robot.drive.drive(axial, lateral, yaw, robot.odometry.getAngle());
     }
 }

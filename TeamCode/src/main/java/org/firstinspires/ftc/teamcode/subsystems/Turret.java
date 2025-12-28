@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.util.MathUtils;
 
@@ -12,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.teamcode.util.measure.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
@@ -19,16 +19,14 @@ import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
 public class Turret extends SubsystemBase
 {
     private final MotorEx turretMotor;
-    private Angle initialRelativeHeading;
+    private Angle initialRelativeAngle;
     private final double degreePerTick = 360.0 / (RobotConstants.Turret.PPR * RobotConstants.Turret.GEAR_RATIO);
     private int targetPosition = 0;
-    private Telemetry telemetry;
 
-    public Turret(MotorEx turretMotor, Angle initialRelativeHeading, Telemetry telemetry)
+    public Turret(MotorEx turretMotor, Angle initialRelativeAngle)
     {
         this.turretMotor = turretMotor;
-        this.initialRelativeHeading = initialRelativeHeading;
-        this.telemetry = telemetry;
+        this.initialRelativeAngle = initialRelativeAngle;
     }
 
     public void aimAbsolute(Angle targetAngle, Angle robotHeading)
@@ -43,12 +41,12 @@ public class Turret extends SubsystemBase
         double currentDegrees = degreePerTick * currentTicks;
 
         // Get target in degrees (normalized [-180, 180))
-        double targetDegrees = targetAngle.toUnitOnlyAngle(AngleUnit.DEGREES);
+        double targetDegrees = targetAngle.getAngle(AngleUnit.DEGREES);
 
         // Get turn limits in degrees
         UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
-        double minDegrees = turnLimits[0].toUnitOnlyAngle(UnnormalizedAngleUnit.DEGREES);
-        double maxDegrees = turnLimits[1].toUnitOnlyAngle(UnnormalizedAngleUnit.DEGREES);
+        double minDegrees = turnLimits[0].getAngle(UnnormalizedAngleUnit.DEGREES);
+        double maxDegrees = turnLimits[1].getAngle(UnnormalizedAngleUnit.DEGREES);
 
         // Clamp current degrees to within limits for path calculation
         // This prevents getting stuck when slightly past a limit due to overshoot
@@ -90,53 +88,42 @@ public class Turret extends SubsystemBase
 
         targetPosition = targetTicks;
 
-        // Debug telemetry
-        telemetry.log().add("targetDeg=" + targetDegrees + " bestTarget=" + bestTarget + " currentDeg=" + currentDegrees);
-        telemetry.log().add("Target: " + targetPosition + " current: " + currentTicks + " limits:[" + minTicks + "," + maxTicks + "]");
-
         // Use SDK's RUN_TO_POSITION for built-in deceleration and position holding
         turretMotor.motorEx.setTargetPosition(targetTicks);
         turretMotor.motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turretMotor.motorEx.setPower(1.0);
     }
 
-    public Angle getAbsoluteHeading(Angle robotHeading, AngleUnit finalUnit)
+    public Angle getAbsoluteAngle(Odometry odometry)
     {
-        return robotHeading.plus(getRelativeHeading(finalUnit), finalUnit); // add the absolute heading of the robot with the relative heading of the turret
+        return getRelativeAngle().plus(odometry.getAngle());
+    }
+
+    public UnnormalizedAngle getAbsoluteUnnormalizedAngle(Odometry odometry)
+    {
+        return getRelativeUnnormalizedAngle().plus(odometry.getUnnormalizedAngle());
+    }
+
+    public Angle getRelativeAngle()
+    {
+        return getRelativeUnnormalizedAngle().toNormalized();
     }
 
     /**
-     *
-     * @param finalUnit
-     * @return The NORMALIZED relative heading [-180 to 180)
+     * @return The {@link UnnormalizedAngle} of the relative turret heading in the raw {@code UnnormalizedAngleUnit.DEGREES}
      */
-    public Angle getRelativeHeading(AngleUnit finalUnit)
-    {
-        return getRelativeHeading(finalUnit.getUnnormalized()).toUnit(finalUnit); // convert the unnormalized angle to the final unit
-    }
-
-    public void setPower(double power)
-    {
-        turretMotor.setRunMode(Motor.RunMode.RawPower);
-        turretMotor.set(power);
-    }
-
-    /**
-     *
-     * @param finalUnit
-     * @return The UNNORMALIZED relative heading
-     */
-    public UnnormalizedAngle getRelativeHeading(UnnormalizedAngleUnit finalUnit)
+    public UnnormalizedAngle getRelativeUnnormalizedAngle()
     {
         double motorPosition = turretMotor.getCurrentPosition(); // in ticks
-        double angle = degreePerTick * motorPosition; // in degrees
+        double turretAngle = degreePerTick * motorPosition; // in degrees
 
-        return initialRelativeHeading.toUnit(UnnormalizedAngleUnit.DEGREES).plus(new UnnormalizedAngle(angle, UnnormalizedAngleUnit.DEGREES)).toUnit(finalUnit); // add unnormalized angle to the initial heading
+        return initialRelativeAngle.toUnit(UnnormalizedAngleUnit.DEGREES) // convert to an unnormalized angle
+                .plus(new UnnormalizedAngle(turretAngle, UnnormalizedAngleUnit.DEGREES)); // add the turret angle to the initial angle
     }
 
     public void reset()
     {
-        initialRelativeHeading = RobotConstants.Turret.FORWARD_ANGLE;
+        initialRelativeAngle = RobotConstants.Turret.FORWARD_ANGLE;
     }
 
     public Command turnToCommand(Angle angle)
