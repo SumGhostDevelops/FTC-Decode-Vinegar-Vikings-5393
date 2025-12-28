@@ -10,12 +10,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit
  */
 public class Angle
 {
-    public final double angle;
+    public final double measure;
     public final AngleUnit unit;
 
-    public Angle(double angle, AngleUnit unit)
+    public Angle(double measure, AngleUnit unit)
     {
-        this.angle = unit.normalize(angle);
+        this.measure = unit.normalize(measure);
         this.unit = unit;
     }
 
@@ -42,7 +42,7 @@ public class Angle
     public UnnormalizedAngle toUnit(UnnormalizedAngleUnit newUnit)
     {
         UnnormalizedAngleUnit unnormalizedUnit = unit.getUnnormalized(); // get unnormalized unit
-        double unnormalizedAngle = unnormalizedUnit.fromUnit(this.unit, this.angle); // convert to unnormalized angle
+        double unnormalizedAngle = unnormalizedUnit.fromUnit(this.unit, this.measure); // convert to unnormalized angle
 
         return new UnnormalizedAngle(unnormalizedAngle, unnormalizedUnit).toUnit(newUnit); // create unnormalizedangle, convert to final unit
     }
@@ -64,10 +64,10 @@ public class Angle
     {
         if (this.unit == newUnit)
         {
-            return this.angle;
+            return this.measure;
         }
 
-        return newUnit.fromUnit(this.unit, angle);
+        return newUnit.fromUnit(this.unit, measure);
     }
 
     /**
@@ -101,7 +101,7 @@ public class Angle
     {
         double bAngle = b.getAngle(this.unit);
 
-        return new Angle(this.angle + bAngle, this.unit);
+        return new Angle(this.measure + bAngle, this.unit);
     }
 
     /**
@@ -113,7 +113,7 @@ public class Angle
     {
         double bAngle = b.getAngle(this.unit);
 
-        return new Angle(this.angle - bAngle, this.unit);
+        return new Angle(this.measure - bAngle, this.unit);
     }
 
     /**

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -87,7 +86,7 @@ public class Drive extends SubsystemBase
         double rotY = axial;
         double rx = yaw;
 
-        double botHeading = botAngle.toUnit(AngleUnit.RADIANS).angle; // ensure angle is always in radians
+        double botHeading = botAngle.toUnit(AngleUnit.RADIANS).measure; // ensure angle is always in radians
 
         switch (currentMode)
         {

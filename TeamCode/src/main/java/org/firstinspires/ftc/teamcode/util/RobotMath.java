@@ -4,7 +4,6 @@ import com.seattlesolvers.solverslib.util.InterpLUT;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
-import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.measure.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
 
@@ -73,7 +72,7 @@ public class RobotMath
 
             double tickPerDegree = (PPR * gearRatio) / 360.0;
 
-            return Math.toIntExact(Math.round(angle.angle * tickPerDegree));
+            return Math.toIntExact(Math.round(angle.measure * tickPerDegree));
         }
 
         /**

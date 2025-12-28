@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.definitions;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
@@ -172,9 +171,9 @@ public class RobotHardware
         {
             pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.PINPOINT);
 
-            pinpoint.setOffsets(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.distance, RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.distance, RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit);
+            pinpoint.setOffsets(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.magnitude, RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.magnitude, RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit);
 
-            double counts_per_unit = (double) RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION / RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.distance;
+            double counts_per_unit = (double) RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION / RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.magnitude;
             pinpoint.setEncoderResolution(counts_per_unit, RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.unit);
 
             pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.FORWARD);

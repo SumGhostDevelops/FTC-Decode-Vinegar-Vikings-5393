@@ -180,7 +180,7 @@ public class Odometry
      */
     public double getHeading(AngleUnit angleUnit)
     {
-        return getAngle().toUnit(angleUnit).angle;
+        return getAngle().toUnit(angleUnit).measure;
     }
 
     /**

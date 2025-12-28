@@ -7,12 +7,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  */
 public class Distance
 {
-    public final double distance;
+    public final double magnitude;
     public final DistanceUnit unit;
 
-    public Distance(double distance, DistanceUnit unit)
+    public Distance(double magnitude, DistanceUnit unit)
     {
-        this.distance = distance;
+        this.magnitude = magnitude;
         this.unit = unit;
     }
 
@@ -36,7 +36,7 @@ public class Distance
      */
     public double getDistance(DistanceUnit newUnit)
     {
-        return newUnit.fromUnit(this.unit, distance);
+        return newUnit.fromUnit(this.unit, magnitude);
     }
 
     /**
@@ -48,7 +48,7 @@ public class Distance
     {
         double bDist = b.getDistance(this.unit);
 
-        return new Distance(this.distance + bDist, this.unit);
+        return new Distance(this.magnitude + bDist, this.unit);
     }
 
     /**
@@ -60,7 +60,7 @@ public class Distance
     {
         double bDist = b.getDistance(b.unit);
 
-        return new Distance(this.distance - bDist, this.unit);
+        return new Distance(this.magnitude - bDist, this.unit);
     }
 
     /**
@@ -70,7 +70,7 @@ public class Distance
      */
     public Distance multiply(double scalar)
     {
-        return new Distance(this.distance * scalar, this.unit);
+        return new Distance(this.magnitude * scalar, this.unit);
     }
 
     /**
@@ -80,6 +80,6 @@ public class Distance
      */
     public Distance divide(double scalar)
     {
-        return new Distance(this.distance / scalar, this.unit);
+        return new Distance(this.magnitude / scalar, this.unit);
     }
 }

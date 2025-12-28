@@ -7,11 +7,9 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.util.MathUtils;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.teamcode.util.measure.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.UnnormalizedAngle;
@@ -177,7 +175,7 @@ public class Turret extends SubsystemBase
         Angle shortDelta = targetAngle.minus(currentAngle);
         Angle longDelta;
 
-        if (shortDelta.angle > 0)
+        if (shortDelta.measure > 0)
         {
             longDelta = shortDelta.minus(new Angle(360, AngleUnit.DEGREES));
         }
@@ -195,7 +193,7 @@ public class Turret extends SubsystemBase
 
         if (shortIsValid && longIsValid) // If both are valid return the shortest one
         {
-            if (Math.abs(shortDelta.angle) <= Math.abs(longDelta.angle))
+            if (Math.abs(shortDelta.measure) <= Math.abs(longDelta.measure))
             {
                 return shortDelta;
             }
