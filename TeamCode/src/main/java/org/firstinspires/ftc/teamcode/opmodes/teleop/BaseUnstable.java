@@ -45,7 +45,6 @@ public abstract class BaseUnstable extends LinearOpMode
      */
     protected void update()
     {
-        robot.odometry.update();
         telemetry.update();
         input.update();
     }

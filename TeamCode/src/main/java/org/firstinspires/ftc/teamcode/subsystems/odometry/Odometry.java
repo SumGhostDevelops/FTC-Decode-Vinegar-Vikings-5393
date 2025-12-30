@@ -1,262 +1,159 @@
 package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
-import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.EncompassingPose;
+import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
-import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
-import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
-import org.firstinspires.ftc.vision.apriltag.AprilTagMetadata;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
 
 public class Odometry
 {
-    private final Telemetry telemetry;
-    private final Webcam webcam;
+    public final Webcam webcam;
     private final Pinpoint pinpoint;
 
-    // Current State
-    private EncompassingPose currentPose;
+    private static DistanceUnit dUnit = DistanceUnit.METER;
+    private static AngleUnit aUnit = AngleUnit.RADIANS;
 
-    // Acceleration Calculation
-    private Pose2D previousVelocity = new Pose2D(DistanceUnit.METER, 0, 0, AngleUnit.RADIANS, 0);
-    private long previousTimeNs = System.nanoTime();
+    private Angle driverForward;
 
-    // Low Pass Filter (0 = infinite smoothing, 1 = no smoothing)
-    private final double ACCEL_FILTER_ALPHA = 0.2;
-    private Pose2D previousAcceleration = new Pose2D(DistanceUnit.METER, 0, 0, AngleUnit.RADIANS, 0);
-
-    AprilTagLibrary library = AprilTagGameDatabase.getDecodeTagLibrary();
-
-    public Odometry(RobotHardware hw, Telemetry telemetry)
+    /**
+     * Initializes the odometry, sets the position to the center of the field, and the forward-angle to the robot's current heading
+     * @param webcam
+     * @param pinpoint
+     */
+    public Odometry(WebcamName webcam, Pinpoint pinpoint)
     {
-        this.telemetry = telemetry;
-        this.webcam = new Webcam(hw.webcam);
-        this.pinpoint = hw.pinpoint;
-
-        update();
-    }
-
-    public void update() {
-        pinpoint.update();
-        long currentTimeNs = System.nanoTime();
-
-        // 1. GET RAW DATA (Always in Meters/Radians for math)
-        Pose2D rawPos = pinpoint.getPosition();
-        Pose2D rawVel = pinpoint.getVelocity();
-
-        // Ensure strictly Meters/Radians
-        Pose2D currPos = convertPose(rawPos, DistanceUnit.METER, AngleUnit.RADIANS);
-        Pose2D currVel = convertPose(rawVel, DistanceUnit.METER, AngleUnit.RADIANS);
-
-        // 2. CALCULATE ACCELERATION
-        double dt = (currentTimeNs - previousTimeNs) / 1.0e9; // Convert Nanoseconds to Seconds
-
-        // Avoid divide by zero on first loop or super fast updates
-        if (dt < 1.0e-4) dt = 1.0e-4;
-
-        double rawAccelX = (currVel.getX(DistanceUnit.METER) - previousVelocity.getX(DistanceUnit.METER)) / dt;
-        double rawAccelY = (currVel.getY(DistanceUnit.METER) - previousVelocity.getY(DistanceUnit.METER)) / dt;
-        double rawAccelH = (currVel.getHeading(AngleUnit.RADIANS) - previousVelocity.getHeading(AngleUnit.RADIANS)) / dt;
-
-        // 3. LOW PASS FILTER (Smoothing)
-        double filteredAccelX = (ACCEL_FILTER_ALPHA * rawAccelX) + ((1 - ACCEL_FILTER_ALPHA) * previousAcceleration.getX(DistanceUnit.METER));
-        double filteredAccelY = (ACCEL_FILTER_ALPHA * rawAccelY) + ((1 - ACCEL_FILTER_ALPHA) * previousAcceleration.getY(DistanceUnit.METER));
-        double filteredAccelH = (ACCEL_FILTER_ALPHA * rawAccelH) + ((1 - ACCEL_FILTER_ALPHA) * previousAcceleration.getHeading(AngleUnit.RADIANS));
-
-        Pose2D currAccel = new Pose2D(DistanceUnit.METER, filteredAccelX, filteredAccelY, AngleUnit.RADIANS, filteredAccelH);
-
-        // 4. UPDATE STATE
-        currentPose = new EncompassingPose(currPos, currVel, currAccel, pinpoint.getHeading(AngleUnit.RADIANS), currentTimeNs);
-
-        previousVelocity = currVel;
-        previousAcceleration = currAccel;
-        previousTimeNs = currentTimeNs;
-    }
-
-    public EncompassingPose getPose()
-    {
-        return currentPose;
-    }
-
-    public void updatePosition(Pose2D pose)
-    {
-        pinpoint.setPosition(pose);
-    }
-
-    public void setStartPosFromTag(int tagId) {
-        if (tagId == 21 || tagId == 22 || tagId == 23)
-        {
-            throw new IllegalArgumentException("Tag Id " + tagId + " should not be used to localize the odometry.");
-        }
-
-        // 1. Look up the tag in the SDK Database
-        AprilTagMetadata tagMetadata = library.lookupTag(tagId);
-
-        if (tagMetadata == null) {
-            telemetry.addData("Error", "Tag ID %d not found in database", tagId);
-            return;
-        }
-
-        // 2. Get Field Data (The DB uses INCHES and QUATERNIONS)
-        // We need to convert Position to Meters
-        double tagFieldX = tagMetadata.distanceUnit.toMeters(tagMetadata.fieldPosition.get(0));
-        double tagFieldY = tagMetadata.distanceUnit.toMeters(tagMetadata.fieldPosition.get(1));
-
-        // We need to convert Orientation (Quaternion) to a standard Z-axis Heading (Radians)
-        // The SDK provides a helper to convert Quaternion to YAW-PITCH-ROLL
-        // AxesReference.EXTRINSIC, AxesOrder.XYZ is standard for extracting Z rotation
-        double tagFieldHeading = tagMetadata.fieldOrientation.toOrientation(
-                org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC,
-                org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ,
-                org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS
-        ).thirdAngle; // thirdAngle corresponds to Z (Yaw) in XYZ order
-
-        // 3. Get the Detection from the Camera
-        findTagPose(tagId).ifPresent(tagDetection -> {
-            // --- LOGIC FROM BEFORE ---
-
-            // A. Calculate Robot Heading
-            // RobotHeading = TagFieldHeading - CameraYaw
-            double cameraYaw = Math.toRadians(tagDetection.yaw); // Ensure radians
-            double robotHeading = tagFieldHeading - cameraYaw;
-
-            // B. Rotation Matrix for Position
-            // Camera X = Right, Y = Forward (Check your specific camera config!)
-            double relativeX = tagDetection.x;
-            double relativeY = tagDetection.y;
-
-            // Rotate camera vector to match field vector
-            double rotatedX = relativeX * Math.cos(robotHeading) - relativeY * Math.sin(robotHeading);
-            double rotatedY = relativeX * Math.sin(robotHeading) + relativeY * Math.cos(robotHeading);
-
-            // C. Calculate Absolute Position
-            double finalX = tagFieldX - rotatedX;
-            double finalY = tagFieldY - rotatedY;
-
-            // D. Update Pinpoint
-            Pose2D newStart = new Pose2D(DistanceUnit.METER, finalX, finalY, AngleUnit.RADIANS, robotHeading);
-            pinpoint.setPosition(newStart);
-
-            // Force internal update
-            update();
-
-            telemetry.addData("Relocalized", "Pos: %.2f, %.2f Heading: %.2f", finalX, finalY, Math.toDegrees(robotHeading));
-        });
+        this(webcam, pinpoint, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.FTC_STD), new Angle(pinpoint.getHeading(aUnit), aUnit)));
     }
 
     /**
-     * @return The {@link Angle} of the robot
-     * @see #getUnnormalizedAngle()
+     * Initializes the odometry
+     * @param webcam
+     * @param pinpoint
+     * @param referencePose What the robot's current pose is
+     */
+    public Odometry(WebcamName webcam, Pinpoint pinpoint, Pose2d referencePose)
+    {
+        this(webcam, pinpoint, referencePose, referencePose.heading);
+    }
+
+    /**
+     * @param webcam
+     * @param pinpoint
+     * @param referencePose The reference (could be the initial) pose of the robot, to determine its absolute position and heading
+     * @param driverForward The absolute {@link Angle} where it is forward from the driver's perspective
+     */
+    public Odometry(WebcamName webcam, Pinpoint pinpoint, Pose2d referencePose, Angle driverForward)
+    {
+        this.webcam = new Webcam(webcam);
+        this.pinpoint = pinpoint;
+        pinpoint.setPosition(referencePose.toPose2D());
+        this.driverForward = driverForward;
+    }
+
+    /**
+     * @return The (hopefully) absolute {@link Angle} of the robot on the field
      */
     public Angle getAngle()
     {
-        return getUnnormalizedAngle().toNormalized();
+        return new Angle(pinpoint.getHeading(aUnit), aUnit);
     }
 
     /**
-     * @return The {@link UnnormalizedAngle} of the robot
-     * @see #getAngle()
+     * @return A version of the robot heading where straight-ahead (in the view of the driver) is 0 degrees.
      */
-    public UnnormalizedAngle getUnnormalizedAngle()
+    public Angle getDriverHeading()
     {
-        return new UnnormalizedAngle(pinpoint.getHeading(UnnormalizedAngleUnit.RADIANS), UnnormalizedAngleUnit.DEGREES);
+        return getAngle().minus(driverForward);
+    }
+
+    public FieldCoordinate getFieldCoord()
+    {
+        Distance x = new Distance(pinpoint.getPosX(dUnit), dUnit);
+        Distance y = new Distance(pinpoint.getPosY(dUnit), dUnit);
+
+        return new FieldCoordinate(x, y);
+    }
+
+    public Pose2d getPose()
+    {
+        return new Pose2d(getFieldCoord(), getAngle());
     }
 
     /**
-     * @param angleUnit
-     * @return The {@link Angle} quantity of the robot in the specified {@link AngleUnit}
-     * @see #getHeading(UnnormalizedAngleUnit)
+     * Resets the current position to 0,0,0 and recalibrates the Odometry Computer's internal IMU. <br><br>
+     * <strong> Robot MUST be stationary </strong> <br><br>
+     * Device takes a large number of samples, and uses those as the gyroscope zero-offset. This takes approximately 0.25 seconds.
      */
-    public double getHeading(AngleUnit angleUnit)
+    public void resetPosAndHeading()
     {
-        return getAngle().toUnit(angleUnit).measure;
+        pinpoint.resetPosAndIMU();
     }
 
     /**
-     * @param angleUnit
-     * @return The {@link UnnormalizedAngle} quantity of the robot in the specified {@link UnnormalizedAngleUnit}
-     * @see #getHeading(AngleUnit)
-     */
-    public double getHeading(UnnormalizedAngleUnit angleUnit)
-    {
-        return getUnnormalizedAngle().toUnit(angleUnit).angle;
-    }
-
-    /**
-     * Resets the heading, but only if the robot is stationary.
+     * Resets the IMU heading. The robot must be perpendicular to the Blue alliance to work without errors.
      */
     public void resetHeading()
     {
-        if (currentPose.getVelocityResultant(DistanceUnit.METER) > 0)
-        {
-            telemetry.log().add("Not updating the heading because the robot is not still.");
-        }
         pinpoint.recalibrateIMU();
     }
 
     /**
-     * @return The resultant velocity of the robot.
+     * Updates the {@link Odometry#driverForward} so that calls to {@link Odometry#getDriverHeading()} are treated as 0-degrees forward.
      */
-    public double getVelocity(DistanceUnit distanceUnit)
+    public void resetDriverHeading()
     {
-        return currentPose.getVelocityResultant(distanceUnit);
+        driverForward = getAngle();
     }
 
     /**
-     * @return The resultant acceleration of the robot.
+     * Attempts to relocalize the robot. Camera must be facing a goal AprilTag to work.
+     * @return If the re-localization was successful or not
      */
-    public double getAcceleration(DistanceUnit distanceUnit)
+    public boolean localize()
     {
-        return currentPose.getAccelerationResultant(distanceUnit);
-    }
-
-    private Pose2D convertPose(Pose2D pose, DistanceUnit distanceUnit, AngleUnit angleUnit)
-    {
-        return new Pose2D(distanceUnit, pose.getX(distanceUnit), pose.getY(distanceUnit), angleUnit, pose.getHeading(angleUnit));
-    }
-
-    // --- Vision Logic ---
-
-    public void updateWebcamDetections()
-    {
-        webcam.updateDetections();
-    }
-
-    public boolean tagIdExists(int id)
-    {
-        return webcam.tagIdExists(id);
-    }
-
-    public Optional<Double> getRangeToTag(int id)
-    {
-        return webcam.getDetection(id).map(detection -> detection.ftcPose.range);
-    }
-
-    public Optional<Integer> findObeliskId()
-    {
+        // verify the apriltag exists
         webcam.updateDetections();
 
-        return webcam.obelisk.getId();
+        Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
+        {
+            if (possibleTag.isEmpty()) return false;
+        }
+
+        // get the apriltag and the pose it has estimated, and set it to the pinpoint
+        AprilTagDetection tag = possibleTag.get();
+        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose);
+        pinpoint.setPosition(estimatedPose.toPose2D());
+
+        return true;
     }
 
-    private Optional<AprilTagPoseFtc> findTagPose(int id)
+    /**
+     * Same thing as {@link Odometry#localize()} but forces the driver-forward angle to be based on specified {@link Team} rather than where the robot is currently facing.
+     * @param team
+     * @return If the re-localization was successful or not
+     * @see Odometry#localize
+     */
+    public boolean localize(Team team)
     {
-        webcam.updateDetections();
+        if (!localize()) return false;
 
-        return webcam.getDetection(id).map(aprilTagDetection -> aprilTagDetection.ftcPose);
+        driverForward = team.forwardAngle;
+
+        return true;
     }
 
+    /**
+     * Closes the {@link Webcam}
+     */
     public void close()
     {
         webcam.close();

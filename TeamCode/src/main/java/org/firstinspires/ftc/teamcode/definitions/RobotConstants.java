@@ -6,6 +6,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 
@@ -106,6 +108,7 @@ public class RobotConstants
     @Config
     public static class Odometry
     {
+        public final static Pose2d DEFAULT_POSE = new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(90, AngleUnit.DEGREES));
         @Config
         public static class Pinpoint
         {

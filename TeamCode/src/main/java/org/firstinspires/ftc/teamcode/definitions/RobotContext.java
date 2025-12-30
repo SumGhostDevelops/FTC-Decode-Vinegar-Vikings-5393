@@ -7,8 +7,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.controls.Gamepads;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 
 public class RobotContext
 {
@@ -26,7 +27,7 @@ public class RobotContext
     public RobotContext(Team team, HardwareMap hardwareMap, Telemetry telemetry, Gamepads gamepads)
     {
         this.hw = new RobotHardware(hardwareMap, telemetry);
-        this.odometry = new Odometry(hw, telemetry);
+        this.odometry = new Odometry(hw.webcam, hw.pinpoint, RobotConstants.Odometry.DEFAULT_POSE, team.forwardAngle);
         this.drive = new Drive(hw.getDriveArray());
         this.intake = new Intake(hw.intake);
         this.outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());

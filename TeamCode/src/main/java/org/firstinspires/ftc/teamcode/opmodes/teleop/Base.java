@@ -45,7 +45,6 @@ public abstract class Base extends LinearOpMode
      */
     protected void update()
     {
-        robot.odometry.update();
         telemetry.update();
         input.update();
     }
@@ -64,7 +63,7 @@ public abstract class Base extends LinearOpMode
         input.bind
                 (
                         () -> robot.gamepads.driver.wasJustPressed(GamepadKeys.Button.B),
-                        () -> robot.odometry.resetHeading()
+                        () -> robot.odometry.resetDriverHeading()
                 );
 
         input.bind
@@ -118,6 +117,6 @@ public abstract class Base extends LinearOpMode
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
 
-        robot.drive.drive(axial, lateral, yaw, robot.odometry.getAngle());
+        robot.drive.drive(axial, lateral, yaw, robot.odometry.getDriverHeading());
     }
 }

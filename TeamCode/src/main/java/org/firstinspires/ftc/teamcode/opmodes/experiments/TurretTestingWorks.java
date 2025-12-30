@@ -43,7 +43,7 @@ public class TurretTestingWorks extends LinearOpMode
         input = new InputHandler();
         hw = new RobotHardware(hardwareMap, telemetry);
         turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
-        odometry = new Odometry(hw, telemetry);
+        odometry = new Odometry(hw.webcam, hw.pinpoint);
         bindKeys();
     }
 
