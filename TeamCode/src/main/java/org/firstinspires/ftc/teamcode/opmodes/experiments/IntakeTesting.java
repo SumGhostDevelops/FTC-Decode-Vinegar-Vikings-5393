@@ -3,72 +3,50 @@ package org.firstinspires.ftc.teamcode.opmodes.experiments;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.controls.InputHandler;
+import org.firstinspires.ftc.teamcode.controls.Commands.IntakeIn;
+import org.firstinspires.ftc.teamcode.controls.Commands.IntakeOut;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import com.seattlesolvers.solverslib.command.CommandScheduler;
+import com.seattlesolvers.solverslib.command.button.Trigger;
+
 
 @TeleOp(name = "Intake Testing", group = "Experiments")
-public class IntakeTesting extends LinearOpMode
-{
-    protected InputHandler input;
-    double power = 0.5;
-    MotorExPlus intake;
-    @Override
-    public void runOpMode() throws InterruptedException
-    {
+public class IntakeTesting extends LinearOpMode {
 
-        initSystems();
+    double power = 0.8;
+
+    Intake intake;
+
+    @Override
+    public void runOpMode() {
+
+        RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
+        intake = new Intake(hw.intake);
+
+        // Triggers
+        Trigger intakeInTrigger =
+                new Trigger(() -> gamepad1.right_trigger > 0.25);
+
+        Trigger intakeOutTrigger =
+                new Trigger(() -> gamepad1.left_trigger > 0.25);
+
+        intakeInTrigger.whileActiveOnce(
+                new IntakeIn(intake, () -> power)
+        );
+
+        intakeOutTrigger.whileActiveOnce(
+                new IntakeOut(intake, () -> power)
+        );
 
         waitForStart();
-        while (opModeIsActive())
-        {
-            input.update();
 
-            run();
+        while (opModeIsActive()) {
+            CommandScheduler.getInstance().run();
 
+            telemetry.addData("Power", power);
+            telemetry.addData("RPM", intake.getRPM());
             telemetry.update();
         }
-    }
-
-    protected void initSystems()
-    {
-        input = new InputHandler();
-        RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
-        intake = hw.intake;
-        bindKeys();
-    }
-
-    protected void bindKeys()
-    {
-        input.bind(
-                () -> gamepad1.right_trigger > 0.25,
-                () -> intake.set(power)
-        );
-
-        input.bind(
-                () -> gamepad1.left_trigger > 0.25,
-                () -> intake.set(-power)
-        );
-
-        input.bind(
-                () -> gamepad1.left_trigger > 0.25 && gamepad1.right_trigger > 0.25 || gamepad1.left_trigger < 0.25 && gamepad1.right_trigger < 0.25,
-                () -> intake.set(0)
-        );
-
-        input.bind(
-                () -> gamepad1.dpadUpWasPressed(),
-                () -> power += 0.1
-        );
-
-        input.bind(
-                () -> gamepad1.dpadDownWasPressed(),
-                () -> power -= 0.1
-        );
-    }
-
-    protected void run() throws InterruptedException
-    {
-        telemetry.addData("Power", power);
-        telemetry.addData("Motor RPM", intake.getRPM());
     }
 }
