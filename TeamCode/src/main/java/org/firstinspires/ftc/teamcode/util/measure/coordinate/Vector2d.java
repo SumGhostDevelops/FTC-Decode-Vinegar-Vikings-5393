@@ -128,4 +128,9 @@ public class Vector2d
     {
         return (this.angUnit == angleUnit);
     }
+
+    public boolean equals(Vector2d otherVector)
+    {
+        return x.equals(otherVector.x) && y.equals(otherVector.y);
+    }
 }

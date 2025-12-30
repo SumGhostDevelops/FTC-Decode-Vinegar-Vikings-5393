@@ -10,6 +10,18 @@ public class Pose2d
     public final FieldCoordinate coord;
     public final Angle heading;
 
+    /**
+     * @param x
+     * @param y
+     * @param heading
+     * @see FieldCoordinate#FieldCoordinate(Distance, Distance)
+     */
+    public Pose2d(Distance x, Distance y, Angle heading)
+    {
+        this.coord = new FieldCoordinate(x, y);
+        this.heading = heading;
+    }
+
     public Pose2d(FieldCoordinate coord, Angle heading)
     {
         this.coord = coord;

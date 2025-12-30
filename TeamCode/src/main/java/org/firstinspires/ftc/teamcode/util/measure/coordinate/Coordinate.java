@@ -44,8 +44,8 @@ public class Coordinate
     {
         DistanceUnit unit = DistanceUnit.METER;
 
-        Coordinate thisCoord = this.toUnit(unit);
-        otherCoord = otherCoord.toUnit(unit);
+        Coordinate thisCoord = this.toDistanceUnit(unit);
+        otherCoord = otherCoord.toDistanceUnit(unit);
 
         Distance xDistance = otherCoord.x.minus(thisCoord.x);
         Distance yDistance = otherCoord.y.minus(thisCoord.y);
@@ -57,7 +57,7 @@ public class Coordinate
      * @param distanceUnit
      * @return The converted {@link Coordinate} with the specified {@link DistanceUnit}
      */
-    public Coordinate toUnit(DistanceUnit distanceUnit)
+    public Coordinate toDistanceUnit(DistanceUnit distanceUnit)
     {
         return new Coordinate(x.toUnit(distanceUnit), y.toUnit(distanceUnit));
     }
@@ -74,6 +74,11 @@ public class Coordinate
         return new Coordinate(newX, newY);
     }
 
+    private Coordinate toComparableStandard()
+    {
+        return new Coordinate(x.toUnit(DistanceUnit.METER), y.toUnit(DistanceUnit.METER));
+    }
+
     /**
      * @param distanceUnit
      * @return If both {@link Distance}s are in the specified {@link DistanceUnit}
@@ -81,5 +86,10 @@ public class Coordinate
     public boolean isDistanceUnit(DistanceUnit distanceUnit)
     {
         return this.x.unit == distanceUnit && this.y.unit == distanceUnit;
+    }
+
+    public boolean equals(Coordinate otherCoord)
+    {
+        return this.x.equals(otherCoord.x) && this.y.equals(otherCoord.y);
     }
 }

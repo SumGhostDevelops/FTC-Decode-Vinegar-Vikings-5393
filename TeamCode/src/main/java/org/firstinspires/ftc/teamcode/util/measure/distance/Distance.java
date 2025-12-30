@@ -88,6 +88,21 @@ public class Distance
         return (this.unit == distanceUnit);
     }
 
+    private Distance toComparableStandard()
+    {
+        return this.toUnit(DistanceUnit.METER);
+    }
+
+    public boolean equals(Distance otherDist)
+    {
+        return compareTo(otherDist) == 0;
+    }
+
+    public double compareTo(Distance otherDist)
+    {
+        return this.toComparableStandard().magnitude - otherDist.toComparableStandard().magnitude;
+    }
+
     @Override
     public String toString()
     {

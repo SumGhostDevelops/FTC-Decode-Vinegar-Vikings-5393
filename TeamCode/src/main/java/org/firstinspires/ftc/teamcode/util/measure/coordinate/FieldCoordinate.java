@@ -7,9 +7,8 @@ import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 /**
  * Describes a {@link FieldCoordinate} in context of the FTC field
  */
-public class FieldCoordinate
+public class FieldCoordinate extends Coordinate
 {
-    public final Coordinate coord;
     public final CoordinateSystem coordSys;
 
     /**
@@ -21,9 +20,14 @@ public class FieldCoordinate
         FTC_STD,
     }
 
-    public FieldCoordinate(Coordinate coord, CoordinateSystem coordSys)
+    public FieldCoordinate(Distance x, Distance y)
     {
-        this.coord = coord;
+        this(x, y, CoordinateSystem.RIGHT_HAND); // right hand cause ftc standard is dumb
+    }
+
+    public FieldCoordinate(Distance x, Distance y, CoordinateSystem coordSys)
+    {
+        super(x, y);
         this.coordSys = coordSys;
     }
 
@@ -33,12 +37,9 @@ public class FieldCoordinate
      */
     public FieldCoordinate toDistanceUnit(DistanceUnit distanceUnit)
     {
-        if (isDistanceUnit(distanceUnit))
-        {
-            return this;
-        }
+        if (this.isDistanceUnit(distanceUnit)) return this;
 
-        return new FieldCoordinate(coord.toUnit(distanceUnit), coordSys);
+        return new FieldCoordinate(x.toUnit(distanceUnit), y.toUnit(distanceUnit), coordSys);
     }
 
     /**
@@ -47,59 +48,63 @@ public class FieldCoordinate
      */
     public FieldCoordinate toCoordinateSystem(CoordinateSystem coordSys)
     {
-        if (isCoordinateSystem(coordSys))
-        {
-            return this;
-        }
+        if (this.isCoordinateSystem(coordSys)) return this;
 
         Distance offset = new Distance(72, DistanceUnit.INCH);
-        Vector2d translation = new Vector2d(offset, offset);
+        Vector2d translation = (coordSys == CoordinateSystem.RIGHT_HAND)
+                ? new Vector2d(offset, offset) // true; add
+                : new Vector2d(offset, offset).inverse(); // false, subtract
 
-        switch (coordSys)
-        {
-            case RIGHT_HAND: // convert FTC_STD to RIGHT_HAND
-                return new FieldCoordinate(coord.translate(translation), coordSys);
-            case FTC_STD: // convert RIGHT_HAND to FTC_STD
-                translation = translation.inverse(); // instead of offsetting positive 72,72, offset negative 72,72
-                return new FieldCoordinate(coord.translate(translation), coordSys);
-            default:
-                throw new IllegalArgumentException(coordSys.toString() + " is not a valid CoordinateSystem");
-        }
+        return new FieldCoordinate(x.plus(translation.x), y.plus(translation.y), coordSys);
+    }
+
+    @Override
+    public FieldCoordinate translate(Vector2d translation)
+    {
+        return new FieldCoordinate(x.plus(translation.x), y.plus(translation.y), coordSys);
+    }
+
+    private FieldCoordinate toComparableStandard()
+    {
+        return this
+                .toDistanceUnit(DistanceUnit.METER)
+                .toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
     }
 
     /**
      * Calculates the {@link Distance} to the other {@link FieldCoordinate}, with consideration to {@link DistanceUnit} and/or {@link CoordinateSystem} mismatches.
+     *
      * @param otherCoord
      * @return The {@link Distance} to the other {@link FieldCoordinate}
      */
     public Distance distanceTo(FieldCoordinate otherCoord)
     {
         // Convert the other FieldCoordinate to our FieldCoordinate's coordinate system
-        otherCoord = otherCoord.toCoordinateSystem(this.coordSys);
-
-        return this.coord.distanceTo(otherCoord.coord);
+        return super.distanceTo(otherCoord.toCoordinateSystem(this.coordSys));
     }
 
     /**
      * Calculates the {@link Angle} to the other {@link FieldCoordinate}, with consideration to {@link DistanceUnit} and/or {@link CoordinateSystem} mismatches.
+     *
      * @param otherCoord
      * @return The {@link Angle} to the other {@link FieldCoordinate}
      */
     public Angle angleTo(FieldCoordinate otherCoord)
     {
         // Convert the other FieldCoordinate to our FieldCoordiante's coordinate system
-        otherCoord = otherCoord.toCoordinateSystem(this.coordSys);
-
-        return this.coord.angleTo(otherCoord.coord);
-    }
-
-    public boolean isDistanceUnit(DistanceUnit distanceUnit)
-    {
-        return this.coord.isDistanceUnit(distanceUnit);
+        return super.angleTo(otherCoord.toCoordinateSystem(this.coordSys));
     }
 
     public boolean isCoordinateSystem(CoordinateSystem coordSys)
     {
         return this.coordSys == coordSys;
+    }
+
+    public boolean equals(FieldCoordinate otherCoord)
+    {
+        FieldCoordinate thisCoord = this.toDistanceUnit(DistanceUnit.METER).toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
+        otherCoord = otherCoord.toDistanceUnit(DistanceUnit.METER).toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
+
+        return thisCoord.x.equals(otherCoord.x) && thisCoord.y.equals(otherCoord.y);
     }
 }
