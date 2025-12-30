@@ -33,6 +33,7 @@ public class AllTesting extends LinearOpMode
         transfer = hw.transfer;
         outtake = hw.getOuttakeMotorExPlusGroup();
         turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
+        turret.lockToPosition = true;
         bindKeys();
 
         transfer.set(RobotConstants.Transfer.MID_ANGLE);
@@ -55,22 +56,22 @@ public class AllTesting extends LinearOpMode
     {
         input.bind(
                 () -> gamepad1.dpadUpWasPressed(),
-                () -> turret.aimRelative(new Angle(0, AngleUnit.DEGREES))
+                () -> turret.setTargetRelative(new Angle(0, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadLeftWasPressed(),
-                () -> turret.aimRelative(new Angle(90, AngleUnit.DEGREES))
+                () -> turret.setTargetRelative(new Angle(90, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadDownWasPressed(),
-                () -> turret.aimRelative(new Angle(180, AngleUnit.DEGREES))
+                () -> turret.setTargetRelative(new Angle(180, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadRightWasPressed(),
-                () -> turret.aimRelative(new Angle(270, AngleUnit.DEGREES))
+                () -> turret.setTargetRelative(new Angle(270, AngleUnit.DEGREES))
         );
 
         input.bind(

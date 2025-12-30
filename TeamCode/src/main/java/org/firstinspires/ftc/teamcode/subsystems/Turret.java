@@ -5,7 +5,6 @@ import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
-import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
@@ -17,10 +16,21 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 public class Turret extends SubsystemBase
 {
     private final MotorEx turretMotor;
-    private Angle initialRelativeAngle;
     private final double degreePerTick = 360.0 / (RobotConstants.Turret.PPR * RobotConstants.Turret.GEAR_RATIO);
+    private Angle initialRelativeAngle;
+
     private int targetPosition = 0;
 
+    /**
+     * If true, the turret will continuously aim to the last {@link Turret#targetPosition} specified when {@link Turret#periodic()} is called.
+     */
+    public boolean lockToPosition = true;
+
+    public Turret(MotorEx turretMotor, Angle initialRelativeAngle, boolean shouldLock)
+    {
+        this(turretMotor, initialRelativeAngle);
+        this.lockToPosition = shouldLock;
+    }
     public Turret(MotorEx turretMotor, Angle initialRelativeAngle)
     {
         this.turretMotor = turretMotor;
@@ -31,74 +41,38 @@ public class Turret extends SubsystemBase
      * Aim absolutely to the field, around the reported {@code iniitalRelativeAngle}
      * @param targetAngle
      * @param robotAngle
-     * @see #aimRelative(Angle targetAngle)
+     * @see #setTargetRelative(Angle targetAngle)
      */
-    public void aimAbsolute(Angle targetAngle, Angle robotAngle)
+    public void setTargetAbsolute(Angle targetAngle, Angle robotAngle)
     {
-        aimRelative(targetAngle.minus(robotAngle));
+        setTargetRelative(targetAngle.minus(robotAngle));
     }
 
     /**
      * Aim relatively to the robot, around the reported {@code initialRelativeAngle}
      * @param targetAngle
-     * @see #aimAbsolute(Angle targetAngle, Angle robotAngle)
+     * @see #setTargetAbsolute(Angle targetAngle, Angle robotAngle)
      */
-    public void aimRelative(Angle targetAngle)
+    public void setTargetRelative(Angle targetAngle)
     {
-        // Get current position in ticks and convert to unnormalized degrees
-        int currentTicks = turretMotor.getCurrentPosition();
-        double currentDegrees = degreePerTick * currentTicks;
+        int targetTicks = resolveSolution(turretMotor.getCurrentPosition(), targetAngle);
 
-        // Get target in degrees (normalized [-180, 180))
-        double targetDegrees = targetAngle.getAngle(AngleUnit.DEGREES);
-
-        // Get turn limits in degrees
+        // Get turn limits
         UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
-        double minDegrees = turnLimits[0].getAngle(UnnormalizedAngleUnit.DEGREES);
-        double maxDegrees = turnLimits[1].getAngle(UnnormalizedAngleUnit.DEGREES);
-
-        // Clamp current degrees to within limits for path calculation
-        // This prevents getting stuck when slightly past a limit due to overshoot
-        double clampedCurrentDegrees = Math.max(minDegrees, Math.min(maxDegrees, currentDegrees));
-
-        // Find the best target position considering turn limits
-        // Check equivalent angles (target + n*360) and pick the closest valid one
-        // where the ENTIRE PATH from current to target stays within limits
-        double bestTarget = clampedCurrentDegrees; // Default to staying in place if no valid target
-        double bestDistance = Double.MAX_VALUE;
-
-        for (int n = -2; n <= 2; n++) {
-            double candidate = targetDegrees + (n * 360);
-
-            // Check if this candidate is within turn limits
-            if (candidate >= minDegrees && candidate <= maxDegrees) {
-                // Also check that the path from current to candidate stays within limits
-                double pathMin = Math.min(clampedCurrentDegrees, candidate);
-                double pathMax = Math.max(clampedCurrentDegrees, candidate);
-
-                // Path is valid if it doesn't go outside turn limits
-                if (pathMin >= minDegrees && pathMax <= maxDegrees) {
-                    double distance = Math.abs(candidate - clampedCurrentDegrees);
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestTarget = candidate;
-                    }
-                }
-            }
-        }
-
-        // Convert best target to ticks
-        int targetTicks = (int) Math.round(bestTarget / degreePerTick);
 
         // Final safety clamp (should not be needed if logic above is correct)
         int minTicks = angleToTicks(turnLimits[0]);
         int maxTicks = angleToTicks(turnLimits[1]);
         targetTicks = Math.max(minTicks, Math.min(maxTicks, targetTicks));
+    }
 
-        targetPosition = targetTicks;
-
+    /**
+     * Aims to the tick specified in {@link Turret#targetPosition}
+     */
+    public void aim()
+    {
         // Use SDK's RUN_TO_POSITION for built-in deceleration and position holding
-        turretMotor.motorEx.setTargetPosition(targetTicks);
+        turretMotor.motorEx.setTargetPosition(targetPosition);
         turretMotor.motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turretMotor.motorEx.setPower(1.0);
     }
@@ -153,7 +127,7 @@ public class Turret extends SubsystemBase
 
     public Command turnToCommand(Angle angle)
     {
-        return new InstantCommand(() -> this.aimRelative(angle), this);
+        return new InstantCommand(() -> this.setTargetRelative(angle), this);
     }
 
     private boolean validSolution(Angle angle)
@@ -167,58 +141,53 @@ public class Turret extends SubsystemBase
     /**
      *
      * @param targetAngle
-     * @return The delta of the solution from the current
+     * @return The solution, in ticks
      */
-    private Angle findBestTurretSolution(Angle currentAngle, Angle targetAngle)
+    private int resolveSolution(int currentTicks, Angle targetAngle)
     {
-        // Calculate the two path options: shortest and longest
-        Angle shortDelta = targetAngle.minus(currentAngle);
-        Angle longDelta;
+        // Convert current position to unnormalized degrees
+        double currentDegrees = degreePerTick * currentTicks;
 
-        if (shortDelta.measure > 0)
-        {
-            longDelta = shortDelta.minus(new Angle(360, AngleUnit.DEGREES));
-        }
-        else
-        {
-            longDelta = shortDelta.plus(new Angle(360, AngleUnit.DEGREES));
-        }
+        // Get target in degrees (normalized [-180, 180))
+        double targetDegrees = targetAngle.getAngle(AngleUnit.DEGREES);
 
-        // Determine which path option is physically valid, prioritizing the shorter path
-        Angle shortAngle = currentAngle.plus(shortDelta);
-        Angle longAngle = currentAngle.plus(longDelta);
+        // Get turn limits in degrees
+        UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
+        double minDegrees = turnLimits[0].getAngle(UnnormalizedAngleUnit.DEGREES);
+        double maxDegrees = turnLimits[1].getAngle(UnnormalizedAngleUnit.DEGREES);
 
-        boolean shortIsValid = validSolution(shortAngle);
-        boolean longIsValid = validSolution(longAngle);
+        // Clamp current degrees to within limits for path calculation
+        // This prevents getting stuck when slightly past a limit due to overshoot
+        double clampedCurrentDegrees = Math.max(minDegrees, Math.min(maxDegrees, currentDegrees));
 
-        if (shortIsValid && longIsValid) // If both are valid return the shortest one
-        {
-            if (Math.abs(shortDelta.measure) <= Math.abs(longDelta.measure))
-            {
-                return shortDelta;
+        // Find the best target position considering turn limits
+        // Check equivalent angles (target + n*360) and pick the closest valid one
+        // where the ENTIRE PATH from current to target stays within limits
+        double bestTarget = clampedCurrentDegrees; // Default to staying in place if no valid target
+        double bestDistance = Double.MAX_VALUE;
+
+        for (int n = -2; n <= 2; n++) {
+            double candidate = targetDegrees + (n * 360);
+
+            // Check if this candidate is within turn limits
+            if (candidate >= minDegrees && candidate <= maxDegrees) {
+                // Also check that the path from current to candidate stays within limits
+                double pathMin = Math.min(clampedCurrentDegrees, candidate);
+                double pathMax = Math.max(clampedCurrentDegrees, candidate);
+
+                // Path is valid if it doesn't go outside turn limits
+                if (pathMin >= minDegrees && pathMax <= maxDegrees) {
+                    double distance = Math.abs(candidate - clampedCurrentDegrees);
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestTarget = candidate;
+                    }
+                }
             }
-            else
-            {
-                return longDelta;
-            }
         }
-        // Return a valid solution, prioritizing the shortest path
-        else if (shortIsValid)
-        {
-            return shortDelta;
-        }
-        else if (longIsValid)
-        {
-            return longDelta;
-        }
-        // Return a max angle if for some reason no solution is valid
-        else
-        {
-            UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
-            UnnormalizedAngleUnit unit = turnLimits[0].unit;
-            double clampedAngle = MathUtils.clamp(shortAngle.toUnit(unit).angle, turnLimits[0].angle, turnLimits[1].angle);
-            return new Angle(clampedAngle - currentAngle.toUnit(unit).angle, unit.getNormalized());
-        }
+
+        // Convert best target to ticks
+        return (int) Math.round(bestTarget / degreePerTick);
     }
 
     private int angleToTicks(Angle angle)
@@ -239,10 +208,16 @@ public class Turret extends SubsystemBase
     @Override
     public void periodic()
     {
-        // RUN_TO_POSITION mode: check if motor has reached target
-        if (!turretMotor.motorEx.isBusy())
+        if (!turretMotor.motorEx.isBusy()) // check if the motor is currently going to a target
         {
-            turretMotor.motorEx.setPower(0);
+            if (this.lockToPosition) // if not, and we should be "locked" to a position
+            {
+                aim(); // aim to that position
+            }
+            else // if the motor is done and we shouldn't continuously aim
+            {
+                turretMotor.motorEx.setPower(0); // set the turret power to 0
+            }
         }
     }
 }

@@ -19,8 +19,6 @@ public class TurretTestingWorks extends LinearOpMode
     private Turret turret;
     private Odometry odometry;
     private RobotHardware hw;
-    private boolean holding = false;
-    private Angle holdingAngle = RobotConstants.Turret.FORWARD_ANGLE;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -43,6 +41,7 @@ public class TurretTestingWorks extends LinearOpMode
         input = new InputHandler();
         hw = new RobotHardware(hardwareMap, telemetry);
         turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
+        turret.lockToPosition = true;
         odometry = new Odometry(hw.webcam, hw.pinpoint);
         bindKeys();
     }
@@ -51,22 +50,22 @@ public class TurretTestingWorks extends LinearOpMode
     {
         input.bind(
                 () -> gamepad1.dpadUpWasPressed(),
-                () -> turret.aimRelative(new Angle(0, AngleUnit.DEGREES))
+                () -> turret.setTargetRelative(new Angle(0, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadLeftWasPressed(),
-                () -> turret.aimRelative(new Angle(90, AngleUnit.DEGREES))
+                () -> turret.setTargetRelative(new Angle(90, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadDownWasPressed(),
-                () -> turret.aimRelative(new Angle(180, AngleUnit.DEGREES))
+                () -> turret.setTargetRelative(new Angle(180, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadRightWasPressed(),
-                () -> turret.aimRelative(new Angle(270, AngleUnit.DEGREES))
+                () -> turret.setTargetRelative(new Angle(270, AngleUnit.DEGREES))
         );
 
         /*
@@ -101,23 +100,6 @@ public class TurretTestingWorks extends LinearOpMode
                     hw.turret.set(0);
                 }
         );
-
-        input.bind(
-                () -> gamepad1.yWasPressed(),
-                () -> {
-                    if (holding)
-                    {
-                        telemetry.log().add("No longer holding.");
-                        holding = false;
-                        hw.turret.set(0);
-                    }
-                    else
-                    {
-                        holding = true;
-                        holdingAngle = odometry.getAngle().toUnit(AngleUnit.DEGREES);
-                    }
-                }
-        );
     }
 
     protected void run() throws InterruptedException
@@ -127,9 +109,5 @@ public class TurretTestingWorks extends LinearOpMode
         telemetry.addData("Raw Ticks", hw.turret.getCurrentPosition());
         telemetry.addData("Target Ticks", turret.getTargetPosition());
         turret.periodic();
-        if (holding)
-        {
-            turret.aimAbsolute(holdingAngle, odometry.getAngle());
-        }
     }
 }
