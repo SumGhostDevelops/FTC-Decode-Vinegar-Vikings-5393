@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.util.measure.coordinate;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
@@ -111,6 +112,18 @@ public class Pose2d
     public Angle angleTo(FieldCoordinate otherCoord)
     {
         return this.coord.angleTo(otherCoord);
+    }
+
+    /**
+     * Convert our custom {@link Pose2d} to the FTC Standard {@link Pose2D}
+     * @return The converted {@link Pose2D}
+     */
+    public Pose2D toPose2D()
+    {
+        // make sure all of the values are even and as they should be (toAngleUnit()) is technically overkill but why not
+        Pose2d verifiedPose = this.toAngleUnit(AngleUnit.RADIANS).toDistanceUnit(DistanceUnit.METER).toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD);
+
+        return new Pose2D(coord.x.unit, coord.x.magnitude, coord.y.magnitude, heading.unit, heading.measure);
     }
 
     /**
