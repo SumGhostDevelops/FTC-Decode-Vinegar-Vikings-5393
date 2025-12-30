@@ -27,7 +27,7 @@ public class AprilTagMetadataPlus
         this.fieldOrientation = fieldOrientation;
     }
 
-    public static AprilTagMetadataPlus toPlus(AprilTagMetadata oldMetadata)
+    public static AprilTagMetadataPlus fromRegular(AprilTagMetadata oldMetadata)
     {
         VectorF fPos = oldMetadata.fieldPosition;
         DistanceUnit posU = oldMetadata.distanceUnit;

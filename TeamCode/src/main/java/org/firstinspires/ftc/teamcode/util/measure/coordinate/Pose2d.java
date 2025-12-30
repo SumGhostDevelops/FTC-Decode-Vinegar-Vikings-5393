@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.util.measure.coordinate;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
@@ -110,5 +111,20 @@ public class Pose2d
     public Angle angleTo(FieldCoordinate otherCoord)
     {
         return this.coord.angleTo(otherCoord);
+    }
+
+    /**
+     * Converts a {@link Pose3D} into a more useful {@link Pose2d}
+     * @param pose
+     * @return The converted {@link Pose2d}
+     */
+    public static Pose2d fromPose3D(Pose3D pose)
+    {
+        FieldCoordinate coord = new FieldCoordinate(
+                new Distance(pose.getPosition().x, pose.getPosition().unit),
+                new Distance(pose.getPosition().x, pose.getPosition().unit),
+                FieldCoordinate.CoordinateSystem.FTC_STD);
+
+        return new Pose2d(coord, new Angle(pose.getOrientation().getYaw(AngleUnit.RADIANS), AngleUnit.RADIANS));
     }
 }
