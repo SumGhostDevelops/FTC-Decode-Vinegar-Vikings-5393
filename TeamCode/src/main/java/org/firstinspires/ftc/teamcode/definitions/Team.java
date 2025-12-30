@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+
 /**
  * Represents a team (RED or BLUE) with associated Goal and Base locations.
  */
@@ -8,9 +12,35 @@ public enum Team
 
     // Enum constants.
     // You can change these default coordinates and IDs as needed.
-    RED("red", new Goal(24, 100.0, 50.0), new Base(10.0, 50.0)),
-    BLUE("blue", new Goal(20, -100.0, 50.0), new Base(-10.0, 50.0)),
-    NONE("none", new Goal(-1, 0, 0), new Base(0, 0));
+    RED("red", new Goal(24, new FieldCoordinate(
+            new Distance(134.5, DistanceUnit.INCH),
+            new Distance(140.5, DistanceUnit.INCH),
+            FieldCoordinate.CoordinateSystem.RIGHT_HAND)),
+
+            new Base(new FieldCoordinate(
+                    new Distance(38.5, DistanceUnit.INCH),
+                    new Distance(33.5, DistanceUnit.INCH),
+                    FieldCoordinate.CoordinateSystem.RIGHT_HAND))),
+
+    BLUE("blue", new Goal(20, new FieldCoordinate(
+            new Distance(9.5, DistanceUnit.INCH),
+            new Distance(140.5, DistanceUnit.INCH),
+            FieldCoordinate.CoordinateSystem.RIGHT_HAND)),
+
+            new Base(new FieldCoordinate(
+                    new Distance(105.25, DistanceUnit.INCH),
+                    new Distance(33.5, DistanceUnit.INCH),
+                    FieldCoordinate.CoordinateSystem.RIGHT_HAND))),
+
+    NONE("none", new Goal(-1, new FieldCoordinate(
+            new Distance(72, DistanceUnit.INCH),
+            new Distance(140.5, DistanceUnit.INCH),
+            FieldCoordinate.CoordinateSystem.RIGHT_HAND)),
+
+            new Base(new FieldCoordinate(
+                    new Distance(72, DistanceUnit.INCH),
+                    new Distance(33.5, DistanceUnit.INCH),
+                    FieldCoordinate.CoordinateSystem.RIGHT_HAND)));
 
     // --- Enum Fields and Methods ---
     public final String color;
@@ -39,21 +69,18 @@ public enum Team
     public static class Goal
     {
         public final int id;
-        public final double x;
-        public final double y;
+        public final FieldCoordinate coord;
 
         /**
          * Constructor for the Goal.
          *
-         * @param id The unique identifier for the goal
-         * @param x  The x-coordinate of the goal
-         * @param y  The y-coordinate of the goal
+         * @param id The AprilTag ID of the goal
+         * @param coord The {@link FieldCoordinate} of the Goal
          */
-        public Goal(int id, double x, double y)
+        public Goal(int id, FieldCoordinate coord)
         {
             this.id = id;
-            this.x = x;
-            this.y = y;
+            this.coord = coord;
         }
     }
 
@@ -62,19 +89,16 @@ public enum Team
      */
     public static class Base
     {
-        public final double x;
-        public final double y;
+        public final FieldCoordinate coord;
 
         /**
          * Constructor for the Base.
          *
-         * @param x The x-coordinate of the base
-         * @param y The y-coordinate of the base
+         * @param coord The {@link FieldCoordinate} of the Base
          */
-        public Base(double x, double y)
+        public Base(FieldCoordinate coord)
         {
-            this.x = x;
-            this.y = y;
+            this.coord = coord;
         }
     }
 }

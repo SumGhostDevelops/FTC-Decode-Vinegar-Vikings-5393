@@ -50,10 +50,10 @@ public class FieldCoordinate extends Coordinate
     {
         if (this.isCoordinateSystem(coordSys)) return this;
 
-        Distance offset = new Distance(72, DistanceUnit.INCH);
+        Distance offset = new Distance(72, DistanceUnit.INCH); // see the javadoc for CoordinateSystem
         Vector2d translation = (coordSys == CoordinateSystem.RIGHT_HAND)
-                ? new Vector2d(offset, offset) // true; add
-                : new Vector2d(offset, offset).inverse(); // false, subtract
+                ? new Vector2d(offset, offset) // FTC -> right_hand, add 72, 72
+                : new Vector2d(offset, offset).inverse(); // right_hand -> ftc, subtract 72, 72
 
         return new FieldCoordinate(x.plus(translation.x), y.plus(translation.y), coordSys);
     }
