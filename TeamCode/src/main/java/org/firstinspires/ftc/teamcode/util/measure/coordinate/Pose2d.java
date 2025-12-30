@@ -122,7 +122,7 @@ public class Pose2d
     {
         FieldCoordinate coord = new FieldCoordinate(
                 new Distance(pose.getPosition().x, pose.getPosition().unit),
-                new Distance(pose.getPosition().x, pose.getPosition().unit),
+                new Distance(pose.getPosition().y, pose.getPosition().unit),
                 FieldCoordinate.CoordinateSystem.FTC_STD);
 
         return new Pose2d(coord, new Angle(pose.getOrientation().getYaw(AngleUnit.RADIANS), AngleUnit.RADIANS));
