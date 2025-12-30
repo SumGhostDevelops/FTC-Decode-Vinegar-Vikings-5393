@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.util.measure.coordinate;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.Vector2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 /**
