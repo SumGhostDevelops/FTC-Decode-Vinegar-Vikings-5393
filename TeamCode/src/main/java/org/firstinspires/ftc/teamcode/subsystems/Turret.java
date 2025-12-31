@@ -63,7 +63,7 @@ public class Turret extends SubsystemBase
         // Final safety clamp (should not be needed if logic above is correct)
         int minTicks = angleToTicks(turnLimits[0]);
         int maxTicks = angleToTicks(turnLimits[1]);
-        targetTicks = Math.max(minTicks, Math.min(maxTicks, targetTicks));
+        this.targetPosition = Math.max(minTicks, Math.min(maxTicks, targetTicks));
     }
 
     /**

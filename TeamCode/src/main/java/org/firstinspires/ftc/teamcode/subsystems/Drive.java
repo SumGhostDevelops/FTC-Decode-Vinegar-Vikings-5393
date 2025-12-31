@@ -6,18 +6,27 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 
 public class Drive extends SubsystemBase
 {
     private final MotorEx frontLeft, frontRight, backLeft, backRight;
 
-    private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
+    private DoubleSupplier axial;
+    private DoubleSupplier lateral;
+    private DoubleSupplier rotational;
 
-    public Drive(MotorEx[] driveMotors)
+    public Odometry odometry; // for getting the angle
+
+    private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
+    private double speed = RobotConstants.DRIVE_SPEED_MULTIPLIER;
+
+    public Drive(MotorEx[] driveMotors, Odometry odometry, DoubleSupplier axial, DoubleSupplier lateral, DoubleSupplier rotational)
     {
         frontLeft = driveMotors[0];
         frontRight = driveMotors[1];
@@ -80,13 +89,17 @@ public class Drive extends SubsystemBase
         }
     }
 
-    public void drive(double axial, double lateral, double yaw, Angle botAngle)
+    public void drive()
     {
+        double axial = this.axial.getAsDouble();
+        double lateral = this.lateral.getAsDouble();
+        double yaw = this.rotational.getAsDouble();
+
         double rotX = lateral;
         double rotY = axial;
         double rx = yaw;
 
-        double botHeading = botAngle.toUnit(AngleUnit.RADIANS).measure; // ensure angle is always in radians
+        double botHeading = odometry.getDriverHeading().toUnit(AngleUnit.RADIANS).measure; // ensure angle is always in radians
 
         switch (currentMode)
         {
@@ -190,6 +203,21 @@ public class Drive extends SubsystemBase
     public void stop()
     {
         setDrivePowers(0, 0, 0, 0);
+    }
+
+    public void increaseSpeed()
+    {
+        speed = Math.min(1.0, speed + 0.25);
+    }
+
+    public void decreaseSpeed()
+    {
+        speed = Math.max(0.0, speed - 0.25);
+    }
+
+    public double getSpeed()
+    {
+        return speed;
     }
 
     public enum DriveMode

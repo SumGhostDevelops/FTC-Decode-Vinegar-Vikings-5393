@@ -42,7 +42,7 @@ public class TurretTestingWorks extends LinearOpMode
         hw = new RobotHardware(hardwareMap, telemetry);
         turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
         turret.lockToPosition = true;
-        odometry = new Odometry(hw.webcam, hw.pinpoint);
+        //odometry = new Odometry(hw.webcam, hw.pinpoint);
         bindKeys();
     }
 
@@ -104,7 +104,7 @@ public class TurretTestingWorks extends LinearOpMode
 
     protected void run() throws InterruptedException
     {
-        telemetry.addData("Robot Heading", odometry.getAngle().toUnit(AngleUnit.DEGREES));
+        //telemetry.addData("Robot Heading", odometry.getAngle().toUnit(AngleUnit.DEGREES));
         telemetry.addData("Turret Relative Heading", turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Raw Ticks", hw.turret.getCurrentPosition());
         telemetry.addData("Target Ticks", turret.getTargetPosition());
