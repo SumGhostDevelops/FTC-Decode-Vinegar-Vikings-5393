@@ -41,7 +41,7 @@ public class Webcam
                 .setDrawCubeProjection(showLiveView)
                 .setDrawTagID(showLiveView)
                 .setDrawTagOutline(showLiveView)
-                .setLensIntrinsics(RobotConstants.Odometry.Webcam.LENS_FX, RobotConstants.Odometry.Webcam.LENS_FY, RobotConstants.Odometry.Webcam.LENS_CX, RobotConstants.Odometry.Webcam.LENS_CY)
+                .setLensIntrinsics(RobotConstants.Odometry.Webcam.Lens.LENS_FX, RobotConstants.Odometry.Webcam.Lens.LENS_FY, RobotConstants.Odometry.Webcam.Lens.LENS_CX, RobotConstants.Odometry.Webcam.Lens.LENS_CY)
                 .setOutputUnits(unit, AngleUnit.DEGREES)
                 .build();
 

@@ -32,7 +32,7 @@ public class RobotContext
     {
         this.hw = new RobotHardware(hardwareMap, telemetry);
         this.odometry = new Odometry(hw.webcam, hw.pinpoint, RobotConstants.Odometry.DEFAULT_POSE);
-        this.drive = new Drive(hw.getDriveArray(), odometry, driveSuppliers[0], driveSuppliers[1], driveSuppliers[2]);
+        this.drive = new Drive(hw.getDriveArray());
         this.intake = new Intake(hw.intake);
         this.outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());
         this.transfer = new Transfer(hw.transfer);

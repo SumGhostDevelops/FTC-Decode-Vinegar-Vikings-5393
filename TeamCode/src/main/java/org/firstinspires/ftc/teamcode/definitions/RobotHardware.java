@@ -94,7 +94,7 @@ public class RobotHardware
         boolean outtakeOk = true;
         try
         {
-            outtakeLeft = new MotorExPlus(hardwareMap, RobotConstants.Outtake.LAUNCHER_LEFT, Motor.GoBILDA.BARE);
+            outtakeLeft = new MotorExPlus(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_LEFT, Motor.GoBILDA.BARE);
         }
         catch (Exception e)
         {
@@ -104,7 +104,7 @@ public class RobotHardware
 
         try
         {
-            outtakeRight = new MotorExPlus(hardwareMap, RobotConstants.Outtake.LAUNCHER_RIGHT, Motor.GoBILDA.BARE);
+            outtakeRight = new MotorExPlus(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_RIGHT, Motor.GoBILDA.BARE);
         }
         catch (Exception e)
         {
@@ -118,8 +118,8 @@ public class RobotHardware
             outtakeGroup.setRunMode(Motor.RunMode.VelocityControl);
             outtakeGroup.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
-            double[] veloCoeffs = RobotConstants.Outtake.veloCoeffs;
-            double[] ffCoeffs = RobotConstants.Outtake.ffCoeffs;
+            double[] veloCoeffs = RobotConstants.Outtake.Coefficients.veloCoeffs;
+            double[] ffCoeffs = RobotConstants.Outtake.Coefficients.ffCoeffs;
 
             outtakeGroup.setVeloCoefficients(veloCoeffs[0], veloCoeffs[1], veloCoeffs[2]);
             outtakeGroup.setFeedforwardCoefficients(ffCoeffs[0], ffCoeffs[1], ffCoeffs[2]);
@@ -157,7 +157,7 @@ public class RobotHardware
 
         try
         {
-            intake = new MotorExPlus(hardwareMap, RobotConstants.Intake.INTAKE, Motor.GoBILDA.RPM_1620);
+            intake = new MotorExPlus(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620);
             intake.setRunMode(Motor.RunMode.RawPower);
             intake.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
         }
@@ -169,7 +169,7 @@ public class RobotHardware
         // Odometry
         try
         {
-            pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.PINPOINT);
+            pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.NAME);
 
             pinpoint.setOffsets(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.magnitude, RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.magnitude, RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit);
 
@@ -187,7 +187,7 @@ public class RobotHardware
 
         try
         {
-            webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.Webcam.WEBCAM);
+            webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.Webcam.NAME);
         }
         catch (Exception e)
         {

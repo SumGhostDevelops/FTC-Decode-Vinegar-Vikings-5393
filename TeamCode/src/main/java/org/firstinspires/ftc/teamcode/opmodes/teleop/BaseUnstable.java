@@ -64,7 +64,7 @@ public abstract class BaseUnstable extends CommandOpMode
                         () -> robot.drive.increaseSpeed()
                 ));
 
-        telemetry.setAutoClear(RobotConstants.TELEMETRY_SET_AUTOCLEAR);
+        telemetry.setAutoClear(RobotConstants.Telemetry.SET_AUTOCLEAR);
         telemetry.addData("Status", "Initialized for " + team);
         displayTelemetry();
         telemetry.update();

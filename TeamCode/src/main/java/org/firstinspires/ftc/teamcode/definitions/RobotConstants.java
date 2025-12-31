@@ -14,32 +14,11 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 @Config
 public class RobotConstants
 {
-    // Drive Constants
-    public static double DRIVE_SPEED_MULTIPLIER = 1.0;
-    public final static double DRIVE_SPEED_MAXIMUM = 1;
-    public final static double DRIVE_SPEED_MINIMUM = 0.25;
-    public final static double DRIVE_SPEED_CHANGE = 0.25;
-
-    public static double HYBRID_MODE_TURN_P = 0.02;
-    public static double HYBRID_MODE_TURN_D = 0.001;
-    public static double HYBRID_MODE_DEADBAND = 0.05;
-
-    // Auto Aim Constants
-    public static double FORCED_ANGLE_OFFSET = 3;
-
-    // Outtake Constants
-    public final static int OUTTAKE_PPR = 28;
-    public final static int OUTTAKE_INITIAL_TARGET_RPM = 4150; // Tune this
-    public static int OUTTAKE_RPM_TOLERANCE = 100;
-    public static int OUTTAKE_STABILITY_TOLERANCE = 150;
-    public static double SHOT_DROP_THRESHOLD = 0.20; // 20% drop implies shot
-    public static double OUTTAKE_F_OFFSET = 0.0;
-
-    // Camera Offsets
-    public final static double cameraOffsetX = 0.0;
-    public final static double cameraOffsetY = 0.0;
-
-    public static boolean TELEMETRY_SET_AUTOCLEAR = true;
+    @Config
+    public static class Telemetry
+    {
+        public static boolean SET_AUTOCLEAR = true;
+    }
 
     @Config
     public static class AprilTags
@@ -56,17 +35,48 @@ public class RobotConstants
         public final static String FRONT_RIGHT = "frontRight";
         public final static String BACK_LEFT = "backLeft";
         public final static String BACK_RIGHT = "backRight";
+
+        @Config
+        public static class Speed
+        {
+            public final static double DEFAULT = 1.0;
+            public final static double MAXIMUM = 1.0;
+            public final static double MINIMUM = 0.25;
+            public final static double CHANGE = 0.25;
+        }
+
+        @Config
+        public static class HybridMode
+        {
+            public static double TURN_P = 0.02;
+            public static double TURN_D = 0.001;
+            public static double DEADBAND = 0.05;
+        }
     }
 
     @Config
     public static class Outtake
     {
-        // Outtake Motors
         public final static int PPR = 28;
-        public final static String LAUNCHER_LEFT = "leftOuttake";
-        public final static String LAUNCHER_RIGHT = "rightOuttake";
-        public final static double[] veloCoeffs = new double[]{1.0, 1.0, 1.0};
-        public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
+
+        public static class Name
+        {
+            public final static String LAUNCHER_LEFT = "leftOuttake";
+            public final static String LAUNCHER_RIGHT = "rightOuttake";
+        }
+
+        public static class Coefficients
+        {
+
+            public final static double[] veloCoeffs = new double[]{1.0, 1.0, 1.0};
+            public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
+        }
+
+        public static class Tolerance
+        {
+            public static int RPM = 100;
+            public static int RPM_ACCELERATION = 150;
+        }
     }
 
     @Config
@@ -102,7 +112,7 @@ public class RobotConstants
     @Config
     public static class Intake
     {
-        public final static String INTAKE = "intake";
+        public final static String NAME = "intake";
     }
 
     @Config
@@ -112,18 +122,29 @@ public class RobotConstants
         @Config
         public static class Pinpoint
         {
-            public final static String PINPOINT = "pinpoint";
+            public final static String NAME = "pinpoint";
         }
 
         @Config
         public static class Webcam
         {
 
-            public final static String WEBCAM = "webcam";
-            public final static double LENS_FX = 1424.38;
-            public final static double LENS_FY = 1424.38;
-            public final static double LENS_CX = 637.325;
-            public final static double LENS_CY = 256.774;
+            public final static String NAME = "webcam";
+
+            public static class Lens
+            {
+
+                public final static double LENS_FX = 1424.38;
+                public final static double LENS_FY = 1424.38;
+                public final static double LENS_CX = 637.325;
+                public final static double LENS_CY = 256.774;
+            }
+
+            public static class Offset
+            {
+                public final static double X = 0.0;
+                public final static double Y = 0.0;
+            }
         }
 
         @Config

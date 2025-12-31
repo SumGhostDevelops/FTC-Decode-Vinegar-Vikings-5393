@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.opmodes.teleop.Base;
 
+/*
 @TeleOp(name = "Tolerance Tuning", group = "Experiments")
 public class ToleranceTuning extends Base
 {
@@ -32,8 +32,8 @@ public class ToleranceTuning extends Base
         telemetry.addData("Modifying Tolerance", tolerance);
         telemetry.addData("Tolerance Change", tolerance);
 
-        telemetry.addData("OUTTAKE_RPM_TOLERANCE", RobotConstants.OUTTAKE_RPM_TOLERANCE);
-        telemetry.addData("OUTTAKE_STABILITY_TOLERANCE", RobotConstants.OUTTAKE_STABILITY_TOLERANCE);
+        telemetry.addData("OUTTAKE_RPM_TOLERANCE", RobotConstants.Outtake.Tolerance.RPM);
+        telemetry.addData("OUTTAKE_STABILITY_TOLERANCE", RobotConstants.Outtake.Tolerance.RPM_ACCELERATION);
 
         telemetry.update();
 
@@ -63,10 +63,10 @@ public class ToleranceTuning extends Base
         switch (tolerance)
         {
             case RPM_TOLERANCE:
-                RobotConstants.OUTTAKE_RPM_TOLERANCE += change;
+                RobotConstants.Outtake.Tolerance.RPM += change;
                 break;
             case STABILITY_TOLERANCE:
-                RobotConstants.OUTTAKE_STABILITY_TOLERANCE += change;
+                RobotConstants.Outtake.Tolerance.RPM_ACCELERATION += change;
                 break;
         }
     }
@@ -111,3 +111,5 @@ public class ToleranceTuning extends Base
                 );
     }
 }
+
+ */

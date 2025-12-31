@@ -6,27 +6,19 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.DoubleSupplier;
 
 public class Drive extends SubsystemBase
 {
     private final MotorEx frontLeft, frontRight, backLeft, backRight;
 
-    private DoubleSupplier axial;
-    private DoubleSupplier lateral;
-    private DoubleSupplier rotational;
-
-    public Odometry odometry; // for getting the angle
-
+    private double speed = RobotConstants.Drive.Speed.DEFAULT;
     private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
-    private double speed = RobotConstants.DRIVE_SPEED_MULTIPLIER;
 
-    public Drive(MotorEx[] driveMotors, Odometry odometry, DoubleSupplier axial, DoubleSupplier lateral, DoubleSupplier rotational)
+    public Drive(MotorEx[] driveMotors)
     {
         frontLeft = driveMotors[0];
         frontRight = driveMotors[1];
@@ -89,17 +81,13 @@ public class Drive extends SubsystemBase
         }
     }
 
-    public void drive()
+    public void drive(double lateral, double axial, double yaw, Angle botAngle)
     {
-        double axial = this.axial.getAsDouble();
-        double lateral = this.lateral.getAsDouble();
-        double yaw = this.rotational.getAsDouble();
-
         double rotX = lateral;
         double rotY = axial;
         double rx = yaw;
 
-        double botHeading = odometry.getDriverHeading().toUnit(AngleUnit.RADIANS).measure; // ensure angle is always in radians
+        double botHeading = botAngle.toUnit(AngleUnit.RADIANS).measure; // ensure angle is always in radians
 
         switch (currentMode)
         {
@@ -112,7 +100,7 @@ public class Drive extends SubsystemBase
                 // Agar.io / Slither.io style: Robot faces the direction the joystick points,
                 // and drives forward based on joystick magnitude.
                 double magnitude = Math.hypot(axial, lateral);
-                if (magnitude > RobotConstants.HYBRID_MODE_DEADBAND)
+                if (magnitude > RobotConstants.Drive.HybridMode.DEADBAND)
                 {
                     // Target heading = direction joystick is pointing (field-relative)
                     // atan2(lateral, axial) gives angle where axial=forward, lateral=right
@@ -124,7 +112,7 @@ public class Drive extends SubsystemBase
                     // Auto-turn to face target direction (unless driver is manually turning)
                     if (Math.abs(yaw) < 0.05)
                     {
-                        rx = Range.clip(error * RobotConstants.HYBRID_MODE_TURN_P, -1.0, 1.0);
+                        rx = Range.clip(error * RobotConstants.Drive.HybridMode.TURN_P, -1.0, 1.0);
                     }
 
                     // Drive forward (robot-centric) based on joystick magnitude
@@ -155,7 +143,7 @@ public class Drive extends SubsystemBase
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        double powerScale = RobotConstants.DRIVE_SPEED_MULTIPLIER;
+        double powerScale = speed;
 
         safeSetPower(frontLeft, frontLeftPower * powerScale);
         safeSetPower(frontRight, frontRightPower * powerScale);
@@ -207,12 +195,12 @@ public class Drive extends SubsystemBase
 
     public void increaseSpeed()
     {
-        speed = Math.min(1.0, speed + 0.25);
+        speed = Math.min(RobotConstants.Drive.Speed.MAXIMUM, speed + RobotConstants.Drive.Speed.CHANGE);
     }
 
     public void decreaseSpeed()
     {
-        speed = Math.max(0.0, speed - 0.25);
+        speed = Math.max(RobotConstants.Drive.Speed.MINIMUM, speed - RobotConstants.Drive.Speed.CHANGE);
     }
 
     public double getSpeed()
