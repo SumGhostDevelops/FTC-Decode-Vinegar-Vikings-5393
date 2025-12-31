@@ -3,9 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.experiments;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.controls.Commands;
-import org.firstinspires.ftc.teamcode.controls.Commands.IntakeIn;
-import org.firstinspires.ftc.teamcode.controls.Commands.IntakeOut;
+import org.firstinspires.ftc.teamcode.controls.commands.IntakeCommands;
+import org.firstinspires.ftc.teamcode.controls.commands.TransferCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
@@ -45,19 +44,19 @@ public class IntakeTesting extends LinearOpMode {
 
 
         intakeInTrigger.whileActiveOnce(
-                new IntakeIn(intake, () -> power)
+                new IntakeCommands.In(intake, () -> power)
         );
 
         intakeOutTrigger.whileActiveOnce(
-                new IntakeOut(intake, () -> power)
+                new IntakeCommands.Out(intake, () -> power)
         );
 
         transferEngageTrigger.whenActive(
-                new Commands.TransferEngage(transfer)
+                new TransferCommands.Open(transfer)
         );
 
         transferDisengageTrigger.whenActive(
-                new Commands.TransferDisengage(transfer)
+                new TransferCommands.Close(transfer)
         );
 
 
