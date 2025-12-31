@@ -76,7 +76,7 @@ public class RobotConstants
         public final static int PPR = 28;
         public final static int TOLERANCE = 0; // in ticks
         public final static double GEAR_RATIO = 19.2 * 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
-        public final static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES); // should be the same as the IMU
+        public final static Angle FORWARD_ANGLE = new Angle(90, AngleUnit.DEGREES);
         public final static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-180, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(180, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         public final static double posCoeff = 1.0;
         public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};

@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems.odometry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
@@ -22,7 +21,10 @@ public class Odometry
     private static DistanceUnit dUnit = DistanceUnit.METER;
     private static AngleUnit aUnit = AngleUnit.RADIANS;
 
-    private Angle driverForward;
+    /**
+     * The Angle reported by the Pinpoint, where it is straight-ahead for the driver.
+     */
+    private Angle driverForward = new Angle(0, AngleUnit.DEGREES);
 
     /**
      * Initializes the odometry, sets the position to the center of the field, and the forward-angle to the robot's current heading
@@ -35,32 +37,19 @@ public class Odometry
     }
 
     /**
-     * Initializes the odometry
-     * @param webcam
-     * @param pinpoint
-     * @param referencePose What the robot's current pose is
-     */
-    public Odometry(WebcamName webcam, Pinpoint pinpoint, Pose2d referencePose)
-    {
-        this(webcam, pinpoint, referencePose, referencePose.heading);
-    }
-
-    /**
      * @param webcam
      * @param pinpoint
      * @param referencePose The reference (could be the initial) pose of the robot, to determine its absolute position and heading
-     * @param driverForward The absolute {@link Angle} where it is forward from the driver's perspective
      */
-    public Odometry(WebcamName webcam, Pinpoint pinpoint, Pose2d referencePose, Angle driverForward)
+    public Odometry(WebcamName webcam, Pinpoint pinpoint, Pose2d referencePose)
     {
         this.webcam = new Webcam(webcam);
         this.pinpoint = pinpoint;
         pinpoint.setPosition(referencePose.toPose2D());
-        this.driverForward = driverForward;
     }
 
     /**
-     * @return The (hopefully) absolute {@link Angle} of the robot on the field
+     * @return The absolute {@link Angle} of the robot on the field
      */
     public Angle getAngle()
     {
@@ -99,19 +88,20 @@ public class Odometry
     }
 
     /**
-     * Resets the IMU heading. The robot must be perpendicular to the Blue alliance to work without errors.
+     * Sets the driver's forward angle to the robot's current absolute heading.
+     * Call this when the robot is facing the direction the driver considers "forward".
      */
-    public void resetHeading()
+    public void setForwardAngle()
     {
-        pinpoint.recalibrateIMU();
+        driverForward = getAngle();
     }
 
     /**
-     * Updates the {@link Odometry#driverForward} so that calls to {@link Odometry#getDriverHeading()} are treated as 0-degrees forward.
+     * Resets the Pinpoint IMU so that, when facing the Angle immediately prior to this being called, the Angle returned is 0.
      */
-    public void resetDriverHeading()
+    public void resetAngle()
     {
-        driverForward = getAngle();
+        pinpoint.recalibrateIMU();
     }
 
     /**
@@ -133,20 +123,7 @@ public class Odometry
         Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose);
         pinpoint.setPosition(estimatedPose.toPose2D());
 
-        return true;
-    }
-
-    /**
-     * Same thing as {@link Odometry#localize()} but forces the driver-forward angle to be based on specified {@link Team} rather than where the robot is currently facing.
-     * @param team
-     * @return If the re-localization was successful or not
-     * @see Odometry#localize
-     */
-    public boolean localize(Team team)
-    {
-        if (!localize()) return false;
-
-        driverForward = team.forwardAngle;
+        driverForward = new Angle(0, AngleUnit.DEGREES);
 
         return true;
     }
