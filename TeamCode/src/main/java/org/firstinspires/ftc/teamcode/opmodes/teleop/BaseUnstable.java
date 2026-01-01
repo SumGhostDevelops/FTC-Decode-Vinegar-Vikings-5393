@@ -1,19 +1,16 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.controls.InputHandler;
+import org.firstinspires.ftc.teamcode.controls.commands.DriveCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.controls.Gamepads;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 /**
  * This class is for implementing and testing new but unstable features
@@ -22,47 +19,20 @@ public abstract class BaseUnstable extends CommandOpMode
 {
     protected Team team;
     protected RobotContext robot;
-    protected InputHandler input;
-
-    protected DoubleSupplier axial;
-    protected DoubleSupplier lateral;
-    protected DoubleSupplier yaw;
 
     @Override
     public void initialize()
     {
-        axial = () -> -gamepad1.left_stick_y;
-        lateral = () -> gamepad1.left_stick_x;
-        yaw = () -> gamepad1.right_stick_x;
-        Gamepads gamepads = new Gamepads(gamepad1, gamepad2);
+        robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
 
-        robot = new RobotContext(team, hardwareMap, telemetry, gamepads, new DoubleSupplier[]{axial, lateral, yaw});
+        register(robot.drive, robot.intake, robot.transfer, robot.turret, robot.outtake, robot.odometry);
 
-        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
-                new InstantCommand(
-                () -> robot.turret.setTargetRelative(new Angle(0, AngleUnit.DEGREES))
-                ));
-        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
-                new InstantCommand(
-                        () -> robot.turret.setTargetRelative(new Angle(90, AngleUnit.DEGREES))
-                ));
-        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
-                new InstantCommand(
-                        () -> robot.turret.setTargetRelative(new Angle(180, AngleUnit.DEGREES))
-                ));
-        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
-                new InstantCommand(
-                        () -> robot.turret.setTargetRelative(new Angle(270, AngleUnit.DEGREES))
-                ));
+        DoubleSupplier axial = () -> -gamepad1.left_stick_y;
+        DoubleSupplier lateral = () -> gamepad1.left_stick_x;
+        DoubleSupplier yaw = () -> gamepad1.right_stick_x;
+        Supplier<Angle> driverHeading = () -> robot.odometry.getDriverHeading();
 
-        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(
-                new InstantCommand(
-                        () -> robot.drive.decreaseSpeed()
-                ));
-        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(
-                new InstantCommand(
-                        () -> robot.drive.increaseSpeed()
-                ));
+        robot.drive.setDefaultCommand(new DriveCommands.Manuever(robot.drive, lateral, axial, yaw, driverHeading));
 
         telemetry.setAutoClear(RobotConstants.Telemetry.SET_AUTOCLEAR);
         telemetry.addData("Status", "Initialized for " + team);
@@ -87,16 +57,15 @@ public abstract class BaseUnstable extends CommandOpMode
      */
     protected void update()
     {
+        displayTelemetry();
         telemetry.update();
-        input.update();
     }
 
+    @Override
     public void run()
     {
-        displayTelemetry();
-        robot.turret.setTargetAbsolute(new Angle(90, AngleUnit.DEGREES), robot.odometry.getAngle());
-
-        // robot.turret.setTargetAbsolute(robot.odometry.getFieldCoord().angleTo(team.goal.coord), robot.odometry.getAngle());
+        update();
+        super.run();
     }
 
     @Override

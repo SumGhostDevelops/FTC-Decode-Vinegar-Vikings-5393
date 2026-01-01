@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
+import com.seattlesolvers.solverslib.command.SubsystemBase;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -13,7 +15,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
 
-public class Odometry
+public class Odometry extends SubsystemBase
 {
     public final Webcam webcam;
     private final Pinpoint pinpoint;
@@ -126,6 +128,12 @@ public class Odometry
         driverForward = new Angle(0, AngleUnit.DEGREES);
 
         return true;
+    }
+
+    @Override
+    public void periodic()
+    {
+        pinpoint.update();
     }
 
     /**

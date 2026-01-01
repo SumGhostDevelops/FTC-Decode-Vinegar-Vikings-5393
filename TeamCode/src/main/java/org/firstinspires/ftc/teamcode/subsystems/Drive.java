@@ -81,13 +81,13 @@ public class Drive extends SubsystemBase
         }
     }
 
-    public void drive(double lateral, double axial, double yaw, Angle botAngle)
+    public void drive(double lateral, double axial, double yaw, Angle driverHeading)
     {
         double rotX = lateral;
         double rotY = axial;
         double rx = yaw;
 
-        double botHeading = botAngle.toUnit(AngleUnit.RADIANS).measure; // ensure angle is always in radians
+        double botHeading = driverHeading.toUnit(AngleUnit.RADIANS).measure; // ensure angle is always in radians
 
         switch (currentMode)
         {

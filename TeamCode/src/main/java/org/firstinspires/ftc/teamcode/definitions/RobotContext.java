@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -28,7 +29,7 @@ public class RobotContext
     public final Telemetry telemetry; // The robot's telemetry interface
     public final Gamepads gamepads; // A custom class for easily sharing access to the robot's gamepads
 
-    public RobotContext(Team team, HardwareMap hardwareMap, Telemetry telemetry, Gamepads gamepads, DoubleSupplier[] driveSuppliers)
+    public RobotContext(Team team, HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2)
     {
         this.hw = new RobotHardware(hardwareMap, telemetry);
         this.odometry = new Odometry(hw.webcam, hw.pinpoint, RobotConstants.Odometry.DEFAULT_POSE);
@@ -40,6 +41,6 @@ public class RobotContext
 
         this.team = team;
         this.telemetry = telemetry;
-        this.gamepads = gamepads;
+        this.gamepads = new Gamepads(gamepad1, gamepad2, drive, intake, transfer);
     }
 }

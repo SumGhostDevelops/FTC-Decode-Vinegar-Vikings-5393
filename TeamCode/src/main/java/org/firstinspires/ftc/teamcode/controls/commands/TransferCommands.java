@@ -2,15 +2,13 @@ package org.firstinspires.ftc.teamcode.controls.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-
 public class TransferCommands
 {
     public static class Open extends CommandBase
     {
-        private final Transfer transfer;
+        private final org.firstinspires.ftc.teamcode.subsystems.Transfer transfer;
 
-        public Open(Transfer transfer)
+        public Open(org.firstinspires.ftc.teamcode.subsystems.Transfer transfer)
         {
             this.transfer = transfer;
         }
@@ -30,9 +28,9 @@ public class TransferCommands
 
     public static class Close extends CommandBase
     {
-        private final Transfer transfer;
+        private final org.firstinspires.ftc.teamcode.subsystems.Transfer transfer;
 
-        public Close(Transfer transfer)
+        public Close(org.firstinspires.ftc.teamcode.subsystems.Transfer transfer)
         {
             this.transfer = transfer;
         }

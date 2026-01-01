@@ -10,7 +10,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.controls.Gamepads;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
+import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
@@ -23,15 +25,14 @@ public class TurretTesting extends CommandOpMode
     public void initialize()
     {
         RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
-        turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
+        RobotContext robot = new RobotContext(Team.BLUE, hardwareMap, telemetry, gamepad1, gamepad2);
 
         register(turret);
 
-        Gamepads gamepads = new Gamepads(gamepad1, gamepad2);
-        Button dpadUp = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_UP);
-        Button dpadLeft = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_LEFT);
-        Button dpadDown = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_DOWN);
-        Button dpadRight = new GamepadButton(gamepads.driver, GamepadKeys.Button.DPAD_RIGHT);
+        Button dpadUp = new GamepadButton(robot.gamepads.driverGamepadEx, GamepadKeys.Button.DPAD_UP);
+        Button dpadLeft = new GamepadButton(robot.gamepads.driverGamepadEx, GamepadKeys.Button.DPAD_LEFT);
+        Button dpadDown = new GamepadButton(robot.gamepads.driverGamepadEx, GamepadKeys.Button.DPAD_DOWN);
+        Button dpadRight = new GamepadButton(robot.gamepads.driverGamepadEx, GamepadKeys.Button.DPAD_RIGHT);
 
         dpadUp.whenPressed(turret.turnToCommand(new Angle(0, AngleUnit.DEGREES)));
         dpadLeft.whenPressed(turret.turnToCommand(new Angle(90, AngleUnit.DEGREES)));

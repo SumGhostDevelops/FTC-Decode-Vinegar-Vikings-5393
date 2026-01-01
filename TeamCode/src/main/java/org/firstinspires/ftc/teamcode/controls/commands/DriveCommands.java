@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.controls.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
@@ -19,13 +20,14 @@ public class DriveCommands
         private final DoubleSupplier yaw;
         private final Supplier<Angle> botAngle;
 
-        public Manuever(Drive drive, DoubleSupplier lateral, DoubleSupplier axial, DoubleSupplier yaw, Supplier<Angle> botAngle)
+        public Manuever(Drive drive, DoubleSupplier lateral, DoubleSupplier axial, DoubleSupplier yaw, Supplier<Angle> driverHeading)
         {
             this.drive = drive;
             this.lateral = lateral;
             this.axial = axial;
             this.yaw = yaw;
-            this.botAngle = botAngle;
+            this.botAngle = driverHeading;
+            addRequirements(drive);
         }
 
         @Override
@@ -35,47 +37,19 @@ public class DriveCommands
         }
     }
 
-    public static class IncreaseSpeed extends CommandBase
+    public static class IncreaseSpeed extends InstantCommand
     {
-        private final Drive drive;
-
         public IncreaseSpeed(Drive drive)
         {
-            this.drive = drive;
-        }
-
-        @Override
-        public void initialize()
-        {
-            drive.increaseSpeed();
-        }
-
-        @Override
-        public boolean isFinished()
-        {
-            return true;
+            super(drive::increaseSpeed, drive);
         }
     }
 
-    public static class DecreaseSpeed extends CommandBase
+    public static class DecreaseSpeed extends InstantCommand
     {
-        private final Drive drive;
-
         public DecreaseSpeed(Drive drive)
         {
-            this.drive = drive;
-        }
-
-        @Override
-        public void initialize()
-        {
-            drive.decreaseSpeed();
-        }
-
-        @Override
-        public boolean isFinished()
-        {
-            return true;
+            super(drive::decreaseSpeed, drive);
         }
     }
 }

@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.controls.commands.IntakeCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.TransferCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.button.Trigger;
@@ -18,16 +16,16 @@ public class IntakeTesting extends LinearOpMode {
 
     double power = 0.8;
 
-    Intake intake;
+    org.firstinspires.ftc.teamcode.subsystems.Intake intake;
 
-    Transfer transfer;
+    org.firstinspires.ftc.teamcode.subsystems.Transfer transfer;
 
     @Override
     public void runOpMode() {
 
         RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
-        intake = new Intake(hw.intake);
-        transfer = new Transfer(hw.transfer);
+        intake = new org.firstinspires.ftc.teamcode.subsystems.Intake(hw.intake);
+        transfer = new org.firstinspires.ftc.teamcode.subsystems.Transfer(hw.transfer);
 
         // Triggers
         Trigger intakeInTrigger =
