@@ -7,28 +7,25 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.controls.commands.DriveCommands;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
+import org.firstinspires.ftc.teamcode.controls.commands.OdometryCommands;
+import org.firstinspires.ftc.teamcode.controls.commands.OuttakeCommands;
+import org.firstinspires.ftc.teamcode.definitions.Subsystems;
 
 public class Gamepads
 {
     public GamepadEx driverGamepadEx;
     public GamepadEx coDriverGamepadEx;
 
-    public org.firstinspires.ftc.teamcode.subsystems.Drive drive;
-    public Intake intake;
-    public Transfer transfer;
+    public Subsystems subsystems;
 
     public Driver driver;
 
-    public Gamepads(Gamepad driver, Gamepad coDriver, org.firstinspires.ftc.teamcode.subsystems.Drive drive, Intake intake, Transfer transfer)
+    public Gamepads(Gamepad driver, Gamepad coDriver, Subsystems subsystems)
     {
         this.driverGamepadEx = new GamepadEx(driver);
         this.coDriverGamepadEx = new GamepadEx(coDriver);
 
-        this.drive = drive;
-        this.intake = intake;
-        this.transfer = transfer;
+        this.subsystems = subsystems;
 
         this.driver = new Driver(driverGamepadEx);
         this.driver.bind();
@@ -41,8 +38,8 @@ public class Gamepads
         private Button leftBumper;
         private Button rightBumper;
 
-        private Button dpadUp;
-        private Button dpadDown;
+        public Button dpadUp;
+        public Button dpadDown;
         private Button dpadLeft;
         private Button dpadRight;
 
@@ -77,8 +74,13 @@ public class Gamepads
 
         public void bind()
         {
-            leftBumper.whenPressed(new DriveCommands.DecreaseSpeed(drive));
-            rightBumper.whenPressed(new DriveCommands.IncreaseSpeed(drive));
+            leftBumper.whenPressed(new DriveCommands.DecreaseSpeed(subsystems.drive));
+            rightBumper.whenPressed(new DriveCommands.IncreaseSpeed(subsystems.drive));
+
+            A.toggleWhenPressed(new OuttakeCommands.On(subsystems.outtake), new OuttakeCommands.Off(subsystems.outtake));
+            B.whenPressed(new OdometryCommands.SetForwardAngle(subsystems.odometry));
+            dpadUp.whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 100));
+            dpadDown.whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));
         }
     }
 }

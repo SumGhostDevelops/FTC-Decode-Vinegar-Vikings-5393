@@ -15,7 +15,7 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
 
     protected InputHandler input;
     double power = 0.8;
-    double rpm = 3500;
+    int rpm = 3500;
     double accelerationTolerance = 8;
     double RPMTolerance = 50;
     boolean hasLaunched = false;
@@ -46,6 +46,7 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
         intake = new Intake(hw.intake);
         transfer = new Transfer(hw.transfer);
         outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());
+        outtake.setRPM(rpm);
     }
     protected void launch() throws InterruptedException {
         if(atSpeed() && !hasLaunched) {
@@ -63,13 +64,13 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
     }
     protected boolean atSpeed()
     {
-        return((Math.abs(outtake.getAcceleration()) <= accelerationTolerance)&&(Math.abs(outtake.getVelocity() - rpm) <= RPMTolerance));
+        return((Math.abs(outtake.getAcceleration()) <= accelerationTolerance)&&(Math.abs(outtake.getRPM() - rpm) <= RPMTolerance));
     }
 
     protected void run() throws InterruptedException
     {
-        telemetry.addData("Outtake Target RPM", rpm);
-        telemetry.addData("Outtake RPM", outtake.getVelocity());
+        telemetry.addData("Outtake Target RPM", outtake.getTargetRPM());
+        telemetry.addData("Outtake RPM", outtake.getRPM());
 
         telemetry.addData("Intake Power", power);
         telemetry.addData("Intake RPM", intake.getRPM());
@@ -80,11 +81,11 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
     {
         input.bind(
                 () -> gamepad1.right_trigger > 0.25,
-                () -> outtake.setRPM(rpm)
+                () -> outtake.on()
         );
         input.bind(
                 () -> gamepad1.right_trigger < 0.25,
-                () -> outtake.stop()
+                () -> outtake.off()
         );
         input.bind(
                 () -> gamepad1.left_trigger > 0.25,

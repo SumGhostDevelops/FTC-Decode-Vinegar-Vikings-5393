@@ -15,29 +15,19 @@ import org.firstinspires.ftc.teamcode.subsystems.odometry.OdometryControlHub;
 public class RobotContext
 {
     public final RobotHardware hw; // Raw interface of the robot's hardware
-    public final Drive drive; // Drive subsystem
-    public final Intake intake; // Intake subsystem
-    public final Outtake outtake; // Outtake subsystem
-    public final Transfer transfer; // Transfer subsystem
-    public final Turret turret;
+    public final Subsystems subsystems;
 
     public final Team team; // Team color the robot is initialized to
-    public final OdometryControlHub odometry; // Odometry of the robot
     public final Telemetry telemetry; // The robot's telemetry interface
     public final Gamepads gamepads; // A custom class for easily sharing access to the robot's gamepads
 
     public RobotContext(Team team, HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2)
     {
         this.hw = new RobotHardware(hardwareMap, telemetry);
-        this.odometry = new OdometryControlHub(hw.webcam, hw.imu, hw.dwFwd, hw.dwStrf);
-        this.drive = new Drive(hw.getDriveArray());
-        this.intake = new Intake(hw.intake);
-        this.outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());
-        this.transfer = new Transfer(hw.transfer);
-        this.turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, true);
+        this.subsystems = new Subsystems(hw);
 
         this.team = team;
         this.telemetry = telemetry;
-        this.gamepads = new Gamepads(gamepad1, gamepad2, drive, intake, transfer);
+        this.gamepads = new Gamepads(gamepad1, gamepad2, subsystems);
     }
 }

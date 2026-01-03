@@ -69,7 +69,7 @@ public class RobotConstants
         public static class Coefficients
         {
 
-            public final static double[] veloCoeffs = new double[]{1.0, 1.0, 1.0};
+            public final static double[] veloCoeffs = new double[]{0.1, 0.0, 0.1};
             public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
         }
 
