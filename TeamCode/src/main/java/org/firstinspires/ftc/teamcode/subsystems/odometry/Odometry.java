@@ -24,9 +24,15 @@ public class Odometry extends SubsystemBase
     private static AngleUnit aUnit = AngleUnit.RADIANS;
 
     /**
-     * The Angle reported by the Pinpoint, where it is straight-ahead for the driver.
+     * Offset added to Pinpoint heading to get field-absolute heading.
+     * After localize(): headingOffset = AprilTag heading - Pinpoint heading at that moment
      */
-    private Angle driverForward = new Angle(0, AngleUnit.DEGREES);
+    private Angle headingOffset = new Angle(0, aUnit);
+
+    /**
+     * The field-absolute heading that the driver considers "forward" for field-centric driving.
+     */
+    private Angle driverForward = new Angle(0, aUnit);
 
     /**
      * Initializes the odometry, sets the position to the center of the field, and the forward-angle to the robot's current heading
@@ -51,11 +57,11 @@ public class Odometry extends SubsystemBase
     }
 
     /**
-     * @return The absolute {@link Angle} of the robot on the field
+     * @return The field-absolute heading of the robot (Pinpoint heading + headingOffset)
      */
     public Angle getAngle()
     {
-        return new Angle(pinpoint.getHeading(aUnit), aUnit);
+        return new Angle(pinpoint.getHeading(aUnit), aUnit).plus(headingOffset);
     }
 
     /**
@@ -92,10 +98,13 @@ public class Odometry extends SubsystemBase
     /**
      * Sets the driver's forward angle to the robot's current absolute heading.
      * Call this when the robot is facing the direction the driver considers "forward".
+     * Note: This assumes the robot is facing field-forward (0°) for absolute heading purposes.
+     * If not, call localize() afterward to correct the absolute heading.
      */
     public void setForwardAngle()
     {
-        driverForward = getAngle();
+        headingOffset = new Angle(0, aUnit);
+        driverForward = new Angle(pinpoint.getHeading(aUnit), aUnit);
     }
 
     /**
@@ -108,6 +117,8 @@ public class Odometry extends SubsystemBase
 
     /**
      * Attempts to relocalize the robot. Camera must be facing a goal AprilTag to work.
+     * This sets the robot's absolute position AND heading on the field based on AprilTag detection.
+     * The driver's relative forward reference is preserved so field-centric driving remains consistent.
      * @return If the re-localization was successful or not
      */
     public boolean localize()
@@ -116,16 +127,26 @@ public class Odometry extends SubsystemBase
         webcam.updateDetections();
 
         Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
-        {
-            if (possibleTag.isEmpty()) return false;
-        }
+        if (possibleTag.isEmpty()) return false;
 
-        // get the apriltag and the pose it has estimated, and set it to the pinpoint
+        // get the apriltag and the pose it has estimated
         AprilTagDetection tag = possibleTag.get();
         Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose);
+
+        // Preserve driver's relative heading before we change headingOffset
+        Angle currentDriverHeading = getAngle().minus(driverForward);
+
+        // Compute new headingOffset so getAngle() returns true field-absolute heading
+        // headingOffset = estimatedPose.heading - currentPinpointHeading
+        Angle currentPinpointHeading = new Angle(pinpoint.getHeading(aUnit), aUnit);
+        headingOffset = estimatedPose.heading.toUnit(aUnit).minus(currentPinpointHeading);
+
+        // Update driverForward so getDriverHeading() still returns the same value
+        driverForward = estimatedPose.heading.toUnit(aUnit).minus(currentDriverHeading);
+
+        // Set the position to the pinpoint
         pinpoint.setPosition(estimatedPose.toPose2D());
 
-        driverForward = new Angle(0, AngleUnit.DEGREES);
 
         return true;
     }

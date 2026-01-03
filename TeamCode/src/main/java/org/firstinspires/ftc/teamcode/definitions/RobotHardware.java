@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
@@ -17,7 +20,9 @@ import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 public class RobotHardware
 {
     public MotorExPlus frontLeft, frontRight, backLeft, backRight, intake, turret, outtakeLeft, outtakeRight;
+    public MotorEx dwFwd, dwStrf;
     public ServoEx transfer;
+    public IMU imu;
     public Pinpoint pinpoint;
     public WebcamName webcam;
 
@@ -183,6 +188,32 @@ public class RobotHardware
         catch (Exception e)
         {
             telemetry.log().add("Warning: goBilda Pinpoint not found");
+        }
+
+        try
+        {
+            imu = hardwareMap.get(IMU.class, RobotConstants.Odometry.IMU.NAME);
+            IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                    RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+            ));
+
+            imu.initialize(parameters);
+            imu.resetYaw();
+        }
+        catch (Exception e)
+        {
+            telemetry.log().add("Warning: Control Hub IMU not found");
+        }
+
+        try
+        {
+            dwFwd = new MotorEx(hardwareMap, RobotConstants.Odometry.Deadwheels.Forward.NAME);
+            dwStrf = new MotorEx(hardwareMap, RobotConstants.Odometry.Deadwheels.Strafe.NAME);
+        }
+        catch (Exception e)
+        {
+            telemetry.log().add("Warning: Forward and/or strafe encoders not found");
         }
 
         try
