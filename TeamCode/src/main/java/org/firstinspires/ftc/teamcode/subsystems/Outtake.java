@@ -50,7 +50,7 @@ public class Outtake extends SubsystemBase {
     // Closed-loop: set a target velocity (RPM)
     public void setRPM(int rpm)
     {
-        targetRPM = Math.max(6000, rpm);
+        targetRPM = Math.min(6000, Math.max(0, rpm));
     }
 
     public int getTargetRPM()
