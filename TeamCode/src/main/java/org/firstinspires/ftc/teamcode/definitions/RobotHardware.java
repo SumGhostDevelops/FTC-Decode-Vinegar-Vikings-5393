@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 public class RobotHardware
 {
     public MotorExPlus frontLeft, frontRight, backLeft, backRight, intake, turret, outtakeLeft, outtakeRight;
-    public MotorEx dwFwd, dwStrf;
+    public Motor.Encoder dwFwd, dwStrf;
     public ServoEx transfer;
     public IMU imu;
     public Pinpoint pinpoint;
@@ -37,7 +37,7 @@ public class RobotHardware
             try
             {
                 frontLeft = new MotorExPlus(hardwareMap, RobotConstants.Drive.FRONT_LEFT, Motor.GoBILDA.RPM_312);
-                frontLeft.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
+                frontLeft.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
             }
             catch (Exception e)
             {
@@ -59,7 +59,7 @@ public class RobotHardware
             try
             {
                 backLeft = new MotorExPlus(hardwareMap, RobotConstants.Drive.BACK_LEFT, Motor.GoBILDA.RPM_312);
-                backLeft.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
+                backLeft.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
             {
@@ -208,8 +208,8 @@ public class RobotHardware
 
         try
         {
-            dwFwd = new MotorEx(hardwareMap, RobotConstants.Odometry.Deadwheels.Forward.NAME);
-            dwStrf = new MotorEx(hardwareMap, RobotConstants.Odometry.Deadwheels.Strafe.NAME);
+            dwFwd = backRight.encoder;
+            dwStrf = backLeft.encoder;
         }
         catch (Exception e)
         {

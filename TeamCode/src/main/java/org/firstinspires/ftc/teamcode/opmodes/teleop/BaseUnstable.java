@@ -20,10 +20,6 @@ public abstract class BaseUnstable extends CommandOpMode
     protected Team team;
     protected RobotContext robot;
 
-    DoubleSupplier axial;
-    DoubleSupplier lateral;
-    DoubleSupplier yaw;
-
     @Override
     public void initialize()
     {
@@ -32,13 +28,12 @@ public abstract class BaseUnstable extends CommandOpMode
         register(robot.drive, robot.intake, robot.transfer, robot.turret, robot.outtake, robot.odometry);
 
 
-        axial = () -> -gamepad1.left_stick_y;
-        lateral = () -> gamepad1.left_stick_x;
-        yaw = () -> gamepad1.right_stick_x;
-        //Supplier<Angle> driverHeading = () -> robot.odometry.getDriverHeading();
+        DoubleSupplier axial = () -> gamepad1.left_stick_y;
+        DoubleSupplier lateral = () -> gamepad1.left_stick_x;
+        DoubleSupplier yaw = () -> gamepad1.right_stick_x;
+        Supplier<Angle> driverHeading = () -> robot.odometry.getDriverHeading();
 
-
-        //robot.drive.setDefaultCommand(new DriveCommands.Manuever(robot.drive, lateral, axial, yaw, driverHeading));
+        robot.drive.setDefaultCommand(new DriveCommands.Manuever(robot.drive, lateral, axial, yaw, driverHeading));
 
         telemetry.setAutoClear(RobotConstants.Telemetry.SET_AUTOCLEAR);
         telemetry.addData("Status", "Initialized for " + team);
@@ -71,7 +66,6 @@ public abstract class BaseUnstable extends CommandOpMode
     public void run()
     {
         update();
-        robot.drive.drive(axial.getAsDouble(), lateral.getAsDouble(), yaw.getAsDouble(), new Angle(0, AngleUnit.DEGREES));
         super.run();
     }
 

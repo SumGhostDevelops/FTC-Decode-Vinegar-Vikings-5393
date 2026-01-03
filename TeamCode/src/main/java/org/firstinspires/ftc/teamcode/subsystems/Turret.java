@@ -39,8 +39,8 @@ public class Turret extends SubsystemBase
 
     /**
      * Aim absolutely to the field, around the reported {@code iniitalRelativeAngle}
-     * @param targetAngle
-     * @param robotAngle
+     * @param targetAngle The absolute target angle
+     * @param robotAngle The robot's absolute angle
      * @see #setTargetRelative(Angle targetAngle)
      */
     public void setTargetAbsolute(Angle targetAngle, Angle robotAngle)

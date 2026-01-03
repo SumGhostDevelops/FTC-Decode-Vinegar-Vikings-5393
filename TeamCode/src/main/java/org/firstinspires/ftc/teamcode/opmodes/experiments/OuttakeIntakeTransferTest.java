@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.teamcode.controls.InputHandler;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
-import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
 @TeleOp(name = "OuttakeIntakeTransferTest", group = "Experiments")
 public class OuttakeIntakeTransferTest extends LinearOpMode {
@@ -18,9 +18,10 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
     double rpm = 3500;
     double tolerance = 50;
     boolean hasLaunched = false;
-    org.firstinspires.ftc.teamcode.subsystems.Intake intake;
-    org.firstinspires.ftc.teamcode.subsystems.Transfer transfer;
-    org.firstinspires.ftc.teamcode.subsystems.Outtake outtake;
+    Intake intake;
+    Transfer transfer;
+    Outtake outtake;
+
     @Override
     public void runOpMode() throws InterruptedException {
         initSystems();
@@ -40,11 +41,15 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
     {
         input = new InputHandler();
         bindKeys();
+        RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
+        intake = new Intake(hw.intake);
+        transfer = new Transfer(hw.transfer);
+        outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());
     }
     protected void launch() throws InterruptedException {
         if(atSpeed() && !hasLaunched) {
             intake.in(power);
-            wait(100);
+            Thread.sleep(100);
             transfer.flip();
             hasLaunched = true;
         }
@@ -74,11 +79,11 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
     {
         input.bind(
                 () -> gamepad1.right_trigger > 0.25,
-                () -> outtake.setTargetVelocity(rpm)
+                () -> outtake.setRPM(rpm)
         );
         input.bind(
                 () -> gamepad1.right_trigger < 0.25,
-                () -> outtake.setTargetVelocity(0)
+                () -> outtake.stop()
         );
         input.bind(
                 () -> gamepad1.left_trigger > 0.25,

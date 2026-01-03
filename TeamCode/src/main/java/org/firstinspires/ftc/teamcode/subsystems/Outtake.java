@@ -2,7 +2,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 
 public class Outtake extends SubsystemBase {
@@ -20,7 +21,8 @@ public class Outtake extends SubsystemBase {
     }
 
     // Closed-loop: set a target velocity (RPM)
-    public void setTargetVelocity(double rpm) {
+    public void setRPM(double rpm) {
+        motor.setRunMode(Motor.RunMode.VelocityControl);
         motor.setRPM(rpm);
     }
 
@@ -40,6 +42,7 @@ public class Outtake extends SubsystemBase {
     }
 
     public void stop() {
+        motor.setRunMode(Motor.RunMode.RawPower);
         motor.set(0.0);
     }
 }

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
 import com.qualcomm.robotcore.hardware.IMU;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.hardware.motors.Motor.Encoder;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -20,8 +20,8 @@ import java.util.Optional;
 public class OdometryControlHub extends SubsystemBase
 {
     private final Webcam webcam;
-    private final MotorEx dwPar;
-    private final MotorEx dwPerp;
+    private final Encoder dwPar;
+    private final Encoder dwPerp;
     private final IMU imu;
 
     private static final DistanceUnit dUnit = DistanceUnit.METER;
@@ -40,12 +40,12 @@ public class OdometryControlHub extends SubsystemBase
      */
     private Angle driverForward = new Angle(0, aUnit);
 
-    public OdometryControlHub(WebcamName webcam, IMU imu, MotorEx dwPar, MotorEx dwPerp)
+    public OdometryControlHub(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp)
     {
         this(webcam, imu, dwPar, dwPerp, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.FTC_STD), new Angle(0, AngleUnit.DEGREES)));
     }
 
-    public OdometryControlHub(WebcamName webcam, IMU imu, MotorEx dwPar, MotorEx dwPerp, Pose2d referencePose)
+    public OdometryControlHub(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp, Pose2d referencePose)
     {
         this.webcam = new Webcam(webcam);
         this.imu = imu;
@@ -53,11 +53,11 @@ public class OdometryControlHub extends SubsystemBase
         this.dwPerp = dwPerp;
 
         // reset encoders so deadwheel handler's initial encoder baseline is known
-        dwPar.stopAndResetEncoder();
-        dwPerp.stopAndResetEncoder();
+        dwPar.reset();
+        dwPerp.reset();
 
         // create handler with current encoder baselines (likely zero after reset)
-        this.dwHandler = new DeadwheelHandler(referencePose, dwPar.getCurrentPosition(), dwPerp.getCurrentPosition());
+        this.dwHandler = new DeadwheelHandler(referencePose, dwPar.getPosition(), dwPerp.getPosition());
     }
 
     public Angle getYaw(AngleUnit angleUnit)
@@ -137,10 +137,9 @@ public class OdometryControlHub extends SubsystemBase
         driverForward = estimatedPose.heading.toUnit(aUnit).minus(currentDriverHeading);
 
         // reset encoders and re-create handler with current baseline and absolute pose
-        dwPar.stopAndResetEncoder();
-        dwPerp.stopAndResetEncoder();
-        dwHandler = new DeadwheelHandler(estimatedPose, dwPar.getCurrentPosition(), dwPerp.getCurrentPosition());
-
+        dwPar.reset();
+        dwPerp.reset();
+        dwHandler = new DeadwheelHandler(estimatedPose, dwPar.getPosition(), dwPerp.getPosition());
 
         return true;
     }
@@ -149,7 +148,7 @@ public class OdometryControlHub extends SubsystemBase
     public void periodic()
     {
         // pass the ABSOLUTE heading into the deadwheel handler for correct field-relative position integration
-        dwHandler.updatePose(dwPar.getCurrentPosition(), dwPerp.getCurrentPosition(), getAngle());
+        dwHandler.updatePose(dwPar.getPosition(), dwPerp.getPosition(), getAngle());
     }
 
     /**f

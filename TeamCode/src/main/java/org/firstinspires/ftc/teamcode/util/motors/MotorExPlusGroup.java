@@ -48,7 +48,7 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
     public void setRPM(double rpm) {
         group[0].setRPM(rpm);
         for (int i = 1; i < group.length; i++) {
-            group[i].set(group[0].get());
+            group[i].setRPM(rpm);
         }
     }
 
@@ -125,7 +125,10 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
     }
 
     public void setRunMode(Motor.RunMode runmode) {
-        group[0].setRunMode(runmode);
+        for (Motor motor: group)
+        {
+            motor.setRunMode(runmode);
+        }
     }
 
     public void setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior) {

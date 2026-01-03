@@ -35,6 +35,12 @@ public class DriveCommands
         {
             drive.drive(lateral.getAsDouble(), axial.getAsDouble(), yaw.getAsDouble(), botAngle.get());
         }
+
+        @Override
+        public void end(boolean interrupted)
+        {
+            drive.stop();
+        }
     }
 
     public static class IncreaseSpeed extends InstantCommand
