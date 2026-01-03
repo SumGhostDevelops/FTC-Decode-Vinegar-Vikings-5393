@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
+import org.firstinspires.ftc.teamcode.util.RobotMath;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -89,6 +91,12 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
     {
         return Arrays.stream(group)
                 .map(MotorExPlus::getRPM)
+                .collect(Collectors.toList());
+    }
+    public List<Double> getAccelerations()
+    {
+        return Arrays.stream(group)
+                .map(MotorExPlus::getRPMAcceleration)
                 .collect(Collectors.toList());
     }
 
@@ -211,5 +219,4 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
             x.stopMotor();
         }
     }
-
 }

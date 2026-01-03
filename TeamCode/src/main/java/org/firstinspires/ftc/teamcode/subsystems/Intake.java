@@ -27,4 +27,6 @@ public class Intake extends SubsystemBase {
     public double getRPM() {
         return intake.getRPM();
     }
+
+    public double getAcceleration() {return intake.getRPMAcceleration();}
 }

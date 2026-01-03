@@ -29,9 +29,14 @@ public class Outtake extends SubsystemBase {
         return motor.getRPM();
     }
 
-    // Convenience check whether current velocity is within tolerance of target
-    public boolean isAtVelocity(double targetRpm, double toleranceRpm) {
-        return Math.abs(getVelocity() - targetRpm) <= toleranceRpm;
+    public double getAcceleration(){
+        double total=0;
+        double count=0;
+        for(double x:motor.getAccelerations()){
+            total+=x;
+            count+=1;
+        };
+        return total/count;
     }
 
     public void stop() {
