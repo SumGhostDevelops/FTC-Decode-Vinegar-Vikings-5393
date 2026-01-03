@@ -58,6 +58,7 @@ public class RobotConstants
     public static class Outtake
     {
         public final static int PPR = 28;
+        public final static int IDLE_RPM = 3000;
 
         public static class Name
         {
@@ -119,6 +120,13 @@ public class RobotConstants
     public static class Odometry
     {
         public final static Pose2d DEFAULT_POSE = new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(90, AngleUnit.DEGREES));
+
+        @Config
+        public static class IMU
+        {
+            public final static String NAME = "imu";
+        }
+
         @Config
         public static class Pinpoint
         {
@@ -154,14 +162,16 @@ public class RobotConstants
             public final static Distance WHEEL_CIRCUMFERENCE = new Distance(35, DistanceUnit.MM);
 
             @Config
-            public static class Forward
+            public static class Forward // also parallel
             {
+                public final static String NAME = "forward";
                 public final static Distance OFFSET = new Distance(0, DistanceUnit.INCH);
             }
 
             @Config
-            public static class Strafe
+            public static class Strafe // also perpendicular
             {
+                public final static String NAME = "strafe";
                 public final static Distance OFFSET = new Distance(0, DistanceUnit.INCH);
             }
         }
