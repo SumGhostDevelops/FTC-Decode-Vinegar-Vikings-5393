@@ -16,7 +16,8 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
     protected InputHandler input;
     double power = 0.8;
     double rpm = 3500;
-    double tolerance = 50;
+    double accelerationTolerance = 8;
+    double RPMTolerance = 50;
     boolean hasLaunched = false;
     Intake intake;
     Transfer transfer;
@@ -62,7 +63,7 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
     }
     protected boolean atSpeed()
     {
-        return(Math.abs(outtake.getAcceleration()) <= tolerance);
+        return((Math.abs(outtake.getAcceleration()) <= accelerationTolerance)&&(Math.abs(outtake.getVelocity() - rpm) <= RPMTolerance));
     }
 
     protected void run() throws InterruptedException
