@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.controls.commands.DriveCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.OdometryCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.OuttakeCommands;
+import org.firstinspires.ftc.teamcode.controls.commands.TurretCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.Team;
@@ -103,7 +104,13 @@ public abstract class BaseUnstable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(() -> telemetry.log().add("RIGHT_BUMPER pressed")).whenPressed(new DriveCommands.IncreaseSpeed(subsystems.drive));
 
         driver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> telemetry.log().add("A pressed")).toggleWhenPressed(new OuttakeCommands.On(subsystems.outtake), new OuttakeCommands.Off(subsystems.outtake));
-        driver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> telemetry.log().add("B pressed")).whenPressed(new OdometryCommands.SetForwardAngle(subsystems.odometry));
+        driver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> telemetry.log().add("B pressed")).whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(subsystems.odometry));
+
+        // X button: Attempt AprilTag localization
+        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> telemetry.log().add("X pressed")).whenPressed(new OdometryCommands.Localize(subsystems.odometry, telemetry));
+
+        // Y button (held): Auto-aim turret to team's goal
+        driver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> telemetry.log().add("Y pressed - auto-aim enabled")).whileHeld(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(() -> telemetry.log().add("DPAD_UP pressed")).whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 100));
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(() -> telemetry.log().add("DPAD_DOWN pressed")).whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));

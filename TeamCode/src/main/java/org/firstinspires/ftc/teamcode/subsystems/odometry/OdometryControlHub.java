@@ -105,6 +105,16 @@ public class OdometryControlHub extends SubsystemBase
     }
 
     /**
+     * Sets the current field-absolute heading as the driver's "forward" direction.
+     * Call this AFTER localization to set which direction the driver considers forward
+     * for field-centric driving, without affecting the absolute heading calibration.
+     */
+    public void setDriverForwardFromCurrent()
+    {
+        driverForward = getAngle();
+    }
+
+    /**
      * Attempts to relocalize the robot. Camera must be facing a goal AprilTag to work.
      * This sets the robot's absolute position AND heading on the field based on AprilTag detection.
      * The driver's relative forward reference is preserved so field-centric driving remains consistent.

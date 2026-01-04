@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
 public class Turret extends SubsystemBase
 {
@@ -64,6 +66,19 @@ public class Turret extends SubsystemBase
         int minTicks = angleToTicks(turnLimits[0]);
         int maxTicks = angleToTicks(turnLimits[1]);
         this.targetPosition = Math.max(minTicks, Math.min(maxTicks, targetTicks));
+    }
+
+    /**
+     * Aims the turret toward a target field coordinate given the robot's current pose.
+     * Uses the bearing from the robot's position to the target to compute the relative turret angle.
+     * @param target The target {@link FieldCoordinate} to aim at (e.g., a goal position)
+     * @param robotPose The robot's current {@link Pose2d} (position and heading)
+     */
+    public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose)
+    {
+        // bearingTo computes the relative angle from the robot's heading to the target
+        Angle relativeBearing = robotPose.bearingTo(target);
+        setTargetRelative(relativeBearing);
     }
 
     /**
