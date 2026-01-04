@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
+import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 import java.util.function.DoubleSupplier;
@@ -27,11 +28,13 @@ public abstract class BaseUnstable extends CommandOpMode
 {
     protected Team team;
     protected RobotContext robot;
+    protected FieldDrawing fieldDrawing;
 
     @Override
     public void initialize()
     {
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
+        fieldDrawing = new FieldDrawing();
 
         register(robot.subsystems.drive, robot.subsystems.intake, robot.subsystems.transfer, robot.subsystems.turret, robot.subsystems.outtake, robot.subsystems.odometry);
 
@@ -80,6 +83,13 @@ public abstract class BaseUnstable extends CommandOpMode
     {
         displayTelemetry();
         telemetry.update();
+
+        // Draw robot position on FTC Dashboard Field panel
+        fieldDrawing.drawRobot(
+                robot.subsystems.odometry.getPose(),
+                robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES),
+                robot.team.goal.coord
+        );
     }
 
     @Override
