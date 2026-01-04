@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.seattlesolvers.solverslib.controller.SquIDFController;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -68,7 +69,6 @@ public class RobotConstants
 
         public static class Coefficients
         {
-
             public final static double[] veloCoeffs = new double[]{0.1, 0.0, 0.1};
             public final static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
         }
