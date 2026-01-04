@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.util.motors;
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
@@ -45,19 +47,71 @@ public class MotorExPlus extends MotorEx
         super(hMap, id, cpr, rpm);
     }
 
+    private double currentAccel = 0.0;
+    private final Tracker tracker = new Tracker(7);
+    private final ElapsedTime accelTimer = new ElapsedTime();
 
-    public void setRPM(double rpm)
+    public void setRPM(int rpm)
     {
-        super.setVelocity(RobotMath.Motor.rpmToTps(rpm, super.getCPR()));
+        setVelocity(RobotMath.Motor.rpmToTps(rpm, super.getCPR()));
+    }
+
+    // Bypass the SolversLib PIDF velocity controller whatever cus it sucks
+    /**
+     * @inheritDoc
+     */
+    public void setVelocity(double velocity)
+    {
+        super.motorEx.setVelocity(velocity);
+    }
+
+    public double getVelocity()
+    {
+        double currentTicks = super.getCorrectedVelocity();
+        currentAccel = tracker.updateAndGetAcceleration(accelTimer.seconds(), currentTicks);
+
+        return currentTicks;
     }
 
     public double getRPM()
     {
-        return RobotMath.Motor.tpsToRpm(super.getCorrectedVelocity(), super.getCPR());
+        return RobotMath.Motor.tpsToRpm(getVelocity(), super.getCPR());
+    }
+
+    public double getAcceleration()
+    {
+        return currentAccel;
     }
 
     public double getRPMAcceleration()
     {
-        return RobotMath.Motor.tps2ToRpm2(super.getAcceleration(), super.getCPR());
+        return RobotMath.Motor.tps2ToRpm2(getAcceleration(), super.getCPR());
+    }
+
+    @Override
+    public void setRunMode(RunMode runMode)
+    {
+        switch (runMode)
+        {
+            case RawPower:
+            {
+                setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                break;
+            }
+            case VelocityControl:
+            {
+                setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                break;
+            }
+            case PositionControl:
+            {
+                setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+        }
+    }
+
+    public void setRunMode(DcMotor.RunMode runMode)
+    {
+        super.motorEx.setMode(runMode);
     }
 }

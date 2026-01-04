@@ -23,7 +23,7 @@ public class FlywheelPIDFTuning extends LinearOpMode
     private double kI = 0.0;
     private double kD = 0.0;
 
-    private double targetRPM = 5000;
+    private int targetRPM = 5000;
     private double testPower = 0.8;
 
     // Menu Navigation

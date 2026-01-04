@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
-import org.firstinspires.ftc.teamcode.util.RobotMath;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -27,7 +25,8 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
      * @param leader    The leader motor.
      * @param followers The follower motors which follow the leader motor's protocols.
      */
-    public MotorExPlusGroup(@NonNull MotorExPlus leader, MotorExPlus... followers) {
+    public MotorExPlusGroup(@NonNull MotorExPlus leader, MotorExPlus... followers)
+    {
         group = new MotorExPlus[followers.length + 1];
         group[0] = leader;
         System.arraycopy(followers, 0, group, 1, followers.length);
@@ -38,37 +37,43 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
      *
      * @param speed The speed to set. Value should be between -1.0 and 1.0.
      */
-    public void set(double speed) {
+    public void set(double speed)
+    {
         group[0].set(speed);
-        for (int i = 1; i < group.length; i++) {
+        for (int i = 1; i < group.length; i++)
+        {
             group[i].set(group[0].get());
         }
     }
 
-    public void setRPM(double rpm) {
-        group[0].setRPM(rpm);
-        for (int i = 1; i < group.length; i++) {
-            group[i].setRPM(rpm);
+    public void setRPM(int rpm)
+    {
+        for (MotorExPlus motor : group)
+        {
+            motor.setRPM(rpm);
         }
     }
 
     /**
      * @return The speed as a percentage of output
      */
-    public double get() {
+    public double get()
+    {
         return group[0].get();
     }
 
     /**
      * @return All motor target speeds as a percentage of output
      */
-    public List<Double> getSpeeds() {
+    public List<Double> getSpeeds()
+    {
         return Arrays.stream(group)
                 .map(Motor::get)
                 .collect(Collectors.toList());
     }
 
-    public double getVelocity() {
+    public double getVelocity()
+    {
         return group[0].getCorrectedVelocity();
     }
 
@@ -76,7 +81,8 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
      * @return All current velocities of the motors in the group in units of distance
      * per second which is by default ticks / second
      */
-    public List<Double> getVelocities() {
+    public List<Double> getVelocities()
+    {
         return Arrays.stream(group)
                 .map(Motor::getRate)
                 .collect(Collectors.toList());
@@ -93,6 +99,7 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
                 .map(MotorExPlus::getRPM)
                 .collect(Collectors.toList());
     }
+
     public List<Double> getAccelerations()
     {
         return Arrays.stream(group)
@@ -102,13 +109,16 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
 
     @NonNull
     @Override
-    public Iterator<MotorExPlus> iterator() {
+    public Iterator<MotorExPlus> iterator()
+    {
         return Arrays.asList(group).iterator();
     }
 
-    public Motor.Encoder setDistancePerPulse(double distancePerPulse) {
+    public Motor.Encoder setDistancePerPulse(double distancePerPulse)
+    {
         Motor.Encoder leaderEncoder = group[0].setDistancePerPulse(distancePerPulse);
-        for (int i = 1; i < group.length; i++) {
+        for (int i = 1; i < group.length; i++)
+        {
             group[i].setDistancePerPulse(distancePerPulse);
         }
         return leaderEncoder;
@@ -118,69 +128,84 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
      * @return The position of every motor in the group in units of distance
      * which is by default ticks
      */
-    public List<Double> getPositions() {
+    public List<Double> getPositions()
+    {
         return Arrays.stream(group)
                 .map(Motor::getDistance)
                 .collect(Collectors.toList());
     }
 
-    public void setRunMode(Motor.RunMode runmode) {
-        for (Motor motor: group)
+    public void setRunMode(Motor.RunMode runmode)
+    {
+        for (Motor motor : group)
         {
             motor.setRunMode(runmode);
         }
     }
 
-    public void setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior) {
-        for (Motor motor : group) {
+    public void setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior)
+    {
+        for (Motor motor : group)
+        {
             motor.setZeroPowerBehavior(behavior);
         }
     }
 
-    public void resetEncoder() {
+    public void resetEncoder()
+    {
         group[0].resetEncoder();
     }
 
-    public void stopAndResetEncoder() {
+    public void stopAndResetEncoder()
+    {
         group[0].stopAndResetEncoder();
     }
 
-    public void setPositionCoefficient(double kp) {
+    public void setPositionCoefficient(double kp)
+    {
         group[0].setPositionCoefficient(kp);
     }
 
-    public boolean atTargetPosition() {
+    public boolean atTargetPosition()
+    {
         return group[0].atTargetPosition();
     }
 
-    public void setTargetPosition(int target) {
+    public void setTargetPosition(int target)
+    {
         group[0].setTargetPosition(target);
     }
 
-    public void setTargetDistance(double target) {
+    public void setTargetDistance(double target)
+    {
         group[0].setTargetDistance(target);
     }
 
-    public void setPositionTolerance(double tolerance) {
+    public void setPositionTolerance(double tolerance)
+    {
         group[0].setPositionTolerance(tolerance);
     }
 
-    public void setVeloCoefficients(double kp, double ki, double kd) {
+    public void setVeloCoefficients(double kp, double ki, double kd)
+    {
         group[0].setVeloCoefficients(kp, ki, kd);
     }
 
-    public void setFeedforwardCoefficients(double ks, double kv) {
+    public void setFeedforwardCoefficients(double ks, double kv)
+    {
         group[0].setFeedforwardCoefficients(ks, kv);
     }
 
-    public void setFeedforwardCoefficients(double ks, double kv, double ka) {
+    public void setFeedforwardCoefficients(double ks, double kv, double ka)
+    {
         group[0].setFeedforwardCoefficients(ks, kv, ka);
     }
 
     /**
      * @return true if the motor group is inverted
      */
-    public boolean getInverted() {
+    public boolean getInverted()
+    {
         return group[0].getInverted();
     }
 
@@ -191,8 +216,10 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
      * @param isInverted The state of inversion true is inverted.
      * @return This object for chaining purposes.
      */
-    public MotorExPlusGroup setInverted(boolean isInverted) {
-        for (Motor motor : group) {
+    public MotorExPlusGroup setInverted(boolean isInverted)
+    {
+        for (Motor motor : group)
+        {
             motor.setInverted(isInverted);
         }
         return this;
@@ -201,8 +228,10 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
     /**
      * Disables all the motor devices.
      */
-    public void disable() {
-        for (Motor x : group) {
+    public void disable()
+    {
+        for (Motor x : group)
+        {
             x.disable();
         }
     }
@@ -210,15 +239,18 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
     /**
      * @return a string characterizing the device type
      */
-    public String getDeviceType() {
+    public String getDeviceType()
+    {
         return "Motor Group";
     }
 
     /**
      * Stops all motors in the group.
      */
-    public void stopMotor() {
-        for (Motor x : group) {
+    public void stopMotor()
+    {
+        for (Motor x : group)
+        {
             x.stopMotor();
         }
     }
