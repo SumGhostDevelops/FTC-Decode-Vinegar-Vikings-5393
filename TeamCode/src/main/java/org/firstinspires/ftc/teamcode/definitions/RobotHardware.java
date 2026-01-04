@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
@@ -15,11 +14,10 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
-import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 
 public class RobotHardware
 {
-    public MotorExPlus frontLeft, frontRight, backLeft, backRight, intake, turret, outtakeLeft, outtakeRight;
+    public MotorExPlus frontLeft, frontRight, backLeft, backRight, intake, turret, outtake;
     public Motor.Encoder dwFwd, dwStrf;
     public ServoEx transfer;
     public IMU imu;
@@ -99,7 +97,14 @@ public class RobotHardware
         boolean outtakeOk = true;
         try
         {
-            outtakeLeft = new MotorExPlus(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_LEFT, Motor.GoBILDA.BARE);
+            outtake = new MotorExPlus(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_LEFT, Motor.GoBILDA.BARE);
+
+            outtake.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            double[] veloCoeffs = RobotConstants.Outtake.Coefficients.veloCoeffs;
+            outtake.setVelocityPIDFCoefficients(veloCoeffs[0], veloCoeffs[1], veloCoeffs[2], veloCoeffs[3]);
+
+            outtake.setRpmTolerance(RobotConstants.Outtake.Tolerance.RPM);
+            outtake.setAccelTolerance(RobotConstants.Outtake.Tolerance.RPM_ACCELERATION);
         }
         catch (Exception e)
         {
@@ -107,6 +112,7 @@ public class RobotHardware
             outtakeOk = false;
         }
 
+        /*
         try
         {
             outtakeRight = new MotorExPlus(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_RIGHT, Motor.GoBILDA.BARE);
@@ -116,6 +122,8 @@ public class RobotHardware
             telemetry.log().add("Warning: Right outtake motor not found");
             outtakeOk = false;
         }
+
+
 
         if (outtakeOk)
         {
@@ -129,6 +137,8 @@ public class RobotHardware
             outtakeGroup.setVeloCoefficients(veloCoeffs[0], veloCoeffs[1], veloCoeffs[2]);
             outtakeGroup.setFeedforwardCoefficients(ffCoeffs[0], ffCoeffs[1], ffCoeffs[2]);
         }
+
+         */
 
         try
         {
@@ -236,6 +246,7 @@ public class RobotHardware
         return new MotorExPlus[]{frontLeft, frontRight, backLeft, backRight};
     }
 
+    /*
     public MotorExPlusGroup getOuttakeMotorExPlusGroup()
     {
         return new MotorExPlusGroup(outtakeLeft, outtakeRight);
@@ -245,4 +256,6 @@ public class RobotHardware
     {
         return new MotorExPlus[]{outtakeLeft, outtakeRight};
     }
+
+     */
 }

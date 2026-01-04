@@ -38,7 +38,7 @@ public class Turret extends SubsystemBase
     }
 
     /**
-     * Aim absolutely to the field, around the reported {@code iniitalRelativeAngle}
+     * Aim absolutely to the field, around the reported {@code initialRelativeAngle}
      * @param targetAngle The absolute target angle
      * @param robotAngle The robot's absolute angle
      * @see #setTargetRelative(Angle targetAngle)
@@ -50,7 +50,7 @@ public class Turret extends SubsystemBase
 
     /**
      * Aim relatively to the robot, around the reported {@code initialRelativeAngle}
-     * @param targetAngle
+     * @param targetAngle The desired turret angle relative to the robot's orientation
      * @see #setTargetAbsolute(Angle targetAngle, Angle robotAngle)
      */
     public void setTargetRelative(Angle targetAngle)
@@ -130,17 +130,12 @@ public class Turret extends SubsystemBase
         return new InstantCommand(() -> this.setTargetRelative(angle), this);
     }
 
-    private boolean validSolution(Angle angle)
-    {
-        UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
-        UnnormalizedAngle unnormAngle = angle.toUnit(turnLimits[0].unit);
-
-        return turnLimits[0].angle <= unnormAngle.angle && unnormAngle.angle <= turnLimits[1].angle;
-    }
-
     /**
+     * Resolves the best turret encoder position (in ticks) to reach the requested angle
+     * while respecting the configured turn limits.
      *
-     * @param targetAngle
+     * @param currentTicks The current turret position in encoder ticks.
+     * @param targetAngle  The desired turret angle to turn to.
      * @return The solution, in ticks
      */
     private int resolveSolution(int currentTicks, Angle targetAngle)

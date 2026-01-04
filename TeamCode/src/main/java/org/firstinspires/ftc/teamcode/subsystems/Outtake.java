@@ -4,56 +4,72 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
-import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
+import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 
 public class Outtake extends SubsystemBase {
 
-    private final MotorExPlusGroup motor;
-    private boolean enabled = false;
+    private final MotorExPlus motor;
+    private State state = State.OFF;
 
-    private int targetRPM;
+    private double targetRPM = 0;
 
     // Accept a single MotorExPlus (RobotContext should provide this)
-    public Outtake(MotorExPlusGroup motor) {
+    public Outtake(MotorExPlus motor)
+    {
         this.motor = motor;
+    }
+
+    public enum State
+    {
+        ON,
+        IDLE,
+        OFF,
     }
 
     public void on()
     {
-        if (enabled)
+        if (state == State.ON)
         {
             return;
         }
 
-        enabled = true;
+        state = State.ON;
         motor.setRunMode(Motor.RunMode.VelocityControl);
         motor.setRPM(targetRPM);
     }
 
-    public void off()
+    /**
+     * Runs the Outtake at half of its target RPM
+     */
+    public void idle()
     {
-        if (!enabled)
+        if (state == State.IDLE)
         {
             return;
         }
 
-        enabled = false;
-        motor.setRunMode(Motor.RunMode.RawPower);
-        motor.set(0.0);
+        state = State.IDLE;
+        motor.setRunMode(Motor.RunMode.VelocityControl);
+        motor.setRPM(targetRPM / 2.0);
     }
 
-    public boolean isEnabled()
+    public void off()
     {
-        return enabled;
+        if (state == State.OFF)
+        {
+            return;
+        }
+
+        state = State.OFF;
+        motor.stopMotor();
     }
 
-    // Closed-loop: set a target velocity (RPM)
-    public void setRPM(int rpm)
+    public void setRPM(double rpm)
     {
         targetRPM = Math.min(6000, Math.max(0, rpm));
     }
 
-    public int getTargetRPM()
+    public double getTargetRPM()
     {
         return targetRPM;
     }
@@ -63,17 +79,19 @@ public class Outtake extends SubsystemBase {
         return motor.getRPM();
     }
 
-    public double getAcceleration()
+    public double getRPMAcceleration()
     {
-        double total = 0;
-        double count = 0;
+        return motor.getRPMAcceleration();
+    }
 
-        for (double x : motor.getAccelerations())
-        {
-            total += x;
-            count += 1;
-        }
+    public boolean isStable()
+    {
+        return motor.isStable();
+    }
 
-        return total/count;
+    @Override
+    public void periodic()
+    {
+        motor.updateAcceleration();
     }
 }

@@ -92,7 +92,7 @@ public class FieldCoordinate extends Coordinate
      */
     public Angle angleTo(FieldCoordinate otherCoord)
     {
-        // Convert the other FieldCoordinate to our FieldCoordiante's coordinate system
+        // Convert the other FieldCoordinate to our FieldCoordinate's coordinate system
         return super.angleTo(otherCoord.toCoordinateSystem(this.coordSys));
     }
 
@@ -101,11 +101,27 @@ public class FieldCoordinate extends Coordinate
         return this.coordSys == coordSys;
     }
 
-    public boolean equals(FieldCoordinate otherCoord)
+    @Override
+    public boolean equals(Object obj)
     {
-        FieldCoordinate thisCoord = this.toDistanceUnit(DistanceUnit.METER).toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
-        otherCoord = otherCoord.toDistanceUnit(DistanceUnit.METER).toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
+        if (this == obj)
+        {
+            return true;
+        }
 
+        if (!(obj instanceof FieldCoordinate))
+        {
+            return false;
+        }
+
+        FieldCoordinate otherCoord = (FieldCoordinate) obj;
+
+        FieldCoordinate thisCoord = this
+                .toDistanceUnit(DistanceUnit.METER)
+                .toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
+        otherCoord = otherCoord
+                .toDistanceUnit(DistanceUnit.METER)
+                .toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
         return thisCoord.x.equals(otherCoord.x) && thisCoord.y.equals(otherCoord.y);
     }
 }

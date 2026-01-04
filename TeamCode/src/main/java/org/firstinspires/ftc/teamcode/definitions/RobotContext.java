@@ -28,6 +28,6 @@ public class RobotContext
 
         this.team = team;
         this.telemetry = telemetry;
-        this.gamepads = new Gamepads(gamepad1, gamepad2, subsystems);
+        this.gamepads = new Gamepads(gamepad1, gamepad2);
     }
 }

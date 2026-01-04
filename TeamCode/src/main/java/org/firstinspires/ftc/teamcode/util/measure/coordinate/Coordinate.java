@@ -89,8 +89,20 @@ public class Coordinate
         return this.x.unit == distanceUnit && this.y.unit == distanceUnit;
     }
 
-    public boolean equals(Coordinate otherCoord)
+    @Override
+    public boolean equals(Object obj)
     {
+        if (this == obj)
+        {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+
+        Coordinate otherCoord = (Coordinate) obj;
         return this.x.equals(otherCoord.x) && this.y.equals(otherCoord.y);
     }
 }

@@ -46,24 +46,25 @@ public class DeadwheelHandler
     // Two Deadwheel Odo
 
     /**
-     * l = ticks from the parallel odometry wheel
-     * r = ticks from the perpendicular odometry wheel
-     * ang = robot's angle (Angle)
+     * l* parallelEncoderTicks = ticks from the parallel (left) odometry wheel
+     * perpendicularEncoderTicks = ticks from the perpendicular (normal) odometry wheel
+     * angle = robot's angle (Angle)
      */
-    public void updatePose(double l, double n, Angle angle)
+    public void updatePose(double parallelEncoderTicks, double perpendicularEncoderTicks, Angle angle)
     {
         double ang = angle.toUnit(AngleUnit.DEGREES).measure;
-        double dL = l - lastLeftEnc;
-        double dN = n - lastNormalEnc;
-        lastNormalEnc = n;
-        lastLeftEnc = l;
+        double dL = parallelEncoderTicks - lastLeftEnc;
+        double dN = perpendicularEncoderTicks - lastNormalEnc;
+        lastNormalEnc = perpendicularEncoderTicks;
+        lastLeftEnc = parallelEncoderTicks;
 
         double leftDist = -dL * ENCODER_WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REVOLUTION;
         double dyR = leftDist;
         double dxR = -dN * ENCODER_WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REVOLUTION;
 
-        double cos = Math.cos((Math.toRadians(ang)));
-        double sin = Math.sin((Math.toRadians(ang)));
+        double angRad = Math.toRadians(ang);
+        double cos = Math.cos(angRad);
+        double sin = Math.sin(angRad);
         double dx = (dxR * sin) + (dyR * cos);
         double dy = (-dxR * cos) + (dyR * sin);
 

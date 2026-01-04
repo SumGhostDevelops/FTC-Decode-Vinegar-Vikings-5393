@@ -45,7 +45,7 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
         RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
         intake = new Intake(hw.intake);
         transfer = new Transfer(hw.transfer);
-        outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());
+        outtake = new Outtake(hw.outtake);
         outtake.setRPM(rpm);
     }
     protected void launch() throws InterruptedException {
@@ -64,7 +64,7 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
     }
     protected boolean atSpeed()
     {
-        return((Math.abs(outtake.getAcceleration()) <= accelerationTolerance)&&(Math.abs(outtake.getRPM() - rpm) <= RPMTolerance));
+        return((Math.abs(outtake.getRPMAcceleration()) <= accelerationTolerance)&&(Math.abs(outtake.getRPM() - rpm) <= RPMTolerance));
     }
 
     protected void run() throws InterruptedException

@@ -13,9 +13,9 @@ public class Pose2d
     public final Angle heading;
 
     /**
-     * @param x
-     * @param y
-     * @param heading
+     * @param x       the x-coordinate distance component of the pose
+     * @param y       the y-coordinate distance component of the pose
+     * @param heading the orientation angle of the pose
      * @see FieldCoordinate#FieldCoordinate(Distance, Distance)
      */
     public Pose2d(Distance x, Distance y, Angle heading)
@@ -70,7 +70,7 @@ public class Pose2d
     }
 
     /**
-     * @param coord
+     * @param coord The target field coordinate to calculate distance to
      * @return The straight line {@link Distance} to another {@link FieldCoordinate}
      */
     public Distance distanceTo(FieldCoordinate coord)
@@ -88,7 +88,7 @@ public class Pose2d
     }
 
     /**
-     * @param otherCoord
+     * @param otherCoord The target {@link FieldCoordinate} to calculate the relative bearing to
      * @return The {@link Angle} to another {@link FieldCoordinate}, taking into account this {@link Pose2d}'s {@link Pose2d#heading}; the relative {@link Angle}
      */
     public Angle bearingTo(FieldCoordinate otherCoord)
@@ -97,7 +97,7 @@ public class Pose2d
     }
 
     /**
-     * @param otherPose
+     * @param otherPose The target {@link Pose2d} whose {@link Pose2d#coord} is used to compute the absolute {@link Angle}
      * @return The {@link Angle} to another {@link Pose2d}'s {@link Pose2d#coord} from this {@link Pose2d}'s {@link Pose2d#coord}; the absolute {@link Angle}
      */
     public Angle angleTo(Pose2d otherPose)
@@ -123,12 +123,12 @@ public class Pose2d
         // make sure all of the values are even and as they should be (toAngleUnit()) is technically overkill but why not
         Pose2d verifiedPose = this.toAngleUnit(AngleUnit.RADIANS).toDistanceUnit(DistanceUnit.METER).toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD);
 
-        return new Pose2D(coord.x.unit, coord.x.magnitude, coord.y.magnitude, heading.unit, heading.measure);
+        return new Pose2D(verifiedPose.coord.x.unit, verifiedPose.coord.x.magnitude, verifiedPose.coord.y.magnitude, verifiedPose.heading.unit, verifiedPose.heading.measure);
     }
 
     /**
      * Converts a {@link Pose3D} into a more useful {@link Pose2d}
-     * @param pose
+     * @param pose The 3D pose to convert to a 2D pose
      * @return The converted {@link Pose2d}
      */
     public static Pose2d fromPose3D(Pose3D pose)

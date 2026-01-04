@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
-import com.seattlesolvers.solverslib.command.Subsystem;
-
 import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
@@ -24,7 +22,7 @@ public class Subsystems
         this.drive = new Drive(hw.getDriveArray());
         this.intake = new Intake(hw.intake);
         this.transfer = new Transfer(hw.transfer);
-        this.outtake = new Outtake(hw.getOuttakeMotorExPlusGroup());
+        this.outtake = new Outtake(hw.outtake);
         this.turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, true);
         this.odometry = new OdometryControlHub(hw.webcam, hw.imu, hw.dwFwd, hw.dwStrf);
     }

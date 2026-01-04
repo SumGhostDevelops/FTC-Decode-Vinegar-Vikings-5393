@@ -151,7 +151,7 @@ public class OdometryControlHub extends SubsystemBase
         dwHandler.updatePose(dwPar.getPosition(), dwPerp.getPosition(), getAngle());
     }
 
-    /**f
+    /**
      * Closes the {@link Webcam}
      */
     public void close()

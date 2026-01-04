@@ -21,7 +21,7 @@ public class AllTesting extends LinearOpMode
     InputHandler input;
     MotorExPlus intake;
     ServoEx transfer;
-    MotorExPlusGroup outtake;
+    MotorExPlus outtake;
     Turret turret;
     TransferState transferState = TransferState.MID;
 
@@ -31,7 +31,7 @@ public class AllTesting extends LinearOpMode
         hw = new RobotHardware(hardwareMap, telemetry);
         intake = hw.intake;
         transfer = hw.transfer;
-        outtake = hw.getOuttakeMotorExPlusGroup();
+        outtake = hw.outtake;
         turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE);
         turret.lockToPosition = true;
         bindKeys();

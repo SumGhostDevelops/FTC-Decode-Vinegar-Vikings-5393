@@ -27,7 +27,7 @@ public class InAndOuttakeTesting extends LinearOpMode {
     //Outtake Variables
 
     private RobotHardware robot;
-    private MotorExPlusGroup outtakeGroup;
+    private MotorExPlus outtake;
 
     // Tuning Parameters
     private double kS = 0.0;
@@ -104,7 +104,7 @@ public class InAndOuttakeTesting extends LinearOpMode {
         RobotHardware hw = new RobotHardware(hardwareMap, telemetry);
         intake = hw.intake;
         robot = new RobotHardware(hardwareMap, telemetry);
-        outtakeGroup = robot.getOuttakeMotorExPlusGroup();
+        outtake = robot.outtake;
         bindKeys();
     }
 
@@ -216,36 +216,36 @@ public class InAndOuttakeTesting extends LinearOpMode {
     }
 
     private void updateMotorConfig() {
-        if (outtakeGroup != null) {
-            outtakeGroup.setVeloCoefficients(kP, kI, kD);
-            outtakeGroup.setFeedforwardCoefficients(kS, kV, kA);
+        if (outtake != null) {
+            outtake.setVeloCoefficients(kP, kI, kD);
+            outtake.setFeedforwardCoefficients(kS, kV, kA);
         }
     }
 
     private void runLogic() {
-        if (outtakeGroup == null) return;
+        if (outtake == null) return;
 
         Param current = params[paramIndex];
         boolean runOpenLoop = (current == Param.TEST_POWER || current == Param.KS || current == Param.KV);
 
         if (gamepad1.a) {
             if (runOpenLoop) {
-                outtakeGroup.setRunMode(Motor.RunMode.RawPower);
-                outtakeGroup.set(testPower);
+                outtake.setRunMode(Motor.RunMode.RawPower);
+                outtake.set(testPower);
             } else {
-                outtakeGroup.setRunMode(Motor.RunMode.VelocityControl);
-                outtakeGroup.setRPM(targetRPM);
+                outtake.setRunMode(Motor.RunMode.VelocityControl);
+                outtake.setRPM(targetRPM);
             }
         } else {
-            outtakeGroup.set(0);
-            outtakeGroup.setRunMode(Motor.RunMode.RawPower);
+            outtake.set(0);
+            outtake.setRunMode(Motor.RunMode.RawPower);
         }
     }
 
     //will currently only work for one motor
     private double getAverageRPM() {
-        if (robot.outtakeLeft == null) return 0;
-        return (robot.outtakeLeft.getRPM()); // outtakeGroup.getRPM() does the same thing but i am too scared to change it
+        if (robot.outtake == null) return 0;
+        return (robot.outtake.getRPM()); // outtakeGroup.getRPM() does the same thing but i am too scared to change it
     }
 
     private void displayTelemetry() {

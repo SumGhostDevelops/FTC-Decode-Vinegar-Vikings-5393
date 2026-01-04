@@ -77,9 +77,14 @@ public class Distance
      * Calculates this {@link Distance} / a scalar
      * @param scalar The scalar to divide by
      * @return The resulting {@link Distance}
+     * @throws IllegalArgumentException if {@code scalar} is zero
      */
     public Distance divide(double scalar)
     {
+        if (scalar == 0.0)
+        {
+            throw new IllegalArgumentException("Scalar divisor must not be zero.");
+        }
         return new Distance(this.magnitude / scalar, this.unit);
     }
 
@@ -93,9 +98,15 @@ public class Distance
         return this.toUnit(DistanceUnit.METER);
     }
 
-    public boolean equals(Distance otherDist)
+    @Override
+    public boolean equals(Object otherDist)
     {
-        return compareTo(otherDist) == 0;
+        if (!(otherDist instanceof Distance))
+        {
+            return false;
+        }
+
+        return Math.abs(compareTo((Distance) otherDist)) < 1e-9;
     }
 
     public double compareTo(Distance otherDist)

@@ -96,31 +96,31 @@ public class Angle
 
     /**
      * Calculates this {@link Angle} + another {@link Angle}
-     * @param b The second {@link Angle}
+     * @* @param other The second {@link Angle}
      * @return The resulting {@link Angle}, in this {@link Angle}'s {@link AngleUnit}
      */
-    public Angle plus(Angle b)
+    public Angle plus(Angle other)
     {
-        double bAngle = b.getAngle(this.unit);
+        double otherAngle = other.getAngle(this.unit);
 
-        return new Angle(this.measure + bAngle, this.unit);
+        return new Angle(this.measure + otherAngle, this.unit);
     }
 
     /**
      * Calculates this {@link Angle} - another {@link Angle}
-     * @param b The second {@link Angle}
+     * @param other The second {@link Angle}
      * @return The resulting {@link Angle}, in this {@link Angle}'s {@link AngleUnit}
      */
-    public Angle minus(Angle b)
+    public Angle minus(Angle other)
     {
-        double bAngle = b.getAngle(this.unit);
+        double otherAngle = other.getAngle(this.unit);
 
-        return new Angle(this.measure - bAngle, this.unit);
+        return new Angle(this.measure - otherAngle, this.unit);
     }
 
     /**
      * @see AngleUnit#getUnnormalized()
-     * @param angleUnit
+     * @param angleUnit The angle unit to get the unnormalized version of
      * @return The unnormalized {@link UnnormalizedAngleUnit} version of the {@link AngleUnit}
      */
     public static UnnormalizedAngleUnit getUnnormalizedUnit(AngleUnit angleUnit)

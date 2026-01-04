@@ -175,9 +175,7 @@ public class ActuatorTesting extends LinearOpMode
             case TURRET:
                 return robot.turret;
             case OUTTAKE_LEFT:
-                return robot.outtakeLeft;
-            case OUTTAKE_RIGHT:
-                return robot.outtakeRight;
+                return robot.outtake;
             case NONE:
             default:
                 return null;

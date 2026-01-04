@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 /**
  * Describes the {@link Vector2d#x} and {@link Vector2d#y} components which form a {@link Vector2d}.
- * Enforces the {@link DistanceUnit} of {@link Vector2d#x} and {@link AngleUnit#RADIANS} of {@link Vector2d#x} by default.
+ * Enforces the {@link DistanceUnit} of {@link Vector2d#x} and {@link AngleUnit#RADIANS} of the {@link Vector2d} direction by default.
  */
 public class Vector2d
 {
@@ -88,7 +88,7 @@ public class Vector2d
     }
 
     /**
-     * @return The inversed {@link Vector2d}, where the {@code x} and {@code y} magnitudes are inversed.
+     * @return The negated {@link Vector2d}, where the {@code x} and {@code y} magnitudes are negated.
      */
     public Vector2d inverse()
     {
@@ -128,8 +128,18 @@ public class Vector2d
         return (this.angUnit == angleUnit);
     }
 
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Vector2d otherVector = (Vector2d) obj;
+        return x.equals(otherVector.x) && y.equals(otherVector.y);
+    }
+
     public boolean equals(Vector2d otherVector)
     {
-        return x.equals(otherVector.x) && y.equals(otherVector.y);
+        return equals((Object) otherVector);
     }
 }

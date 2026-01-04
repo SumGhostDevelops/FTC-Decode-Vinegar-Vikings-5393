@@ -75,7 +75,7 @@ public class UnnormalizedAngle
     public double getWrappedAngle(UnnormalizedAngleUnit newUnit)
     {
         double convertedAngle = getAngle(newUnit);
-        return MathUtils.normalizeAngle(convertedAngle, true, getNormalizedUnit(this.unit));
+        return MathUtils.normalizeAngle(convertedAngle, true, getNormalizedUnit(newUnit));
     }
 
     /**

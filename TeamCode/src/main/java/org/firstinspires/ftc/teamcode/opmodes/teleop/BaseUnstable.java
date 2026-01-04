@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.controls.commands.DriveCommands;
+import org.firstinspires.ftc.teamcode.controls.commands.OdometryCommands;
+import org.firstinspires.ftc.teamcode.controls.commands.OuttakeCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.definitions.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
@@ -36,6 +42,8 @@ public abstract class BaseUnstable extends CommandOpMode
 
         robot.subsystems.drive.setDefaultCommand(new DriveCommands.Manuever(robot.subsystems.drive, lateral, axial, yaw, driverHeading));
 
+        bindKeys();
+
         telemetry.setAutoClear(RobotConstants.Telemetry.SET_AUTOCLEAR);
         telemetry.addData("Status", "Initialized for " + team);
         displayTelemetry();
@@ -58,6 +66,7 @@ public abstract class BaseUnstable extends CommandOpMode
         telemetry.addLine("--- Outtake ---");
         telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
         telemetry.addData("True RPM", robot.subsystems.outtake.getRPM());
+        telemetry.addData("Is Stable", robot.subsystems.outtake.isStable());
         telemetry.addLine("--- Turret ---");
         telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
@@ -83,5 +92,20 @@ public abstract class BaseUnstable extends CommandOpMode
     public void end()
     {
         robot.subsystems.odometry.close();
+    }
+
+    public void bindKeys()
+    {
+        GamepadEx driver = robot.gamepads.driver;
+        Subsystems subsystems = robot.subsystems;
+
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(() -> telemetry.log().add("LEFT_BUMPER pressed")).whenPressed(new DriveCommands.DecreaseSpeed(subsystems.drive));
+        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(() -> telemetry.log().add("RIGHT_BUMPER pressed")).whenPressed(new DriveCommands.IncreaseSpeed(subsystems.drive));
+
+        driver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> telemetry.log().add("A pressed")).toggleWhenPressed(new OuttakeCommands.On(subsystems.outtake), new OuttakeCommands.Off(subsystems.outtake));
+        driver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> telemetry.log().add("B pressed")).whenPressed(new OdometryCommands.SetForwardAngle(subsystems.odometry));
+
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(() -> telemetry.log().add("DPAD_UP pressed")).whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 100));
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(() -> telemetry.log().add("DPAD_DOWN pressed")).whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));
     }
 }

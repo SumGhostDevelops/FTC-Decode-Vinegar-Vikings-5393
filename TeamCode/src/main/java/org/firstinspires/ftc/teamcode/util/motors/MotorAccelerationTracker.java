@@ -2,14 +2,16 @@ package org.firstinspires.ftc.teamcode.util.motors;
 
 import java.util.ArrayList;
 
-public class Tracker
+public class MotorAccelerationTracker
 {
 
-    private static class DataPoint {
+    private static class DataPoint
+    {
         double time;
         double rpm;
 
-        public DataPoint(double time, double rpm) {
+        public DataPoint(double time, double rpm)
+        {
             this.time = time;
             this.rpm = rpm;
         }
@@ -25,9 +27,10 @@ public class Tracker
     // 25ms is a safe bet. Most motors update velocity every 10ms-20ms.
     // By setting this slightly higher than the motor update rate,
     // we ensure we never capture the same "stale" frame twice.
-    private final double MIN_UPDATE_INTERVAL = 0.025; // Seconds
+    private static final double MIN_UPDATE_INTERVAL = 0.025; // Seconds
 
-    public Tracker(int bufferSize) {
+    public MotorAccelerationTracker(int bufferSize)
+    {
         this.capacity = bufferSize;
         this.buffer = new ArrayList<>();
     }
@@ -36,10 +39,12 @@ public class Tracker
      * Updates the buffer only if enough time has passed, then returns the slope.
      * If called too quickly, it returns the previously calculated slope.
      */
-    public double updateAndGetAcceleration(double currentTimeSeconds, double currentRPM) {
+    public double updateAndGetAcceleration(double currentTimeSeconds, double currentRPM)
+    {
 
         // 1. CHECK: Has enough time passed since the last sample?
-        if (currentTimeSeconds - lastAddTimestamp < MIN_UPDATE_INTERVAL) {
+        if (currentTimeSeconds - lastAddTimestamp < MIN_UPDATE_INTERVAL)
+        {
             // Not enough time has passed. The sensor data might be stale.
             // Return the last known valid acceleration.
             return lastCalculatedAccel;
@@ -52,16 +57,19 @@ public class Tracker
         buffer.add(new DataPoint(currentTimeSeconds, currentRPM));
 
         // 4. Manage Buffer Size
-        if (buffer.size() > capacity) {
+        if (buffer.size() > capacity)
+        {
             buffer.remove(0);
         }
 
         // 5. Calculate Slope (Linear Regression)
-        if (buffer.size() < 2) {
-            return 0.0;
+        if (buffer.size() < 2)
+        {
+            lastCalculatedAccel = 0.0;
+            return lastCalculatedAccel;
         }
 
-        double n = buffer.size();
+        double numDataPoints = buffer.size();
         double sumX = 0;
         double sumY = 0;
         double sumXY = 0;
@@ -69,7 +77,8 @@ public class Tracker
 
         double startTime = buffer.get(0).time;
 
-        for (DataPoint point : buffer) {
+        for (DataPoint point : buffer)
+        {
             double x = point.time - startTime;
             double y = point.rpm;
 
@@ -79,18 +88,22 @@ public class Tracker
             sumXX += (x * x);
         }
 
-        double denominator = (n * sumXX) - (sumX * sumX);
+        double denominator = (numDataPoints * sumXX) - (sumX * sumX);
 
-        if (Math.abs(denominator) < 1e-9) {
+        if (Math.abs(denominator) < 1e-9)
+        {
             lastCalculatedAccel = 0.0;
-        } else {
-            lastCalculatedAccel = ((n * sumXY) - (sumX * sumY)) / denominator;
+        }
+        else
+        {
+            lastCalculatedAccel = ((numDataPoints * sumXY) - (sumX * sumY)) / denominator;
         }
 
         return lastCalculatedAccel;
     }
 
-    public void reset() {
+    public void reset()
+    {
         buffer.clear();
         lastAddTimestamp = 0;
         lastCalculatedAccel = 0;

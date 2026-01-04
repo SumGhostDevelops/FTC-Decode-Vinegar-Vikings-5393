@@ -24,7 +24,7 @@ public class OuttakeCommands
 
     public static class ChangeTargetRPM extends InstantCommand
     {
-        public ChangeTargetRPM(Outtake outtake, int rpm)
+        public ChangeTargetRPM(Outtake outtake, double rpm)
         {
             super(() -> outtake.setRPM(outtake.getTargetRPM() + rpm), outtake);
         }
