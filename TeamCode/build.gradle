@@ -51,6 +51,9 @@ repositories {
 dependencies {
     implementation project(':ftcrobotcontroller')
 
+    // JUnit for unit testing
+    testImplementation 'junit:junit:4.13.2'
+
     // SolversLib: Latest Stable Version
     implementation "org.solverslib:core:0.3.3" // core
     implementation "org.solverslib:pedroPathing:0.3.3" // pedroPathing
