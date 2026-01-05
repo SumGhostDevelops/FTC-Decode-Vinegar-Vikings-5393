@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
-import com.seattlesolvers.solverslib.controller.SquIDFController;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -13,16 +11,15 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 
-@Configurable
 public class RobotConstants
 {
+
     @Configurable
     public static class Telemetry
     {
         public static boolean SET_AUTOCLEAR = true;
     }
 
-    @Configurable
     public static class AprilTags
     {
         public static int[] GOAL_IDS = new int[]{20, 24};
@@ -30,7 +27,6 @@ public class RobotConstants
     }
 
     // Hardware Names
-    @Configurable
     public static class Drive
     {
         public static String FRONT_LEFT = "frontLeft";
@@ -38,7 +34,6 @@ public class RobotConstants
         public static String BACK_LEFT = "backLeft";
         public static String BACK_RIGHT = "backRight";
 
-        @Configurable
         public static class Speed
         {
             public static double DEFAULT = 1.0;
@@ -47,7 +42,6 @@ public class RobotConstants
             public static double CHANGE = 0.25;
         }
 
-        @Configurable
         public static class HybridMode
         {
             public static double TURN_P = 0.02;
@@ -62,7 +56,6 @@ public class RobotConstants
         public static int PPR = 28;
         public static int IDLE_RPM = 3000;
 
-        @Configurable
         public static class Name
         {
             public static String LAUNCHER_LEFT = "leftOuttake";
@@ -90,12 +83,11 @@ public class RobotConstants
         public static int PPR = 28;
         public static int TOLERANCE = 0; // in ticks
         public static double GEAR_RATIO = 19.2 * 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
-        public static Angle FORWARD_ANGLE = new Angle(90, AngleUnit.DEGREES);
+        public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-180, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(180, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         public static double posCoeff = 1.0;
         public static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
 
-        @Configurable
         public static class LazySusan
         {
             public static Distance radius = new Distance(1.0, DistanceUnit.CM);
@@ -113,7 +105,6 @@ public class RobotConstants
         public static double MAX_ANGLE = 60;
     }
 
-    @Configurable
     public static class Intake
     {
         public static String NAME = "intake";
@@ -124,25 +115,21 @@ public class RobotConstants
     {
         public static Pose2d DEFAULT_POSE = new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(90, AngleUnit.DEGREES));
 
-        @Configurable
         public static class IMU
         {
             public static String NAME = "imu";
         }
 
-        @Configurable
         public static class Pinpoint
         {
             public static String NAME = "pinpoint";
         }
 
-        @Configurable
         public static class Webcam
         {
 
             public static String NAME = "webcam";
 
-            @Configurable
             public static class Lens
             {
 
@@ -173,7 +160,7 @@ public class RobotConstants
                 public static String NAME = "forward";
                 // Distance from the center to the FORWARD wheel along the Y-axis (LATERAL)
                 // Positive if LEFT of center, Negative if RIGHT of center
-                public static Distance OFFSET = new Distance(0, DistanceUnit.INCH);
+                public static Distance OFFSET = new Distance(6.68, DistanceUnit.INCH);
             }
 
             @Configurable
@@ -182,7 +169,7 @@ public class RobotConstants
                 public static String NAME = "strafe";
                 // Distance from the center to the STRAFE wheel along the X-axis (LONGITUDINAL)
                 // Positive if FORWARD of center, Negative if BACKWARD of center
-                public static Distance OFFSET = new Distance(0, DistanceUnit.INCH);
+                public static Distance OFFSET = new Distance(-7.81, DistanceUnit.INCH);
             }
         }
     }

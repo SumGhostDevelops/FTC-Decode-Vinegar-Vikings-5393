@@ -69,24 +69,53 @@ public class DeadwheelHandler {
         double rawForwardDist = dForwardTicks * ENCODER_WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REVOLUTION;
         double rawStrafeDist = dStrafeTicks * ENCODER_WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REVOLUTION;
 
-        // 3. Arc Compensation (Correcting for offset)
-        // Forward (X) calculation: PLUS the offset correction
-        // Strafe (Y) calculation: MINUS the offset correction
+        // 3. Arc Compensation [CORRECTED]
+        // Forward Wheel (Standard: Left is positive Offset)
+        // We ADD the offset component because the wheel spins backward during positive rotation.
         double robotDeltaX = rawForwardDist + (FORWARD_WHEEL_Y_OFFSET * deltaAngleRad);
+
+        // Strafe Wheel (Standard: Forward is positive Offset)
+        // We SUBTRACT the offset component because the wheel spins positive (left) during positive rotation.
         double robotDeltaY = rawStrafeDist - (STRAFE_WHEEL_X_OFFSET * deltaAngleRad);
 
-        // 4. Field Centric Conversion
-        // Use average angle for improved accuracy
-        double averageHeadingRad = Math.toRadians(currentAngleDeg - (deltaAngleDeg / 2.0));
 
-        double sin = Math.sin(averageHeadingRad);
-        double cos = Math.cos(averageHeadingRad);
+        // 4. Field Centric Conversion using Pose Exponential
+        // This provides mathematically exact integration for constant curvature motion
+        double fieldDeltaX, fieldDeltaY;
 
-        // Rotate the robot-relative deltas into field coordinates
-        // Field X = RobotX * cos - RobotY * sin
-        // Field Y = RobotX * sin + RobotY * cos
-        double fieldDeltaX = (robotDeltaX * cos) - (robotDeltaY * sin);
-        double fieldDeltaY = (robotDeltaX * sin) + (robotDeltaY * cos);
+        // Always use start heading for consistency (pose at beginning of this update)
+        double startHeadingRad = Math.toRadians(currentAngleDeg - deltaAngleDeg);
+
+        // Compute sinc(θ) and cosc(θ) with Taylor series for small angles
+        // This avoids numerical instability near zero while maintaining accuracy
+        double sincTheta, coscTheta;
+        double halfDelta = deltaAngleRad / 2.0;
+
+        if (Math.abs(deltaAngleRad) < 1e-4) {
+            // Taylor series approximations for small angles (more terms for accuracy)
+            // sinc(θ) ≈ 1 - θ²/6 + θ⁴/120
+            // cosc(θ) ≈ θ/2 - θ³/24 + θ⁵/720
+            double theta2 = deltaAngleRad * deltaAngleRad;
+            double theta4 = theta2 * theta2;
+            sincTheta = 1.0 - theta2 / 6.0 + theta4 / 120.0;
+            coscTheta = halfDelta * (1.0 - theta2 / 12.0 + theta4 / 360.0);
+        } else {
+            // Standard computation for larger angles
+            sincTheta = Math.sin(deltaAngleRad) / deltaAngleRad;
+            coscTheta = (1.0 - Math.cos(deltaAngleRad)) / deltaAngleRad;
+        }
+
+        // Transform robot-frame deltas through the exponential map
+        // This accounts for the curved path during rotation
+        double rotatedX = (sincTheta * robotDeltaX) - (coscTheta * robotDeltaY);
+        double rotatedY = (coscTheta * robotDeltaX) + (sincTheta * robotDeltaY);
+
+        // Rotate from robot frame to field frame using starting heading
+        double sin = Math.sin(startHeadingRad);
+        double cos = Math.cos(startHeadingRad);
+
+        fieldDeltaX = (rotatedX * cos) - (rotatedY * sin);
+        fieldDeltaY = (rotatedX * sin) + (rotatedY * cos);
 
         // 5. Update Pose
         pose = new Pose2d(

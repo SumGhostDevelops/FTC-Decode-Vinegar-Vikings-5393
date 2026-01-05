@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.definitions;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,12 +21,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 
+import java.util.List;
+
 public class RobotHardware
 {
     public MotorExPlus frontLeft, frontRight, backLeft, backRight, intake, turret, outtake;
     public Motor.Encoder dwFwd, dwStrf;
     public ServoEx transfer;
     public IMU imu;
+    public List<LynxModule> allHubs;
     public Pinpoint pinpoint;
     public WebcamName webcam;
 
@@ -192,11 +196,10 @@ public class RobotHardware
             pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.NAME);
 
             // Pinpoint convention: X offset (left=positive), Y offset (forward=positive)
-            // Our convention: right=positive, forward=positive
-            // So we negate the X offset to convert from our convention to Pinpoint's
+            // Our RobotConstants convention matches Pinpoint: left=positive, forward=positive
             pinpoint.setOffsets(
-                    -RobotConstants.Odometry.Deadwheels.Forward.OFFSET.magnitude,  // Negate: our right+ -> Pinpoint left+
-                    RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.magnitude,    // Same: forward is positive in both
+                    RobotConstants.Odometry.Deadwheels.Forward.OFFSET.magnitude,   // Left is positive in both conventions
+                    RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.magnitude,    // Forward is positive in both conventions
                     RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit
             );
 
@@ -223,6 +226,13 @@ public class RobotHardware
 
             imu.initialize(parameters);
             imu.resetYaw();
+
+            allHubs = hardwareMap.getAll(LynxModule.class);
+
+            for (LynxModule hub : allHubs)
+            {
+                hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+            }
         }
         catch (Exception e)
         {
@@ -232,9 +242,9 @@ public class RobotHardware
         try
         {
             dwFwd = backRight.encoder;
-            dwFwd.setDirection(Motor.Direction.REVERSE);
+            dwFwd.setDirection(Motor.Direction.FORWARD);
             dwStrf = backLeft.encoder;
-            dwStrf.setDirection(Motor.Direction.FORWARD);
+            dwStrf.setDirection(Motor.Direction.REVERSE);
         }
         catch (Exception e)
         {
@@ -259,6 +269,13 @@ public class RobotHardware
     public MotorExPlus[] getDriveArray()
     {
         return new MotorExPlus[]{frontLeft, frontRight, backLeft, backRight};
+    }
+
+    public void clearHubCache()
+    {
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
     }
 
     /*

@@ -33,16 +33,16 @@ public class OdometryControlHub extends SubsystemBase
      * Offset added to IMU yaw to get field-absolute heading.
      * After localize(): headingOffset = AprilTag heading - IMU yaw at that moment
      */
-    private Angle headingOffset = new Angle(0, aUnit);
+    private Angle headingOffset;
 
     /**
      * The field-absolute heading that the driver considers "forward" for field-centric driving.
      */
-    private Angle driverForward = new Angle(0, aUnit);
+    private Angle driverForward;
 
     public OdometryControlHub(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp)
     {
-        this(webcam, imu, dwPar, dwPerp, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.FTC_STD), new Angle(0, AngleUnit.DEGREES)));
+        this(webcam, imu, dwPar, dwPerp, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.FTC_STD), new Angle(90, AngleUnit.DEGREES)));
     }
 
     public OdometryControlHub(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp, Pose2d referencePose)
@@ -55,6 +55,13 @@ public class OdometryControlHub extends SubsystemBase
         // reset encoders so deadwheel handler's initial encoder baseline is known
         dwPar.reset();
         dwPerp.reset();
+
+        // Initialize headingOffset so getAngle() returns the reference pose heading
+        // Since IMU yaw starts at 0 after reset, headingOffset = referencePose.heading - 0 = referencePose.heading
+        this.headingOffset = referencePose.heading.toUnit(aUnit);
+
+        // Initialize driverForward to the reference pose heading so getDriverHeading() starts at 0
+        this.driverForward = referencePose.heading.toUnit(aUnit);
 
         // create handler with current encoder baselines (likely zero after reset)
         this.dwHandler = new DeadwheelHandler(referencePose, dwPar.getPosition(), dwPerp.getPosition());

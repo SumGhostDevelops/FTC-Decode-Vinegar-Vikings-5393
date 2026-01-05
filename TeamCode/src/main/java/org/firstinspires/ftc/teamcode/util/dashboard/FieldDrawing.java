@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.dashboard;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.bylazar.field.FieldManager;
+import com.bylazar.field.PanelsField;
+import com.bylazar.field.Style;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -10,31 +10,43 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
 /**
- * Utility class for drawing the robot and field elements on FTC Dashboard's Field panel.
+ * Utility class for drawing the robot and field elements on Panels Dashboard's Field panel.
  * Designed for use with the Panels (bylazar) plugin.
+ *
+ * @author Vinegar Vikings - 5393
+ * @version 2.0
  */
 public class FieldDrawing
 {
-    private final FtcDashboard dashboard;
+    // Robot radius in inches
+    public static final double ROBOT_RADIUS = 9.0;
 
-    // Robot dimensions in inches (adjust as needed)
-    private static final double ROBOT_WIDTH = 18.0;
-    private static final double ROBOT_LENGTH = 18.0;
+    private static final FieldManager panelsField = PanelsField.INSTANCE.getField();
 
-    // Colors
-    private static final String ROBOT_COLOR = "#3F51B5"; // Material Blue
-    private static final String ROBOT_DIRECTION_COLOR = "#FF5722"; // Material Deep Orange
-    private static final String TURRET_COLOR = "#4CAF50"; // Material Green
-    private static final String TARGET_COLOR = "#F44336"; // Material Red
+    // Styles - Using stroke width for visibility
+    private static final Style robotStyle = new Style(
+            "#3F51B5", "#3F51B5", 2.0  // Material Blue, filled with stroke
+    );
+    private static final Style directionStyle = new Style(
+            "#FF5722", "#FF5722", 3.0  // Material Deep Orange, thicker stroke
+    );
+    private static final Style turretStyle = new Style(
+            "#4CAF50", "#4CAF50", 3.0  // Material Green, thicker stroke
+    );
+    private static final Style targetStyle = new Style(
+            "#F44336", "#F44336", 2.0  // Material Red
+    );
+    private static final Style targetMarkerStyle = new Style(
+            "#F44336", "#F44336", 2.0  // Material Red for target marker
+    );
 
-    public FieldDrawing()
+    /**
+     * Prepares Panels Field for using FTC Standard coordinate offsets.
+     * Call this in your OpMode init.
+     */
+    public static void init()
     {
-        this.dashboard = FtcDashboard.getInstance();
-    }
-
-    public FieldDrawing(FtcDashboard dashboard)
-    {
-        this.dashboard = dashboard;
+        panelsField.setOffsets(PanelsField.INSTANCE.getPresets().getPEDRO_PATHING());
     }
 
     /**
@@ -43,7 +55,7 @@ public class FieldDrawing
      *
      * @param robotPose The robot's current pose
      */
-    public void drawRobot(Pose2d robotPose)
+    public static void drawRobot(Pose2d robotPose)
     {
         drawRobot(robotPose, null, null);
     }
@@ -51,10 +63,10 @@ public class FieldDrawing
     /**
      * Draws the robot on the field with turret direction.
      *
-     * @param robotPose The robot's current pose
+     * @param robotPose             The robot's current pose
      * @param turretAbsoluteHeading The turret's absolute heading on the field (or null to skip)
      */
-    public void drawRobot(Pose2d robotPose, Double turretAbsoluteHeading)
+    public static void drawRobot(Pose2d robotPose, Double turretAbsoluteHeading)
     {
         drawRobot(robotPose, turretAbsoluteHeading, null);
     }
@@ -62,119 +74,101 @@ public class FieldDrawing
     /**
      * Draws the robot on the field with turret direction and target point.
      *
-     * @param robotPose The robot's current pose
+     * @param robotPose             The robot's current pose
      * @param turretAbsoluteHeading The turret's absolute heading on the field in degrees (or null to skip)
-     * @param targetCoord The target coordinate the turret is aiming at (or null to skip)
+     * @param targetCoord           The target coordinate the turret is aiming at (or null to skip)
      */
-    public void drawRobot(Pose2d robotPose, Double turretAbsoluteHeading, FieldCoordinate targetCoord)
+    public static void drawRobot(Pose2d robotPose, Double turretAbsoluteHeading, FieldCoordinate targetCoord)
     {
-        TelemetryPacket packet = new TelemetryPacket();
-        Canvas canvas = packet.fieldOverlay();
+        if (robotPose == null)
+        {
+            return;
+        }
 
-        // Convert pose to FTC Standard coordinates (center origin) in inches
-        Pose2d ftcPose = robotPose
-                .toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD)
+        // Convert pose to RIGHT_HAND coordinates (corner origin) in inches
+        // This matches the PEDRO_PATHING preset which expects (0,0) at corner
+        Pose2d convertedPose = robotPose
+                .toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND)
                 .toDistanceUnit(DistanceUnit.INCH);
 
-        double x = ftcPose.coord.x.magnitude;
-        double y = ftcPose.coord.y.magnitude;
-        double headingRad = ftcPose.heading.getAngle(AngleUnit.RADIANS);
+        double x = convertedPose.coord.x.magnitude;
+        double y = convertedPose.coord.y.magnitude;
+        double headingRad = convertedPose.heading.getAngle(AngleUnit.RADIANS);
 
-        // Draw robot body (rotated rectangle)
-        canvas.setStroke(ROBOT_COLOR);
-        canvas.setStrokeWidth(2);
-        drawRotatedRectangle(canvas, x, y, ROBOT_WIDTH, ROBOT_LENGTH, headingRad);
+        if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(headingRad))
+        {
+            return;
+        }
 
-        // Draw direction indicator (line from center pointing forward)
-        double directionLength = ROBOT_LENGTH * 0.6;
-        double dirX = x + directionLength * Math.cos(headingRad);
-        double dirY = y + directionLength * Math.sin(headingRad);
-        canvas.setStroke(ROBOT_DIRECTION_COLOR);
-        canvas.setStrokeWidth(3);
-        canvas.strokeLine(x, y, dirX, dirY);
+        // Draw robot body (filled circle)
+        panelsField.setStyle(robotStyle);
+        panelsField.moveCursor(x, y);
+        panelsField.circle(ROBOT_RADIUS);
 
-        // Draw turret direction if provided
+        // Draw a smaller inner circle to make it more visible
+        panelsField.moveCursor(x, y);
+        panelsField.circle(ROBOT_RADIUS * 0.6);
+
+        // Draw direction indicator (line from center extending past the robot edge)
+        double dirX1 = x;
+        double dirY1 = y;
+        double dirX2 = x + (ROBOT_RADIUS * 1.5) * Math.cos(headingRad);
+        double dirY2 = y + (ROBOT_RADIUS * 1.5) * Math.sin(headingRad);
+
+        panelsField.setStyle(directionStyle);
+        panelsField.moveCursor(dirX1, dirY1);
+        panelsField.line(dirX2, dirY2);
+
+        // Draw turret direction if provided (extends past the robot edge)
         if (turretAbsoluteHeading != null)
         {
             double turretRad = Math.toRadians(turretAbsoluteHeading);
-            double turretLength = ROBOT_LENGTH * 0.8;
-            double turretX = x + turretLength * Math.cos(turretRad);
-            double turretY = y + turretLength * Math.sin(turretRad);
-            canvas.setStroke(TURRET_COLOR);
-            canvas.setStrokeWidth(2);
-            canvas.strokeLine(x, y, turretX, turretY);
+            double turretX1 = x;
+            double turretY1 = y;
+            double turretX2 = x + (ROBOT_RADIUS * 1.8) * Math.cos(turretRad);
+            double turretY2 = y + (ROBOT_RADIUS * 1.8) * Math.sin(turretRad);
 
-            // Draw small circle at turret end
-            canvas.setFill(TURRET_COLOR);
-            canvas.fillCircle(turretX, turretY, 2);
+            panelsField.setStyle(turretStyle);
+            panelsField.moveCursor(turretX1, turretY1);
+            panelsField.line(turretX2, turretY2);
+
+            // Draw a small circle at the turret end for visibility
+            panelsField.moveCursor(turretX2, turretY2);
+            panelsField.circle(2);
         }
 
         // Draw target point if provided
         if (targetCoord != null)
         {
-            FieldCoordinate ftcTarget = targetCoord
-                    .toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD)
+            FieldCoordinate convertedTarget = targetCoord
+                    .toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND)
                     .toDistanceUnit(DistanceUnit.INCH);
 
-            double targetX = ftcTarget.x.magnitude;
-            double targetY = ftcTarget.y.magnitude;
+            double targetX = convertedTarget.x.magnitude;
+            double targetY = convertedTarget.y.magnitude;
 
-            // Draw target marker (X shape)
-            canvas.setStroke(TARGET_COLOR);
-            canvas.setStrokeWidth(2);
+            // Draw target marker (larger circle for visibility)
+            panelsField.setStyle(targetMarkerStyle);
+            panelsField.moveCursor(targetX, targetY);
+            panelsField.circle(6);
+
+            // Draw an X through the target
+            panelsField.setStyle(targetStyle);
             double markerSize = 4;
-            canvas.strokeLine(targetX - markerSize, targetY - markerSize, targetX + markerSize, targetY + markerSize);
-            canvas.strokeLine(targetX - markerSize, targetY + markerSize, targetX + markerSize, targetY - markerSize);
-
-            // Draw line from robot to target
-            canvas.setStroke(TARGET_COLOR);
-            canvas.setStrokeWidth(1);
-            canvas.strokeLine(x, y, targetX, targetY);
+            panelsField.moveCursor(targetX - markerSize, targetY - markerSize);
+            panelsField.line(targetX + markerSize, targetY + markerSize);
+            panelsField.moveCursor(targetX - markerSize, targetY + markerSize);
+            panelsField.line(targetX + markerSize, targetY - markerSize);
         }
-
-        // Add telemetry data to packet
-        packet.put("Robot X (in)", String.format("%.2f", x));
-        packet.put("Robot Y (in)", String.format("%.2f", y));
-        packet.put("Robot Heading (deg)", String.format("%.1f", Math.toDegrees(headingRad)));
-        if (turretAbsoluteHeading != null)
-        {
-            packet.put("Turret Heading (deg)", String.format("%.1f", turretAbsoluteHeading));
-        }
-
-        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
-     * Draws a rotated rectangle on the canvas.
+     * Sends the current packet to Panels Dashboard.
+     * Call this after drawing all elements for the current frame.
      */
-    private void drawRotatedRectangle(Canvas canvas, double cx, double cy, double width, double height, double headingRad)
+    public static void sendPacket()
     {
-        // Calculate corner offsets
-        double halfW = width / 2;
-        double halfH = height / 2;
-
-        double cos = Math.cos(headingRad);
-        double sin = Math.sin(headingRad);
-
-        // Calculate the four corners
-        double[] xCorners = new double[4];
-        double[] yCorners = new double[4];
-
-        // Front-left
-        xCorners[0] = cx + halfH * cos - halfW * sin;
-        yCorners[0] = cy + halfH * sin + halfW * cos;
-        // Front-right
-        xCorners[1] = cx + halfH * cos + halfW * sin;
-        yCorners[1] = cy + halfH * sin - halfW * cos;
-        // Back-right
-        xCorners[2] = cx - halfH * cos + halfW * sin;
-        yCorners[2] = cy - halfH * sin - halfW * cos;
-        // Back-left
-        xCorners[3] = cx - halfH * cos - halfW * sin;
-        yCorners[3] = cy - halfH * sin + halfW * cos;
-
-        // Draw the rectangle
-        canvas.strokePolygon(xCorners, yCorners);
+        panelsField.update();
     }
 }
 

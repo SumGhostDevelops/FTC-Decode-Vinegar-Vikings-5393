@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
@@ -51,8 +49,6 @@ public class FlywheelPIDFTuning extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        // Initialize Telemetry with Dashboard
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         initSystems();
 

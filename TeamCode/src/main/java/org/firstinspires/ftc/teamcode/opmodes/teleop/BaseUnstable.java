@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -28,13 +27,14 @@ public abstract class BaseUnstable extends CommandOpMode
 {
     protected Team team;
     protected RobotContext robot;
-    protected FieldDrawing fieldDrawing;
 
     @Override
     public void initialize()
     {
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
-        //fieldDrawing = new FieldDrawing();
+
+        // Initialize Panels Field with FTC Standard coordinates
+        FieldDrawing.init();
 
         register(robot.subsystems.drive, robot.subsystems.intake, robot.subsystems.transfer, robot.subsystems.turret, robot.subsystems.outtake, robot.subsystems.odometry);
 
@@ -84,16 +84,15 @@ public abstract class BaseUnstable extends CommandOpMode
     {
         displayTelemetry();
         telemetry.update();
+        robot.hw.clearHubCache();
 
-        // Draw robot position on FTC Dashboard Field panel
-        /*
-        fieldDrawing.drawRobot(
+        // Draw robot position on Panels Dashboard Field panel
+        FieldDrawing.drawRobot(
                 robot.subsystems.odometry.getPose(),
                 robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES),
                 robot.team.goal.coord
         );
-
-         */
+        FieldDrawing.sendPacket();
     }
 
     @Override
@@ -107,6 +106,9 @@ public abstract class BaseUnstable extends CommandOpMode
     public void end()
     {
         robot.subsystems.odometry.close();
+        robot.subsystems.turret.setTargetRelative(RobotConstants.Turret.FORWARD_ANGLE);
+        robot.subsystems.turret.aim();
+        robot.subsystems.turret.waitWhileBusy();
     }
 
     public void bindKeys()

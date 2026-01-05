@@ -218,6 +218,21 @@ public class Turret extends SubsystemBase
         return targetPosition;
     }
 
+    public void waitWhileBusy()
+    {
+        while (turretMotor.motorEx.isBusy())
+        {
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     @Override
     public void periodic()
     {
