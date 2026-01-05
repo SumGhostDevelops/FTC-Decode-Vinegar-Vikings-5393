@@ -7,12 +7,16 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.controller.SquIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 
@@ -110,7 +114,7 @@ public class RobotHardware
         catch (Exception e)
         {
             telemetry.log().add("Warning: Left outtake motor not found");
-            outtakeOk = false;
+            telemetry.log().add(e.getMessage());
         }
 
         /*
@@ -187,7 +191,14 @@ public class RobotHardware
         {
             pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.NAME);
 
-            pinpoint.setOffsets(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.magnitude, RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.magnitude, RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit);
+            // Pinpoint convention: X offset (left=positive), Y offset (forward=positive)
+            // Our convention: right=positive, forward=positive
+            // So we negate the X offset to convert from our convention to Pinpoint's
+            pinpoint.setOffsets(
+                    -RobotConstants.Odometry.Deadwheels.Forward.OFFSET.magnitude,  // Negate: our right+ -> Pinpoint left+
+                    RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.magnitude,    // Same: forward is positive in both
+                    RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit
+            );
 
             double counts_per_unit = (double) RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION / RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.magnitude;
             pinpoint.setEncoderResolution(counts_per_unit, RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.unit);
@@ -204,8 +215,9 @@ public class RobotHardware
         try
         {
             imu = hardwareMap.get(IMU.class, RobotConstants.Odometry.IMU.NAME);
+
             IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                    RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                     RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
             ));
 
@@ -220,7 +232,9 @@ public class RobotHardware
         try
         {
             dwFwd = backRight.encoder;
+            dwFwd.setDirection(Motor.Direction.REVERSE);
             dwStrf = backLeft.encoder;
+            dwStrf.setDirection(Motor.Direction.FORWARD);
         }
         catch (Exception e)
         {

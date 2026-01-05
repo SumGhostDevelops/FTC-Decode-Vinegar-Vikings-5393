@@ -15,7 +15,7 @@ public class Subsystems
     public final Outtake outtake;
     public final Turret turret;
 
-    public final OdometryControlHub odometry;
+    public OdometryControlHub odometry;
 
     public Subsystems(RobotHardware hw)
     {

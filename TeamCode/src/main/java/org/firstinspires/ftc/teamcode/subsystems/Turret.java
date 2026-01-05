@@ -57,7 +57,10 @@ public class Turret extends SubsystemBase
      */
     public void setTargetRelative(Angle targetAngle)
     {
-        int targetTicks = resolveSolution(turretMotor.getCurrentPosition(), targetAngle);
+        // Subtract initialRelativeAngle to convert from "relative to robot" coordinates
+        // to "relative to motor zero position" coordinates
+        Angle adjustedTarget = targetAngle.minus(initialRelativeAngle);
+        int targetTicks = resolveSolution(turretMotor.getCurrentPosition(), adjustedTarget);
 
         // Get turn limits
         UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
@@ -99,7 +102,7 @@ public class Turret extends SubsystemBase
      */
     public Angle getAbsoluteAngle(Angle robotAngle)
     {
-        return getRelativeAngle().plus(robotAngle);
+        return getRelativeAngle().plus(robotAngle).minus(initialRelativeAngle);
     }
 
     /**

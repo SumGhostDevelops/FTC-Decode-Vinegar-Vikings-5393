@@ -34,7 +34,7 @@ public abstract class BaseUnstable extends CommandOpMode
     public void initialize()
     {
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
-        fieldDrawing = new FieldDrawing();
+        //fieldDrawing = new FieldDrawing();
 
         register(robot.subsystems.drive, robot.subsystems.intake, robot.subsystems.transfer, robot.subsystems.turret, robot.subsystems.outtake, robot.subsystems.odometry);
 
@@ -61,6 +61,7 @@ public abstract class BaseUnstable extends CommandOpMode
     {
         telemetry.addData("Team", team);
         telemetry.addLine("--- Odometry ---");
+        telemetry.addData("Raw Yaw", robot.hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
         telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("x (inches)", robot.subsystems.odometry.getFieldCoord().x.toUnit(DistanceUnit.INCH));
@@ -85,11 +86,14 @@ public abstract class BaseUnstable extends CommandOpMode
         telemetry.update();
 
         // Draw robot position on FTC Dashboard Field panel
+        /*
         fieldDrawing.drawRobot(
                 robot.subsystems.odometry.getPose(),
                 robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES),
                 robot.team.goal.coord
         );
+
+         */
     }
 
     @Override
@@ -120,7 +124,7 @@ public abstract class BaseUnstable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> telemetry.log().add("X pressed")).whenPressed(new OdometryCommands.Localize(subsystems.odometry, telemetry));
 
         // Y button (held): Auto-aim turret to team's goal
-        driver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> telemetry.log().add("Y pressed - auto-aim enabled")).whileHeld(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
+        driver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> telemetry.log().add("Y pressed - auto-aim enabled")).toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(() -> telemetry.log().add("DPAD_UP pressed")).whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 100));
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(() -> telemetry.log().add("DPAD_DOWN pressed")).whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));

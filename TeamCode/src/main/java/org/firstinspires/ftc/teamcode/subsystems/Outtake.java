@@ -8,8 +8,15 @@ import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 
 public class Outtake extends SubsystemBase {
 
+    public enum State
+    {
+        ON,
+        IDLE,
+        OFF,
+    }
+
     private final MotorExPlus motor;
-    private State state = State.OFF;
+    private State state;
 
     private double targetRPM = 0;
 
@@ -17,13 +24,7 @@ public class Outtake extends SubsystemBase {
     public Outtake(MotorExPlus motor)
     {
         this.motor = motor;
-    }
-
-    public enum State
-    {
-        ON,
-        IDLE,
-        OFF,
+        this.state = State.OFF;
     }
 
     public void on()

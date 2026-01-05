@@ -19,6 +19,7 @@ public class RobotMath
          */
         public static double tpsToRpm(double tps, double ppr)
         {
+            if (ppr == 0.0) return 0.0;
             return (tps / ppr) * 60.0;
         }
 

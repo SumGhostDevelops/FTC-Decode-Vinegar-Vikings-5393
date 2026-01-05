@@ -61,11 +61,23 @@ public class MotorExPlus extends MotorEx
     private static final int TRACKER_WINDOW_SIZE = 7;
 
     private double currentAccel = 0.0;
-    private final MotorAccelerationTracker tracker = new MotorAccelerationTracker(TRACKER_WINDOW_SIZE);
-    private final ElapsedTime accelTimer = new ElapsedTime();
+    private MotorAccelerationTracker tracker;
+    private ElapsedTime accelTimer;
 
     private double rpmTolerance = 50;
     private double accelTolerance = 150;
+
+    private void ensureTrackerInitialized()
+    {
+        if (tracker == null)
+        {
+            tracker = new MotorAccelerationTracker(TRACKER_WINDOW_SIZE);
+        }
+        if (accelTimer == null)
+        {
+            accelTimer = new ElapsedTime();
+        }
+    }
 
     public double getRpmTolerance()
     {
@@ -118,7 +130,12 @@ public class MotorExPlus extends MotorEx
 
     public double getRPM()
     {
-        return RobotMath.Motor.tpsToRpm(super.getCorrectedVelocity(), super.getCPR());
+        double cpr = super.getCPR();
+        if (cpr == 0)
+        {
+            return 0.0;
+        }
+        return RobotMath.Motor.tpsToRpm(super.getVelocity(), cpr);
     }
 
     public double getAcceleration()
@@ -128,7 +145,12 @@ public class MotorExPlus extends MotorEx
 
     public double getRPMAcceleration()
     {
-        return RobotMath.Motor.tps2ToRpm2(getAcceleration(), super.getCPR());
+        double cpr = super.getCPR();
+        if (cpr == 0)
+        {
+            return 0.0;
+        }
+        return RobotMath.Motor.tps2ToRpm2(getAcceleration(), cpr);
     }
 
     /**
@@ -136,7 +158,21 @@ public class MotorExPlus extends MotorEx
      */
     public void updateAcceleration()
     {
-        currentAccel = tracker.updateAndGetAcceleration(accelTimer.seconds(), getRPM());
+        try
+        {
+            ensureTrackerInitialized();
+            double time = accelTimer.seconds();
+            double rpm = getRPM();
+            currentAccel = tracker.updateAndGetAcceleration(time, rpm);
+        } catch (Exception e)
+        {
+            // Silently handle any errors
+            currentAccel = 0.0;
+        } catch (Error e)
+        {
+            // Catch serious errors too (like NoClassDefFoundError)
+            currentAccel = 0.0;
+        }
     }
 
     /**
