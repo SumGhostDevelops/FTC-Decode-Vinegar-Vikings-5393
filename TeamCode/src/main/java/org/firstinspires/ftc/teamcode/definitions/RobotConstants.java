@@ -159,7 +159,8 @@ public class RobotConstants
         public static class Deadwheels // These are plugged in directly to the Pinpoint
         {
             public final static int COUNTS_PER_REVOLUTION = 8192;
-            public final static Distance WHEEL_CIRCUMFERENCE = new Distance(35, DistanceUnit.MM);
+            public final static Distance WHEEL_DIAMETER = new Distance(35, DistanceUnit.MM);
+            public final static Distance WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER.multiply(Math.PI); // π × diameter
 
             @Config
             public static class Forward // also parallel
