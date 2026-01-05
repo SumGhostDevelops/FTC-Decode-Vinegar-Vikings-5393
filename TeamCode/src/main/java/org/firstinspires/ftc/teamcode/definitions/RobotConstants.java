@@ -171,15 +171,17 @@ public class RobotConstants
             public static class Forward // also parallel
             {
                 public static String NAME = "forward";
-                // Offset from robot center x-axis (positive = forward of center)
-                public static Distance OFFSET = new Distance(-3.5, DistanceUnit.INCH);
+                // Distance from the center to the FORWARD wheel along the Y-axis (LATERAL)
+                // Positive if LEFT of center, Negative if RIGHT of center
+                public static Distance OFFSET = new Distance(0, DistanceUnit.INCH);
             }
 
             @Configurable
             public static class Strafe // also perpendicular
             {
                 public static String NAME = "strafe";
-                // Offset from robot center y-axis (positive = right of center)
+                // Distance from the center to the STRAFE wheel along the X-axis (LONGITUDINAL)
+                // Positive if FORWARD of center, Negative if BACKWARD of center
                 public static Distance OFFSET = new Distance(0, DistanceUnit.INCH);
             }
         }

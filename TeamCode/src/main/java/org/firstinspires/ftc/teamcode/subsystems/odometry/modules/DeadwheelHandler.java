@@ -8,109 +8,102 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
-public class DeadwheelHandler
-{
+public class DeadwheelHandler {
     // Constants
-    private final double ENCODER_TICKS_PER_REVOLUTION = RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION; // ticks measured after
-    // one full revolution of the deadwheel
+    private final double ENCODER_TICKS_PER_REVOLUTION = RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION;
     private final double ENCODER_WHEEL_CIRCUMFERENCE = RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.toUnit(DistanceUnit.INCH).magnitude;
 
     // Distance from the center to the FORWARD wheel along the Y-axis (LATERAL)
+    // Positive if LEFT of center, Negative if RIGHT of center
     private final double FORWARD_WHEEL_Y_OFFSET = RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude;
 
     // Distance from the center to the STRAFE wheel along the X-axis (LONGITUDINAL)
+    // Positive if FORWARD of center, Negative if BACKWARD of center
     private final double STRAFE_WHEEL_X_OFFSET = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(DistanceUnit.INCH).magnitude;
 
     // Variables
     private Pose2d pose;
-    private double lastLeftEnc = 0, lastNormalEnc = 0;
-    private double lastAngle = 0;
+    private double lastForwardEnc = 0, lastStrafeEnc = 0;
+    private double lastAngleDeg = 0;
 
-    public DeadwheelHandler(Pose2d pose)
-    {
+    public DeadwheelHandler(Pose2d pose) {
         this.pose = pose.toDistanceUnit(DistanceUnit.INCH).toAngleUnit(AngleUnit.DEGREES);
-        this.lastAngle = this.pose.heading.toUnit(AngleUnit.DEGREES).measure;
+        this.lastAngleDeg = this.pose.heading.toUnit(AngleUnit.DEGREES).measure;
     }
 
-    /**
-     * New constructor that allows providing initial encoder baselines so the first update uses deltas correctly.
-     */
-    public DeadwheelHandler(Pose2d pose, double leftEncBaseline, double normalEncBaseline)
-    {
+    public DeadwheelHandler(Pose2d pose, double forwardEncBaseline, double strafeEncBaseline) {
         this(pose);
-        this.lastLeftEnc = leftEncBaseline;
-        this.lastNormalEnc = normalEncBaseline;
+        this.lastForwardEnc = forwardEncBaseline;
+        this.lastStrafeEnc = strafeEncBaseline;
+    }
+
+    public void resetEncoders(double forwardEncBaseline, double strafeEncBaseline) {
+        this.lastForwardEnc = forwardEncBaseline;
+        this.lastStrafeEnc = strafeEncBaseline;
     }
 
     /**
-     * Optional reset of encoder baselines at runtime.
-     */
-    public void resetEncoders(double leftEncBaseline, double normalEncBaseline)
-    {
-        this.lastLeftEnc = leftEncBaseline;
-        this.lastNormalEnc = normalEncBaseline;
-    }
-
-    // Two Deadwheel Odo
-
-    /**
-     * Parallel encoder measures forward/backward (Y in robot frame)
-     * Perpendicular encoder measures left/right (X in robot frame)
+     * Updates the robot's pose based on encoder deltas and IMU heading.
      *
-     * @param parallelEncoderTicks = ticks from the parallel (forward) odometry wheel
-     * @param perpendicularEncoderTicks = ticks from the perpendicular (strafe) odometry wheel
-     * @param angle = robot's heading angle (from IMU)
+     * @param forwardEncoderTicks Ticks from the Forward/Backward pod
+     * @param strafeEncoderTicks  Ticks from the Left/Right (Strafe) pod
+     * @param currentAngle        Current absolute heading from IMU
      */
-    public void updatePose(double parallelEncoderTicks, double perpendicularEncoderTicks, Angle angle)
-    {
-        double ang = angle.toUnit(AngleUnit.DEGREES).measure;
-        double dL = parallelEncoderTicks - lastLeftEnc; // Parallel delta
-        double dN = perpendicularEncoderTicks - lastNormalEnc; // Perpendicular delta
-        double dTheta = Math.toRadians(ang - lastAngle); // Heading change in radians
+    public void updatePose(double forwardEncoderTicks, double strafeEncoderTicks, Angle currentAngle) {
+        double currentAngleDeg = currentAngle.toUnit(AngleUnit.DEGREES).measure;
 
-        lastNormalEnc = perpendicularEncoderTicks;
-        lastLeftEnc = parallelEncoderTicks;
-        lastAngle = ang;
+        // 1. Calculate Deltas
+        double dForwardTicks = forwardEncoderTicks - lastForwardEnc;
+        double dStrafeTicks = strafeEncoderTicks - lastStrafeEnc;
 
-        // 1. Convert encoder ticks to distance
-        // Note: Removed the negative signs unless your encoders are mounted inverted
-        double rawParallelDist = dL * ENCODER_WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REVOLUTION;
-        double rawPerpDist = dN * ENCODER_WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REVOLUTION;
+        // Calculate angle delta handling wrapping (-180 to 180)
+        double deltaAngleDeg = AngleUnit.normalizeDegrees(currentAngleDeg - lastAngleDeg);
+        double deltaAngleRad = Math.toRadians(deltaAngleDeg);
 
-        // 2. Arc compensation (The r * theta fix)
-        // dxR should be the Forward wheel corrected by its Y-offset
-        // dyR should be the Strafe wheel corrected by its X-offset
-        double dxR = rawParallelDist - (FORWARD_WHEEL_Y_OFFSET * dTheta);
-        double dyR = rawPerpDist - (STRAFE_WHEEL_X_OFFSET * dTheta);
+        // Update state for next loop
+        lastForwardEnc = forwardEncoderTicks;
+        lastStrafeEnc = strafeEncoderTicks;
+        lastAngleDeg = currentAngleDeg;
 
-        // 3. Convert from robot-relative to field-relative coordinates
-        // Standard Rotation Matrix for X (Forward) and Y (Strafe)
-        double angRad = Math.toRadians(ang);
-        double cos = Math.cos(angRad);
-        double sin = Math.sin(angRad);
+        // 2. Convert encoder ticks to distance (inches)
+        double rawForwardDist = dForwardTicks * ENCODER_WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REVOLUTION;
+        double rawStrafeDist = dStrafeTicks * ENCODER_WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REVOLUTION;
 
-        // Field X = (RobotX * cos) - (RobotY * sin)
-        // Field Y = (RobotX * sin) + (RobotY * cos)
-        double dx = (dxR * cos) - (dyR * sin);
-        double dy = (dxR * sin) + (dyR * cos);
+        // 3. Arc Compensation (Correcting for offset)
+        // Forward (X) calculation: PLUS the offset correction
+        // Strafe (Y) calculation: MINUS the offset correction
+        double robotDeltaX = rawForwardDist + (FORWARD_WHEEL_Y_OFFSET * deltaAngleRad);
+        double robotDeltaY = rawStrafeDist - (STRAFE_WHEEL_X_OFFSET * deltaAngleRad);
 
+        // 4. Field Centric Conversion
+        // Use average angle for improved accuracy
+        double averageHeadingRad = Math.toRadians(currentAngleDeg - (deltaAngleDeg / 2.0));
+
+        double sin = Math.sin(averageHeadingRad);
+        double cos = Math.cos(averageHeadingRad);
+
+        // Rotate the robot-relative deltas into field coordinates
+        // Field X = RobotX * cos - RobotY * sin
+        // Field Y = RobotX * sin + RobotY * cos
+        double fieldDeltaX = (robotDeltaX * cos) - (robotDeltaY * sin);
+        double fieldDeltaY = (robotDeltaX * sin) + (robotDeltaY * cos);
+
+        // 5. Update Pose
         pose = new Pose2d(
                 new FieldCoordinate(
-                        pose.coord.x.plus(new Distance(dx, DistanceUnit.INCH)),
-                        pose.coord.y.plus(new Distance(dy, DistanceUnit.INCH)),
+                        pose.coord.x.plus(new Distance(fieldDeltaX, DistanceUnit.INCH)),
+                        pose.coord.y.plus(new Distance(fieldDeltaY, DistanceUnit.INCH)),
                         pose.coord.coordSys
                 ),
-                new Angle(ang, AngleUnit.DEGREES)
+                new Angle(currentAngleDeg, AngleUnit.DEGREES)
         );
     }
 
-    public Pose2d getPose()
-    {
+    public Pose2d getPose() {
         return pose;
     }
 
-    public FieldCoordinate getCoord()
-    {
+    public FieldCoordinate getCoord() {
         return pose.coord;
     }
 }
