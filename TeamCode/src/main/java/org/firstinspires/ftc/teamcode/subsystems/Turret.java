@@ -91,7 +91,7 @@ public class Turret extends SubsystemBase
     {
         // Use SDK's RUN_TO_POSITION for built-in deceleration and position holding
         turretMotor.motorEx.setTargetPosition(targetPosition);
-        turretMotor.motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (!turretMotor.motorEx.getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) turretMotor.motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turretMotor.motorEx.setPower(1.0);
     }
 
@@ -216,21 +216,6 @@ public class Turret extends SubsystemBase
     public int getTargetPosition()
     {
         return targetPosition;
-    }
-
-    public void waitWhileBusy()
-    {
-        while (turretMotor.motorEx.isBusy())
-        {
-            try
-            {
-                Thread.sleep(500);
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override

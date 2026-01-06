@@ -7,14 +7,6 @@ import org.firstinspires.ftc.teamcode.subsystems.odometry.OdometryControlHub;
 
 public class OdometryCommands
 {
-    public static class SetForwardAngle extends InstantCommand
-    {
-        public SetForwardAngle(OdometryControlHub odometry)
-        {
-            super(odometry::setForwardAngle, odometry);
-        }
-    }
-
     /**
      * Sets the current field-absolute heading as the driver's forward direction.
      * Use this AFTER localization to define forward for field-centric driving.

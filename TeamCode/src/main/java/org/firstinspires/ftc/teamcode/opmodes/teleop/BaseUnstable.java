@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -106,9 +108,6 @@ public abstract class BaseUnstable extends CommandOpMode
     public void end()
     {
         robot.subsystems.odometry.close();
-        robot.subsystems.turret.setTargetRelative(RobotConstants.Turret.FORWARD_ANGLE);
-        robot.subsystems.turret.aim();
-        robot.subsystems.turret.waitWhileBusy();
     }
 
     public void bindKeys()
@@ -130,5 +129,10 @@ public abstract class BaseUnstable extends CommandOpMode
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(() -> telemetry.log().add("DPAD_UP pressed")).whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 100));
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(() -> telemetry.log().add("DPAD_DOWN pressed")).whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));
+
+        Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
+        Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
+
+        driverRightTrigger.whenActive(() -> telemetry.log().add("Right trigger activated")).whileActiveOnce(new OuttakeCommands.Toggle(subsystems.outtake));
     }
 }

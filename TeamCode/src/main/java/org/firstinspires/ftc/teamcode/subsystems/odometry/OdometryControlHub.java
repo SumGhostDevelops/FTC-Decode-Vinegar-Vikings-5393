@@ -99,19 +99,6 @@ public class OdometryControlHub extends SubsystemBase
     }
 
     /**
-     * Resets the IMU yaw and sets the driver's forward to the current heading.
-     * Call this when the robot is facing the direction the driver wants to be "forward".
-     * Note: This assumes the robot is facing field-forward (0°) for absolute heading purposes.
-     * If not, call localize() afterward to correct the absolute heading.
-     */
-    public void setForwardAngle()
-    {
-        imu.resetYaw();
-        headingOffset = new Angle(0, aUnit);
-        driverForward = new Angle(0, aUnit);
-    }
-
-    /**
      * Sets the current field-absolute heading as the driver's "forward" direction.
      * Call this AFTER localization to set which direction the driver considers forward
      * for field-centric driving, without affecting the absolute heading calibration.

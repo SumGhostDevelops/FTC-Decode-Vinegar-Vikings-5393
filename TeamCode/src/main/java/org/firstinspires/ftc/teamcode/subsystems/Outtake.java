@@ -1,8 +1,7 @@
-// java
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 
@@ -19,8 +18,11 @@ public class Outtake extends SubsystemBase {
     private State state;
 
     private double targetRPM = 0;
+    private double setRPM = targetRPM;
 
-    // Accept a single MotorExPlus (RobotContext should provide this)
+    // Tolerance to avoid tiny floating-point updates (adjust as needed)
+    private static final double RPM_EPS = 1.0;
+
     public Outtake(MotorExPlus motor)
     {
         this.motor = motor;
@@ -29,14 +31,26 @@ public class Outtake extends SubsystemBase {
 
     public void on()
     {
-        if (state == State.ON)
+        on(false);
+    }
+
+    public void on(boolean force)
+    {
+        if (state == State.ON && !force)
         {
             return;
         }
 
         state = State.ON;
-        motor.setRunMode(Motor.RunMode.VelocityControl);
-        motor.setRPM(targetRPM);
+
+        // Only change motor mode / RPM if actually needed
+        double desired = targetRPM;
+        if (Math.abs(desired - setRPM) > RPM_EPS || force)
+        {
+            motor.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setRPM(desired);
+            setRPM = desired;
+        }
     }
 
     /**
@@ -44,14 +58,25 @@ public class Outtake extends SubsystemBase {
      */
     public void idle()
     {
-        if (state == State.IDLE)
+        idle(false);
+    }
+
+    public void idle(boolean force)
+    {
+        if (state == State.IDLE && !force)
         {
             return;
         }
 
         state = State.IDLE;
-        motor.setRunMode(Motor.RunMode.VelocityControl);
-        motor.setRPM(targetRPM / 2.0);
+
+        double desired = targetRPM / 2.0;
+        if (Math.abs(desired - setRPM) > RPM_EPS || force)
+        {
+            motor.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setRPM(desired);
+            setRPM = desired;
+        }
     }
 
     public void off()
@@ -63,11 +88,45 @@ public class Outtake extends SubsystemBase {
 
         state = State.OFF;
         motor.stopMotor();
+
+        setRPM = 0;
     }
 
-    public void setRPM(double rpm)
+    public void setTargetRPM(double rpm)
     {
-        targetRPM = Math.min(6000, Math.max(0, rpm));
+        double newRPM = Math.min(6000, Math.max(0, rpm));
+
+        // Only apply changes when they are significant
+        if (Math.abs(newRPM - targetRPM) <= RPM_EPS)
+        {
+            targetRPM = newRPM; // keep value but don't push small changes
+            return;
+        }
+
+        targetRPM = newRPM;
+
+        // If motor is active, compute desired rpm for current state and update only if needed
+        double desired;
+        switch (state)
+        {
+            case ON:
+                desired = targetRPM;
+                break;
+            case IDLE:
+                desired = targetRPM / 2.0;
+                break;
+            case OFF:
+            default:
+                // When OFF, do not push RPM to motor
+                return;
+        }
+
+        if (Math.abs(desired - setRPM) > RPM_EPS)
+        {
+            motor.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setRPM(desired);
+            setRPM = desired;
+        }
     }
 
     public double getTargetRPM()
@@ -88,6 +147,11 @@ public class Outtake extends SubsystemBase {
     public boolean isStable()
     {
         return motor.isStable();
+    }
+
+    public State getState()
+    {
+        return state;
     }
 
     @Override

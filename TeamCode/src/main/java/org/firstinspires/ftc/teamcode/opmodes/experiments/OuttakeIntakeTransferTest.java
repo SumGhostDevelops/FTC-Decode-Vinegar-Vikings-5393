@@ -46,7 +46,7 @@ public class OuttakeIntakeTransferTest extends LinearOpMode {
         intake = new Intake(hw.intake);
         transfer = new Transfer(hw.transfer);
         outtake = new Outtake(hw.outtake);
-        outtake.setRPM(rpm);
+        outtake.setTargetRPM(rpm);
     }
     protected void launch() throws InterruptedException {
         if(atSpeed() && !hasLaunched) {
