@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode.util;
 import com.seattlesolvers.solverslib.util.InterpLUT;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 public class RobotMath
 {
@@ -97,12 +99,15 @@ public class RobotMath
     {
         private static final InterpLUT lut = new InterpLUT();
         private static boolean lutInitialized = false;
+        private static DistanceUnit dUnit = DistanceUnit.METER;
 
         /**
          * Initialize the look up table.
          */
         public static void initLUT()
         {
+            // make sure all distances have .toUnit(dUnit)
+            // distance, rpm
             /* example stuff
             //Adding each val with a key
             lut.add(1.1, 0.2);
@@ -118,17 +123,17 @@ public class RobotMath
 
         /**
          * Get
-         * @param distance
+         * @param dist
          * @return
          */
-        public static double rpmLUT(double distance)
+        public static double rpmLUT(Distance dist)
         {
             if (!lutInitialized)
             {
                 initLUT();
             }
 
-            return lut.get(distance);
+            return lut.get(dist.toUnit(dUnit).magnitude);
         }
     }
 }

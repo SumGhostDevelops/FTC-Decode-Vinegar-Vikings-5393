@@ -54,7 +54,7 @@ public class RobotConstants
     public static class Outtake
     {
         public static int PPR = 28;
-        public static int IDLE_RPM = 3000;
+        public static int BASE_RPM = 3000;
 
         public static class Name
         {

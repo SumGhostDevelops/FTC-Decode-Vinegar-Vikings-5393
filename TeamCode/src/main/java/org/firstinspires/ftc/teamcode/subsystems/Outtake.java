@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
+import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.util.RobotMath;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 
 public class Outtake extends SubsystemBase {
@@ -15,10 +18,10 @@ public class Outtake extends SubsystemBase {
     }
 
     private final MotorExPlus motor;
-    private State state;
+    private State state = State.OFF;
 
-    private double targetRPM = 0;
-    private double setRPM = targetRPM;
+    private double targetRPM = RobotConstants.Outtake.BASE_RPM;
+    private double setRPM = 0;
 
     // Tolerance to avoid tiny floating-point updates (adjust as needed)
     private static final double RPM_EPS = 1.0;
@@ -26,7 +29,6 @@ public class Outtake extends SubsystemBase {
     public Outtake(MotorExPlus motor)
     {
         this.motor = motor;
-        this.state = State.OFF;
     }
 
     public void on()
@@ -127,6 +129,11 @@ public class Outtake extends SubsystemBase {
             motor.setRPM(desired);
             setRPM = desired;
         }
+    }
+
+    public void setTargetRPMFromDistance(Distance dist)
+    {
+        setTargetRPM(RobotMath.Outtake.rpmLUT(dist));
     }
 
     public double getTargetRPM()
