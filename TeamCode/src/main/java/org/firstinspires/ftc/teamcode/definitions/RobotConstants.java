@@ -115,8 +115,8 @@ public class RobotConstants
          * If true, the intake will automatically be set to intake mode.
          */
         public static boolean automaticBehavior = true;
-        public static double intakePower = 0.5;
-        public static double transferPower = 0.5;
+        public static double intakePower = 0.4;
+        public static double transferPower = 0.7;
     }
 
     @Configurable
