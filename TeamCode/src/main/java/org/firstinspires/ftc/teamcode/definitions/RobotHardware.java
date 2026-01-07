@@ -171,7 +171,7 @@ public class RobotHardware
         try
         {
             transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, RobotConstants.Transfer.SERVO_RANGE, AngleUnit.DEGREES);
-            //Servo transfer = hardwareMap.get(Servo.class, RobotConstants.Transfer.TRANSFER);
+            transfer.set(RobotConstants.Transfer.CLOSED_ANGLE);
         }
         catch (Exception e)
         {

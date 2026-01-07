@@ -101,14 +101,22 @@ public class RobotConstants
     {
         public static String TRANSFER = "transfer";
         public static double SERVO_RANGE = 360.0; // Physical servo range in degrees
-        public static double OPEN_ANGLE = 75;
+        public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
         public static double MID_ANGLE = 30;
-        public static double CLOSED_ANGLE = 180;
+        public static double CLOSED_ANGLE = 0;
+        public static double autoPauseMs = 1000; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
     }
 
+    @Configurable
     public static class Intake
     {
         public static String NAME = "intake";
+        /**
+         * If true, the intake will automatically be set to intake mode.
+         */
+        public static boolean automaticBehavior = true;
+        public static double intakePower = 0.5;
+        public static double transferPower = 0.5;
     }
 
     @Configurable

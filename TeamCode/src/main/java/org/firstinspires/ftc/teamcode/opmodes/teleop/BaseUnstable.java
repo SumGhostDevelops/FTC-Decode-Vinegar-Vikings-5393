@@ -119,6 +119,8 @@ public abstract class BaseUnstable extends CommandOpMode
         GamepadEx driver = robot.gamepads.driver;
         Subsystems subsystems = robot.subsystems;
 
+        Trigger opModeIsActive = new Trigger(this::opModeIsActive);
+
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(() -> telemetry.log().add("LEFT_BUMPER pressed"))
                 .whenPressed(new DriveCommands.DecreaseSpeed(subsystems.drive));
@@ -152,16 +154,28 @@ public abstract class BaseUnstable extends CommandOpMode
 
         Trigger outtakeReady = new Trigger(subsystems.outtake::isReady);
 
-        Command intakeCommand = new IntakeCommands.In(subsystems.intake, () -> 0.8);
+        Command intakeCommand = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
+        Command transferCommand = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPower);
         Command openTransfer = new TransferCommands.Open(subsystems.transfer);
         Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
 
-        // Intake mode: Left trigger held, right trigger NOT pressed
-        // Runs intake continuously while conditions are met
-        driverLeftTrigger
-                .and(driverRightTrigger.negate())
-                .whenActive(() -> telemetry.log().add("Intake mode"))
-                .whileActiveContinuous(intakeCommand);
+        if (RobotConstants.Intake.automaticBehavior)
+        {
+            // Intake mode: Automatic
+            opModeIsActive
+                    .and(driverLeftTrigger.negate())
+                    .whenActive(() -> telemetry.log().add("Passive intake enabled"))
+                    .whileActiveOnce(intakeCommand);
+        }
+        else
+        {
+            // Intake mode: Left trigger held, right trigger NOT pressed
+            // Runs intake continuously while conditions are met
+            driverLeftTrigger
+                    .and(driverRightTrigger.negate())
+                    .whenActive(() -> telemetry.log().add("Intake mode"))
+                    .whileActiveContinuous(intakeCommand);
+        }
 
         // Transfer mode: Both triggers pressed AND outtake is ready
         // Runs both intake and transfer while all conditions are met
@@ -170,7 +184,10 @@ public abstract class BaseUnstable extends CommandOpMode
                 .whileActiveContinuous(openTransfer)
                 .and(outtakeReady)
                 .whenActive(() -> telemetry.log().add("Outtake ready; transferring..."))
-                .whileActiveContinuous(intakeCommand);
+                .whileActiveOnce(transferCommand);
+
+        // When outtake becomes not ready, close transfer for a short duration to prevent accidental shots
+        outtakeReady.whenInactive(new TransferCommands.CloseForDuration(subsystems.transfer, RobotConstants.Transfer.autoPauseMs)); // 500ms
 
         // Outtake: Right trigger spins up flywheel
         driverRightTrigger
