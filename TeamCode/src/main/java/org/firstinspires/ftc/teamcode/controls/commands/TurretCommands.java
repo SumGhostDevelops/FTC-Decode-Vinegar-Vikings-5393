@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.controls.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
@@ -32,15 +31,13 @@ public class TurretCommands
         @Override
         public void execute()
         {
-            turret.setTargetAbsolute(targetAngle.get(), robotAngle.get());
-            turret.aim();
+            turret.aimAbsolute(targetAngle.get(), robotAngle.get());
         }
 
         @Override
         public void end(boolean interrupted)
         {
-            turret.setTargetRelative(RobotConstants.Turret.FORWARD_ANGLE);
-            turret.aim();
+            turret.reset();
         }
     }
 
@@ -60,15 +57,13 @@ public class TurretCommands
         @Override
         public void execute()
         {
-            turret.setTargetRelative(targetAngle.get());
-            turret.aim();
+            turret.aimRelative(targetAngle.get());
         }
 
         @Override
         public void end(boolean interrupted)
         {
-            turret.setTargetRelative(RobotConstants.Turret.FORWARD_ANGLE);
-            turret.aim();
+            turret.reset();
         }
     }
 
@@ -99,14 +94,12 @@ public class TurretCommands
         public void execute()
         {
             turret.aimToCoordinate(targetCoord, robotPose.get());
-            turret.aim();
         }
 
         @Override
         public void end(boolean interrupted)
         {
-            turret.setTargetRelative(RobotConstants.Turret.FORWARD_ANGLE);
-            turret.aim();
+            turret.reset();
         }
     }
 }

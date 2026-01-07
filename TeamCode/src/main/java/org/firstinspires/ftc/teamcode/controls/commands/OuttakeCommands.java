@@ -7,43 +7,43 @@ import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 
 public class OuttakeCommands
 {
-    public static class On extends InstantCommand
-    {
-        public On(Outtake outtake)
-        {
-            super(outtake::on, outtake);
-        }
-    }
-
-    public static class Idle extends InstantCommand
-    {
-        public Idle(Outtake outtake)
-        {
-            super(outtake::idle, outtake);
-        }
-    }
-
-    public static class Off extends InstantCommand
-    {
-        public Off(Outtake outtake)
-        {
-            super(outtake::off, outtake);
-        }
-    }
-
-    public static class Toggle extends CommandBase
+    public static class On extends CommandBase
     {
         Outtake outtake;
 
-        public Toggle(Outtake outtake)
+        public On(Outtake outtake)
         {
             this.outtake = outtake;
+            addRequirements(outtake);
         }
 
         @Override
         public void execute()
         {
             outtake.on();
+        }
+
+        @Override
+        public void end(boolean interrupted)
+        {
+            outtake.off();
+        }
+    }
+
+    public static class Idle extends CommandBase
+    {
+        Outtake outtake;
+
+        public Idle(Outtake outtake)
+        {
+            this.outtake = outtake;
+            addRequirements(outtake);
+        }
+
+        @Override
+        public void execute()
+        {
+            outtake.idle();
         }
 
         @Override

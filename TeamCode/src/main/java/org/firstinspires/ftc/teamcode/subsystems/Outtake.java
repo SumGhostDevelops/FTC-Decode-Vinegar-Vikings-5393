@@ -151,9 +151,12 @@ public class Outtake extends SubsystemBase {
         return motor.getRPMAcceleration();
     }
 
-    public boolean isStable()
+    /**
+     * @return If the outtake is ready for balls to be transferred and shot out
+     */
+    public boolean isReady()
     {
-        return motor.isStable();
+        return motor.isStable() && state.equals(State.ON);
     }
 
     public State getState()

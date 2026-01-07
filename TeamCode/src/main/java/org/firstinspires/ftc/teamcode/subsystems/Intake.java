@@ -12,11 +12,15 @@ public class Intake extends SubsystemBase {
         this.intake = intake;
     }
 
-    public void in(double power) {
+    public void in(double power)
+    {
+        power = Math.abs(power);
         intake.set(power);
     }
 
-    public void out(double power) {
+    public void out(double power)
+    {
+        power = Math.abs(power);
         intake.set(-power);
     }
 

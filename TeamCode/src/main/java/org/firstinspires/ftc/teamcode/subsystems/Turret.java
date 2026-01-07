@@ -43,19 +43,19 @@ public class Turret extends SubsystemBase
      * Aim absolutely to the field, around the reported {@code initialRelativeAngle}
      * @param targetAngle The absolute target angle
      * @param robotAngle The robot's absolute angle
-     * @see #setTargetRelative(Angle targetAngle)
+     * @see #aimRelative(Angle targetAngle)
      */
-    public void setTargetAbsolute(Angle targetAngle, Angle robotAngle)
+    public void aimAbsolute(Angle targetAngle, Angle robotAngle)
     {
-        setTargetRelative(targetAngle.minus(robotAngle));
+        aimRelative(targetAngle.minus(robotAngle));
     }
 
     /**
      * Aim relatively to the robot, around the reported {@code initialRelativeAngle}
      * @param targetAngle The desired turret angle relative to the robot's orientation
-     * @see #setTargetAbsolute(Angle targetAngle, Angle robotAngle)
+     * @see #aimAbsolute(Angle targetAngle, Angle robotAngle)
      */
-    public void setTargetRelative(Angle targetAngle)
+    public void aimRelative(Angle targetAngle)
     {
         // Subtract initialRelativeAngle to convert from "relative to robot" coordinates
         // to "relative to motor zero position" coordinates
@@ -69,6 +69,7 @@ public class Turret extends SubsystemBase
         int minTicks = angleToTicks(turnLimits[0]);
         int maxTicks = angleToTicks(turnLimits[1]);
         this.targetPosition = Math.max(minTicks, Math.min(maxTicks, targetTicks));
+        aim();
     }
 
     /**
@@ -81,18 +82,23 @@ public class Turret extends SubsystemBase
     {
         // bearingTo computes the relative angle from the robot's heading to the target
         Angle relativeBearing = robotPose.bearingTo(target);
-        setTargetRelative(relativeBearing);
+        aimRelative(relativeBearing);
     }
 
     /**
      * Aims to the tick specified in {@link Turret#targetPosition}
      */
-    public void aim()
+    private void aim()
     {
         // Use SDK's RUN_TO_POSITION for built-in deceleration and position holding
         turretMotor.motorEx.setTargetPosition(targetPosition);
         if (!turretMotor.motorEx.getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) turretMotor.motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turretMotor.motorEx.setPower(1.0);
+    }
+
+    public void reset()
+    {
+        aimRelative(RobotConstants.Turret.FORWARD_ANGLE);
     }
 
     /**
@@ -138,14 +144,14 @@ public class Turret extends SubsystemBase
                 .plus(new UnnormalizedAngle(turretAngle, UnnormalizedAngleUnit.DEGREES)); // add the turret angle to the initial angle
     }
 
-    public void reset()
+    public void setForward()
     {
         initialRelativeAngle = RobotConstants.Turret.FORWARD_ANGLE;
     }
 
     public Command turnToCommand(Angle angle)
     {
-        return new InstantCommand(() -> this.setTargetRelative(angle), this);
+        return new InstantCommand(() -> this.aimRelative(angle), this);
     }
 
     /**

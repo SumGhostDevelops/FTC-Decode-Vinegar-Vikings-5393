@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
-import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 
 @TeleOp(name = "All Testing", group = "Experimental")
 public class AllTesting extends LinearOpMode
@@ -56,22 +55,22 @@ public class AllTesting extends LinearOpMode
     {
         input.bind(
                 () -> gamepad1.dpadUpWasPressed(),
-                () -> turret.setTargetRelative(new Angle(0, AngleUnit.DEGREES))
+                () -> turret.aimRelative(new Angle(0, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadLeftWasPressed(),
-                () -> turret.setTargetRelative(new Angle(90, AngleUnit.DEGREES))
+                () -> turret.aimRelative(new Angle(90, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadDownWasPressed(),
-                () -> turret.setTargetRelative(new Angle(180, AngleUnit.DEGREES))
+                () -> turret.aimRelative(new Angle(180, AngleUnit.DEGREES))
         );
 
         input.bind(
                 () -> gamepad1.dpadRightWasPressed(),
-                () -> turret.setTargetRelative(new Angle(270, AngleUnit.DEGREES))
+                () -> turret.aimRelative(new Angle(270, AngleUnit.DEGREES))
         );
 
         input.bind(
