@@ -5,16 +5,33 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 
+import java.util.function.BooleanSupplier;
+
 public class OuttakeCommands
 {
     public static class On extends CommandBase
     {
         Outtake outtake;
+        BooleanSupplier idleWhenEnd;
 
-        public On(Outtake outtake)
+        public On(Outtake outtake, BooleanSupplier idleWhenEnd)
         {
             this.outtake = outtake;
+            this.idleWhenEnd = idleWhenEnd;
             addRequirements(outtake);
+        }
+
+        @Override
+        public void initialize()
+        {
+            if (idleWhenEnd.getAsBoolean())
+            {
+                outtake.idle();
+            }
+            else
+            {
+                outtake.off();
+            }
         }
 
         @Override
@@ -26,7 +43,14 @@ public class OuttakeCommands
         @Override
         public void end(boolean interrupted)
         {
-            outtake.off();
+            if (idleWhenEnd.getAsBoolean())
+            {
+                outtake.idle();
+            }
+            else
+            {
+                outtake.off();
+            }
         }
     }
 
@@ -50,6 +74,14 @@ public class OuttakeCommands
         public void end(boolean interrupted)
         {
             outtake.off();
+        }
+    }
+
+    public static class Off extends InstantCommand
+    {
+        public Off(Outtake outtake)
+        {
+            super(outtake::off);
         }
     }
 

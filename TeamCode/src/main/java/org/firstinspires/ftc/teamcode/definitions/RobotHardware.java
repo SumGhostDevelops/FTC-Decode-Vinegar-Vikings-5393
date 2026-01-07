@@ -184,6 +184,7 @@ public class RobotHardware
             intake = new MotorExPlus(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620);
             intake.setRunMode(Motor.RunMode.RawPower);
             intake.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
+            intake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         }
         catch (Exception e)
         {

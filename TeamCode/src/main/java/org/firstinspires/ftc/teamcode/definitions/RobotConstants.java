@@ -55,6 +55,7 @@ public class RobotConstants
     {
         public static int PPR = 28;
         public static int BASE_RPM = 3000;
+        public static boolean IDLE_WHEN_END = false;
 
         public static class Name
         {
@@ -100,9 +101,9 @@ public class RobotConstants
     {
         public static String TRANSFER = "transfer";
         public static double SERVO_RANGE = 360.0; // Physical servo range in degrees
-        public static double MIN_ANGLE = 0;
+        public static double OPEN_ANGLE = 75;
         public static double MID_ANGLE = 30;
-        public static double MAX_ANGLE = 60;
+        public static double CLOSED_ANGLE = 180;
     }
 
     public static class Intake

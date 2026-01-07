@@ -113,11 +113,11 @@ public class AllTesting extends LinearOpMode
                             break;
                         case MID:
                             transferState = TransferState.MAX;
-                            transfer.set(RobotConstants.Transfer.MAX_ANGLE);
+                            transfer.set(RobotConstants.Transfer.CLOSED_ANGLE);
                             break;
                         case MAX:
                             transferState = TransferState.MIN;
-                            transfer.set(RobotConstants.Transfer.MIN_ANGLE);
+                            transfer.set(RobotConstants.Transfer.OPEN_ANGLE);
                             break;
                     }
                 }

@@ -8,6 +8,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
 public class TransferCommands
 {
+    /**
+     * Allows balls to be moved into the outtake.
+     */
     public static class Open extends CommandBase
     {
         private final Transfer transfer;
@@ -15,6 +18,12 @@ public class TransferCommands
         public Open(Transfer transfer)
         {
             this.transfer = transfer;
+        }
+
+        @Override
+        public void initialize()
+        {
+            transfer.close();
         }
 
         @Override

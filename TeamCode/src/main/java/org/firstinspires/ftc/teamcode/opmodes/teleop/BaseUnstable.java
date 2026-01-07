@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -8,6 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.controls.commands.DriveCommands;
+import org.firstinspires.ftc.teamcode.controls.commands.IntakeCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.OdometryCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.OuttakeCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.TransferCommands;
@@ -19,6 +22,7 @@ import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -143,29 +147,34 @@ public abstract class BaseUnstable extends CommandOpMode
                 .whenPressed(() -> telemetry.log().add("DPAD_DOWN pressed"))
                 .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));
 
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(() -> telemetry.log().add("DPAD_LEFT pressed"))
-                .whenHeld(new TransferCommands.BallTransfer(subsystems.transfer, subsystems.intake));
-
         Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
         Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
 
-        driverLeftTrigger
-                .whenActive(() -> telemetry.log().add("Left trigger activated"))
-                .whileActiveOnce(new TransferCommands.BallTransfer(subsystems.transfer, subsystems.intake));
-        driverRightTrigger
-                .whenActive(() -> telemetry.log().add("Right trigger activated"))
-                .whileActiveOnce(new OuttakeCommands.On(subsystems.outtake));
-
-        /*
         Trigger outtakeReady = new Trigger(subsystems.outtake::isReady);
 
+        Command intakeCommand = new IntakeCommands.In(subsystems.intake, () -> 0.8);
+        Command openTransfer = new TransferCommands.Open(subsystems.transfer);
+        Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
+
+        // Intake mode: Left trigger held, right trigger NOT pressed
+        // Runs intake continuously while conditions are met
         driverLeftTrigger
-                .whenActive(() -> telemetry.log().add("Left trigger activated"))
+                .and(driverRightTrigger.negate())
+                .whenActive(() -> telemetry.log().add("Intake mode"))
+                .whileActiveContinuous(intakeCommand);
+
+        // Transfer mode: Both triggers pressed AND outtake is ready
+        // Runs both intake and transfer while all conditions are met
+        driverLeftTrigger
+                .and(driverRightTrigger)
+                .whileActiveContinuous(openTransfer)
                 .and(outtakeReady)
                 .whenActive(() -> telemetry.log().add("Outtake ready; transferring..."))
-                .whileActiveOnce(new TransferCommands.BallTransfer(subsystems.transfer, subsystems.intake));
-                
-         */
+                .whileActiveContinuous(intakeCommand);
+
+        // Outtake: Right trigger spins up flywheel
+        driverRightTrigger
+                .whenActive(() -> telemetry.log().add("Right trigger activated"))
+                .whileActiveOnce(outtakeOn);
     }
 }
