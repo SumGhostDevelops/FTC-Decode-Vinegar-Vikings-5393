@@ -20,6 +20,14 @@ public class DriveCommands
         private final DoubleSupplier yaw;
         private final Supplier<Angle> botAngle;
 
+        /**
+         *
+         * @param drive
+         * @param lateral Left Stick Y; robot forward/backward
+         * @param axial Left Stick X; robot left/right
+         * @param yaw Right Stick X; robot orientation
+         * @param driverHeading
+         */
         public Manuever(Drive drive, DoubleSupplier lateral, DoubleSupplier axial, DoubleSupplier yaw, Supplier<Angle> driverHeading)
         {
             this.drive = drive;
