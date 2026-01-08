@@ -58,20 +58,32 @@ public class IntakeCommands
         }
     }
 
-    public static class Transfer extends CommandBase
+    public static class TransferPreventForDuration extends CommandBase
     {
-        private Intake intake;
+        private final Intake intake;
+        private final double power;
+        private final double durationMs;
+        private long startTime;
 
-        public Transfer(Intake intake)
+        public TransferPreventForDuration(Intake intake, double power, double durationMs)
         {
             this.intake = intake;
+            this.power = power;
+            this.durationMs = durationMs;
             addRequirements(intake);
         }
 
         @Override
         public void execute()
         {
-            intake.in(0.5);
+            startTime = System.currentTimeMillis();
+            intake.out(power);
+        }
+
+        @Override
+        public boolean isFinished()
+        {
+            return System.currentTimeMillis() - startTime >= durationMs;
         }
 
         @Override

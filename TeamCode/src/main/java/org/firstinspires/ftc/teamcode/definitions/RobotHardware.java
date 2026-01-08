@@ -6,18 +6,14 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.controller.SquIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 
@@ -171,7 +167,7 @@ public class RobotHardware
         try
         {
             transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, RobotConstants.Transfer.SERVO_RANGE, AngleUnit.DEGREES);
-            transfer.set(RobotConstants.Transfer.CLOSED_ANGLE);
+            transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
         }
         catch (Exception e)
         {
@@ -198,10 +194,12 @@ public class RobotHardware
 
             // Pinpoint convention: X offset (left=positive), Y offset (forward=positive)
             // Our RobotConstants convention matches Pinpoint: left=positive, forward=positive
+            DistanceUnit dUnit = RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit;
+
             pinpoint.setOffsets(
                     RobotConstants.Odometry.Deadwheels.Forward.OFFSET.magnitude,   // Left is positive in both conventions
-                    RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.magnitude,    // Forward is positive in both conventions
-                    RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit
+                    RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(dUnit).magnitude,    // Forward is positive in both conventions
+                    dUnit
             );
 
             double counts_per_unit = (double) RobotConstants.Odometry.Deadwheels.COUNTS_PER_REVOLUTION / RobotConstants.Odometry.Deadwheels.WHEEL_CIRCUMFERENCE.magnitude;

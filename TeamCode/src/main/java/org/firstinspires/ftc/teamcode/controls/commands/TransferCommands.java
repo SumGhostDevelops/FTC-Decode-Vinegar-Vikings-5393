@@ -11,11 +11,11 @@ public class TransferCommands
     /**
      * Allows balls to be moved into the outtake.
      */
-    public static class Open extends CommandBase
+    public static class OpenTransfer extends CommandBase
     {
         private final Transfer transfer;
 
-        public Open(Transfer transfer)
+        public OpenTransfer(Transfer transfer)
         {
             this.transfer = transfer;
             addRequirements(transfer);
@@ -36,15 +36,15 @@ public class TransferCommands
         @Override
         public void end(boolean interrupted)
         {
-            transfer.close();
+            transfer.close(Transfer.CloseType.TRANSFER);
         }
     }
 
-    public static class Close extends CommandBase
+    public static class CloseIntake extends CommandBase
     {
         private final Transfer transfer;
 
-        public Close(Transfer transfer)
+        public CloseIntake(Transfer transfer)
         {
             this.transfer = transfer;
             addRequirements(transfer);
@@ -53,27 +53,42 @@ public class TransferCommands
         @Override
         public void execute()
         {
-            transfer.close();
+            transfer.close(Transfer.CloseType.INTAKE);
+        }
+
+        // Never changes position when ending
+    }
+
+    public static class CloseTransfer extends CommandBase
+    {
+        private final Transfer transfer;
+
+        public CloseTransfer(Transfer transfer)
+        {
+            this.transfer = transfer;
+            addRequirements(transfer);
         }
 
         @Override
-        public void end(boolean interrupted)
+        public void execute()
         {
-            transfer.open();
+            transfer.close(Transfer.CloseType.TRANSFER);
         }
+
+        // Never changes position when ending
     }
 
     /**
      * Closes the transfer for a specified duration, then ends.
      * Useful for preventing accidental shots when outtake becomes not ready.
      */
-    public static class CloseForDuration extends CommandBase
+    public static class CloseTransferForDuration extends CommandBase
     {
         private final Transfer transfer;
         private final double durationMs;
         private long startTime;
 
-        public CloseForDuration(Transfer transfer, double durationMs)
+        public CloseTransferForDuration(Transfer transfer, double durationMs)
         {
             this.transfer = transfer;
             this.durationMs = durationMs;
@@ -83,13 +98,13 @@ public class TransferCommands
         @Override
         public void initialize()
         {
-            startTime = System.currentTimeMillis();
-            transfer.close();
+            transfer.close(Transfer.CloseType.TRANSFER);
         }
 
         @Override
         public void execute()
         {
+            startTime = System.currentTimeMillis();
             transfer.close();
         }
 
@@ -102,7 +117,7 @@ public class TransferCommands
         @Override
         public void end(boolean interrupted)
         {
-            //if (!interrupted) transfer.open();
+            if (!interrupted) transfer.open();
         }
     }
 
@@ -112,7 +127,7 @@ public class TransferCommands
         {
             addCommands(
                     new IntakeCommands.In(intake, () -> 0.8),
-                    new Open(transfer)
+                    new OpenTransfer(transfer)
             );
             addRequirements(transfer, intake);
         }

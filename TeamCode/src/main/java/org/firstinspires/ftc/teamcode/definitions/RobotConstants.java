@@ -34,9 +34,10 @@ public class RobotConstants
         public static String BACK_LEFT = "backLeft";
         public static String BACK_RIGHT = "backRight";
 
+        @Configurable
         public static class Speed
         {
-            public static double DEFAULT = 1.0;
+            public static double DEFAULT = 0.75;
             public static double MAXIMUM = 1.0;
             public static double MINIMUM = 0.25;
             public static double CHANGE = 0.25;
@@ -54,7 +55,7 @@ public class RobotConstants
     public static class Outtake
     {
         public static int PPR = 28;
-        public static int BASE_RPM = 3000;
+        public static int BASE_RPM = 3700;
         public static boolean IDLE_WHEN_END = false;
 
         public static class Name
@@ -72,8 +73,8 @@ public class RobotConstants
         @Configurable
         public static class Tolerance
         {
-            public static int RPM = 100;
-            public static int RPM_ACCELERATION = 150;
+            public static int RPM = 75;
+            public static int RPM_ACCELERATION = 100;
         }
     }
 
@@ -88,12 +89,6 @@ public class RobotConstants
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-180, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(180, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         public static double posCoeff = 1.0;
         public static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
-
-        public static class LazySusan
-        {
-            public static Distance radius = new Distance(1.0, DistanceUnit.CM);
-            public static Distance circumference = radius.multiply(2 * Math.PI);
-        }
     }
 
     @Configurable
@@ -102,9 +97,9 @@ public class RobotConstants
         public static String TRANSFER = "transfer";
         public static double SERVO_RANGE = 360.0; // Physical servo range in degrees
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
-        public static double MID_ANGLE = 30;
-        public static double CLOSED_ANGLE = 0;
-        public static double autoPauseMs = 1000; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
+        public static double CLOSED_INTAKE_ANGLE = 0; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSED_TRANSFER_ANGLE = 180;
+        public static double autoCloseMs = 250; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
     }
 
     @Configurable
@@ -114,9 +109,12 @@ public class RobotConstants
         /**
          * If true, the intake will automatically be set to intake mode.
          */
-        public static boolean automaticBehavior = true;
-        public static double intakePower = 0.4;
-        public static double transferPower = 0.7;
+        public static boolean automaticBehavior = false;
+        public static double intakePower = 1.0;
+        public static double outtakePower = 0.5;
+        public static double transferPassPower = 1.0;
+        public static double transferPreventPower = 1.0;
+        public static double transferPreventDurationMs = 100;
     }
 
     @Configurable
@@ -139,6 +137,7 @@ public class RobotConstants
 
             public static String NAME = "webcam";
 
+            @Configurable
             public static class Lens
             {
 
