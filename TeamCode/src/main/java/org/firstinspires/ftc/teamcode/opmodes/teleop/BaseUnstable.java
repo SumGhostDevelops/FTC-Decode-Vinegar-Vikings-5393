@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.seattlesolvers.solverslib.command.Command;
-import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -22,7 +21,6 @@ import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -67,6 +65,7 @@ public abstract class BaseUnstable extends CommandOpMode
     {
         telemetry.clear();
         telemetry.addData("Team", team);
+        telemetry.addData("Distance to Goal (meters)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.METER).magnitude);
         telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH).magnitude);
         telemetry.addLine("--- Odometry ---");
         telemetry.addData("Raw Yaw", robot.hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
@@ -140,9 +139,11 @@ public abstract class BaseUnstable extends CommandOpMode
                 .toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 100));
+                .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 25));
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));
+                .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -25));
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                .whenPressed(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
 
         Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
         Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
@@ -150,25 +151,30 @@ public abstract class BaseUnstable extends CommandOpMode
         Trigger outtakeReady = new Trigger(subsystems.outtake::isReady);
 
         Command intakeCommand = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
-        Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPower);
-        Command openTransfer = new TransferCommands.Open(subsystems.transfer);
+        Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
+        Command openTransfer = new TransferCommands.OpenTransfer(subsystems.transfer);
         Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
 
         if (RobotConstants.Intake.automaticBehavior)
         {
             // Intake mode: Automatic
             opModeIsActive
-                    .and(driverLeftTrigger.negate())
-                    .whileActiveOnce(intakeCommand);
+                .and(driverLeftTrigger.negate())
+                .whileActiveOnce(intakeCommand);
         }
         else
         {
             // Intake mode: Left trigger held, right trigger NOT pressed
             // Runs intake continuously while conditions are met
             driverLeftTrigger
-                    .and(driverRightTrigger.negate())
-                    .whileActiveContinuous(intakeCommand);
+                .and(driverRightTrigger.negate())
+                .whileActiveOnce(intakeCommand);
         }
+
+        // Intake Mode: Set transfer to the intake/blocking mode
+        driverLeftTrigger
+                .and(driverRightTrigger.negate())
+                .whileActiveOnce(new TransferCommands.CloseIntake(subsystems.transfer));
 
         // Transfer mode: Both triggers pressed AND outtake is ready
         // Runs both intake and transfer while all conditions are met
@@ -178,8 +184,10 @@ public abstract class BaseUnstable extends CommandOpMode
                 .whileActiveOnce(openTransfer)
                 .whileActiveOnce(intakeTransfer);
 
-        // When outtake becomes not ready, close transfer for a short duration to prevent accidental shots
-        //outtakeReady.whenInactive(new TransferCommands.CloseForDuration(subsystems.transfer, RobotConstants.Transfer.autoPauseMs)); // 500ms
+        // When outtake becomes not ready, close transfer for a short duration and run intake in reverse to prevent accidental shots
+        outtakeReady
+                .whenInactive(new IntakeCommands.TransferPreventForDuration(subsystems.intake, RobotConstants.Intake.transferPreventPower, RobotConstants.Intake.transferPreventDurationMs), false)
+                .whenInactive(new TransferCommands.CloseTransferForDuration(subsystems.transfer, RobotConstants.Transfer.autoCloseMs), false);
 
         // Outtake: Right trigger spins up flywheel
         driverRightTrigger

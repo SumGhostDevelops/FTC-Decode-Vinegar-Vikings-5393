@@ -50,11 +50,11 @@ public class IntakeTesting extends LinearOpMode {
         );
 
         transferEngageTrigger.whenActive(
-                new TransferCommands.Open(transfer)
+                new TransferCommands.OpenTransfer(transfer)
         );
 
         transferDisengageTrigger.cancelWhenActive(
-                new TransferCommands.Open(transfer)
+                new TransferCommands.OpenTransfer(transfer)
         );
 
 
