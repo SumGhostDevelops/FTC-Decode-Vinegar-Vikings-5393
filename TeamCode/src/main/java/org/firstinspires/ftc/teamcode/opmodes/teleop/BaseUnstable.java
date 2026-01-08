@@ -150,46 +150,52 @@ public abstract class BaseUnstable extends CommandOpMode
 
         Trigger outtakeReady = new Trigger(subsystems.outtake::isReady);
 
-        Command intakeCommand = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
+        Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
         Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
-        Command openTransfer = new TransferCommands.OpenTransfer(subsystems.transfer);
+        Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
         Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
 
         if (RobotConstants.Intake.automaticBehavior)
         {
             // Intake mode: Automatic
+            // If the op mode is active, and we are not holding down the left trigger, turn the intake on
             opModeIsActive
                 .and(driverLeftTrigger.negate())
-                .whileActiveOnce(intakeCommand);
+                .whileActiveOnce(intakeIntake);
         }
         else
         {
             // Intake mode: Left trigger held, right trigger NOT pressed
             // Runs intake continuously while conditions are met
+            // While we are holding down the left trigger, and we are not holding down the right trigger, turn the intake on
             driverLeftTrigger
                 .and(driverRightTrigger.negate())
-                .whileActiveOnce(intakeCommand);
+                .whileActiveOnce(intakeIntake);
         }
 
         // Intake Mode: Set transfer to the intake/blocking mode
+        // If we are holding down the left trigger, and we are not holding down the right trigger, set the transfer to a blocking state
         driverLeftTrigger
                 .and(driverRightTrigger.negate())
                 .whileActiveOnce(new TransferCommands.CloseIntake(subsystems.transfer));
 
         // Transfer mode: Both triggers pressed AND outtake is ready
         // Runs both intake and transfer while all conditions are met
+        // If the left trigger, right trigger, and outtake are ready, open the transfer and set the intake to a transfer mode
         driverLeftTrigger
                 .and(driverRightTrigger)
                 .and(outtakeReady)
-                .whileActiveOnce(openTransfer)
+                .whileActiveOnce(transferOpen)
                 .whileActiveOnce(intakeTransfer);
 
         // When outtake becomes not ready, close transfer for a short duration and run intake in reverse to prevent accidental shots
+        // When the outtake goes from ready -> not ready, forcibly turn the intake in reverse and put the transfer in a block-allow state
         outtakeReady
                 .whenInactive(new IntakeCommands.TransferPreventForDuration(subsystems.intake, RobotConstants.Intake.transferPreventPower, RobotConstants.Intake.transferPreventDurationMs), false)
                 .whenInactive(new TransferCommands.CloseTransferForDuration(subsystems.transfer, RobotConstants.Transfer.autoCloseMs), false);
 
         // Outtake: Right trigger spins up flywheel
+        // While the right trigger is held down, turn the intake on
         driverRightTrigger
                 .whileActiveOnce(outtakeOn);
     }
