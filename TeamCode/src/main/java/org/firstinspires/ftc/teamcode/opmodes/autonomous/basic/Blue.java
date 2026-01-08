@@ -8,8 +8,11 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 
 @Autonomous(name = "BlueBasicVikingsAutonomous", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
@@ -18,6 +21,7 @@ public class Blue extends Base
     private Paths paths;
     private Timer timer, opModeTimer;
     private Follower follower;
+
     private Paths.PathState currentPathState;
 
 
@@ -28,12 +32,14 @@ public class Blue extends Base
         super.runOpMode();
         initAuto();
         waitForStart();
+
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
             follower.followPath(paths.ToShoot);
 
             while (opModeIsActive() && !isStopRequested()) {
                 handlePathing(paths);
+                follower.update();
 
                 telemetry.addData("Current State", currentPathState);
                 telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
@@ -44,8 +50,9 @@ public class Blue extends Base
 
     }
 
+
     public void initAuto(){
-        currentPathState = Paths.PathState.ToShoot;
+        paths = new Paths(follower);
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
