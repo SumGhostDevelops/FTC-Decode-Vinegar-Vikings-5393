@@ -9,11 +9,13 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
+import org.firstinspires.ftc.teamcode.opmodes.autonomous.PedroConstants;
 
 @Autonomous(name = "BlueBasicVikingsAutonomous", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
 public class Blue extends Base
@@ -28,17 +30,20 @@ public class Blue extends Base
     @Override
     public void runOpMode() throws InterruptedException
     {
+        follower = PedroConstants.createFollower(hardwareMap);
         team = Team.BLUE;
         super.runOpMode();
         initAuto();
         waitForStart();
 
+
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
             follower.followPath(paths.ToShoot);
 
+
             while (opModeIsActive() && !isStopRequested()) {
-                handlePathing(paths);
+                handlePathing();
                 follower.update();
 
                 telemetry.addData("Current State", currentPathState);
@@ -64,124 +69,81 @@ public class Blue extends Base
         timer.resetTimer();
     }
 
-    private void handlePathing(Paths paths) {
-        switch (currentPathState) {
-            case ToShoot:
-                if (!follower.isBusy()) {
+    private void handlePathing() {
+        // This check ensures we only try to start a new path *after* the current one is complete.
+        if (!follower.isBusy()) {
+            switch (currentPathState) {
+                // The logic is now: when a state is finished, start the NEXT path and set the NEXT state.
+                case ToShoot:
                     // shoot();
-                    follower.followPath(paths.ToShoot);
-                    setPathState(Paths.PathState.ToBallOne);
-                }
-                break;
-
-            case ToBallOne:
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.ToBallOne);
-                    setPathState(Paths.PathState.ToBallOneFull);
-                }
-                break;
-
-            case ToBallOneFull:
-                if (!follower.isBusy()) {
-                    // intake();
+                    follower.followPath(paths.ToBallOne); // Start NEXT path
+                    setPathState(Paths.PathState.ToBallOne); // Set NEXT state
+                    break;
+                case ToBallOne:
                     follower.followPath(paths.ToBallOneFull);
-                    setPathState(Paths.PathState.ToShoot_1);
-                }
-                break;
-
-            case ToShoot_1:
-                if (!follower.isBusy()) {
-                    // shoot();
+                    setPathState(Paths.PathState.ToBallOneFull);
+                    break;
+                case ToBallOneFull:
+                    // intake();
                     follower.followPath(paths.ToShoot_1);
-                    setPathState(Paths.PathState.ToBallTwo);
-                }
-                break;
-
-            case ToBallTwo:
-                if (!follower.isBusy()) {
+                    setPathState(Paths.PathState.ToShoot_1);
+                    break;
+                case ToShoot_1:
+                    // shoot();
                     follower.followPath(paths.ToBallTwo);
-                    setPathState(Paths.PathState.ToBallTwoFull);
-                }
-                break;
-
-            case ToBallTwoFull:
-                if (!follower.isBusy()) {
-                    // intake();
+                    setPathState(Paths.PathState.ToBallTwo);
+                    break;
+                case ToBallTwo:
                     follower.followPath(paths.ToBallTwoFull);
-                    setPathState(Paths.PathState.ToShoot_2);
-                }
-                break;
-
-            case ToShoot_2:
-                if (!follower.isBusy()) {
-                    // shoot();
+                    setPathState(Paths.PathState.ToBallTwoFull);
+                    break;
+                case ToBallTwoFull:
+                    // intake();
                     follower.followPath(paths.ToShoot_2);
-                    setPathState(Paths.PathState.Gate1);
-                }
-                break;
-
-            case Gate1:
-                if (!follower.isBusy()) {
+                    setPathState(Paths.PathState.ToShoot_2);
+                    break;
+                case ToShoot_2:
+                    // shoot();
                     follower.followPath(paths.Gate1);
-                    setPathState(Paths.PathState.Gate2);
-                }
-                break;
-
-            case Gate2:
-                if (!follower.isBusy()) {
+                    setPathState(Paths.PathState.Gate1);
+                    break;
+                case Gate1:
                     follower.followPath(paths.Gate2);
-                    setPathState(Paths.PathState.ToEatGate);
-                }
-                break;
-
-            case ToEatGate:
-                if (!follower.isBusy()) {
-                    // intake();
+                    setPathState(Paths.PathState.Gate2);
+                    break;
+                case Gate2:
                     follower.followPath(paths.ToEatGate);
-                    setPathState(Paths.PathState.ToShoot_3);
-                }
-                break;
-
-            case ToShoot_3:
-                if (!follower.isBusy()) {
-                    // shoot();
-                    follower.followPath(paths.ToShoot_3);
-                    setPathState(Paths.PathState.ToThree);
-                }
-                break;
-
-            case ToThree:
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.ToThree);
-                    setPathState(Paths.PathState.ToThreeFull);
-                }
-                break;
-
-            case ToThreeFull:
-                if (!follower.isBusy()) {
+                    setPathState(Paths.PathState.ToEatGate);
+                    break;
+                case ToEatGate:
                     // intake();
-                    follower.followPath(paths.ToThreeFull);
-                    setPathState(Paths.PathState.ToShoot_4);
-                }
-                break;
-
-            case ToShoot_4:
-                if (!follower.isBusy()) {
+                    follower.followPath(paths.ToShoot_3);
+                    setPathState(Paths.PathState.ToShoot_3);
+                    break;
+                case ToShoot_3:
                     // shoot();
+                    follower.followPath(paths.ToThree);
+                    setPathState(Paths.PathState.ToThree);
+                    break;
+                case ToThree:
+                    follower.followPath(paths.ToThreeFull);
+                    setPathState(Paths.PathState.ToThreeFull);
+                    break;
+                case ToThreeFull:
+                    // intake();
                     follower.followPath(paths.ToShoot_4);
-                    setPathState(Paths.PathState.ToRandom);
-                }
-                break;
-
-            case ToRandom:
-                if (!follower.isBusy()) {
+                    setPathState(Paths.PathState.ToShoot_4);
+                    break;
+                case ToShoot_4:
+                    // shoot();
                     follower.followPath(paths.ToRandom, true);
-                    // Autonomous is complete. No further state change.
-                }
-                break;
+                    setPathState(Paths.PathState.ToRandom);
+                    break;
+                case ToRandom:
+                    // Autonomous is complete. Do nothing.
+                    break;
+            }
         }
-
-        follower.update();
     }
     public static class Paths {
 
