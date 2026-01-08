@@ -24,7 +24,7 @@ public class RobotContext
     public RobotContext(Team team, HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2)
     {
         this.hw = new RobotHardware(hardwareMap, telemetry);
-        this.subsystems = new Subsystems(hw);
+        this.subsystems = new Subsystems(hw, team);
 
         this.team = team;
         this.telemetry = telemetry;
