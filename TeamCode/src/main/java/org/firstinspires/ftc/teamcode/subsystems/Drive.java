@@ -92,8 +92,8 @@ public class Drive extends SubsystemBase
         switch (currentMode)
         {
             case FIELD_CENTRIC:
-                rotX = lateral * Math.cos(-botHeading) - axial * Math.sin(-botHeading);
-                rotY = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
+                rotX = lateral * Math.cos(botHeading) - axial * Math.sin(botHeading);
+                rotY = lateral * Math.sin(botHeading) + axial * Math.cos(botHeading);
                 break;
 
             case ROBOT_CENTRIC_HYBRID:

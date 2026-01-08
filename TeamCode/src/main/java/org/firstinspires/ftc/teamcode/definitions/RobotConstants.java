@@ -5,6 +5,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
@@ -26,6 +27,7 @@ public class RobotConstants
         public static int[] OBELISK_IDS = new int[]{21, 22, 23};
     }
 
+    @Configurable
     // Hardware Names
     public static class Drive
     {
@@ -33,6 +35,8 @@ public class RobotConstants
         public static String FRONT_RIGHT = "frontRight";
         public static String BACK_LEFT = "backLeft";
         public static String BACK_RIGHT = "backRight";
+
+        public org.firstinspires.ftc.teamcode.subsystems.Drive.DriveMode driveMode = org.firstinspires.ftc.teamcode.subsystems.Drive.DriveMode.FIELD_CENTRIC;
 
         @Configurable
         public static class Speed
@@ -97,9 +101,9 @@ public class RobotConstants
         public static String TRANSFER = "transfer";
         public static double SERVO_RANGE = 360.0; // Physical servo range in degrees
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
-        public static double CLOSED_INTAKE_ANGLE = 0; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSED_INTAKE_ANGLE = 45; // An angle where the trapdoor blocks balls from entering
         public static double CLOSED_TRANSFER_ANGLE = 180;
-        public static double autoCloseMs = 250; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
+        public static double autoCloseMs = 500; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
     }
 
     @Configurable

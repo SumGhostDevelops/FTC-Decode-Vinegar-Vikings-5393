@@ -30,6 +30,7 @@ public class Blue extends Base {
         team = Team.BLUE;
         super.runOpMode();
         initAuto();
+        waitForStart();
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
             follower.followPath(paths.ToShoot);
