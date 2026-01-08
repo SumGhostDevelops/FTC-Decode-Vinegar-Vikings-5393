@@ -54,7 +54,7 @@ public class RobotConstants
     public static class Outtake
     {
         public static int PPR = 28;
-        public static int BASE_RPM = 3000;
+        public static int BASE_RPM = 4000;
         public static boolean IDLE_WHEN_END = false;
 
         public static class Name
@@ -72,8 +72,8 @@ public class RobotConstants
         @Configurable
         public static class Tolerance
         {
-            public static int RPM = 100;
-            public static int RPM_ACCELERATION = 150;
+            public static int RPM = 75;
+            public static int RPM_ACCELERATION = 100;
         }
     }
 
@@ -115,8 +115,8 @@ public class RobotConstants
          * If true, the intake will automatically be set to intake mode.
          */
         public static boolean automaticBehavior = true;
-        public static double intakePower = 0.4;
-        public static double transferPower = 0.7;
+        public static double intakePower = 1.0;
+        public static double transferPower = 1.0;
     }
 
     @Configurable
