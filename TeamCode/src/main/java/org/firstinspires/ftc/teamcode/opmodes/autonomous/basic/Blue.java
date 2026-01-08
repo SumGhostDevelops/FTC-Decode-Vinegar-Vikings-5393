@@ -30,7 +30,7 @@ public class Blue extends Base
     @Override
     public void runOpMode() throws InterruptedException
     {
-        follower = PedroConstants.createFollower(hardwareMap);
+
         team = Team.BLUE;
         super.runOpMode();
         initAuto();
@@ -62,6 +62,7 @@ public class Blue extends Base
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
         setPathState(Paths.PathState.ToShoot);
+        follower = PedroConstants.createFollower(hardwareMap);
 
     }
     public void setPathState(Paths.PathState pathState) {
