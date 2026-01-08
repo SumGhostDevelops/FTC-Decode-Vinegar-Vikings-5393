@@ -109,7 +109,7 @@ public class RobotConstants
         /**
          * If true, the intake will automatically be set to intake mode.
          */
-        public static boolean automaticBehavior = true;
+        public static boolean automaticBehavior = false;
         public static double intakePower = 1.0;
         public static double outtakePower = 0.5;
         public static double transferPassPower = 1.0;
