@@ -22,7 +22,7 @@ public class PedroConstants {
             .rightRearMotorName(RobotConstants.Drive.BACK_RIGHT)
             .leftRearMotorName(RobotConstants.Drive.BACK_LEFT)
             .leftFrontMotorName(RobotConstants.Drive.FRONT_LEFT)
-            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
