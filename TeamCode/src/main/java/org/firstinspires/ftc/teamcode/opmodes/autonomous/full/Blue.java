@@ -48,13 +48,12 @@ public class Blue extends Base {
     }
 
     public void initAuto() {
+        follower = PedroConstants.createFollower(hardwareMap);
         paths = new Paths(follower);
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
         setPathState(Paths.PathState.ToShoot);
-        follower = PedroConstants.createFollower(hardwareMap);
-
     }
 
     public void setPathState(Paths.PathState pathState) {
