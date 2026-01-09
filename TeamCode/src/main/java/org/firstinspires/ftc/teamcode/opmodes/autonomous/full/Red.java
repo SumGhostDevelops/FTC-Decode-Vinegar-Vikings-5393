@@ -67,7 +67,6 @@ public class Red extends Base
         currentPathState = pathState;
         timer.resetTimer();
     }
-
     private void handlePathing() {
         // This check ensures we only try to start a new path *after* the current one is complete.
         if (!follower.isBusy()) {
