@@ -15,25 +15,25 @@ public class DriveCommands
     {
         private final Drive drive;
 
-        private final DoubleSupplier lateral;
-        private final DoubleSupplier axial;
-        private final DoubleSupplier yaw;
+        private final DoubleSupplier x;
+        private final DoubleSupplier y;
+        private final DoubleSupplier rx;
         private final Supplier<Angle> botAngle;
 
         /**
          *
          * @param drive
-         * @param lateral Left Stick Y; robot forward/backward
-         * @param axial Left Stick X; robot left/right
-         * @param yaw Right Stick X; robot orientation
+         * @param x Left Stick X; robot left/right
+         * @param y Left Stick Y; robot forward/backward
+         * @param rx Right Stick X; robot orientation
          * @param driverHeading
          */
-        public Manuever(Drive drive, DoubleSupplier lateral, DoubleSupplier axial, DoubleSupplier yaw, Supplier<Angle> driverHeading)
+        public Manuever(Drive drive, DoubleSupplier x, DoubleSupplier y, DoubleSupplier rx, Supplier<Angle> driverHeading)
         {
             this.drive = drive;
-            this.lateral = lateral;
-            this.axial = axial;
-            this.yaw = yaw;
+            this.x = x;
+            this.y = y;
+            this.rx = rx;
             this.botAngle = driverHeading;
             addRequirements(drive);
         }
@@ -41,7 +41,7 @@ public class DriveCommands
         @Override
         public void execute()
         {
-            drive.drive(lateral.getAsDouble(), axial.getAsDouble(), yaw.getAsDouble(), botAngle.get());
+            drive.drive(x.getAsDouble(), y.getAsDouble(), rx.getAsDouble(), botAngle.get());
         }
 
         @Override

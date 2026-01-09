@@ -81,36 +81,35 @@ public class Drive extends SubsystemBase
         }
     }
 
-    public void drive(double lateral, double axial, double yaw, Angle driverHeading)
+    public void drive(double x, double y, double rx, Angle driverHeading)
     {
-        double rotX = lateral;
-        double rotY = axial;
-        double rx = yaw;
+        double rotX = x;
+        double rotY = y;
 
         double botHeading = driverHeading.toUnit(AngleUnit.RADIANS).measure; // ensure angle is always in radians
 
         switch (currentMode)
         {
             case FIELD_CENTRIC:
-                rotX = lateral * Math.cos(-botHeading) - axial * Math.sin(-botHeading);
-                rotY = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
+                rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+                rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
                 break;
 
             case ROBOT_CENTRIC_HYBRID:
                 // Agar.io / Slither.io style: Robot faces the direction the joystick points,
                 // and drives forward based on joystick magnitude.
-                double magnitude = Math.hypot(axial, lateral);
+                double magnitude = Math.hypot(y, x);
                 if (magnitude > RobotConstants.Drive.HybridMode.DEADBAND)
                 {
                     // Target heading = direction joystick is pointing (field-relative)
                     // atan2(lateral, axial) gives angle where axial=forward, lateral=right
-                    double targetHeading = Math.atan2(lateral, axial);
+                    double targetHeading = Math.atan2(x, y);
 
                     // Calculate shortest angle error to target heading
                     double error = AngleUnit.normalizeRadians(targetHeading - botHeading);
 
                     // Auto-turn to face target direction (unless driver is manually turning)
-                    if (Math.abs(yaw) < 0.05)
+                    if (Math.abs(rx) < 0.05)
                     {
                         rx = Range.clip(error * RobotConstants.Drive.HybridMode.TURN_P, -1.0, 1.0);
                     }
