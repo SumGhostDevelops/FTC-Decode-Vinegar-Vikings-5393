@@ -51,7 +51,7 @@ public class RobotHardware
             try
             {
                 frontRight = new MotorExPlus(hardwareMap, RobotConstants.Drive.FRONT_RIGHT, Motor.GoBILDA.RPM_312);
-                frontRight.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
+                frontRight.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
             {
@@ -62,7 +62,7 @@ public class RobotHardware
             try
             {
                 backLeft = new MotorExPlus(hardwareMap, RobotConstants.Drive.BACK_LEFT, Motor.GoBILDA.RPM_312);
-                backLeft.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
+                backLeft.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
             {
