@@ -130,6 +130,9 @@ public abstract class BaseUnstable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new DriveCommands.IncreaseSpeed(subsystems.drive));
 
+        driver.getGamepadButton(GamepadKeys.Button.A)
+                .whileActiveOnce(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
+
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(subsystems.odometry));
 
@@ -146,7 +149,12 @@ public abstract class BaseUnstable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -25));
         driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whileActiveOnce(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
+                .whenPressed(new TransferCommands.CloseTransfer(subsystems.transfer));
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                .whenPressed(new TransferCommands.OpenTransfer(subsystems.transfer));
+        driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
+                .whenPressed(new TransferCommands.CloseIntake(subsystems.transfer));
+
 
         Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
         Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
@@ -156,6 +164,7 @@ public abstract class BaseUnstable extends CommandOpMode
         Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
         Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
         Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
+        Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
         Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
 
         if (RobotConstants.Intake.automaticBehavior)
@@ -188,8 +197,9 @@ public abstract class BaseUnstable extends CommandOpMode
         driverLeftTrigger
                 .and(driverRightTrigger)
                 .whileActiveOnce(intakeTransfer)
-                .and(outtakeReady)
-                .whileActiveOnce(transferOpen);
+                //.and(outtakeReady)
+                .whileActiveOnce(transferShoot);
+
 
         // When outtake becomes not ready, close transfer for a short duration and run intake in reverse to prevent accidental shots
         // When the outtake goes from ready -> not ready, forcibly turn the intake in reverse and put the transfer in a block-allow state

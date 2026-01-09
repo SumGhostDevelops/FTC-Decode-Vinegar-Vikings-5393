@@ -78,6 +78,41 @@ public class TransferCommands
         // Never changes position when ending
     }
 
+    public static class ShootingTransfer extends CommandBase
+    {
+        private final Transfer transfer;
+
+        public ShootingTransfer(Transfer transfer) {
+            this.transfer = transfer;
+            addRequirements(transfer);
+        }
+
+        @Override
+        public void execute()
+        {
+            transfer.open();
+            try {
+                Thread.sleep(600);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            transfer.close(Transfer.CloseType.TRANSFER);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            transfer.close(Transfer.CloseType.INTAKE);
+            try {
+                Thread.sleep(600);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Never changes position when ending
+    }
+
     /**
      * Closes the transfer for a specified duration, then ends.
      * Useful for preventing accidental shots when outtake becomes not ready.
