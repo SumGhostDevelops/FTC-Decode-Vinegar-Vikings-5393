@@ -2,9 +2,12 @@ package org.firstinspires.ftc.teamcode.controls.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.util.Timing.Timer;
 
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
+
+import java.util.concurrent.TimeUnit;
 
 public class TransferCommands
 {
@@ -113,6 +116,51 @@ public class TransferCommands
         // Never changes position when ending
     }
 
+    public static class ShootingTransfer2 extends CommandBase
+    {
+        private final Transfer transfer;
+        private final Timer timer = new Timer(1500, TimeUnit.MILLISECONDS);
+        private final boolean[] stepsCompleted = new boolean[]{false, false, false};
+
+        public ShootingTransfer2(Transfer transfer) {
+            this.transfer = transfer;
+            addRequirements(transfer);
+        }
+
+        @Override
+        public void execute()
+        {
+            if (!timer.isTimerOn())
+            {
+                timer.start();
+            }
+
+            if (!stepsCompleted[0])
+            {
+                transfer.open();
+                stepsCompleted[0] = true;
+            }
+            else if (timer.elapsedTime() >= 600 && !stepsCompleted[1])
+            {
+                transfer.close(Transfer.CloseType.TRANSFER);
+                stepsCompleted[1] = true;
+            }
+            else if (timer.elapsedTime() >= 900 && !stepsCompleted[2])
+            {
+                transfer.close(Transfer.CloseType.INTAKE);
+                stepsCompleted[2] = true;
+            }
+        }
+
+        @Override
+        public boolean isFinished()
+        {
+            return timer.done();
+        }
+
+        // Never changes position when ending
+    }
+
     /**
      * Closes the transfer for a specified duration, then ends.
      * Useful for preventing accidental shots when outtake becomes not ready.
@@ -120,33 +168,30 @@ public class TransferCommands
     public static class CloseTransferForDuration extends CommandBase
     {
         private final Transfer transfer;
-        private final double durationMs;
-        private long startTime;
+        private final Timer timer;
 
         public CloseTransferForDuration(Transfer transfer, double durationMs)
         {
             this.transfer = transfer;
-            this.durationMs = durationMs;
+            timer = new Timer((long) durationMs, TimeUnit.MILLISECONDS);
             addRequirements(transfer);
-        }
-
-        @Override
-        public void initialize()
-        {
-            transfer.close(Transfer.CloseType.TRANSFER);
         }
 
         @Override
         public void execute()
         {
-            startTime = System.currentTimeMillis();
+            if (!timer.isTimerOn())
+            {
+                timer.start();
+            }
+
             transfer.close();
         }
 
         @Override
         public boolean isFinished()
         {
-            return System.currentTimeMillis() - startTime >= durationMs;
+            return timer.done();
         }
 
         @Override

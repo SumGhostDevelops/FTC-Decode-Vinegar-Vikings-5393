@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.controls.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
+import com.seattlesolvers.solverslib.util.Timing.Timer;
 
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 
 public class IntakeCommands
@@ -62,28 +64,31 @@ public class IntakeCommands
     {
         private final Intake intake;
         private final double power;
-        private final double durationMs;
-        private long startTime;
+        private final Timer timer;
 
         public TransferPreventForDuration(Intake intake, double power, double durationMs)
         {
             this.intake = intake;
             this.power = power;
-            this.durationMs = durationMs;
+            timer = new Timer((long) durationMs, TimeUnit.MILLISECONDS);
             addRequirements(intake);
         }
 
         @Override
         public void execute()
         {
-            startTime = System.currentTimeMillis();
+            if (!timer.isTimerOn())
+            {
+                timer.start();
+            }
+
             intake.out(power);
         }
 
         @Override
         public boolean isFinished()
         {
-            return System.currentTimeMillis() - startTime >= durationMs;
+            return timer.done();
         }
 
         @Override
