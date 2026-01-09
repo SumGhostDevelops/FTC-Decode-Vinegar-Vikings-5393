@@ -16,7 +16,7 @@ public class Drive extends SubsystemBase
     private final MotorEx frontLeft, frontRight, backLeft, backRight;
 
     private double speed = RobotConstants.Drive.Speed.DEFAULT;
-    private DriveMode currentMode = DriveMode.RAW_ROBOT_CENTRIC;
+    private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
 
     public Drive(MotorEx[] driveMotors)
     {
@@ -92,8 +92,8 @@ public class Drive extends SubsystemBase
         switch (currentMode)
         {
             case FIELD_CENTRIC:
-                rotX = lateral * Math.cos(botHeading) - axial * Math.sin(botHeading);
-                rotY = lateral * Math.sin(botHeading) + axial * Math.cos(botHeading);
+                rotX = lateral * Math.cos(-botHeading) - axial * Math.sin(-botHeading);
+                rotY = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
                 break;
 
             case ROBOT_CENTRIC_HYBRID:
