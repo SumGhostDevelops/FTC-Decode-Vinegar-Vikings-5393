@@ -71,7 +71,7 @@ public class RobotConstants
         @Configurable
         public static class Coefficients
         {
-            public static double[] veloCoeffs = new double[]{1.0, 1.0, 1.0, 1.0};
+            public static double[] veloCoeffs = new double[]{20, 5, -10, -2};
         }
 
         @Configurable
@@ -116,7 +116,7 @@ public class RobotConstants
         public static boolean automaticBehavior = false;
         public static double intakePower = 1.0;
         public static double outtakePower = 0.5;
-        public static double transferPassPower = 1.0;
+        public static double transferPassPower = 0.7;
         public static double transferPreventPower = 1.0;
         public static double transferPreventDurationMs = 100;
     }
