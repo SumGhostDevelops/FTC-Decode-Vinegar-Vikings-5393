@@ -46,7 +46,7 @@ public abstract class BaseUnstable extends CommandOpMode
         DoubleSupplier axial = () -> -gamepad1.left_stick_y; // Y is inverted
         DoubleSupplier lateral = () -> gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
         DoubleSupplier yaw = () -> gamepad1.right_stick_x;
-        Supplier<Angle> driverHeading = () -> new Angle(robot.hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES), AngleUnit.DEGREES);
+        Supplier<Angle> driverHeading = () -> robot.subsystems.odometry.getDriverHeading();
 
         robot.subsystems.drive.setDefaultCommand(new DriveCommands.Manuever(robot.subsystems.drive, lateral, axial, yaw, driverHeading));
 
