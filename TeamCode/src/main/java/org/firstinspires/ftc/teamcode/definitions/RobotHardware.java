@@ -240,10 +240,12 @@ public class RobotHardware
 
         try
         {
-            dwFwd = backRight.encoder;
-            dwFwd.setDirection(Motor.Direction.FORWARD);
-            dwStrf = backLeft.encoder;
-            dwStrf.setDirection(Motor.Direction.REVERSE);
+            dwFwd = backLeft.encoder;
+            dwFwd.setDirection(Motor.Direction.REVERSE);
+            dwStrf = backRight.encoder;
+            dwStrf.setDirection(Motor.Direction.FORWARD);
+            dwFwd.reset();
+            dwStrf.reset();
         }
         catch (Exception e)
         {
