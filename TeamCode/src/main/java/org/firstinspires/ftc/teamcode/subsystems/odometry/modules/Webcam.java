@@ -154,6 +154,7 @@ public class Webcam
                 if (possibleId == id)
                 {
                     idIsCorrect = true;
+                    break;
                 }
             }
 

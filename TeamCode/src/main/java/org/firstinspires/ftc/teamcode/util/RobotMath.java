@@ -99,7 +99,7 @@ public class RobotMath
     {
         private static final InterpLUT lut = new InterpLUT();
         private static boolean lutInitialized = false;
-        private static DistanceUnit dUnit = DistanceUnit.METER;
+        private static final DistanceUnit dUnit = DistanceUnit.METER;
 
         /**
          * Initialize the look up table.

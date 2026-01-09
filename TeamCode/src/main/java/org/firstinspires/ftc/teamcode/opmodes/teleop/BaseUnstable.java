@@ -33,7 +33,7 @@ public abstract class BaseUnstable extends CommandOpMode
 {
     protected Team team;
     protected RobotContext robot;
-    private Timer timer = new Timer(150, TimeUnit.SECONDS);
+    private final Timer timer = new Timer(150, TimeUnit.SECONDS);
 
     @Override
     public void initialize()
@@ -48,7 +48,7 @@ public abstract class BaseUnstable extends CommandOpMode
         DoubleSupplier x = () -> gamepad1.left_stick_x; // Counteract imperfect strafing
         DoubleSupplier y = () -> -gamepad1.left_stick_y; // Y is inverted
         DoubleSupplier rx = () -> gamepad1.right_stick_x;
-        Supplier<Angle> driverHeading = () -> robot.subsystems.odometry.getDriverHeading();;
+        Supplier<Angle> driverHeading = () -> robot.subsystems.odometry.getDriverHeading();
 
         robot.subsystems.drive.setDefaultCommand(new DriveCommands.Manuever(robot.subsystems.drive, x, y, rx, driverHeading));
 

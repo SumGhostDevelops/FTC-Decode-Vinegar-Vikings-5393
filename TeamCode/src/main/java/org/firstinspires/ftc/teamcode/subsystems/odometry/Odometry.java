@@ -20,8 +20,8 @@ public class Odometry extends SubsystemBase
     public final Webcam webcam;
     private final Pinpoint pinpoint;
 
-    private static DistanceUnit dUnit = DistanceUnit.METER;
-    private static AngleUnit aUnit = AngleUnit.RADIANS;
+    private static final DistanceUnit dUnit = DistanceUnit.METER;
+    private static final AngleUnit aUnit = AngleUnit.RADIANS;
 
     /**
      * Offset added to Pinpoint heading to get field-absolute heading.
