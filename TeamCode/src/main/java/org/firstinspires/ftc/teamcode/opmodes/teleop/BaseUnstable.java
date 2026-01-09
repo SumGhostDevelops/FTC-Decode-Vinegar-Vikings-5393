@@ -71,7 +71,7 @@ public abstract class BaseUnstable extends CommandOpMode
         telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH).magnitude);
         telemetry.addLine("--- Odometry ---");
         telemetry.addData("Raw Yaw", robot.hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-        telemetry.addData("Deg of Angle Implementation", angleImplementation);
+        telemetry.addData("Deg of Angle Implementation", angleImplementation.toUnit(AngleUnit.DEGREES).measure);
         telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("x (inches)", robot.subsystems.odometry.getFieldCoord().x.toUnit(DistanceUnit.INCH));
@@ -188,7 +188,7 @@ public abstract class BaseUnstable extends CommandOpMode
         driverLeftTrigger
                 .and(driverRightTrigger)
                 .whileActiveOnce(intakeTransfer)
-                //.and(outtakeReady)
+                .and(outtakeReady)
                 .whileActiveOnce(transferOpen);
 
         // When outtake becomes not ready, close transfer for a short duration and run intake in reverse to prevent accidental shots
