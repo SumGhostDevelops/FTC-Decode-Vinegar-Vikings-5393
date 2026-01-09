@@ -93,6 +93,7 @@ public class RobotConstants
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-180, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(180, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         public static double posCoeff = 1.0;
         public static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
+        public static boolean autoAimToGoal = true;
     }
 
     @Configurable

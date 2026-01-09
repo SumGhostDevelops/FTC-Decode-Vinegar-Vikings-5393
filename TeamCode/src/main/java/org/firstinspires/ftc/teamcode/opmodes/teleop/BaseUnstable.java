@@ -140,9 +140,16 @@ public abstract class BaseUnstable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new OdometryCommands.Localize(subsystems.odometry, telemetry));
 
-        // Y button (held): Auto-aim turret to team's goal
-        driver.getGamepadButton(GamepadKeys.Button.Y)
-                .toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
+        if (RobotConstants.Turret.autoAimToGoal)
+        {
+            opModeIsActive.whileActiveOnce(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
+        }
+        else
+        {
+            // Y button (held): Auto-aim turret to team's goal
+            driver.getGamepadButton(GamepadKeys.Button.Y)
+                    .toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
+        }
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 25));
