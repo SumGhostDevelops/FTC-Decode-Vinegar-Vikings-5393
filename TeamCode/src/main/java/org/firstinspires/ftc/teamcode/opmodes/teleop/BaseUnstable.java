@@ -90,7 +90,6 @@ public abstract class BaseUnstable extends CommandOpMode
     {
         displayTelemetry();
         telemetry.update();
-        robot.hw.clearHubCache();
 
         // Draw robot position on Panels Dashboard Field panel
         FieldDrawing.drawRobot(
