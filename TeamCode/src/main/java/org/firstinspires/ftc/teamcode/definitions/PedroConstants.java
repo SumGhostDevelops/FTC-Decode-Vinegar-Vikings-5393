@@ -35,10 +35,10 @@ public class PedroConstants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName(RobotConstants.Drive.BACK_RIGHT)
-            .strafeEncoder_HardwareMapName(RobotConstants.Drive.BACK_LEFT)
-            .forwardEncoderDirection(Encoder.FORWARD)
-            .strafeEncoderDirection(Encoder.REVERSE)
+            .forwardEncoder_HardwareMapName(RobotConstants.Drive.BACK_LEFT)
+            .strafeEncoder_HardwareMapName(RobotConstants.Drive.BACK_RIGHT)
+            .forwardEncoderDirection(Encoder.REVERSE)
+            .strafeEncoderDirection(Encoder.FORWARD)
             .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             .strafePodX(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             .IMU_HardwareMapName("imu")
