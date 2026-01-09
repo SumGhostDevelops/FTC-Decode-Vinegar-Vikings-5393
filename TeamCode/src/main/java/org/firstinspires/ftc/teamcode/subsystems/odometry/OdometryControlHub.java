@@ -67,7 +67,7 @@ public class OdometryControlHub extends SubsystemBase
         this.dwHandler = new DeadwheelHandler(referencePose, dwPar.getPosition(), dwPerp.getPosition());
     }
 
-    public Angle getYaw(AngleUnit angleUnit)
+    public Angle getIMUYaw(AngleUnit angleUnit)
     {
         return new Angle(imu.getRobotYawPitchRollAngles().getYaw(angleUnit), angleUnit);
         //-180 to 180
@@ -78,7 +78,7 @@ public class OdometryControlHub extends SubsystemBase
      */
     public Angle getAngle()
     {
-        return getYaw(aUnit).plus(headingOffset);
+        return getIMUYaw(aUnit).plus(headingOffset);
     }
 
     /**
@@ -133,7 +133,7 @@ public class OdometryControlHub extends SubsystemBase
 
         // Compute new headingOffset so getAngle() returns true field-absolute heading
         // headingOffset = estimatedPose.heading - currentIMUYaw
-        Angle currentImuYaw = getYaw(aUnit);
+        Angle currentImuYaw = getIMUYaw(aUnit);
         headingOffset = estimatedPose.heading.toUnit(aUnit).minus(currentImuYaw);
 
         // Update driverForward so getDriverHeading() still returns the same value

@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.util.Timing.Timer;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -31,6 +33,7 @@ public abstract class BaseUnstable extends CommandOpMode
 {
     protected Team team;
     protected RobotContext robot;
+    private Timer timer = new Timer(150, TimeUnit.SECONDS);
 
     @Override
     public void initialize()
@@ -64,6 +67,7 @@ public abstract class BaseUnstable extends CommandOpMode
     {
         telemetry.clear();
         telemetry.addData("Team", team);
+        telemetry.addData("Remaining Time", timer.remainingTime() + "/150");
         telemetry.addData("Distance to Goal (meters)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.METER).magnitude);
         telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH).magnitude);
         telemetry.addLine("--- Odometry ---");
@@ -78,11 +82,11 @@ public abstract class BaseUnstable extends CommandOpMode
         telemetry.addLine("--- Outtake ---");
         telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
         telemetry.addData("True RPM", robot.subsystems.outtake.getRPM());
+        telemetry.addData("True Acceleration", robot.subsystems.outtake.getRPMAcceleration());
         telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
         telemetry.addLine("--- Turret ---");
         telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
-        telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
     }
 
     /**
@@ -105,6 +109,14 @@ public abstract class BaseUnstable extends CommandOpMode
     @Override
     public void run()
     {
+        if (!timer.isTimerOn())
+        {
+            timer.start();
+        }
+        if (timer.done())
+        {
+            timer.pause();
+        }
         update();
         super.run();
     }
@@ -152,13 +164,23 @@ public abstract class BaseUnstable extends CommandOpMode
                 .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 25));
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -25));
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(new TransferCommands.CloseTransfer(subsystems.transfer));
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new TransferCommands.OpenTransfer(subsystems.transfer));
-        driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
-                .whenPressed(new TransferCommands.CloseIntake(subsystems.transfer));
 
+        if (RobotConstants.Transfer.testingKeybinds)
+        {
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                    .whenPressed(new TransferCommands.CloseTransfer(subsystems.transfer));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                    .whenPressed(new TransferCommands.OpenTransfer(subsystems.transfer));
+            driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
+                    .whenPressed(new TransferCommands.CloseIntake(subsystems.transfer));
+        }
+        else
+        {
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                    .whenPressed(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                    .whenPressed(new IntakeCommands.In(subsystems.intake, () -> 1.0));
+        }
 
         Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
         Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
@@ -168,7 +190,7 @@ public abstract class BaseUnstable extends CommandOpMode
         Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
         Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
         Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
-        Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
+        Command transferShoot = new TransferCommands.ShootingTransfer2(subsystems.transfer);
         Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
 
         if (RobotConstants.Intake.automaticBehavior)
@@ -201,13 +223,17 @@ public abstract class BaseUnstable extends CommandOpMode
         driverLeftTrigger
                 .and(driverRightTrigger)
                 .whileActiveOnce(intakeTransfer)
-                //.and(outtakeReady)
+                .and(outtakeReady)
                 .whileActiveOnce(transferShoot);
 
 
         // When outtake becomes not ready, close transfer for a short duration and run intake in reverse to prevent accidental shots
         // When the outtake goes from ready -> not ready, forcibly turn the intake in reverse and put the transfer in a block-allow state
-        //outtakeReady.whenInactive(new IntakeCommands.TransferPreventForDuration(subsystems.intake, RobotConstants.Intake.transferPreventPower, RobotConstants.Intake.transferPreventDurationMs), true).whenInactive(new TransferCommands.CloseTransferForDuration(subsystems.transfer, RobotConstants.Transfer.autoCloseMs), true);
+
+        if (RobotConstants.Transfer.autoTransferPrevent)
+        {
+            outtakeReady.whenInactive(new IntakeCommands.TransferPreventForDuration(subsystems.intake, RobotConstants.Intake.transferPreventPower, RobotConstants.Intake.transferPreventDurationMs), true).whenInactive(new TransferCommands.CloseTransferForDuration(subsystems.transfer, RobotConstants.Transfer.autoCloseMs), true);
+        }
 
         // Outtake: Right trigger spins up flywheel
         // While the right trigger is held down, turn the intake on

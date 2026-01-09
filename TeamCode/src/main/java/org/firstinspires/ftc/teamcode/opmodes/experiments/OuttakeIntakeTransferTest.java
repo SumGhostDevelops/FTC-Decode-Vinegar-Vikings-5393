@@ -1,6 +1,7 @@
 // java
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
 @TeleOp(name = "OuttakeIntakeTransferTest", group = "Experiments")
+@Disabled
 public class OuttakeIntakeTransferTest extends LinearOpMode {
 
     protected InputHandler input;

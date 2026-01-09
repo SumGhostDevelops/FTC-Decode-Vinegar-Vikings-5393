@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 @TeleOp(name = "Turret Testing (Works)", group = "Experiments")
+@Disabled
 public class TurretTestingWorks extends LinearOpMode
 {
     protected InputHandler input;

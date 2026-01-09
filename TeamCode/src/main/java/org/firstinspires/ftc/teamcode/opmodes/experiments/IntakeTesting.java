@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,6 +13,7 @@ import com.seattlesolvers.solverslib.command.button.Trigger;
 
 
 @TeleOp(name = "Intake Testing", group = "Experiments")
+@Disabled
 public class IntakeTesting extends LinearOpMode {
 
     double power = 0.8;

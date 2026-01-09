@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.button.Button;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 @TeleOp(name = "Turret Testing", group = "Experimental")
+@Disabled
 public class TurretTesting extends CommandOpMode
 {
     private Turret turret;

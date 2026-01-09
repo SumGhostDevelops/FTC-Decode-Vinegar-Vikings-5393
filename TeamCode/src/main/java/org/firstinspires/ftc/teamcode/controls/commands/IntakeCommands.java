@@ -94,7 +94,7 @@ public class IntakeCommands
         @Override
         public void end(boolean interrupted)
         {
-            intake.stop();
+            if (!interrupted) intake.stop();
         }
     }
 }

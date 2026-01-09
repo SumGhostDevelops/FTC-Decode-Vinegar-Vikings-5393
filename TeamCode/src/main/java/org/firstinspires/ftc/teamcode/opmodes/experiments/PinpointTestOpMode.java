@@ -1,6 +1,7 @@
 // Java
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 
 @TeleOp(name="Pinpoint Test", group="Experimental")
+@Disabled
 public class PinpointTestOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {

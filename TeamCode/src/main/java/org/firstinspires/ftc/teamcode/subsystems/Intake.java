@@ -16,11 +16,13 @@ public class Intake extends SubsystemBase
 
     public void in(double power)
     {
+        power = Math.max(1, Math.abs(power));
         intake.set(Math.abs(power));
     }
 
     public void out(double power)
     {
+        power = Math.max(1, Math.abs(power));
         intake.set(-Math.abs(power));
     }
 

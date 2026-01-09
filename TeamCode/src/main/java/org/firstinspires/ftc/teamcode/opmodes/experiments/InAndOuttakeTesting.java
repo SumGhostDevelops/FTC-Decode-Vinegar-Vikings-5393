@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
@@ -10,7 +11,7 @@ import org.firstinspires.ftc.teamcode.util.motors.MotorExPlus;
 import org.firstinspires.ftc.teamcode.util.motors.MotorExPlusGroup;
 
 @TeleOp(name = "Intake + Outtake Testing", group = "Experiments")
-
+@Disabled
 public class InAndOuttakeTesting extends LinearOpMode {
 
     //Intake Variables

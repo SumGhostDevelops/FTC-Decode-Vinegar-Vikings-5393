@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.experiments;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
@@ -9,6 +10,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 
 @TeleOp(name = "Actuator Testing", group = "Experiments")
+@Disabled
 public class ActuatorTesting extends LinearOpMode
 {
     private final MotorSelection[] motorOptions = MotorSelection.values();

@@ -14,6 +14,11 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 
 public class RobotConstants
 {
+    @Configurable
+    public static class General
+    {
+        public static boolean ENERGY_SAVER_MODE = false;
+    }
 
     @Configurable
     public static class Telemetry
@@ -60,7 +65,7 @@ public class RobotConstants
     {
         public static int PPR = 28;
         public static int BASE_RPM = 3700;
-        public static boolean IDLE_WHEN_END = false;
+        public static boolean IDLE_WHEN_END = false && !General.ENERGY_SAVER_MODE;
 
         public static class Name
         {
@@ -93,7 +98,7 @@ public class RobotConstants
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-180, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(180, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         public static double posCoeff = 1.0;
         public static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
-        public static boolean autoAimToGoal = true;
+        public static boolean autoAimToGoal = true && !General.ENERGY_SAVER_MODE;
     }
 
     @Configurable
@@ -105,6 +110,8 @@ public class RobotConstants
         public static double CLOSED_INTAKE_ANGLE = 0; // An angle where the trapdoor blocks balls from entering
         public static double CLOSED_TRANSFER_ANGLE = 210;
         public static double autoCloseMs = 500; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
+        public static boolean autoTransferPrevent = false;
+        public static boolean testingKeybinds = false;
     }
 
     @Configurable
@@ -114,7 +121,7 @@ public class RobotConstants
         /**
          * If true, the intake will automatically be set to intake mode.
          */
-        public static boolean automaticBehavior = false;
+        public static boolean automaticBehavior = false && !General.ENERGY_SAVER_MODE;
         public static double intakePower = 0.6;
         public static double outtakePower = 0.5;
         public static double transferPassPower = 0.55;
