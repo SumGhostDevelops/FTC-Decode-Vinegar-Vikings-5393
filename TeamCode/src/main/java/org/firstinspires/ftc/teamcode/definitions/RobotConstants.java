@@ -102,7 +102,7 @@ public class RobotConstants
         public static double SERVO_RANGE = 360.0; // Physical servo range in degrees
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
         public static double CLOSED_INTAKE_ANGLE = 45; // An angle where the trapdoor blocks balls from entering
-        public static double CLOSED_TRANSFER_ANGLE = 180;
+        public static double CLOSED_TRANSFER_ANGLE = 210;
         public static double autoCloseMs = 500; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
     }
 
