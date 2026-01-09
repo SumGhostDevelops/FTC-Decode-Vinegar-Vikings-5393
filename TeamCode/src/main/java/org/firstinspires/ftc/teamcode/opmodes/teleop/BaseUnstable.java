@@ -32,8 +32,6 @@ public abstract class BaseUnstable extends CommandOpMode
     protected Team team;
     protected RobotContext robot;
 
-    Supplier<Angle> angleImplementation;
-
     @Override
     public void initialize()
     {
@@ -44,11 +42,10 @@ public abstract class BaseUnstable extends CommandOpMode
 
         register(robot.subsystems.drive, robot.subsystems.intake, robot.subsystems.transfer, robot.subsystems.turret, robot.subsystems.outtake, robot.subsystems.odometry);
 
-        angleImplementation = () -> robot.subsystems.odometry.getDriverHeading();
         DoubleSupplier x = () -> gamepad1.left_stick_x; // Counteract imperfect strafing
         DoubleSupplier y = () -> -gamepad1.left_stick_y; // Y is inverted
         DoubleSupplier rx = () -> gamepad1.right_stick_x;
-        Supplier<Angle> driverHeading = angleImplementation;
+        Supplier<Angle> driverHeading = () -> robot.subsystems.odometry.getDriverHeading();
 
         robot.subsystems.drive.setDefaultCommand(new DriveCommands.Manuever(robot.subsystems.drive, x, y, rx, driverHeading));
 
@@ -71,7 +68,7 @@ public abstract class BaseUnstable extends CommandOpMode
         telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH).magnitude);
         telemetry.addLine("--- Odometry ---");
         telemetry.addData("Raw Yaw", robot.hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-        telemetry.addData("Deg of Angle Implementation", angleImplementation.get().toUnit(AngleUnit.DEGREES).measure);
+        telemetry.addData("Deg of Angle Implementation", robot.subsystems.odometry.getDriverHeading());
         telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("x (inches)", robot.subsystems.odometry.getFieldCoord().x.toUnit(DistanceUnit.INCH));
