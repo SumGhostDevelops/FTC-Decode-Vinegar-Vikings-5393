@@ -45,7 +45,7 @@ public abstract class BaseUnstable extends CommandOpMode
         DoubleSupplier x = () -> gamepad1.left_stick_x; // Counteract imperfect strafing
         DoubleSupplier y = () -> -gamepad1.left_stick_y; // Y is inverted
         DoubleSupplier rx = () -> gamepad1.right_stick_x;
-        Supplier<Angle> driverHeading = () -> robot.subsystems.odometry.getDriverHeading();
+        Supplier<Angle> driverHeading = () -> new Angle(robot.hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES),AngleUnit.RADIANS);
 
         robot.subsystems.drive.setDefaultCommand(new DriveCommands.Manuever(robot.subsystems.drive, x, y, rx, driverHeading));
 
@@ -81,6 +81,7 @@ public abstract class BaseUnstable extends CommandOpMode
         telemetry.addLine("--- Turret ---");
         telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
+        telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
     }
 
     /**
