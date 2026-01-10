@@ -103,6 +103,7 @@ public class Blue extends Base {
                     .addPath(new BezierLine(startPose, shootPose))
                     .setTangentHeadingInterpolation()
                     .build();
+
         }
     }
 }
