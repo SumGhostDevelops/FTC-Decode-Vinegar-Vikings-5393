@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.controls.BlockingCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.PedroConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 @Autonomous(name = "RedBasicVikingsAutonomous", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
 public class Red extends Base
@@ -31,10 +33,10 @@ public class Red extends Base
     private Paths.PathState currentPathState;
 
     public void runOpMode() throws InterruptedException {
-        team = Team.RED;
-        RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
         initAuto();
         waitForStart();
+        team = Team.RED;
+        RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
             robotContext.subsystems.transfer.open();
@@ -52,7 +54,7 @@ public class Red extends Base
             }
             follower.followPath(paths.ToShoot);
 
-
+            Timer endDriving = new Timer();
 
             while (opModeIsActive() && !isStopRequested()) {
 
