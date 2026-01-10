@@ -28,9 +28,10 @@ public class PedroConstants {
             .rightRearMotorName(RobotConstants.Drive.BACK_RIGHT)
             .leftRearMotorName(RobotConstants.Drive.BACK_LEFT)
             .leftFrontMotorName(RobotConstants.Drive.FRONT_LEFT)
+            // typical sign layout: left motors reversed, right motors forward
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
@@ -40,7 +41,8 @@ public class PedroConstants {
             .forwardEncoderDirection(Encoder.REVERSE)
             .strafeEncoderDirection(Encoder.FORWARD)
             .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
-            .strafePodX(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
+            // <- corrected to use Strafe offset
+            .strafePodX(RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             .IMU_HardwareMapName("imu")
             .IMU_Orientation(
                     new RevHubOrientationOnRobot(
