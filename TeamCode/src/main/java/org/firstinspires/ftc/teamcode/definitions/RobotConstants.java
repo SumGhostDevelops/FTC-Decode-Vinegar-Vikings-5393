@@ -18,13 +18,14 @@ public class RobotConstants
     public static class General
     {
         public static boolean ENERGY_SAVER_MODE = false;
+        public static boolean REGRESSION_TESTING_MODE = false;
     }
 
     @Configurable
     public static class Telemetry
     {
-        public static boolean SET_AUTOCLEAR = false;
-        public static boolean SET_AUTOCLEAR_LOGS = false;
+        public static boolean SET_AUTOCLEAR = true;
+        public static boolean SET_AUTOCLEAR_LOGS = true;
     }
 
     public static class AprilTags
@@ -67,7 +68,7 @@ public class RobotConstants
         public static int PPR = 28;
         public static int BASE_RPM = 3700;
         public static boolean IDLE_WHEN_END = false && !General.ENERGY_SAVER_MODE;
-        public static boolean AUTO_DISTANCE_ADJUSMENT = true;
+        public static boolean AUTO_DISTANCE_ADJUSMENT = true && !General.REGRESSION_TESTING_MODE;
 
         public static class Name
         {
@@ -97,7 +98,7 @@ public class RobotConstants
         public static int TOLERANCE = 0; // in ticks
         public static double GEAR_RATIO = 19.2 * 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
-        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-180, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(180, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
+        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-180, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(90, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         public static double posCoeff = 1.0;
         public static double[] ffCoeffs = new double[]{1.0, 1.0, 1.0};
         public static boolean autoAimToGoal = true && !General.ENERGY_SAVER_MODE;
@@ -109,12 +110,12 @@ public class RobotConstants
         public static String TRANSFER = "transfer";
         public static double SERVO_RANGE = 360.0; // Physical servo range in degrees
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
-        public static double CLOSED_INTAKE_ANGLE = 210; // An angle where the trapdoor blocks balls from entering
-        public static double CLOSED_TRANSFER_ANGLE = 0;
+        public static double CLOSED_INTAKE_ANGLE = 0; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSED_TRANSFER_ANGLE = 210;
         public static double autoCloseMs = 500; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
         public static boolean autoTransferPrevent = false;
         public static boolean testingKeybinds = false;
-        public static boolean RELEASE_ALL_BALLS_WHEN_READY = true;
+        public static boolean RELEASE_ALL_BALLS_WHEN_READY = false;
 
         @Configurable
         public static class TimerConstants
@@ -135,7 +136,7 @@ public class RobotConstants
         public static boolean automaticBehavior = false && !General.ENERGY_SAVER_MODE;
         public static double intakePower = 0.6;
         public static double outtakePower = 0.5;
-        public static double transferPassPower = 0.35;
+        public static double transferPassPower = 0.4;
         public static double transferPassPowerSpeed = 0.5;
         public static double transferPreventPower = 1.0;
 

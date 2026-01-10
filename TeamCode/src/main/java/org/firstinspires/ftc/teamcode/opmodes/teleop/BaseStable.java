@@ -169,10 +169,18 @@ public abstract class BaseStable extends CommandOpMode
                     .toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
         }
 
+        if (RobotConstants.General.REGRESSION_TESTING_MODE)
+        {
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                    .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 100));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                    .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));
+        }
+
         driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
                 .whileHeld(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
         driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whileHeld(new TransferCommands.CloseTransfer(subsystems.transfer));
+                .whileHeld(new TransferCommands.CloseIntake(subsystems.transfer));
 
         Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
         Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
@@ -184,7 +192,7 @@ public abstract class BaseStable extends CommandOpMode
         Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
         Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
         Command transferCloseIntake = new TransferCommands.CloseIntake(subsystems.transfer);
-        Command transferCloseTransfer = new TransferCommands.CloseIntake(subsystems.transfer);
+        Command transferCloseTransfer = new TransferCommands.CloseTransfer(subsystems.transfer);
         Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
 
         if (RobotConstants.Intake.automaticBehavior)
@@ -209,7 +217,7 @@ public abstract class BaseStable extends CommandOpMode
         // If we are holding down the left trigger, and we are not holding down the right trigger, set the transfer to a blocking state
         driverLeftTrigger
                 .and(driverRightTrigger.negate())
-                .whileActiveOnce(transferCloseIntake);
+                .whileActiveOnce(transferCloseTransfer);
 
         if (!RobotConstants.Transfer.RELEASE_ALL_BALLS_WHEN_READY)
         {

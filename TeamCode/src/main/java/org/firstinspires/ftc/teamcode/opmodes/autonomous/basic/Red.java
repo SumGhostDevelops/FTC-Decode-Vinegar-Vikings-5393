@@ -1,5 +1,5 @@
-
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.basic;
+
 import android.provider.SyncStateContract;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.controls.BlockingCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
@@ -17,23 +18,23 @@ import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.PedroConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
-import java.nio.file.Paths;
+
+import java.util.concurrent.TimeUnit;
 
 @Autonomous(name = "RedBasicVikingsAutonomous", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
 public class Red extends Base
 {
-
-
-    private Paths paths;
+    private AutoPaths paths;
     private Timer timer, opModeTimer;
     private Follower follower;
-    RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
-    private Paths.PathState currentPathState;
+
+    private AutoPaths.PathState currentPathState;
 
     public void runOpMode() throws InterruptedException {
-        team = Team.RED;
         initAuto();
         waitForStart();
+        team = Team.RED;
+        RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
             robotContext.subsystems.transfer.open();
@@ -49,9 +50,8 @@ public class Red extends Base
                 robotContext.subsystems.intake.stop();
                 Thread.sleep(3000);
             }
+
             follower.followPath(paths.ToShoot);
-
-
 
             while (opModeIsActive() && !isStopRequested()) {
 
@@ -64,51 +64,53 @@ public class Red extends Base
             }
         }
     }
+
     public void initAuto() throws InterruptedException {
         follower = PedroConstants.createFollower(hardwareMap);
-        paths = new Paths(follower);
+        paths = new AutoPaths(follower);
+
+        // Try to set follower pose to the path start pose (works for different follower APIs)
+        try {
+            java.lang.reflect.Method m = follower.getClass().getMethod("setPose", com.pedropathing.geometry.Pose.class);
+            m.invoke(follower, paths.startPose);
+        } catch (NoSuchMethodException e) {
+            try {
+                java.lang.reflect.Method m2 = follower.getClass().getMethod("setPoseEstimate", com.pedropathing.geometry.Pose.class);
+                m2.invoke(follower, paths.startPose);
+            } catch (Exception ignored) {}
+        } catch (Exception ignored) {}
+
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-      timer.resetTimer();
+        timer.resetTimer();
     }
 
-    public void setPathState(Paths.PathState pathState) {
+    public void setPathState(AutoPaths.PathState pathState) {
         currentPathState = pathState;
         timer.resetTimer();
     }
 
-
-
-    public static class Paths {
-
+    public static class AutoPaths {
 
         public PathChain ToShoot;
-
+        public final Pose startPose;
 
         public enum PathState {
             ToShoot
-
         }
 
-        public Paths(Follower follower) {
-            final Pose startPose = new Pose(63, 8.3);
+        public AutoPaths(Follower follower) {
+            startPose = new Pose(63, 8.3);
             final Pose shootPose = new Pose(57, 44);
-
 
             ToShoot = follower.pathBuilder().addPath(
                             new BezierLine(
                                     startPose,
-
                                     shootPose
                             )
                     ).setTangentHeadingInterpolation()
                     .build();
-
-
         }
-
-
     }
 }
-

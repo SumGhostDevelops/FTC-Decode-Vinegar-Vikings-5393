@@ -149,8 +149,10 @@ public class Outtake extends SubsystemBase {
         }
 
         lastDistance = dist;
-        double meters = dist.toUnit(DistanceUnit.METER).magnitude;
-        setTargetRPM(-223.05528*meters*meters + 1691.10697*meters + 34.64716);
+        double distance = dist.toUnit(DistanceUnit.INCH).magnitude;
+
+        // regression is in inches
+        setTargetRPM(0.388614*Math.pow(distance, 2) - 47.89998 * distance + 4458.86043);
     }
 
     public double getTargetRPM()
