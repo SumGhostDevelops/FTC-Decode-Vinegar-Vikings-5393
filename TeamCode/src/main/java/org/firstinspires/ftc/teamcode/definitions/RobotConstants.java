@@ -17,7 +17,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static boolean ENERGY_SAVER_MODE = true;
+        public static boolean ENERGY_SAVER_MODE = false;
     }
 
     @Configurable
@@ -66,7 +66,7 @@ public class RobotConstants
         public static int PPR = 28;
         public static int BASE_RPM = 3700;
         public static boolean IDLE_WHEN_END = false && !General.ENERGY_SAVER_MODE;
-        public static boolean AUTO_DISTANCE_ADJUSMENT = false;
+        public static boolean AUTO_DISTANCE_ADJUSMENT = true;
 
         public static class Name
         {
