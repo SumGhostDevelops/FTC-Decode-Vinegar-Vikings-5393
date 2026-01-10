@@ -26,12 +26,12 @@ public class Blue extends Base {
     private Timer timer, opModeTimer;
     private Follower follower;
 
-    RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
+
     private Paths.PathState currentPathState;
 
     public void runOpMode() throws InterruptedException {
         team = Team.BLUE;
-
+        RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
         initAuto();
         waitForStart();
         if (opModeIsActive() && !isStopRequested()) {

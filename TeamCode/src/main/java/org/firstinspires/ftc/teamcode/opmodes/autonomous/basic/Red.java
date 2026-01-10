@@ -27,11 +27,12 @@ public class Red extends Base
     private Paths paths;
     private Timer timer, opModeTimer;
     private Follower follower;
-    RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
+
     private Paths.PathState currentPathState;
 
     public void runOpMode() throws InterruptedException {
         team = Team.RED;
+        RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
         initAuto();
         waitForStart();
         if (opModeIsActive() && !isStopRequested()) {
