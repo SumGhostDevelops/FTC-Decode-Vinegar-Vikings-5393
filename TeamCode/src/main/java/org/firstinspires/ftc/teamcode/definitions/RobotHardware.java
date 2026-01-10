@@ -151,6 +151,7 @@ public class RobotHardware
             turret.motorEx.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             turret.motorEx.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             turret.setRunMode(Motor.RunMode.PositionControl);
+            turret.setTargetPosition(0);
             turret.setPositionTolerance(10); // Allow 10 ticks tolerance for atTargetPosition()
             //turret.setPositionCoefficient(RobotConstants.Turret.posCoeff);
 
@@ -167,7 +168,7 @@ public class RobotHardware
         try
         {
             transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, RobotConstants.Transfer.SERVO_RANGE, AngleUnit.DEGREES);
-            transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
+            transfer.set(RobotConstants.Transfer.CLOSED_TRANSFER_ANGLE);
         }
         catch (Exception e)
         {
