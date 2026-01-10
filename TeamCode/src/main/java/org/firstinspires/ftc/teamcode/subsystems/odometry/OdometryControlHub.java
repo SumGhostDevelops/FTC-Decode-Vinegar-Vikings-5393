@@ -163,7 +163,7 @@ public class OdometryControlHub extends SubsystemBase
 
         AprilTagDetection tag = possibleTag.get();
         return String.format(
-            "ID=%d | Raw XYZ: (%.2f, %.2f, %.2f) %s | Yaw: %.1f° | Converted Pose: (%.2f, %.2f) in, heading: %.1f°",
+            "ID=%d | Raw XYZ: (%.2f, %.2f, %.2f) %s | Yaw: %.1f° | Converted Pose: (%.2f, %.2f) in, range: %.2f, heading: %.1f°, yaw: %.2f",
             tag.id,
             tag.robotPose.getPosition().x,
             tag.robotPose.getPosition().y,
@@ -172,7 +172,9 @@ public class OdometryControlHub extends SubsystemBase
             tag.robotPose.getOrientation().getYaw(AngleUnit.DEGREES),
             Pose2d.fromPose3D(tag.robotPose).coord.x.getDistance(DistanceUnit.INCH),
             Pose2d.fromPose3D(tag.robotPose).coord.y.getDistance(DistanceUnit.INCH),
-            Pose2d.fromPose3D(tag.robotPose).heading.getAngle(AngleUnit.DEGREES)
+            tag.ftcPose.range,
+            Pose2d.fromPose3D(tag.robotPose).heading.getAngle(AngleUnit.DEGREES),
+                tag.ftcPose.yaw
         );
     }
 
