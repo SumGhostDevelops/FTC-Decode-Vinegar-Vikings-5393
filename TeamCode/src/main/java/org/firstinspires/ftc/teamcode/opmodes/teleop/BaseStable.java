@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.definitions.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
+import org.firstinspires.ftc.teamcode.util.localization.CornersCoordinates;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 
 import java.util.concurrent.TimeUnit;
@@ -29,7 +30,7 @@ import java.util.function.Supplier;
 /**
  * This class is for implementing and testing new but unstable features
  */
-public abstract class BaseUnstable extends CommandOpMode
+public abstract class BaseStable extends CommandOpMode
 {
     protected Team team;
     protected RobotContext robot;
@@ -66,23 +67,22 @@ public abstract class BaseUnstable extends CommandOpMode
     protected void displayTelemetry()
     {
         telemetry.clear();
+        telemetry.addLine("--- Co Driver Keybinds ---");
+        telemetry.addLine("DPAD UP: BLUE GOAL");
+        telemetry.addLine("DPAD RIGHT: RED GOAL");
+        telemetry.addLine("DPAD DOWN: BLUE LOADING ZONE");
+        telemetry.addLine("DPAD LEFT: RED LOADING ZONE");
+        telemetry.addLine("------");
         telemetry.addData("Team", team);
         telemetry.addData("Remaining Time", timer.remainingTime() + "/120");
-        telemetry.addData("Distance to Goal", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.METER));
         telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
         telemetry.addLine("--- Odometry ---");
-        telemetry.addData("Raw Yaw", robot.hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-        telemetry.addData("Deg of Angle Implementation", robot.subsystems.odometry.getDriverHeading());
-        telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
         telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
-        telemetry.addData("x (inches)", robot.subsystems.odometry.getFieldCoord().x.toUnit(DistanceUnit.INCH));
-        telemetry.addData("y (inches)", robot.subsystems.odometry.getFieldCoord().y.toUnit(DistanceUnit.INCH));
         telemetry.addLine("--- Drive ---");
         telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
         telemetry.addLine("--- Outtake ---");
         telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
         telemetry.addData("True RPM", robot.subsystems.outtake.getRPM());
-        telemetry.addData("True Acceleration", robot.subsystems.outtake.getRPMAcceleration());
         telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
         telemetry.addLine("--- Turret ---");
         telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
@@ -94,6 +94,7 @@ public abstract class BaseUnstable extends CommandOpMode
      */
     protected void update()
     {
+        telemetry.log().clear();
         robot.subsystems.outtake.setTargetRPMFromDistance(robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord));
         displayTelemetry();
         telemetry.update();
@@ -131,6 +132,7 @@ public abstract class BaseUnstable extends CommandOpMode
     public void bindKeys()
     {
         GamepadEx driver = robot.gamepads.driver;
+        GamepadEx coDriver = robot.gamepads.coDriver;
         Subsystems subsystems = robot.subsystems;
 
         Trigger opModeIsActive = new Trigger(this::opModeIsActive);
@@ -139,9 +141,6 @@ public abstract class BaseUnstable extends CommandOpMode
                 .whenPressed(new DriveCommands.DecreaseSpeed(subsystems.drive));
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new DriveCommands.IncreaseSpeed(subsystems.drive));
-
-        driver.getGamepadButton(GamepadKeys.Button.A)
-                .whileActiveOnce(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
 
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(subsystems.odometry));
@@ -161,27 +160,10 @@ public abstract class BaseUnstable extends CommandOpMode
                     .toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
         }
 
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whileHeld(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 25));
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whileHeld(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -25));
-
-        if (RobotConstants.Transfer.testingKeybinds)
-        {
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                    .whenPressed(new TransferCommands.CloseTransfer(subsystems.transfer));
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                    .whenPressed(new TransferCommands.OpenTransfer(subsystems.transfer));
-            driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
-                    .whenPressed(new TransferCommands.CloseIntake(subsystems.transfer));
-        }
-        else
-        {
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                    .whileHeld(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                    .whileHeld(new TransferCommands.CloseTransfer(subsystems.transfer));
-        }
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                .whileHeld(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                .whileHeld(new TransferCommands.CloseTransfer(subsystems.transfer));
 
         Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
         Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
@@ -201,8 +183,8 @@ public abstract class BaseUnstable extends CommandOpMode
             // Intake mode: Automatic
             // If the op mode is active, and we are not holding down the left trigger, turn the intake on
             opModeIsActive
-                .and(driverLeftTrigger.negate())
-                .whileActiveOnce(intakeIntake);
+                    .and(driverLeftTrigger.negate())
+                    .whileActiveOnce(intakeIntake);
         }
         else
         {
@@ -210,8 +192,8 @@ public abstract class BaseUnstable extends CommandOpMode
             // Runs intake continuously while conditions are met
             // While we are holding down the left trigger, and we are not holding down the right trigger, turn the intake on
             driverLeftTrigger
-                .and(driverRightTrigger.negate())
-                .whileActiveOnce(intakeIntake);
+                    .and(driverRightTrigger.negate())
+                    .whileActiveOnce(intakeIntake);
         }
 
         // Intake Mode: Set transfer to the intake/blocking mode
@@ -255,5 +237,11 @@ public abstract class BaseUnstable extends CommandOpMode
         // While the right trigger is held down, turn the intake on
         driverRightTrigger
                 .whileActiveOnce(outtakeOn);
+
+        // Co driver localization
+        coDriver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_GOAL));
+        coDriver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_GOAL));
+        coDriver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_LOADING_ZONE));
+        coDriver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_LOADING_ZONE));
     }
 }
