@@ -14,14 +14,87 @@ import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.PedroConstants;
 
+import java.nio.file.Paths;
+
+
 @Autonomous(name = "BlueBasicVikingsAutonomous", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
-public class Blue extends Base
-{
-    public void runOpMode() throws InterruptedException
-    {
+public class Blue extends Base {
+
+
+    private Paths paths;
+    private Timer timer, opModeTimer;
+    private Follower follower;
+
+    private Paths.PathState currentPathState;
+
+    public void runOpMode() throws InterruptedException {
         team = Team.BLUE;
         super.runOpMode();
-         }
+        initAuto();
+        waitForStart();
+        if (opModeIsActive() && !isStopRequested()) {
+            opModeTimer.resetTimer();
+            follower.followPath(paths.ToShoot);
+
+
+            while (opModeIsActive() && !isStopRequested()) {
+
+                follower.update();
+
+                telemetry.addData("Current State", currentPathState);
+                telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
+                telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
+                telemetry.update();
+            }
+        }
+    }
+    public void initAuto() {
+        follower = PedroConstants.createFollower(hardwareMap);
+        paths = new Paths(follower);
+        timer = new Timer();
+        opModeTimer = new Timer();
+        opModeTimer.resetTimer();
+        sleep(2000);
+        // add shoot
+        setPathState(Paths.PathState.ToShoot);
     }
 
+    public void setPathState(Paths.PathState pathState) {
+        currentPathState = pathState;
+        timer.resetTimer();
+    }
+
+
+
+    public static class Paths {
+
+
+        public PathChain ToShoot;
+
+
+        public enum PathState {
+            ToShoot
+
+        }
+
+        public Paths(Follower follower) {
+            final Pose startPose = new Pose(80, 8.3);
+            final Pose shootPose = new Pose(92, 51);
+
+
+            ToShoot = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    startPose,
+
+                                    shootPose
+                            )
+                    ).setTangentHeadingInterpolation()
+                    .build();
+
+
+        }
+
+
+    }
+}
 
