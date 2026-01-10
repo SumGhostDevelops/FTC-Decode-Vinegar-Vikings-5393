@@ -24,4 +24,6 @@ public class CornersCoordinates
 
     public static final Pose2d BLUE_GOAL = new Pose2d(new FieldCoordinate(new Distance(23.35, INCH), new Distance(127.41, INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(144, DEGREES));
     public static final Pose2d RED_GOAL = new Pose2d(new FieldCoordinate(new Distance(120.74, INCH), new Distance(127.41, INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(36, DEGREES));
+
+    //public static final Pose2d SMALL_TRIANGLE = new Pose2d
 }
