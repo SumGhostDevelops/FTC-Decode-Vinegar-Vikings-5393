@@ -23,7 +23,8 @@ public class RobotConstants
     @Configurable
     public static class Telemetry
     {
-        public static boolean SET_AUTOCLEAR = true;
+        public static boolean SET_AUTOCLEAR = false;
+        public static boolean SET_AUTOCLEAR_LOGS = false;
     }
 
     public static class AprilTags

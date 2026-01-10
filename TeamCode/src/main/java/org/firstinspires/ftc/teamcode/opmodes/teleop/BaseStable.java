@@ -66,7 +66,14 @@ public abstract class BaseStable extends CommandOpMode
      */
     protected void displayTelemetry()
     {
-        telemetry.clear();
+        if (RobotConstants.Telemetry.SET_AUTOCLEAR)
+        {
+            telemetry.clear();
+        }
+        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS)
+        {
+            telemetry.log().clear();
+        }
         telemetry.addLine("--- Co Driver Keybinds ---");
         telemetry.addLine("DPAD UP: BLUE GOAL");
         telemetry.addLine("DPAD RIGHT: RED GOAL");
@@ -94,7 +101,6 @@ public abstract class BaseStable extends CommandOpMode
      */
     protected void update()
     {
-        telemetry.log().clear();
         robot.subsystems.outtake.setTargetRPMFromDistance(robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord));
         displayTelemetry();
         telemetry.update();
@@ -146,8 +152,11 @@ public abstract class BaseStable extends CommandOpMode
                 .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(subsystems.odometry));
 
         // X button: Attempt AprilTag localization
+        /*
         driver.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new OdometryCommands.Localize(subsystems.odometry, telemetry));
+
+         */
 
         if (RobotConstants.Turret.autoAimToGoal)
         {

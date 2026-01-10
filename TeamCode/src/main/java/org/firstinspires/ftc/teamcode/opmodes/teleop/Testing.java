@@ -65,8 +65,14 @@ public abstract class Testing extends CommandOpMode
      */
     protected void displayTelemetry()
     {
-        telemetry.clear();
-        telemetry.log().clear();
+        if (RobotConstants.Telemetry.SET_AUTOCLEAR)
+        {
+            telemetry.clear();
+        }
+        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS)
+        {
+            telemetry.log().clear();
+        }
         telemetry.addData("Team", team);
         telemetry.addData("Remaining Time", timer.remainingTime() + "/120");
         telemetry.addData("Distance to Goal", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.METER));
