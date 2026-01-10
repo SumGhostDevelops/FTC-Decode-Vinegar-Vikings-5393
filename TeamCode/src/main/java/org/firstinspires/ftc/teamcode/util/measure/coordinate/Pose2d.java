@@ -133,9 +133,11 @@ public class Pose2d
      */
     public static Pose2d fromPose3D(Pose3D pose)
     {
+        // AprilTag robotPose X/Y are in field coordinates but need to be negated
+        // to match the expected behavior (distance decreases as robot approaches tag)
         FieldCoordinate coord = new FieldCoordinate(
-                new Distance(pose.getPosition().x, pose.getPosition().unit),
-                new Distance(pose.getPosition().y, pose.getPosition().unit),
+                new Distance(-pose.getPosition().x, pose.getPosition().unit),
+                new Distance(-pose.getPosition().y, pose.getPosition().unit),
                 FieldCoordinate.CoordinateSystem.FTC_STD);
 
         return new Pose2d(coord, new Angle(pose.getOrientation().getYaw(AngleUnit.RADIANS), AngleUnit.RADIANS));
