@@ -1,5 +1,6 @@
+// java
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.basic;
-import android.provider.SyncStateContract;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -8,27 +9,22 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.PedroConstants;
 
-import java.nio.file.Paths;
-
-
-@Autonomous(name = "BlueBasicVikingsAutonomous", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
 public class Blue extends Base {
-
 
     private Paths paths;
     private Timer timer, opModeTimer;
     private Follower follower;
 
-    RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
+    private RobotContext robotContext; // initialize in initAuto
     private Paths.PathState currentPathState;
 
+    @Override
     public void runOpMode() throws InterruptedException {
         team = Team.BLUE;
 
@@ -41,21 +37,26 @@ public class Blue extends Base {
             robotContext.subsystems.outtake.setTargetRPM(4000);
             robotContext.subsystems.outtake.on();
 
-            for (int i = 0; i < 4; i++)
-            {
-                while (robotContext.subsystems.outtake.isReady())
-                {
-                    robotContext.subsystems.intake.in(0.6);
+            // Feed 4 rings: wait until shooter is ready, then pulse the intake to feed
+            for (int i = 0; i < 4 && opModeIsActive() && !isStopRequested(); i++) {
+                // wait until shooter reports ready
+                while (opModeIsActive() && !isStopRequested() && !robotContext.subsystems.outtake.isReady()) {
+                    Thread.sleep(10);
                 }
+
+                // pulse intake to feed one ring
+                robotContext.subsystems.intake.in(0.6);
+                Thread.sleep(300); // feed duration, tune as needed
                 robotContext.subsystems.intake.stop();
-                Thread.sleep(3000);
+
+                // short delay between shots
+                Thread.sleep(300);
             }
+
+            // start path after shooting
             follower.followPath(paths.ToShoot);
 
-
-
             while (opModeIsActive() && !isStopRequested()) {
-
                 follower.update();
 
                 telemetry.addData("Current State", currentPathState);
@@ -65,8 +66,12 @@ public class Blue extends Base {
             }
         }
     }
+
     public void initAuto() throws InterruptedException {
+        // follower and robotContext require hardwareMap and team to be set, so create them here
         follower = PedroConstants.createFollower(hardwareMap);
+        robotContext = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
+
         paths = new Paths(follower);
         timer = new Timer();
         opModeTimer = new Timer();
@@ -78,37 +83,22 @@ public class Blue extends Base {
         timer.resetTimer();
     }
 
-
-
     public static class Paths {
-
-
         public PathChain ToShoot;
-
 
         public enum PathState {
             ToShoot
-
         }
 
         public Paths(Follower follower) {
+            // Tune these poses if the robot drives too far or in the wrong direction.
             final Pose startPose = new Pose(80, 8.3);
-            final Pose shootPose = new Pose(92, 51);
+            final Pose shootPose = new Pose(80, 27); // adjust values if distance is incorrect
 
-
-            ToShoot = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    startPose,
-
-                                    shootPose
-                            )
-                    ).setTangentHeadingInterpolation()
+            ToShoot = follower.pathBuilder()
+                    .addPath(new BezierLine(startPose, shootPose))
+                    .setTangentHeadingInterpolation()
                     .build();
-
-
         }
-
-
     }
 }
-
