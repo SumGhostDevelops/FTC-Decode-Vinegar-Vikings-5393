@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
+import org.firstinspires.ftc.teamcode.definitions.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.PedroConstants;
@@ -25,16 +26,32 @@ public class Blue extends Base {
     private Timer timer, opModeTimer;
     private Follower follower;
 
+    RobotContext robotContext = new RobotContext(team,hardwareMap,telemetry,gamepad1,gamepad2);
     private Paths.PathState currentPathState;
 
     public void runOpMode() throws InterruptedException {
         team = Team.BLUE;
-        super.runOpMode();
+
         initAuto();
         waitForStart();
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
+
+            robotContext.subsystems.transfer.open();
+            robotContext.subsystems.outtake.setTargetRPM(4000);
+            robotContext.subsystems.outtake.on();
+
+            for (int i = 0; i < 4; i++)
+            {
+                while (robotContext.subsystems.outtake.isReady())
+                {
+                    robotContext.subsystems.intake.in(0.6);
+                }
+                robotContext.subsystems.intake.stop();
+                Thread.sleep(3000);
+            }
             follower.followPath(paths.ToShoot);
+
 
 
             while (opModeIsActive() && !isStopRequested()) {
@@ -54,9 +71,6 @@ public class Blue extends Base {
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-        Thread.sleep(2000);
-        // add shoot
-        setPathState(Paths.PathState.ToShoot);
     }
 
     public void setPathState(Paths.PathState pathState) {
