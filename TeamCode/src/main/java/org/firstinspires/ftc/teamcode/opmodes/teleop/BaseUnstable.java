@@ -33,7 +33,7 @@ public abstract class BaseUnstable extends CommandOpMode
 {
     protected Team team;
     protected RobotContext robot;
-    private final Timer timer = new Timer(150, TimeUnit.SECONDS);
+    private final Timer timer = new Timer(120, TimeUnit.SECONDS);
 
     @Override
     public void initialize()
@@ -67,9 +67,9 @@ public abstract class BaseUnstable extends CommandOpMode
     {
         telemetry.clear();
         telemetry.addData("Team", team);
-        telemetry.addData("Remaining Time", timer.remainingTime() + "/150");
-        telemetry.addData("Distance to Goal (meters)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.METER).magnitude);
-        telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH).magnitude);
+        telemetry.addData("Remaining Time", timer.remainingTime() + "/120");
+        telemetry.addData("Distance to Goal", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.METER));
+        telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
         telemetry.addLine("--- Odometry ---");
         telemetry.addData("Raw Yaw", robot.hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
         telemetry.addData("Deg of Angle Implementation", robot.subsystems.odometry.getDriverHeading());
@@ -94,6 +94,7 @@ public abstract class BaseUnstable extends CommandOpMode
      */
     protected void update()
     {
+        robot.subsystems.outtake.setTargetRPMFromDistance(robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord));
         displayTelemetry();
         telemetry.update();
 
@@ -222,9 +223,9 @@ public abstract class BaseUnstable extends CommandOpMode
         // If the left trigger, right trigger, and outtake are ready, open the transfer and set the intake to a transfer mode
         driverLeftTrigger
                 .and(driverRightTrigger)
-                .whileActiveOnce(intakeTransfer)
+                .whileActiveOnce(transferOpen)
                 .and(outtakeReady)
-                .whileActiveOnce(transferShoot);
+                .whileActiveOnce(intakeTransfer);
 
 
         // When outtake becomes not ready, close transfer for a short duration and run intake in reverse to prevent accidental shots

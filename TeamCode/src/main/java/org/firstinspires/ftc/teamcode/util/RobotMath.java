@@ -108,16 +108,17 @@ public class RobotMath
         {
             // make sure all distances have .toUnit(dUnit)
             // distance, rpm
-            /* example stuff
             //Adding each val with a key
-            lut.add(1.1, 0.2);
-            lut.add(2.7, .5);
-            lut.add(3.6, 0.75);
-            lut.add(4.1, 0.9);
-            lut.add(5, 1);
+            /*
+            lut.add(1.529, 2250);
+            lut.add(1.911, 2400);
+            lut.add(3.872, 3300);
+            lut.add(2.934, 2950);
+
+
+             */
             //generating final equation
             lut.createLUT();
-             */
             lutInitialized = true;
         }
 
@@ -128,12 +129,8 @@ public class RobotMath
          */
         public static double rpmLUT(Distance dist)
         {
-            if (!lutInitialized)
-            {
-                initLUT();
-            }
-
-            return lut.get(dist.toUnit(dUnit).magnitude);
+            double meters = dist.toUnit(DistanceUnit.METER).magnitude;
+            return -223.05528*meters*meters + 1691.10697*meters + 34.64716;
         }
     }
 }

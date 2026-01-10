@@ -154,10 +154,10 @@ public class RobotConstants
             public static class Lens
             {
 
-                public static double LENS_FX = 1424.38;
-                public static double LENS_FY = 1424.38;
-                public static double LENS_CX = 637.325;
-                public static double LENS_CY = 256.774;
+                public static double LENS_FX = 958.876;
+                public static double LENS_FY = 958.876;
+                public static double LENS_CX = 654.11;
+                public static double LENS_CY = 358.336;
             }
 
             @Configurable
