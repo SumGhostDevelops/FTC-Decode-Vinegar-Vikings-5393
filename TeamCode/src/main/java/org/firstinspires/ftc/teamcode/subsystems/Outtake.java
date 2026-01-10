@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
@@ -22,6 +23,8 @@ public class Outtake extends SubsystemBase {
 
     private double targetRPM = RobotConstants.Outtake.BASE_RPM;
     private double setRPM = 0;
+
+    private Distance lastDistance = new Distance(0, DistanceUnit.INCH);
 
     // Tolerance to avoid tiny floating-point updates (adjust as needed)
     private static final double RPM_EPS = 1.0;
@@ -133,7 +136,21 @@ public class Outtake extends SubsystemBase {
 
     public void setTargetRPMFromDistance(Distance dist)
     {
-        setTargetRPM(RobotMath.Outtake.rpmLUT(dist));
+        if (!RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT)
+        {
+            return;
+        }
+
+        Distance epsilon = new Distance(1, DistanceUnit.INCH);
+
+        if (Math.abs(lastDistance.minus(dist).toUnit(epsilon.unit).magnitude) < epsilon.magnitude)
+        {
+            return;
+        }
+
+        lastDistance = dist;
+        double meters = dist.toUnit(DistanceUnit.METER).magnitude;
+        setTargetRPM(-223.05528*meters*meters + 1691.10697*meters + 34.64716);
     }
 
     public double getTargetRPM()

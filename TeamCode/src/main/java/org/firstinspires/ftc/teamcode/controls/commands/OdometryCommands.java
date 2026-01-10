@@ -21,13 +21,20 @@ public class OdometryCommands
 
     /**
      * Attempts to localize the robot using AprilTag detection.
-     * Logs success or failure to telemetry.
+     * Logs success or failure to telemetry, along with raw AprilTag data for debugging.
      */
     public static class Localize extends InstantCommand
     {
         public Localize(OdometryControlHub odometry, Telemetry telemetry)
         {
             super(() -> {
+                // Get raw data before localization for debugging
+                String rawData = odometry.getRawAprilTagData();
+                if (rawData != null)
+                {
+                    telemetry.log().add("AprilTag: " + rawData);
+                }
+
                 boolean success = odometry.localize();
                 if (success)
                 {

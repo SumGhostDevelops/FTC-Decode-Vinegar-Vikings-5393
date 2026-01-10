@@ -124,6 +124,8 @@ public class OdometryControlHub extends SubsystemBase
         if (possibleTag.isEmpty()) return false;
 
         // get the apriltag and the pose it has estimated
+        // Note: robotPose already accounts for camera offset since we configured
+        // the AprilTagProcessor with setCameraPose() in the Webcam class
         AprilTagDetection tag = possibleTag.get();
         Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose);
 
@@ -147,6 +149,31 @@ public class OdometryControlHub extends SubsystemBase
         dwHandler = new DeadwheelHandler(estimatedPose, dwPar.getPosition(), dwPerp.getPosition());
 
         return true;
+    }
+
+    /**
+     * Gets raw AprilTag detection data for debugging. Does not modify robot state.
+     * @return String with raw AprilTag pose data, or null if no tag detected
+     */
+    public String getRawAprilTagData()
+    {
+        webcam.updateDetections();
+        Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
+        if (possibleTag.isEmpty()) return null;
+
+        AprilTagDetection tag = possibleTag.get();
+        return String.format(
+            "ID=%d | Raw XYZ: (%.2f, %.2f, %.2f) %s | Yaw: %.1f° | Converted Pose: (%.2f, %.2f) in, heading: %.1f°",
+            tag.id,
+            tag.robotPose.getPosition().x,
+            tag.robotPose.getPosition().y,
+            tag.robotPose.getPosition().z,
+            tag.robotPose.getPosition().unit.toString(),
+            tag.robotPose.getOrientation().getYaw(AngleUnit.DEGREES),
+            Pose2d.fromPose3D(tag.robotPose).coord.x.getDistance(DistanceUnit.INCH),
+            Pose2d.fromPose3D(tag.robotPose).coord.y.getDistance(DistanceUnit.INCH),
+            Pose2d.fromPose3D(tag.robotPose).heading.getAngle(AngleUnit.DEGREES)
+        );
     }
 
     @Override

@@ -17,7 +17,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static boolean ENERGY_SAVER_MODE = false;
+        public static boolean ENERGY_SAVER_MODE = true;
     }
 
     @Configurable
@@ -66,6 +66,7 @@ public class RobotConstants
         public static int PPR = 28;
         public static int BASE_RPM = 3700;
         public static boolean IDLE_WHEN_END = false && !General.ENERGY_SAVER_MODE;
+        public static boolean AUTO_DISTANCE_ADJUSMENT = false;
 
         public static class Name
         {
@@ -76,7 +77,7 @@ public class RobotConstants
         @Configurable
         public static class Coefficients
         {
-            public static double[] veloCoeffs = new double[]{20, 5, -10, -2};
+            public static double[] veloCoeffs = new double[]{200, 0, 0, 15};
         }
 
         @Configurable
@@ -107,11 +108,20 @@ public class RobotConstants
         public static String TRANSFER = "transfer";
         public static double SERVO_RANGE = 360.0; // Physical servo range in degrees
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
-        public static double CLOSED_INTAKE_ANGLE = 0; // An angle where the trapdoor blocks balls from entering
-        public static double CLOSED_TRANSFER_ANGLE = 210;
+        public static double CLOSED_INTAKE_ANGLE = 210; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSED_TRANSFER_ANGLE = 0;
         public static double autoCloseMs = 500; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
         public static boolean autoTransferPrevent = false;
         public static boolean testingKeybinds = false;
+        public static boolean RELEASE_ALL_BALLS_WHEN_READY = true;
+
+        @Configurable
+        public static class TimerConstants
+        {
+            public static int totalTime = 600;
+            public static int upTime = 300;
+            public static int downTime = 300;
+        }
     }
 
     @Configurable
@@ -124,7 +134,8 @@ public class RobotConstants
         public static boolean automaticBehavior = false && !General.ENERGY_SAVER_MODE;
         public static double intakePower = 0.6;
         public static double outtakePower = 0.5;
-        public static double transferPassPower = 0.55;
+        public static double transferPassPower = 0.35;
+        public static double transferPassPowerSpeed = 0.5;
         public static double transferPreventPower = 1.0;
 
         public static double transferPreventDurationMs = 100;
@@ -163,8 +174,22 @@ public class RobotConstants
             @Configurable
             public static class Offset
             {
-                public static double X = 0.0;
-                public static double Y = 0.0;
+                // Position of camera relative to robot center
+                // Uses FTC SDK conventions for setCameraPose():
+                // X: Left/right (positive = RIGHT of center)
+                // Y: Forward/backward (positive = FORWARD of center)
+                // Z: Height above ground
+                public static Distance X = new Distance(0, DistanceUnit.INCH); // camera centered left/right
+                public static Distance Y = new Distance(4.75, DistanceUnit.INCH); // camera forward of center
+                public static Distance Z = new Distance(9, DistanceUnit.INCH);
+
+                // Camera orientation (YawPitchRoll)
+                // Yaw: 0 = pointing forward, +90 = pointing left, -90 = pointing right
+                // Pitch: -90 = horizontal (pointing forward), 0 = pointing straight up
+                // Roll: 0 = level, +/-90 = vertical, 180 = upside-down
+                public static Angle YAW = new Angle(0, AngleUnit.DEGREES);
+                public static Angle PITCH = new Angle(-90, AngleUnit.DEGREES); // horizontal camera
+                public static Angle ROLL = new Angle(0, AngleUnit.DEGREES);
             }
         }
 

@@ -162,9 +162,9 @@ public abstract class BaseUnstable extends CommandOpMode
         }
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 25));
+                .whileHeld(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 25));
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -25));
+                .whileHeld(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -25));
 
         if (RobotConstants.Transfer.testingKeybinds)
         {
@@ -178,9 +178,9 @@ public abstract class BaseUnstable extends CommandOpMode
         else
         {
             driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                    .whenPressed(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
+                    .whileHeld(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
             driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                    .whenPressed(new IntakeCommands.In(subsystems.intake, () -> 1.0));
+                    .whileHeld(new TransferCommands.CloseTransfer(subsystems.transfer));
         }
 
         Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
@@ -191,7 +191,9 @@ public abstract class BaseUnstable extends CommandOpMode
         Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
         Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
         Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
-        Command transferShoot = new TransferCommands.ShootingTransfer2(subsystems.transfer);
+        Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
+        Command transferCloseIntake = new TransferCommands.CloseIntake(subsystems.transfer);
+        Command transferCloseTransfer = new TransferCommands.CloseIntake(subsystems.transfer);
         Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
 
         if (RobotConstants.Intake.automaticBehavior)
@@ -216,24 +218,37 @@ public abstract class BaseUnstable extends CommandOpMode
         // If we are holding down the left trigger, and we are not holding down the right trigger, set the transfer to a blocking state
         driverLeftTrigger
                 .and(driverRightTrigger.negate())
-                .whileActiveOnce(new TransferCommands.CloseIntake(subsystems.transfer));
+                .whileActiveOnce(transferCloseIntake);
 
-        // Transfer mode: Both triggers pressed AND outtake is ready
-        // Runs both intake and transfer while all conditions are met
-        // If the left trigger, right trigger, and outtake are ready, open the transfer and set the intake to a transfer mode
-        driverLeftTrigger
-                .and(driverRightTrigger)
-                .whileActiveOnce(transferOpen)
-                .and(outtakeReady)
-                .whileActiveOnce(intakeTransfer);
+        if (!RobotConstants.Transfer.RELEASE_ALL_BALLS_WHEN_READY)
+        {
+            // Transfer mode: Both triggers pressed AND outtake is ready
+            // Runs both intake and transfer while all conditions are met
+            // If the left trigger, right trigger, and outtake are ready, open the transfer and set the intake to a transfer mode
+            driverLeftTrigger
+                    .and(driverRightTrigger)
+                    .whileActiveOnce(transferOpen)
+                    .and(outtakeReady)
+                    .whileActiveOnce(intakeTransfer);
+        }
+        else
+        {
+            driverLeftTrigger
+                    .and(driverRightTrigger)
+                    .whileActiveOnce(transferOpen)
+                    .and(outtakeReady)
+                    .whenActive(intakeTransfer);
 
+            driverLeftTrigger.negate().cancelWhenActive(intakeTransfer);
+            driverRightTrigger.negate().cancelWhenActive(intakeTransfer);
+        }
 
         // When outtake becomes not ready, close transfer for a short duration and run intake in reverse to prevent accidental shots
         // When the outtake goes from ready -> not ready, forcibly turn the intake in reverse and put the transfer in a block-allow state
 
         if (RobotConstants.Transfer.autoTransferPrevent)
         {
-            outtakeReady.whenInactive(new IntakeCommands.TransferPreventForDuration(subsystems.intake, RobotConstants.Intake.transferPreventPower, RobotConstants.Intake.transferPreventDurationMs), true).whenInactive(new TransferCommands.CloseTransferForDuration(subsystems.transfer, RobotConstants.Transfer.autoCloseMs), true);
+            outtakeReady.whenInactive(new IntakeCommands.TransferPreventForDuration(subsystems.intake, RobotConstants.Intake.transferPreventPower, RobotConstants.Intake.transferPreventDurationMs), false).whenInactive(new TransferCommands.CloseTransferForDuration(subsystems.transfer, RobotConstants.Transfer.autoCloseMs), false);
         }
 
         // Outtake: Right trigger spins up flywheel

@@ -4,6 +4,8 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.util.Timing.Timer;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
@@ -95,19 +97,13 @@ public class TransferCommands
         {
             transfer.open();
             try {
-                Thread.sleep(600);
+                Thread.sleep(RobotConstants.Transfer.TimerConstants.upTime);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             transfer.close(Transfer.CloseType.TRANSFER);
             try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            transfer.close(Transfer.CloseType.INTAKE);
-            try {
-                Thread.sleep(600);
+                Thread.sleep(RobotConstants.Transfer.TimerConstants.downTime);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -119,11 +115,16 @@ public class TransferCommands
     public static class ShootingTransfer2 extends CommandBase
     {
         private final Transfer transfer;
-        private final Timer timer = new Timer(1500, TimeUnit.MILLISECONDS);
+        private final Timer timer;
         private final boolean[] stepsCompleted = new boolean[]{false, false, false};
 
-        public ShootingTransfer2(Transfer transfer) {
+        private Telemetry telemetry;
+
+        public ShootingTransfer2(Transfer transfer, Telemetry telemetry) {
             this.transfer = transfer;
+            this.telemetry = telemetry;
+            timer = new Timer(RobotConstants.Transfer.TimerConstants.totalTime, TimeUnit.MILLISECONDS);
+            timer.pause();
             addRequirements(transfer);
         }
 
@@ -140,21 +141,17 @@ public class TransferCommands
                 transfer.open();
                 stepsCompleted[0] = true;
             }
-            else if (timer.elapsedTime() >= 600 && !stepsCompleted[1])
+            else if (timer.elapsedTime() >= RobotConstants.Transfer.TimerConstants.upTime && !stepsCompleted[1])
             {
                 transfer.close(Transfer.CloseType.TRANSFER);
                 stepsCompleted[1] = true;
-            }
-            else if (timer.elapsedTime() >= 900 && !stepsCompleted[2])
-            {
-                transfer.close(Transfer.CloseType.INTAKE);
-                stepsCompleted[2] = true;
             }
         }
 
         @Override
         public boolean isFinished()
         {
+            telemetry.log().add("Transfer timer remaining", (int) timer.remainingTime());
             return timer.done();
         }
 

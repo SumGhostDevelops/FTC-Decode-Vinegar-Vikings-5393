@@ -5,6 +5,8 @@ import android.util.Size;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -26,22 +28,37 @@ public class Webcam
 
     public Webcam(WebcamName webcam)
     {
-        this(webcam, DistanceUnit.METER, false);
+        this(webcam, DistanceUnit.METER, true);
     }
 
     protected Webcam(WebcamName webcam, DistanceUnit unit)
     {
-        this(webcam, unit, false);
+        this(webcam, unit, true);
     }
 
     protected Webcam(WebcamName webcam, DistanceUnit unit, boolean showLiveView)
     {
+        // Camera position relative to robot center
+        Position cameraPosition = new Position(DistanceUnit.INCH,
+                RobotConstants.Odometry.Webcam.Offset.X.getDistance(DistanceUnit.INCH),
+                RobotConstants.Odometry.Webcam.Offset.Y.getDistance(DistanceUnit.INCH),
+                RobotConstants.Odometry.Webcam.Offset.Z.getDistance(DistanceUnit.INCH),
+                0);
+
+        // Camera orientation (yaw, pitch, roll)
+        YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
+                RobotConstants.Odometry.Webcam.Offset.YAW.getAngle(AngleUnit.DEGREES),
+                RobotConstants.Odometry.Webcam.Offset.PITCH.getAngle(AngleUnit.DEGREES),
+                RobotConstants.Odometry.Webcam.Offset.ROLL.getAngle(AngleUnit.DEGREES),
+                0);
+
         tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(showLiveView)
                 .setDrawCubeProjection(showLiveView)
                 .setDrawTagID(showLiveView)
                 .setDrawTagOutline(showLiveView)
                 .setLensIntrinsics(RobotConstants.Odometry.Webcam.Lens.LENS_FX, RobotConstants.Odometry.Webcam.Lens.LENS_FY, RobotConstants.Odometry.Webcam.Lens.LENS_CX, RobotConstants.Odometry.Webcam.Lens.LENS_CY)
+                .setCameraPose(cameraPosition, cameraOrientation)
                 .setOutputUnits(unit, AngleUnit.DEGREES)
                 .build();
 

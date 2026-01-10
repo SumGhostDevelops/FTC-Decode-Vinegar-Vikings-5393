@@ -229,7 +229,7 @@ public class Turret extends SubsystemBase
     {
         if (!turretMotor.motorEx.isBusy()) // check if the motor is currently going to a target
         {
-            if (this.lockToPosition) // if not, and we should be "locked" to a position
+            if (this.lockToPosition && !RobotConstants.Turret.autoAimToGoal) // if not, and we should be "locked" to a position
             {
                 aim(); // aim to that position
             }
