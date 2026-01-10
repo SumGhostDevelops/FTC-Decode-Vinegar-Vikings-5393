@@ -152,6 +152,31 @@ public class OdometryControlHub extends SubsystemBase
     }
 
     /**
+     * Manually sets the robot's position and heading based on a known reference pose.
+     * Use this when the robot is placed at a known location (e.g., from CornersCoordinates).
+     * The driver's relative forward reference is preserved so field-centric driving remains consistent.
+     * @param referencePose The known pose of the robot on the field
+     */
+    public void updateReferencePose(Pose2d referencePose)
+    {
+        // Preserve driver's relative heading before we change headingOffset
+        Angle currentDriverHeading = getAngle().minus(driverForward);
+
+        // Compute new headingOffset so getAngle() returns the reference pose heading
+        // headingOffset = referencePose.heading - currentIMUYaw
+        Angle currentImuYaw = getIMUYaw(aUnit);
+        headingOffset = referencePose.heading.toUnit(aUnit).minus(currentImuYaw);
+
+        // Update driverForward so getDriverHeading() still returns the same value
+        driverForward = referencePose.heading.toUnit(aUnit).minus(currentDriverHeading);
+
+        // reset encoders and re-create handler with current baseline and the new reference pose
+        dwPar.reset();
+        dwPerp.reset();
+        dwHandler = new DeadwheelHandler(referencePose, dwPar.getPosition(), dwPerp.getPosition());
+    }
+
+    /**
      * Gets raw AprilTag detection data for debugging. Does not modify robot state.
      * @return String with raw AprilTag pose data, or null if no tag detected
      */
