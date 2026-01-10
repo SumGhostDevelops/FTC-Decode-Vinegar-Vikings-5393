@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
 import org.firstinspires.ftc.teamcode.definitions.PedroConstants;
 
+@Autonomous(name = "BlueBetterAuto")
 public class Blue extends Base {
 
     private Paths paths;
@@ -34,7 +35,7 @@ public class Blue extends Base {
             opModeTimer.resetTimer();
 
             robotContext.subsystems.transfer.open();
-            robotContext.subsystems.outtake.setTargetRPM(4000);
+            robotContext.subsystems.outtake.setTargetRPM(4200);
             robotContext.subsystems.outtake.on();
 
             // Feed 4 rings: wait until shooter is ready, then pulse the intake to feed
@@ -53,6 +54,7 @@ public class Blue extends Base {
                 Thread.sleep(300);
             }
 
+            /*
             // start path after shooting
             follower.followPath(paths.ToShoot);
 
@@ -64,6 +66,8 @@ public class Blue extends Base {
                 telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
                 telemetry.update();
             }
+
+             */
         }
     }
 

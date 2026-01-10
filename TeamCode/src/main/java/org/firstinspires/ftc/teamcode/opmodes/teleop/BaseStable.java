@@ -256,9 +256,9 @@ public abstract class BaseStable extends CommandOpMode
                 .whileActiveOnce(outtakeOn);
 
         // Co driver localization
-        coDriver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_GOAL));
-        coDriver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_GOAL));
-        coDriver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_LOADING_ZONE));
-        coDriver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_LOADING_ZONE));
+        coDriver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_GOAL));
+        coDriver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_GOAL));
+        coDriver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_LOADING_ZONE));
+        coDriver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_LOADING_ZONE));
     }
 }

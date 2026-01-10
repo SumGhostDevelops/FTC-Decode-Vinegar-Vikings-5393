@@ -136,7 +136,7 @@ public class RobotConstants
         public static boolean automaticBehavior = false && !General.ENERGY_SAVER_MODE;
         public static double intakePower = 0.6;
         public static double outtakePower = 0.5;
-        public static double transferPassPower = 0.4;
+        public static double transferPassPower = 0.7;
         public static double transferPassPowerSpeed = 0.5;
         public static double transferPreventPower = 1.0;
 

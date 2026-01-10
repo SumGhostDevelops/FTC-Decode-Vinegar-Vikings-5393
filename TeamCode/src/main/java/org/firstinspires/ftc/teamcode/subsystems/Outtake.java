@@ -152,7 +152,7 @@ public class Outtake extends SubsystemBase {
         double distance = dist.toUnit(DistanceUnit.INCH).magnitude;
 
         // regression is in inches
-        setTargetRPM(0.388614*Math.pow(distance, 2) - 47.89998 * distance + 4458.86043);
+        setTargetRPM(0.00444146*Math.pow(distance, 2) + 14.06355 * distance + 2167.42661);
     }
 
     public double getTargetRPM()
