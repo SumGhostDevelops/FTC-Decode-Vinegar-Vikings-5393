@@ -10,6 +10,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Const;
+import org.firstinspires.ftc.teamcode.controls.BlockingCommands;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.Team;
@@ -55,7 +56,8 @@ public class Red extends Base
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-        wait(2000);
+
+        Thread.sleep(2000);
         // add shoot
         setPathState(Paths.PathState.ToShoot);
     }

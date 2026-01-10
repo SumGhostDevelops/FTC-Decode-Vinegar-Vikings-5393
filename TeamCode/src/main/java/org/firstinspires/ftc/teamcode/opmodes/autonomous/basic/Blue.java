@@ -48,13 +48,13 @@ public class Blue extends Base {
             }
         }
     }
-    public void initAuto() {
+    public void initAuto() throws InterruptedException {
         follower = PedroConstants.createFollower(hardwareMap);
         paths = new Paths(follower);
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-        sleep(2000);
+        Thread.sleep(2000);
         // add shoot
         setPathState(Paths.PathState.ToShoot);
     }
