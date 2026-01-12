@@ -1,6 +1,7 @@
 // java
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.basic;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -17,6 +18,15 @@ import org.firstinspires.ftc.teamcode.definitions.PedroConstants;
 
 @Autonomous(name = "BlueBetterAuto")
 public class Blue extends Base {
+
+    @Configurable
+    public static class Constants
+    {
+        public static double targetRPM = 4200;
+        public static long lengthOfDrivingMs = 1000;
+        public static long feedDuration = 300;
+        public static long timeBetweenShots = 300;
+    }
 
     private Paths paths;
     private Timer timer, opModeTimer;
@@ -35,7 +45,7 @@ public class Blue extends Base {
             opModeTimer.resetTimer();
 
             robotContext.subsystems.transfer.open();
-            robotContext.subsystems.outtake.setTargetRPM(4200);
+            robotContext.subsystems.outtake.setTargetRPM(Constants.targetRPM);
             robotContext.subsystems.outtake.on();
 
             // Feed 4 rings: wait until shooter is ready, then pulse the intake to feed
@@ -47,11 +57,11 @@ public class Blue extends Base {
 
                 // pulse intake to feed one ring
                 robotContext.subsystems.intake.in(0.6);
-                Thread.sleep(300); // feed duration, tune as needed
+                Thread.sleep(Constants.feedDuration); // feed duration, tune as needed
                 robotContext.subsystems.intake.stop();
 
                 // short delay between shots
-                Thread.sleep(300);
+                Thread.sleep(Constants.timeBetweenShots);
             }
 
             /*
@@ -68,6 +78,10 @@ public class Blue extends Base {
             }
 
              */
+
+            robotContext.subsystems.drive.setDrivePowers(1, 1, 1, 1);
+            Thread.sleep(Constants.lengthOfDrivingMs);
+            robotContext.subsystems.drive.stop();
         }
     }
 
