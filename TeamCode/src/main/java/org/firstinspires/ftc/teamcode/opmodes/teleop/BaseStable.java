@@ -152,11 +152,11 @@ public abstract class BaseStable extends CommandOpMode
                 .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(subsystems.odometry));
 
         // X button: Attempt AprilTag localization
-        /*
+
         driver.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new OdometryCommands.Localize(subsystems.odometry, telemetry));
 
-         */
+
 
         if (RobotConstants.Turret.autoAimToGoal)
         {
