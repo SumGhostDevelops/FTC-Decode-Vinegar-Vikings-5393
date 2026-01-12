@@ -39,7 +39,7 @@ public class RobotHardware
 
             try
             {
-                frontLeft = new MotorExPlus(hardwareMap, RobotConstants.Drive.FRONT_LEFT, Motor.GoBILDA.RPM_312);
+                frontLeft = new MotorExPlus(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT, Motor.GoBILDA.RPM_312);
                 frontLeft.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
@@ -50,7 +50,7 @@ public class RobotHardware
 
             try
             {
-                frontRight = new MotorExPlus(hardwareMap, RobotConstants.Drive.FRONT_RIGHT, Motor.GoBILDA.RPM_312);
+                frontRight = new MotorExPlus(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT, Motor.GoBILDA.RPM_312);
                 frontRight.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
@@ -61,7 +61,7 @@ public class RobotHardware
 
             try
             {
-                backLeft = new MotorExPlus(hardwareMap, RobotConstants.Drive.BACK_LEFT, Motor.GoBILDA.RPM_312);
+                backLeft = new MotorExPlus(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT, Motor.GoBILDA.RPM_312);
                 backLeft.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
@@ -72,7 +72,7 @@ public class RobotHardware
 
             try
             {
-                backRight = new MotorExPlus(hardwareMap, RobotConstants.Drive.BACK_RIGHT, Motor.GoBILDA.RPM_312);
+                backRight = new MotorExPlus(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT, Motor.GoBILDA.RPM_312);
                 backRight.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
             }
             catch (Exception e)
@@ -147,7 +147,7 @@ public class RobotHardware
 
         try
         {
-            turret = new MotorExPlus(hardwareMap, RobotConstants.Turret.TURRET, Motor.GoBILDA.RPM_312);
+            turret = new MotorExPlus(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_312);
             turret.motorEx.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             turret.motorEx.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             turret.setRunMode(Motor.RunMode.PositionControl);
@@ -167,8 +167,8 @@ public class RobotHardware
 
         try
         {
-            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.TRANSFER, RobotConstants.Transfer.SERVO_RANGE, AngleUnit.DEGREES);
-            transfer.set(RobotConstants.Transfer.CLOSED_TRANSFER_ANGLE);
+            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.NAME, RobotConstants.Transfer.SERVO_RANGE, AngleUnit.DEGREES);
+            transfer.set(RobotConstants.Transfer.CLOSED_FULL_TRANSFER_ANGLE);
         }
         catch (Exception e)
         {

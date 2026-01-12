@@ -7,7 +7,6 @@ import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.TwoWheelConstants;
-import com.pedropathing.localization.Localizer;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -24,10 +23,10 @@ public class PedroConstants {
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .rightFrontMotorName(RobotConstants.Drive.FRONT_RIGHT)
-            .rightRearMotorName(RobotConstants.Drive.BACK_RIGHT)
-            .leftRearMotorName(RobotConstants.Drive.BACK_LEFT)
-            .leftFrontMotorName(RobotConstants.Drive.FRONT_LEFT)
+            .rightFrontMotorName(RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT)
+            .rightRearMotorName(RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT)
+            .leftRearMotorName(RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT)
+            .leftFrontMotorName(RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT)
             // typical sign layout: left motors reversed, right motors forward
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
@@ -36,8 +35,8 @@ public class PedroConstants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName(RobotConstants.Drive.BACK_LEFT)
-            .strafeEncoder_HardwareMapName(RobotConstants.Drive.BACK_RIGHT)
+            .forwardEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT)
+            .strafeEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT)
             .forwardEncoderDirection(Encoder.REVERSE)
             .strafeEncoderDirection(Encoder.FORWARD)
             .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)

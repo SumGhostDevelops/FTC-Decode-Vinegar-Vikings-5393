@@ -4,8 +4,10 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class OuttakeCommands
 {
@@ -90,6 +92,14 @@ public class OuttakeCommands
         public ChangeTargetRPM(Outtake outtake, double rpm)
         {
             super(() -> outtake.setTargetRPM(outtake.getTargetRPM() + rpm), outtake);
+        }
+    }
+
+    public static class UpdateRPMBasedOnDistance extends InstantCommand
+    {
+        public UpdateRPMBasedOnDistance(Outtake outtake, Supplier<Distance> distance)
+        {
+            outtake.setTargetRPMFromDistance(distance.get());
         }
     }
 }

@@ -32,6 +32,11 @@ public class Transfer extends SubsystemBase
         transfer.set(RobotConstants.Transfer.OPEN_ANGLE);
     }
 
+    public void transfer()
+    {
+        transfer.set(RobotConstants.Transfer.TRANSFER_ANGLE);
+    }
+
     public void close()
     {
         transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
@@ -47,7 +52,7 @@ public class Transfer extends SubsystemBase
                 leftSide = true;
                 break;
             case TRANSFER:
-                transfer.set(RobotConstants.Transfer.CLOSED_TRANSFER_ANGLE);
+                transfer.set(RobotConstants.Transfer.CLOSED_FULL_TRANSFER_ANGLE);
                 leftSide = false;
                 break;
         }

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.controls.commands.OdometryCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.OuttakeCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.TransferCommands;
 import org.firstinspires.ftc.teamcode.controls.commands.TurretCommands;
+import org.firstinspires.ftc.teamcode.definitions.ConstantsPresets;
 import org.firstinspires.ftc.teamcode.definitions.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.Team;
@@ -39,6 +40,7 @@ public abstract class BaseStable extends CommandOpMode
     @Override
     public void initialize()
     {
+        ConstantsPresets.applyPreset();
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
 
         // Initialize Panels Field with FTC Standard coordinates
@@ -101,7 +103,6 @@ public abstract class BaseStable extends CommandOpMode
      */
     protected void update()
     {
-        robot.subsystems.outtake.setTargetRPMFromDistance(robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord));
         displayTelemetry();
         telemetry.update();
 
@@ -142,6 +143,18 @@ public abstract class BaseStable extends CommandOpMode
         Subsystems subsystems = robot.subsystems;
 
         Trigger opModeIsActive = new Trigger(this::opModeIsActive);
+        Trigger outtakeReady = new Trigger(subsystems.outtake::isReady);
+
+        Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
+        Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
+
+        Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
+        Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
+        Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
+        Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
+        Command transferCloseIntake = new TransferCommands.CloseIntake(subsystems.transfer);
+        Command transferCloseTransfer = new TransferCommands.CloseTransfer(subsystems.transfer);
+        Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_BY_DEFAULT);
 
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new DriveCommands.DecreaseSpeed(subsystems.drive));
@@ -156,11 +169,9 @@ public abstract class BaseStable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new OdometryCommands.Localize(subsystems.odometry, telemetry));
 
-
-
         if (RobotConstants.Turret.autoAimToGoal)
         {
-            opModeIsActive.whileActiveOnce(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
+            opModeIsActive.whileActiveContinuous(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
         }
         else
         {
@@ -172,9 +183,13 @@ public abstract class BaseStable extends CommandOpMode
         if (RobotConstants.General.REGRESSION_TESTING_MODE)
         {
             driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                    .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 100));
+                    .whileHeld(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 25));
             driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                    .whenPressed(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -100));
+                    .whileHeld(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -25));
+        }
+        else
+        {
+            opModeIsActive.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(subsystems.outtake, () -> robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord)));
         }
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
@@ -182,20 +197,7 @@ public abstract class BaseStable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
                 .whileHeld(new TransferCommands.CloseIntake(subsystems.transfer));
 
-        Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
-        Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
-
-        Trigger outtakeReady = new Trigger(subsystems.outtake::isReady);
-
-        Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
-        Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
-        Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
-        Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
-        Command transferCloseIntake = new TransferCommands.CloseIntake(subsystems.transfer);
-        Command transferCloseTransfer = new TransferCommands.CloseTransfer(subsystems.transfer);
-        Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_WHEN_END);
-
-        if (RobotConstants.Intake.automaticBehavior)
+        if (RobotConstants.Intake.INTAKE_BY_DEFAULT)
         {
             // Intake mode: Automatic
             // If the op mode is active, and we are not holding down the left trigger, turn the intake on
