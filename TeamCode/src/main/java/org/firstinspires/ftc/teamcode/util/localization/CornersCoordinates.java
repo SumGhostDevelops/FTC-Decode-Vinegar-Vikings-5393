@@ -19,8 +19,8 @@ public class CornersCoordinates
     private static final DistanceUnit INCH = DistanceUnit.INCH;
     private static final AngleUnit DEGREES = AngleUnit.DEGREES;
 
-    public static final Pose2d BLUE_LOADING_ZONE = new Pose2d(new FieldCoordinate(new Distance(136, INCH), new Distance(8.625, INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(90, DEGREES));
-    public static final Pose2d RED_LOADING_ZONE = new Pose2d(new FieldCoordinate(new Distance(8, INCH), new Distance(8.625, INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(90, DEGREES));
+    public static final Pose2d BLUE_LOADING_ZONE = new Pose2d(new FieldCoordinate(new Distance(136, INCH), new Distance(8.625, INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(0, DEGREES));
+    public static final Pose2d RED_LOADING_ZONE = new Pose2d(new FieldCoordinate(new Distance(8, INCH), new Distance(8.625, INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(180, DEGREES));
 
     public static final Pose2d BLUE_GOAL = new Pose2d(new FieldCoordinate(new Distance(23.35, INCH), new Distance(127.41, INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(144, DEGREES));
     public static final Pose2d RED_GOAL = new Pose2d(new FieldCoordinate(new Distance(120.74, INCH), new Distance(127.41, INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(36, DEGREES));

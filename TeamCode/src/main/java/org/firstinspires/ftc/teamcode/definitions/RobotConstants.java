@@ -69,6 +69,7 @@ public class RobotConstants
         public static int BASE_RPM = 3700;
         public static boolean IDLE_WHEN_END = false && !General.ENERGY_SAVER_MODE;
         public static boolean AUTO_DISTANCE_ADJUSMENT = true && !General.REGRESSION_TESTING_MODE;
+        public static double GEAR_RATIO = 1.5; // driver::driving 3::2
 
         public static class Name
         {
