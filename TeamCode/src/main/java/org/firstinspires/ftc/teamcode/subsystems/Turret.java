@@ -219,9 +219,9 @@ public class Turret extends SubsystemBase
         return RobotMath.Motor.angleToTicks(angle, RobotConstants.Turret.PPR, RobotConstants.Turret.GEAR_RATIO);
     }
 
-    public int getTargetPosition()
+    public Angle bearingToTarget()
     {
-        return targetPosition;
+        return RobotMath.Motor.ticksToAngle(turretMotor.motorEx.getCurrentPosition() - targetPosition, RobotConstants.Turret.PPR, RobotConstants.Turret.GEAR_RATIO);
     }
 
     @Override

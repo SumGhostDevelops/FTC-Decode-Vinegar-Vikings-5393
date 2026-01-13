@@ -68,34 +68,59 @@ public abstract class BaseStable extends CommandOpMode
      */
     protected void displayTelemetry()
     {
-        if (RobotConstants.Telemetry.SET_AUTOCLEAR)
+        if (RobotConstants.Telemetry.SET_AUTOCLEAR) telemetry.clear();
+        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS) telemetry.log().clear();
+
+        switch (RobotConstants.General.PRESET_OPTION)
         {
-            telemetry.clear();
+            case DEFAULT:
+            case COMPETITION:
+                telemetry.addLine("--- Co Driver Keybinds ---");
+                telemetry.addLine("DPAD UP: BLUE GOAL");
+                telemetry.addLine("DPAD RIGHT: RED GOAL");
+                telemetry.addLine("DPAD DOWN: BLUE LOADING ZONE");
+                telemetry.addLine("DPAD LEFT: RED LOADING ZONE");
+                telemetry.addLine("RIGHT BUMPER: SMALL/FAR TRIANGLE");
+                telemetry.addLine("------");
+                telemetry.addData("Team", team);
+                telemetry.addData("Remaining Time", timer.remainingTime() + "/120");
+                telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
+                telemetry.addLine("--- Odometry ---");
+                telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addLine("--- Drive ---");
+                telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
+                telemetry.addLine("--- Outtake ---");
+                telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
+                telemetry.addData("True RPM", robot.subsystems.outtake.getRPM());
+                telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
+                telemetry.addLine("--- Turret ---");
+                telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
+            case TESTING:
+                telemetry.addLine("--- Co Driver Keybinds ---");
+                telemetry.addLine("DPAD UP: BLUE GOAL");
+                telemetry.addLine("DPAD RIGHT: RED GOAL");
+                telemetry.addLine("DPAD DOWN: BLUE LOADING ZONE");
+                telemetry.addLine("DPAD LEFT: RED LOADING ZONE");
+                telemetry.addLine("RIGHT BUMPER: SMALL/FAR TRIANGLE");
+                telemetry.addLine("------");
+                telemetry.addData("Team", team);
+                telemetry.addData("Distance to Goal", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
+                telemetry.addLine("--- Odometry ---");
+                telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addLine("--- Drive ---");
+                telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
+                telemetry.addLine("--- Outtake ---");
+                telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
+                telemetry.addData("RPM", robot.subsystems.outtake.getRPM());
+                telemetry.addData("Acceleration", robot.subsystems.outtake.getRPMAcceleration());
+                telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
+                telemetry.addLine("--- Turret ---");
+                telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Bearing to Target", robot.subsystems.turret.bearingToTarget());
         }
-        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS)
-        {
-            telemetry.log().clear();
-        }
-        telemetry.addLine("--- Co Driver Keybinds ---");
-        telemetry.addLine("DPAD UP: BLUE GOAL");
-        telemetry.addLine("DPAD RIGHT: RED GOAL");
-        telemetry.addLine("DPAD DOWN: BLUE LOADING ZONE");
-        telemetry.addLine("DPAD LEFT: RED LOADING ZONE");
-        telemetry.addLine("------");
-        telemetry.addData("Team", team);
-        telemetry.addData("Remaining Time", timer.remainingTime() + "/120");
-        telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
-        telemetry.addLine("--- Odometry ---");
-        telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
-        telemetry.addLine("--- Drive ---");
-        telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
-        telemetry.addLine("--- Outtake ---");
-        telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
-        telemetry.addData("True RPM", robot.subsystems.outtake.getRPM());
-        telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
-        telemetry.addLine("--- Turret ---");
-        telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
-        telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
     }
 
     /**
@@ -105,7 +130,6 @@ public abstract class BaseStable extends CommandOpMode
     {
         displayTelemetry();
         telemetry.update();
-
         // Draw robot position on Panels Dashboard Field panel
         FieldDrawing.drawRobot(
                 robot.subsystems.odometry.getPose(),
@@ -161,6 +185,10 @@ public abstract class BaseStable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new DriveCommands.IncreaseSpeed(subsystems.drive));
 
+        if (RobotConstants.General.PRESET_OPTION.equals(ConstantsPresets.Preset.TESTING))
+        {
+            driver.getGamepadButton(GamepadKeys.Button.A).toggleWhenPressed(subsystems.transfer::close, subsystems.transfer::open);
+        }
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(subsystems.odometry));
 
@@ -221,36 +249,12 @@ public abstract class BaseStable extends CommandOpMode
                 .and(driverRightTrigger.negate())
                 .whileActiveOnce(transferCloseTransfer);
 
-        if (!RobotConstants.Transfer.RELEASE_ALL_BALLS_WHEN_READY)
-        {
-            // Transfer mode: Both triggers pressed AND outtake is ready
-            // Runs both intake and transfer while all conditions are met
-            // If the left trigger, right trigger, and outtake are ready, open the transfer and set the intake to a transfer mode
-            driverLeftTrigger
-                    .and(driverRightTrigger)
-                    .whileActiveOnce(transferOpen)
-                    .and(outtakeReady)
-                    .whileActiveOnce(intakeTransfer);
-        }
-        else
-        {
-            driverLeftTrigger
-                    .and(driverRightTrigger)
-                    .whileActiveOnce(transferOpen)
-                    .and(outtakeReady)
-                    .whenActive(intakeTransfer);
+        driverLeftTrigger
+                .and(driverRightTrigger)
+                //.and(outtakeReady)
+                .whileActiveOnce(transferOpen)
+                .whileActiveOnce(intakeTransfer);
 
-            driverLeftTrigger.negate().cancelWhenActive(intakeTransfer);
-            driverRightTrigger.negate().cancelWhenActive(intakeTransfer);
-        }
-
-        // When outtake becomes not ready, close transfer for a short duration and run intake in reverse to prevent accidental shots
-        // When the outtake goes from ready -> not ready, forcibly turn the intake in reverse and put the transfer in a block-allow state
-
-        if (RobotConstants.Transfer.autoTransferPrevent)
-        {
-            outtakeReady.whenInactive(new IntakeCommands.TransferPreventForDuration(subsystems.intake, RobotConstants.Intake.transferPreventPower, RobotConstants.Intake.transferPreventDurationMs), false).whenInactive(new TransferCommands.CloseTransferForDuration(subsystems.transfer, RobotConstants.Transfer.autoCloseMs), false);
-        }
 
         // Outtake: Right trigger spins up flywheel
         // While the right trigger is held down, turn the intake on
@@ -262,5 +266,6 @@ public abstract class BaseStable extends CommandOpMode
         coDriver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_GOAL));
         coDriver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_LOADING_ZONE));
         coDriver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_LOADING_ZONE));
+        coDriver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.SMALL_TRIANGLE));
     }
 }

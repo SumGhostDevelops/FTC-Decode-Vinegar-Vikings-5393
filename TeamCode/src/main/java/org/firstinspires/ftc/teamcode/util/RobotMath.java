@@ -93,6 +93,51 @@ public class RobotMath
 
             return Math.toIntExact(Math.round(angle.angle * tickPerDegree));
         }
+
+        /**
+         * Convert encoder ticks to a normalized {@link Angle} ([-180,180) degrees).
+         *
+         * @param ticks   encoder tick count
+         * @param PPR     pulses per revolution of the encoder
+         * @param gearRatio gear ratio from motor/encoder input to output (e.g. 20.0 for 20:1)
+         * @return an {@link Angle} in degrees (normalized)
+         */
+        public static Angle ticksToAngle(int ticks, int PPR, double gearRatio)
+        {
+            double tickPerDegree = (PPR * gearRatio) / 360.0;
+
+            if (tickPerDegree == 0.0)
+            {
+                return new Angle(0.0, AngleUnit.DEGREES);
+            }
+
+            double degrees = ticks / tickPerDegree;
+
+            return new Angle(degrees, AngleUnit.DEGREES);
+        }
+
+        /**
+         * Convert encoder ticks to an {@link UnnormalizedAngle} (unbounded angle quantity).
+         * Useful when you want the raw continuous angle without normalization.
+         *
+         * @param ticks   encoder tick count
+         * @param PPR     pulses per revolution of the encoder
+         * @param gearRatio gear ratio from motor/encoder input to output (e.g. 20.0 for 20:1)
+         * @return an {@link UnnormalizedAngle} in degrees (not normalized/wrapped)
+         */
+        public static UnnormalizedAngle ticksToUnnormalizedAngle(int ticks, int PPR, double gearRatio)
+        {
+            double tickPerDegree = (PPR * gearRatio) / 360.0;
+
+            if (tickPerDegree == 0.0)
+            {
+                return new UnnormalizedAngle(0.0, UnnormalizedAngleUnit.DEGREES);
+            }
+
+            double degrees = ticks / tickPerDegree;
+
+            return new UnnormalizedAngle(degrees, UnnormalizedAngleUnit.DEGREES);
+        }
     }
 
     public static class Outtake

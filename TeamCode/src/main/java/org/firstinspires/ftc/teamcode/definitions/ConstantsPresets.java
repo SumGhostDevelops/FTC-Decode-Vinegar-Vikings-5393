@@ -30,6 +30,7 @@ public class ConstantsPresets
             case TESTING:
                 RobotConstants.Outtake.IDLE_BY_DEFAULT = false;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
+                RobotConstants.General.REGRESSION_TESTING_MODE = true;
                 break;
             case COMPETITION:
                 RobotConstants.Outtake.IDLE_BY_DEFAULT = true;
