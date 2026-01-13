@@ -10,7 +10,7 @@ public class HybridShooterController
 
     // Tuning Parameters
     public static double kS = 0.0;  // Static Friction (Base power to move)
-    public static double kV = 0.0005; // Velocity Constant (Power per RPM)
+    public static double kV = 0.0002; // Velocity Constant (Power per RPM)
 
     // Gain Scheduling: aggressive when far, gentle when close
     public static double kP_Far = 0.005, kP_Near = 0.002;
@@ -20,7 +20,7 @@ public class HybridShooterController
     // Thresholds
     public static double NEAR_THRESHOLD_RPM = 100; // Switch to "Near" gains within this range
     public static double I_ZONE_RPM = 50;          // Only use Integral within this range
-    public static double RECOVERY_TRIGGER_RPM = 300; // Error size that triggers "Recovery Mode"
+    public static double RECOVERY_TRIGGER_RPM = 250; // Error size that triggers "Recovery Mode"
 
     // Recovery Boost (The "Kick")
     public static double BOOST_POWER = 0.2;     // Extra power added during recovery

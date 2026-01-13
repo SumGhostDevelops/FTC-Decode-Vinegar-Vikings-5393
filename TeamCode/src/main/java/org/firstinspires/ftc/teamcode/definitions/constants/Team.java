@@ -57,7 +57,7 @@ public enum Team
         /**
          * Constructor for the Goal.
          *
-         * @param id The AprilTag ID of the goal
+         * @param id    The AprilTag ID of the goal
          * @param coord The {@link FieldCoordinate} of the Goal
          */
         public Goal(int id, FieldCoordinate coord)
