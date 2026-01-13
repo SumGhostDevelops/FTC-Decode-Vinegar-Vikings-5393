@@ -125,9 +125,10 @@ public class RobotHardware
             turret = new MotorREx(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_312);
             turret.motorEx.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             turret.motorEx.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            turret.motorEx.setPositionPIDFCoefficients(RobotConstants.Turret.pCoeff);
             turret.setRunMode(Motor.RunMode.PositionControl);
             turret.setTargetPosition(0);
-            turret.setPositionTolerance(10); // Allow 10 ticks tolerance for atTargetPosition()
+            turret.setPositionTolerance(RobotConstants.Turret.TOLERANCE); // Allow 5 ticks tolerance for atTargetPosition()
         }
         catch (Exception e)
         {
