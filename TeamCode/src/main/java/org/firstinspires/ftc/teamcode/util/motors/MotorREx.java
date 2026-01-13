@@ -10,7 +10,10 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.teamcode.util.RobotMath;
 
-public class MotorExPlus extends MotorEx
+/**
+ * A fancier version of {@link MotorEx}
+ */
+public class MotorREx extends MotorEx
 {
     // Basically the same thing as MotorEx but adds built-in functionality for interfacing it w/ RPM
 
@@ -20,7 +23,7 @@ public class MotorExPlus extends MotorEx
      * @param hMap the hardware map from the OpMode
      * @param id   the device id from the RC config
      */
-    public MotorExPlus(@NonNull HardwareMap hMap, String id)
+    public MotorREx(@NonNull HardwareMap hMap, String id)
     {
         super(hMap, id);
     }
@@ -32,7 +35,7 @@ public class MotorExPlus extends MotorEx
      * @param id          the device id from the RC config
      * @param gobildaType the type of gobilda 5202 series motor being used
      */
-    public MotorExPlus(@NonNull HardwareMap hMap, String id, @NonNull Motor.GoBILDA gobildaType)
+    public MotorREx(@NonNull HardwareMap hMap, String id, @NonNull Motor.GoBILDA gobildaType)
     {
         super(hMap, id, gobildaType);
     }
@@ -45,7 +48,7 @@ public class MotorExPlus extends MotorEx
      * @param cpr  the counts per revolution of the motor
      * @param rpm  the revolutions per minute of the motor
      */
-    public MotorExPlus(@NonNull HardwareMap hMap, String id, double cpr, double rpm)
+    public MotorREx(@NonNull HardwareMap hMap, String id, double cpr, double rpm)
     {
         super(hMap, id, cpr, rpm);
     }
