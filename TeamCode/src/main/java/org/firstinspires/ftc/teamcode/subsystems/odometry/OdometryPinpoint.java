@@ -15,7 +15,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
 
-public class Odometry extends SubsystemBase
+public class OdometryPinpoint extends SubsystemBase
 {
     public final Webcam webcam;
     private final Pinpoint pinpoint;
@@ -39,7 +39,7 @@ public class Odometry extends SubsystemBase
      * @param webcam
      * @param pinpoint
      */
-    public Odometry(WebcamName webcam, Pinpoint pinpoint)
+    public OdometryPinpoint(WebcamName webcam, Pinpoint pinpoint)
     {
         this(webcam, pinpoint, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.FTC_STD), new Angle(pinpoint.getHeading(aUnit), aUnit)));
     }
@@ -49,7 +49,7 @@ public class Odometry extends SubsystemBase
      * @param pinpoint
      * @param referencePose The reference (could be the initial) pose of the robot, to determine its absolute position and heading
      */
-    public Odometry(WebcamName webcam, Pinpoint pinpoint, Pose2d referencePose)
+    public OdometryPinpoint(WebcamName webcam, Pinpoint pinpoint, Pose2d referencePose)
     {
         this.webcam = new Webcam(webcam);
         this.pinpoint = pinpoint;

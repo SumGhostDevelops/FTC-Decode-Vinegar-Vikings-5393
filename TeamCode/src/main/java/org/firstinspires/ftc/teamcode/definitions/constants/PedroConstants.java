@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.definitions;
+package org.firstinspires.ftc.teamcode.definitions.constants;
 
 
 import com.pedropathing.follower.Follower;

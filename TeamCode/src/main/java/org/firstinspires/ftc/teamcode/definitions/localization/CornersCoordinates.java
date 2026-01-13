@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.util.localization;
+package org.firstinspires.ftc.teamcode.definitions.localization;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;

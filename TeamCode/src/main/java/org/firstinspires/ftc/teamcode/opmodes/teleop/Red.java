@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.definitions.Team;
+import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 
 @TeleOp(name = "RedVikingsTeleOp", group = "Game")
 public class Red extends BaseStable

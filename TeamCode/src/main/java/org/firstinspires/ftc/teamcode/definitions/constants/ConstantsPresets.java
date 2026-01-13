@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.definitions;
+package org.firstinspires.ftc.teamcode.definitions.constants;
 
 public class ConstantsPresets
 {

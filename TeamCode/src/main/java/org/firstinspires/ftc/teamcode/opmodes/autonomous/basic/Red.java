@@ -7,9 +7,9 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.pedropathing.util.Timer;
 
-import org.firstinspires.ftc.teamcode.definitions.RobotContext;
-import org.firstinspires.ftc.teamcode.definitions.Team;
-import org.firstinspires.ftc.teamcode.definitions.PedroConstants;
+import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
+import org.firstinspires.ftc.teamcode.definitions.constants.Team;
+import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 
 @Autonomous(name = "RedBasicVikingsAutonomous", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
 public class Red extends Base
