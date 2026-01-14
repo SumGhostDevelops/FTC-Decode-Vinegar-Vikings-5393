@@ -105,4 +105,10 @@ public class Coordinate
         Coordinate otherCoord = (Coordinate) obj;
         return this.x.equals(otherCoord.x) && this.y.equals(otherCoord.y);
     }
+
+    @Override
+    public String toString()
+    {
+        return "x = " + x.toString() + ", y = " + y.toString();
+    }
 }

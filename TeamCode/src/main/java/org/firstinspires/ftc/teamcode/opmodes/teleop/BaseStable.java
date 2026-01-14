@@ -116,10 +116,11 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Team", team);
                 telemetry.addData("Distance to Goal", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
                 telemetry.addLine("--- Odometry ---");
-                telemetry.addData("Strafe Encoder", robot.hw.dwStrf.getPosition());
-                telemetry.addData("Fwd Encoder", robot.hw.dwFwd.getPosition());
+                telemetry.addData("Coordinate", robot.subsystems.odometry.getPose());
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Velocity (in/sec)", Math.hypot(robot.subsystems.odometry.getVelocityX(), robot.subsystems.odometry.getVelocityY()));
+                telemetry.addData("Acceleration (in/sec^2)", Math.hypot(robot.subsystems.odometry.getAccelerationX(), robot.subsystems.odometry.getAccelerationY()));
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
                 telemetry.addLine("--- Outtake ---");

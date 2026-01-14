@@ -142,4 +142,10 @@ public class Pose2d
 
         return new Pose2d(coord, new Angle((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS));
     }
+
+    @Override
+    public String toString()
+    {
+        return coord.toString() + "; " + heading.toString();
+    }
 }

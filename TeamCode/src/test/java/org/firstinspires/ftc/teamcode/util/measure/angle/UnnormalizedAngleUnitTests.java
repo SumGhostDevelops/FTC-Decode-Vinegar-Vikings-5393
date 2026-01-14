@@ -18,7 +18,7 @@ public class UnnormalizedAngleUnitTests
     public void constructor_setsAngleAndUnit_degrees()
     {
         UnnormalizedAngle a = new UnnormalizedAngle(45.0, UnnormalizedAngleUnit.DEGREES);
-        assertEquals(45.0, a.angle, DELTA);
+        assertEquals(45.0, a.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.DEGREES, a.unit);
     }
 
@@ -26,7 +26,7 @@ public class UnnormalizedAngleUnitTests
     public void constructor_setsAngleAndUnit_radians()
     {
         UnnormalizedAngle a = new UnnormalizedAngle(Math.PI / 4, UnnormalizedAngleUnit.RADIANS);
-        assertEquals(Math.PI / 4, a.angle, DELTA);
+        assertEquals(Math.PI / 4, a.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.RADIANS, a.unit);
     }
 
@@ -35,7 +35,7 @@ public class UnnormalizedAngleUnitTests
     {
         // 720 degrees should remain 720 (unnormalized)
         UnnormalizedAngle a = new UnnormalizedAngle(720.0, UnnormalizedAngleUnit.DEGREES);
-        assertEquals(720.0, a.angle, DELTA);
+        assertEquals(720.0, a.measure, DELTA);
     }
 
     @Test
@@ -43,28 +43,28 @@ public class UnnormalizedAngleUnitTests
     {
         // -720 degrees should remain -720 (unnormalized)
         UnnormalizedAngle a = new UnnormalizedAngle(-720.0, UnnormalizedAngleUnit.DEGREES);
-        assertEquals(-720.0, a.angle, DELTA);
+        assertEquals(-720.0, a.measure, DELTA);
     }
 
     @Test
     public void constructor_zeroAngle()
     {
         UnnormalizedAngle a = new UnnormalizedAngle(0.0, UnnormalizedAngleUnit.DEGREES);
-        assertEquals(0.0, a.angle, DELTA);
+        assertEquals(0.0, a.measure, DELTA);
     }
 
     @Test
     public void constructor_negativeAngle()
     {
         UnnormalizedAngle a = new UnnormalizedAngle(-45.0, UnnormalizedAngleUnit.DEGREES);
-        assertEquals(-45.0, a.angle, DELTA);
+        assertEquals(-45.0, a.measure, DELTA);
     }
 
     @Test
     public void constructor_multipleRotations()
     {
         UnnormalizedAngle a = new UnnormalizedAngle(1080.0, UnnormalizedAngleUnit.DEGREES);
-        assertEquals(1080.0, a.angle, DELTA);
+        assertEquals(1080.0, a.measure, DELTA);
     }
 
     // ==================== toUnit(UnnormalizedAngleUnit) Tests ====================
@@ -82,7 +82,7 @@ public class UnnormalizedAngleUnitTests
     {
         UnnormalizedAngle a = new UnnormalizedAngle(180.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle converted = a.toUnit(UnnormalizedAngleUnit.RADIANS);
-        assertEquals(Math.PI, converted.angle, DELTA);
+        assertEquals(Math.PI, converted.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.RADIANS, converted.unit);
     }
 
@@ -91,7 +91,7 @@ public class UnnormalizedAngleUnitTests
     {
         UnnormalizedAngle a = new UnnormalizedAngle(Math.PI, UnnormalizedAngleUnit.RADIANS);
         UnnormalizedAngle converted = a.toUnit(UnnormalizedAngleUnit.DEGREES);
-        assertEquals(180.0, converted.angle, DELTA);
+        assertEquals(180.0, converted.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.DEGREES, converted.unit);
     }
 
@@ -100,7 +100,7 @@ public class UnnormalizedAngleUnitTests
     {
         UnnormalizedAngle a = new UnnormalizedAngle(720.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle converted = a.toUnit(UnnormalizedAngleUnit.RADIANS);
-        assertEquals(4 * Math.PI, converted.angle, DELTA);
+        assertEquals(4 * Math.PI, converted.measure, DELTA);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class UnnormalizedAngleUnitTests
     {
         UnnormalizedAngle a = new UnnormalizedAngle(4 * Math.PI, UnnormalizedAngleUnit.RADIANS);
         UnnormalizedAngle converted = a.toUnit(UnnormalizedAngleUnit.DEGREES);
-        assertEquals(720.0, converted.angle, DELTA);
+        assertEquals(720.0, converted.measure, DELTA);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class UnnormalizedAngleUnitTests
     {
         UnnormalizedAngle a = new UnnormalizedAngle(-90.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle converted = a.toUnit(UnnormalizedAngleUnit.RADIANS);
-        assertEquals(-Math.PI / 2, converted.angle, DELTA);
+        assertEquals(-Math.PI / 2, converted.measure, DELTA);
     }
 
     // ==================== toUnit(AngleUnit) Tests ====================
@@ -253,7 +253,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(30.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(45.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.plus(b);
-        assertEquals(75.0, result.angle, DELTA);
+        assertEquals(75.0, result.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.DEGREES, result.unit);
     }
 
@@ -263,7 +263,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(90.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(Math.PI / 2, UnnormalizedAngleUnit.RADIANS);
         UnnormalizedAngle result = a.plus(b);
-        assertEquals(180.0, result.angle, DELTA);
+        assertEquals(180.0, result.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.DEGREES, result.unit);
     }
 
@@ -273,7 +273,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(45.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(0.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.plus(b);
-        assertEquals(45.0, result.angle, DELTA);
+        assertEquals(45.0, result.measure, DELTA);
     }
 
     @Test
@@ -282,7 +282,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(360.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(360.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.plus(b);
-        assertEquals(720.0, result.angle, DELTA);
+        assertEquals(720.0, result.measure, DELTA);
     }
 
     @Test
@@ -291,7 +291,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(-30.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(-45.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.plus(b);
-        assertEquals(-75.0, result.angle, DELTA);
+        assertEquals(-75.0, result.measure, DELTA);
     }
 
     // ==================== minus() Tests ====================
@@ -302,7 +302,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(75.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(30.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.minus(b);
-        assertEquals(45.0, result.angle, DELTA);
+        assertEquals(45.0, result.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.DEGREES, result.unit);
     }
 
@@ -312,7 +312,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(180.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(Math.PI / 2, UnnormalizedAngleUnit.RADIANS);
         UnnormalizedAngle result = a.minus(b);
-        assertEquals(90.0, result.angle, DELTA);
+        assertEquals(90.0, result.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.DEGREES, result.unit);
     }
 
@@ -322,7 +322,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(45.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(0.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.minus(b);
-        assertEquals(45.0, result.angle, DELTA);
+        assertEquals(45.0, result.measure, DELTA);
     }
 
     @Test
@@ -331,7 +331,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(30.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(75.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.minus(b);
-        assertEquals(-45.0, result.angle, DELTA);
+        assertEquals(-45.0, result.measure, DELTA);
     }
 
     @Test
@@ -340,7 +340,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(720.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle b = new UnnormalizedAngle(360.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.minus(b);
-        assertEquals(360.0, result.angle, DELTA);
+        assertEquals(360.0, result.measure, DELTA);
     }
 
     // ==================== getNormalizedUnit() Tests ====================
@@ -365,7 +365,7 @@ public class UnnormalizedAngleUnitTests
     public void edgeCase_veryLargeAngle()
     {
         UnnormalizedAngle a = new UnnormalizedAngle(36000.0, UnnormalizedAngleUnit.DEGREES);
-        assertEquals(36000.0, a.angle, DELTA);
+        assertEquals(36000.0, a.measure, DELTA);
         Angle normalized = a.toNormalized();
         assertEquals(0.0, normalized.measure, DELTA);
     }
@@ -374,7 +374,7 @@ public class UnnormalizedAngleUnitTests
     public void edgeCase_verySmallAngle()
     {
         UnnormalizedAngle a = new UnnormalizedAngle(1e-15, UnnormalizedAngleUnit.RADIANS);
-        assertEquals(1e-15, a.angle, 1e-24);
+        assertEquals(1e-15, a.measure, 1e-24);
     }
 
     @Test
@@ -383,7 +383,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(720.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.toUnit(UnnormalizedAngleUnit.RADIANS)
                                     .toUnit(UnnormalizedAngleUnit.DEGREES);
-        assertEquals(720.0, result.angle, DELTA);
+        assertEquals(720.0, result.measure, DELTA);
     }
 
     @Test
@@ -392,7 +392,7 @@ public class UnnormalizedAngleUnitTests
         UnnormalizedAngle a = new UnnormalizedAngle(360.0, UnnormalizedAngleUnit.DEGREES);
         UnnormalizedAngle result = a.plus(new UnnormalizedAngle(180.0, UnnormalizedAngleUnit.DEGREES))
                                     .minus(new UnnormalizedAngle(90.0, UnnormalizedAngleUnit.DEGREES));
-        assertEquals(450.0, result.angle, DELTA);
+        assertEquals(450.0, result.measure, DELTA);
     }
 }
 

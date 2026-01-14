@@ -117,6 +117,6 @@ public class Distance
     @Override
     public String toString()
     {
-        return unit.toString(magnitude);
+        return unit.toString(magnitude) + " " + unit;
     }
 }

@@ -124,4 +124,10 @@ public class FieldCoordinate extends Coordinate
                 .toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
         return thisCoord.x.equals(otherCoord.x) && thisCoord.y.equals(otherCoord.y);
     }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + "(" + coordSys.toString() + ")";
+    }
 }

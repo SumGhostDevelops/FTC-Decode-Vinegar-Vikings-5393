@@ -143,7 +143,7 @@ public class AngleUnitTests
     {
         Angle a = new Angle(45.0, AngleUnit.DEGREES);
         UnnormalizedAngle converted = a.toUnit(UnnormalizedAngleUnit.DEGREES);
-        assertEquals(45.0, converted.angle, DELTA);
+        assertEquals(45.0, converted.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.DEGREES, converted.unit);
     }
 
@@ -152,7 +152,7 @@ public class AngleUnitTests
     {
         Angle a = new Angle(Math.PI / 4, AngleUnit.RADIANS);
         UnnormalizedAngle converted = a.toUnit(UnnormalizedAngleUnit.RADIANS);
-        assertEquals(Math.PI / 4, converted.angle, DELTA);
+        assertEquals(Math.PI / 4, converted.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.RADIANS, converted.unit);
     }
 
@@ -161,7 +161,7 @@ public class AngleUnitTests
     {
         Angle a = new Angle(90.0, AngleUnit.DEGREES);
         UnnormalizedAngle converted = a.toUnit(UnnormalizedAngleUnit.RADIANS);
-        assertEquals(Math.PI / 2, converted.angle, DELTA);
+        assertEquals(Math.PI / 2, converted.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.RADIANS, converted.unit);
     }
 
@@ -172,7 +172,7 @@ public class AngleUnitTests
     {
         Angle a = new Angle(45.0, AngleUnit.DEGREES);
         UnnormalizedAngle converted = a.toUnnormalized();
-        assertEquals(45.0, converted.angle, DELTA);
+        assertEquals(45.0, converted.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.DEGREES, converted.unit);
     }
 
@@ -181,7 +181,7 @@ public class AngleUnitTests
     {
         Angle a = new Angle(Math.PI / 4, AngleUnit.RADIANS);
         UnnormalizedAngle converted = a.toUnnormalized();
-        assertEquals(Math.PI / 4, converted.angle, DELTA);
+        assertEquals(Math.PI / 4, converted.measure, DELTA);
         assertEquals(UnnormalizedAngleUnit.RADIANS, converted.unit);
     }
 

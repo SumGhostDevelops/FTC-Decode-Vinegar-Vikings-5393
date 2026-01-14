@@ -5,17 +5,19 @@ import com.seattlesolvers.solverslib.util.MathUtils;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 
+import java.util.Locale;
+
 /**
  * {@link UnnormalizedAngle} represents an unnormalized angle ({@code (-infinity, infinity) based on a full circle}) and its unit of measure.
  */
 public class UnnormalizedAngle
 {
-    public final double angle;
+    public final double measure;
     public final UnnormalizedAngleUnit unit;
 
-    public UnnormalizedAngle(double angle, UnnormalizedAngleUnit unit)
+    public UnnormalizedAngle(double measure, UnnormalizedAngleUnit unit)
     {
-        this.angle = angle;
+        this.measure = measure;
         this.unit = unit;
     }
 
@@ -41,7 +43,7 @@ public class UnnormalizedAngle
     public Angle toUnit(AngleUnit newUnit)
     {
         AngleUnit normalizedUnit = this.unit.getNormalized(); // get the normalized version of the current unit
-        Angle normalized = new Angle(this.angle, normalizedUnit); // create a new angle, constructor handles normalization
+        Angle normalized = new Angle(this.measure, normalizedUnit); // create a new angle, constructor handles normalization
 
         return normalized.toUnit(newUnit);
     }
@@ -57,7 +59,7 @@ public class UnnormalizedAngle
      */
     public double getAngle(UnnormalizedAngleUnit newUnit)
     {
-        return newUnit.fromUnit(this.unit, angle);
+        return newUnit.fromUnit(this.unit, measure);
     }
 
     /**
@@ -87,7 +89,7 @@ public class UnnormalizedAngle
     {
         double bAngle = b.getAngle(this.unit);
 
-        return new UnnormalizedAngle(this.angle + bAngle, this.unit);
+        return new UnnormalizedAngle(this.measure + bAngle, this.unit);
     }
 
     /**
@@ -99,7 +101,7 @@ public class UnnormalizedAngle
     {
         double bAngle = b.getAngle(this.unit);
 
-        return new UnnormalizedAngle(this.angle - bAngle, this.unit);
+        return new UnnormalizedAngle(this.measure - bAngle, this.unit);
     }
 
     /**
@@ -113,6 +115,17 @@ public class UnnormalizedAngle
             default:
             case DEGREES: return AngleUnit.DEGREES;
             case RADIANS: return AngleUnit.RADIANS;
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        switch (this.unit)
+        {
+            default:
+            case DEGREES: return String.format(Locale.getDefault(), "%.3f degrees", measure);
+            case RADIANS: return String.format(Locale.getDefault(), "%.3f radians", measure);
         }
     }
 }

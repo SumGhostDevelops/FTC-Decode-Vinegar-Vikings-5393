@@ -142,4 +142,10 @@ public class Vector2d
     {
         return equals((Object) otherVector);
     }
+
+    @Override
+    public String toString()
+    {
+        return getDistance().toString() + "; " + getDirection().toString();
+    }
 }

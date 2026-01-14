@@ -101,7 +101,7 @@ public class RobotMath
 
             double tickPerDegree = (PPR * gearRatio) / 360.0;
 
-            return Math.toIntExact(Math.round(angle.angle * tickPerDegree));
+            return Math.toIntExact(Math.round(angle.measure * tickPerDegree));
         }
 
         /**
