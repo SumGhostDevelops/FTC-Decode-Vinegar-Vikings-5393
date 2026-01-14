@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
  *
  * @author Jackson
  */
-public class MotorRExGroup implements Iterable<MotorREx>
+public class MotorXPGroup implements Iterable<MotorXP>
 {
-    private final MotorREx[] group;
+    private final MotorXP[] group;
 
     /**
      * Create a new MotorGroup with the provided Motors.
@@ -25,9 +25,9 @@ public class MotorRExGroup implements Iterable<MotorREx>
      * @param leader    The leader motor.
      * @param followers The follower motors which follow the leader motor's protocols.
      */
-    public MotorRExGroup(@NonNull MotorREx leader, MotorREx... followers)
+    public MotorXPGroup(@NonNull MotorXP leader, MotorXP... followers)
     {
-        group = new MotorREx[followers.length + 1];
+        group = new MotorXP[followers.length + 1];
         group[0] = leader;
         System.arraycopy(followers, 0, group, 1, followers.length);
     }
@@ -48,7 +48,7 @@ public class MotorRExGroup implements Iterable<MotorREx>
 
     public void setRPM(int rpm)
     {
-        for (MotorREx motor : group)
+        for (MotorXP motor : group)
         {
             motor.setRPM(rpm);
         }
@@ -96,20 +96,20 @@ public class MotorRExGroup implements Iterable<MotorREx>
     public List<Double> getRPMs()
     {
         return Arrays.stream(group)
-                .map(MotorREx::getRPM)
+                .map(MotorXP::getRPM)
                 .collect(Collectors.toList());
     }
 
     public List<Double> getAccelerations()
     {
         return Arrays.stream(group)
-                .map(MotorREx::getRPMAcceleration)
+                .map(MotorXP::getRPMAcceleration)
                 .collect(Collectors.toList());
     }
 
     @NonNull
     @Override
-    public Iterator<MotorREx> iterator()
+    public Iterator<MotorXP> iterator()
     {
         return Arrays.asList(group).iterator();
     }
@@ -216,7 +216,7 @@ public class MotorRExGroup implements Iterable<MotorREx>
      * @param isInverted The state of inversion true is inverted.
      * @return This object for chaining purposes.
      */
-    public MotorRExGroup setInverted(boolean isInverted)
+    public MotorXPGroup setInverted(boolean isInverted)
     {
         for (Motor motor : group)
         {

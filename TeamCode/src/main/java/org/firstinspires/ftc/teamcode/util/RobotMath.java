@@ -11,6 +11,16 @@ import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 public class RobotMath
 {
+    public static double clamp(double value, double minValue, double maxValue)
+    {
+        return  Math.max(minValue, Math.min(value, maxValue));
+    }
+
+    public static int clamp(int value, int minValue, int maxValue)
+    {
+        return clamp(value, minValue, maxValue);
+    }
+
     public static class Motor
     {
         /**

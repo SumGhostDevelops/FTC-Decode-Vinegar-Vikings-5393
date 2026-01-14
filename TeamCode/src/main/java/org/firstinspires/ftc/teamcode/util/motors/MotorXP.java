@@ -13,17 +13,30 @@ import org.firstinspires.ftc.teamcode.util.RobotMath;
 /**
  * A fancier version of {@link MotorEx}
  */
-public class MotorREx extends MotorEx
+public class MotorXP extends MotorEx
 {
     // Basically the same thing as MotorEx but adds built-in functionality for interfacing it w/ RPM
 
+    /**
+     * Number of recent samples the {@link MotorAccelerationTracker} maintains when estimating
+     * velocity/acceleration. A window size of 7 was chosen empirically as a
+     * balance between responsiveness (smaller window) and noise smoothing
+     * (larger window) for typical FTC motor telemetry rates.
+     */
+    private static final int TRACKER_WINDOW_SIZE = 7;
+    private double targetRPM = 0;
+    private double currentAccel = 0.0;
+    private MotorAccelerationTracker tracker;
+    private ElapsedTime accelTimer;
+    private double rpmTolerance = 50;
+    private double accelTolerance = 150;
     /**
      * Constructs the instance motor for the wrapper
      *
      * @param hMap the hardware map from the OpMode
      * @param id   the device id from the RC config
      */
-    public MotorREx(@NonNull HardwareMap hMap, String id)
+    public MotorXP(@NonNull HardwareMap hMap, String id)
     {
         super(hMap, id);
     }
@@ -35,11 +48,10 @@ public class MotorREx extends MotorEx
      * @param id          the device id from the RC config
      * @param gobildaType the type of gobilda 5202 series motor being used
      */
-    public MotorREx(@NonNull HardwareMap hMap, String id, @NonNull Motor.GoBILDA gobildaType)
+    public MotorXP(@NonNull HardwareMap hMap, String id, @NonNull Motor.GoBILDA gobildaType)
     {
         super(hMap, id, gobildaType);
     }
-
     /**
      * Constructs an instance motor for the wrapper
      *
@@ -48,27 +60,10 @@ public class MotorREx extends MotorEx
      * @param cpr  the counts per revolution of the motor
      * @param rpm  the revolutions per minute of the motor
      */
-    public MotorREx(@NonNull HardwareMap hMap, String id, double cpr, double rpm)
+    public MotorXP(@NonNull HardwareMap hMap, String id, double cpr, double rpm)
     {
         super(hMap, id, cpr, rpm);
     }
-
-    private double targetRPM = 0;
-
-    /**
-     * Number of recent samples the {@link MotorAccelerationTracker} maintains when estimating
-     * velocity/acceleration. A window size of 7 was chosen empirically as a
-     * balance between responsiveness (smaller window) and noise smoothing
-     * (larger window) for typical FTC motor telemetry rates.
-     */
-    private static final int TRACKER_WINDOW_SIZE = 7;
-
-    private double currentAccel = 0.0;
-    private MotorAccelerationTracker tracker;
-    private ElapsedTime accelTimer;
-
-    private double rpmTolerance = 50;
-    private double accelTolerance = 150;
 
     private void ensureTrackerInitialized()
     {
@@ -110,9 +105,9 @@ public class MotorREx extends MotorEx
         this.accelTolerance = accelTolerance;
     }
 
-    public void setRPM(double rpm)
+    public double getVelocity()
     {
-        setVelocity(RobotMath.Motor.rpmToTps(rpm, super.getCPR()));
+        return RobotMath.Motor.rpmToTps(getRPM(), super.getCPR());
     }
 
     // Bypass the SolversLib PIDF velocity controller whatever cus it sucks
@@ -126,11 +121,6 @@ public class MotorREx extends MotorEx
         super.motorEx.setVelocity(velocity);
     }
 
-    public double getVelocity()
-    {
-        return RobotMath.Motor.rpmToTps(getRPM(), super.getCPR());
-    }
-
     public double getRPM()
     {
         double cpr = super.getCPR();
@@ -139,6 +129,11 @@ public class MotorREx extends MotorEx
             return 0.0;
         }
         return RobotMath.Motor.tpsToRpm(super.getVelocity(), cpr);
+    }
+
+    public void setRPM(double rpm)
+    {
+        setVelocity(RobotMath.Motor.rpmToTps(rpm, super.getCPR()));
     }
 
     public double getAcceleration()
@@ -167,11 +162,13 @@ public class MotorREx extends MotorEx
             double time = accelTimer.seconds();
             double rpm = getRPM();
             currentAccel = tracker.updateAndGetAcceleration(time, rpm);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             // Silently handle any errors
             currentAccel = 0.0;
-        } catch (Error e)
+        }
+        catch (Error e)
         {
             // Catch serious errors too (like NoClassDefFoundError)
             currentAccel = 0.0;

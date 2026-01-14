@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
-import org.firstinspires.ftc.teamcode.util.motors.MotorREx;
+import org.firstinspires.ftc.teamcode.util.motors.MotorXP;
 
 public class Outtake extends SubsystemBase {
 
@@ -17,7 +17,7 @@ public class Outtake extends SubsystemBase {
         OFF,
     }
 
-    private final MotorREx motor;
+    private final MotorXP motor;
     private State state = State.OFF;
 
     private double targetRPM = RobotConstants.Outtake.BASE_RPM;
@@ -28,7 +28,7 @@ public class Outtake extends SubsystemBase {
     // Tolerance to avoid tiny floating-point updates (adjust as needed)
     private static final double RPM_EPS = 1.0;
 
-    public Outtake(MotorREx motor)
+    public Outtake(MotorXP motor)
     {
         this.motor = motor;
     }

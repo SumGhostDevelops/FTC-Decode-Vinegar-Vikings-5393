@@ -17,13 +17,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
-import org.firstinspires.ftc.teamcode.util.motors.MotorREx;
+import org.firstinspires.ftc.teamcode.util.motors.MotorXP;
 
 import java.util.List;
 
 public class RobotHardware
 {
-    public MotorREx frontLeft, frontRight, backLeft, backRight, intake, turret, outtake;
+    public MotorXP frontLeft, frontRight, backLeft, backRight, intake, turret, outtake;
     public Motor.Encoder dwFwd, dwStrf;
     public ServoEx transfer;
     public IMU imu;
@@ -42,7 +42,7 @@ public class RobotHardware
 
             try
             {
-                frontLeft = new MotorREx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT, Motor.GoBILDA.RPM_312);
+                frontLeft = new MotorXP(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT, Motor.GoBILDA.RPM_312);
                 frontLeft.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
@@ -53,7 +53,7 @@ public class RobotHardware
 
             try
             {
-                frontRight = new MotorREx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT, Motor.GoBILDA.RPM_312);
+                frontRight = new MotorXP(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT, Motor.GoBILDA.RPM_312);
                 frontRight.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
@@ -64,7 +64,7 @@ public class RobotHardware
 
             try
             {
-                backLeft = new MotorREx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT, Motor.GoBILDA.RPM_312);
+                backLeft = new MotorXP(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT, Motor.GoBILDA.RPM_312);
                 backLeft.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             }
             catch (Exception e)
@@ -75,7 +75,7 @@ public class RobotHardware
 
             try
             {
-                backRight = new MotorREx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT, Motor.GoBILDA.RPM_312);
+                backRight = new MotorXP(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT, Motor.GoBILDA.RPM_312);
                 backRight.motorEx.setDirection(DcMotorSimple.Direction.FORWARD);
             }
             catch (Exception e)
@@ -105,7 +105,7 @@ public class RobotHardware
         boolean outtakeOk = true;
         try
         {
-            outtake = new MotorREx(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_LEFT, Motor.GoBILDA.BARE);
+            outtake = new MotorXP(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_LEFT, Motor.GoBILDA.BARE);
 
             outtake.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
             double[] veloCoeffs = RobotConstants.Outtake.Coefficients.veloCoeffs;
@@ -122,7 +122,7 @@ public class RobotHardware
 
         try
         {
-            turret = new MotorREx(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_312);
+            turret = new MotorXP(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_312);
             turret.motorEx.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             turret.motorEx.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             turret.motorEx.setPositionPIDFCoefficients(RobotConstants.Turret.pCoeff);
@@ -149,7 +149,7 @@ public class RobotHardware
 
         try
         {
-            intake = new MotorREx(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620);
+            intake = new MotorXP(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620);
             intake.setRunMode(Motor.RunMode.RawPower);
             intake.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             intake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -248,9 +248,9 @@ public class RobotHardware
         return new MotorGroup(frontLeft, frontRight, backLeft, backRight);
     }
 
-    public MotorREx[] getDriveArray()
+    public MotorXP[] getDriveArray()
     {
-        return new MotorREx[]{frontLeft, frontRight, backLeft, backRight};
+        return new MotorXP[]{frontLeft, frontRight, backLeft, backRight};
     }
 
     public void clearHubCache()

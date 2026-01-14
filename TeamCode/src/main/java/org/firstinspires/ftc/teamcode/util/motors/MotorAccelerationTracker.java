@@ -15,7 +15,7 @@ public class MotorAccelerationTracker
     // 25ms is good. If you run at 50Hz control loop, this guarantees 1 sample per loop.
     // If your loop is 20ms, you might miss every other sample.
     // Consider lowering to 0.015 or 0.020 if your loops are fast.
-    private final double MIN_UPDATE_INTERVAL = 0.020;
+    private final double MIN_UPDATE_INTERVAL = 0.015;
 
     public MotorAccelerationTracker(int bufferSize)
     {
