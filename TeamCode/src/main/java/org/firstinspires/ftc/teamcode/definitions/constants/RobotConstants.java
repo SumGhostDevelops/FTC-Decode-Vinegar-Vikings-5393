@@ -86,6 +86,11 @@ public class RobotConstants
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = true;
 
+        @Sorter(sort = 5)
+        public static boolean USE_FUTURE_POSE = false;
+        @Sorter(sort = 6)
+        public static double FUTURE_POSE_TIME = 1.0;
+
         @IgnoreConfigurable
         public static class Name
         {
@@ -131,6 +136,11 @@ public class RobotConstants
 
         @Sorter(sort = 7)
         public static double pCoeff = 1;
+
+        @Sorter(sort = 8)
+        public static boolean USE_FUTURE_POSE = false;
+        @Sorter(sort = 9)
+        public static double FUTURE_POSE_TIME = 1.0;
     }
 
     @Configurable

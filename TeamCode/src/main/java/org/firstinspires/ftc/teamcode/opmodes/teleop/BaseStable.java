@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.definitions.localization.CornersCoordinates;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
@@ -135,7 +136,7 @@ public abstract class BaseStable extends CommandOpMode
         // Draw robot position on Panels Dashboard Field panel
         FieldDrawing.draw(
                 robot.subsystems.odometry.getPose(),
-                robot.subsystems.odometry.getFuturePose(RobotConstants.Odometry.FUTURE_POSE_TIME),
+                robot.subsystems.odometry.getFuturePose(RobotConstants.Turret.FUTURE_POSE_TIME),
                 robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES),
                 robot.team.goal.coord
         );
@@ -200,15 +201,20 @@ public abstract class BaseStable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new OdometryCommands.Localize(subsystems.odometry, telemetry));
 
+        Supplier<Pose2d> turretPose;
+
+        if (RobotConstants.Turret.USE_FUTURE_POSE) turretPose = () -> subsystems.odometry.getFuturePose(RobotConstants.Turret.FUTURE_POSE_TIME);
+        else turretPose = () -> subsystems.odometry.getPose();
+
         if (RobotConstants.Turret.autoAimToGoal)
         {
-            opModeIsActive.whileActiveContinuous(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
+            opModeIsActive.whileActiveContinuous(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, turretPose));
         }
         else
         {
             // Y button (held): Auto-aim turret to team's goal
             driver.getGamepadButton(GamepadKeys.Button.Y)
-                    .toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, () -> subsystems.odometry.getPose()));
+                    .toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, turretPose));
         }
 
         if (RobotConstants.General.REGRESSION_TESTING_MODE)
@@ -220,7 +226,11 @@ public abstract class BaseStable extends CommandOpMode
         }
         else
         {
-            opModeIsActive.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(subsystems.outtake, () -> robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord)));
+            Supplier<Pose2d> outtakePose;
+            if (RobotConstants.Outtake.USE_FUTURE_POSE) outtakePose = () -> subsystems.odometry.getFuturePose(RobotConstants.Outtake.FUTURE_POSE_TIME);
+            else outtakePose = () -> subsystems.odometry.getPose();
+
+            opModeIsActive.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(subsystems.outtake, () -> outtakePose.get().distanceTo(team.goal.coord)));
         }
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
