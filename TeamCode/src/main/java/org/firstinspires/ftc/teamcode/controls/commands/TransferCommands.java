@@ -101,7 +101,7 @@ public class TransferCommands
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            transfer.close(Transfer.CloseType.TRANSFER);
+            transfer.close(Transfer.CloseType.SHOOT);
             try {
                 Thread.sleep(RobotConstants.Transfer.TimerConstants.downTime);
             } catch (InterruptedException e) {
@@ -143,7 +143,7 @@ public class TransferCommands
             }
             else if (timer.elapsedTime() >= RobotConstants.Transfer.TimerConstants.upTime && !stepsCompleted[1])
             {
-                transfer.close(Transfer.CloseType.TRANSFER);
+                transfer.close(Transfer.CloseType.SHOOT);
                 stepsCompleted[1] = true;
             }
         }

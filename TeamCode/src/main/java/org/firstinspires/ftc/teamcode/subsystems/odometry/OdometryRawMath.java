@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
 import com.qualcomm.robotcore.hardware.IMU;
@@ -16,9 +17,10 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
-public class OdometryControlHub extends SubsystemBase
+public class OdometryRawMath extends SubsystemBase
 {
     private final Webcam webcam;
     private final Encoder dwPar;
@@ -41,12 +43,12 @@ public class OdometryControlHub extends SubsystemBase
      */
     private Angle driverForward;
 
-    public OdometryControlHub(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp)
+    public OdometryRawMath(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp)
     {
         this(webcam, imu, dwPar, dwPerp, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.FTC_STD), new Angle(90, AngleUnit.DEGREES)));
     }
 
-    public OdometryControlHub(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp, Pose2d referencePose)
+    public OdometryRawMath(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp, Pose2d referencePose)
     {
         this.webcam = new Webcam(webcam);
         this.imu = imu;
@@ -108,6 +110,12 @@ public class OdometryControlHub extends SubsystemBase
     public void setDriverForwardFromCurrent()
     {
         driverForward = getAngle();
+    }
+    /*
+
+    public ArrayList<Double> getRobotCoordinates(AprilTagDetection tag)
+    {
+        tag.ftcPose.range()
     }
 
     /**
@@ -189,18 +197,18 @@ public class OdometryControlHub extends SubsystemBase
 
         AprilTagDetection tag = possibleTag.get();
         return String.format(
-            "ID=%d | Raw XYZ: (%.2f, %.2f, %.2f) %s | Yaw: %.1f° | Converted Pose: (%.2f, %.2f) in, range: %.2f, heading: %.1f°, yaw: %.2f",
-            tag.id,
-            tag.robotPose.getPosition().x,
-            tag.robotPose.getPosition().y,
-            tag.robotPose.getPosition().z,
-            tag.robotPose.getPosition().unit.toString(),
-            tag.robotPose.getOrientation().getYaw(AngleUnit.DEGREES),
-            Pose2d.fromPose3D(tag.robotPose).coord.x.getDistance(DistanceUnit.INCH),
-            Pose2d.fromPose3D(tag.robotPose).coord.y.getDistance(DistanceUnit.INCH),
-            tag.ftcPose.range,
-            Pose2d.fromPose3D(tag.robotPose).heading.getAngle(AngleUnit.DEGREES),
-            tag.ftcPose.yaw
+                "ID=%d | Raw XYZ: (%.2f, %.2f, %.2f) %s | Yaw: %.1f° | Converted Pose: (%.2f, %.2f) in, range: %.2f, heading: %.1f°, yaw: %.2f",
+                tag.id,
+                tag.robotPose.getPosition().x,
+                tag.robotPose.getPosition().y,
+                tag.robotPose.getPosition().z,
+                tag.robotPose.getPosition().unit.toString(),
+                tag.robotPose.getOrientation().getYaw(AngleUnit.DEGREES),
+                Pose2d.fromPose3D(tag.robotPose).coord.x.getDistance(DistanceUnit.INCH),
+                Pose2d.fromPose3D(tag.robotPose).coord.y.getDistance(DistanceUnit.INCH),
+                tag.ftcPose.range,
+                Pose2d.fromPose3D(tag.robotPose).heading.getAngle(AngleUnit.DEGREES),
+                tag.ftcPose.yaw
         );
     }
 

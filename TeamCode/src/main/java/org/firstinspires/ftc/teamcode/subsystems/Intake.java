@@ -14,14 +14,14 @@ public class Intake extends SubsystemBase
         this.intake = intake;
     }
 
-    public void in(double power)
+    public void in(double RPM)
     {
-        intake.set(Math.abs(power));
+        intake.setRPM(Math.abs(RPM));
     }
 
     public void out(double power)
     {
-        intake.set(-Math.abs(power));
+        intake.setRPM(-Math.abs(power));
     }
 
     public void stop()

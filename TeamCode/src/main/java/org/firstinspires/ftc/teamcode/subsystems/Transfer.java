@@ -17,6 +17,7 @@ public class Transfer extends SubsystemBase
          * Moves the transfer servo in a manner that balls are allowed to enter the ball pit: backward, for transferring
          */
         TRANSFER,
+        SHOOT,
         /**
          * Moves the transfer in a manner that balls are not allowed to enter the ball pit: forward, for intaking
          */
@@ -53,6 +54,10 @@ public class Transfer extends SubsystemBase
                 break;
             case TRANSFER:
                 transfer.set(RobotConstants.Transfer.CLOSED_FULL_TRANSFER_ANGLE);
+                leftSide = false;
+                break;
+            case SHOOT:
+                transfer.set(RobotConstants.Transfer.CLOSED_SHOOTING_TRANSFER_ANGLE);
                 leftSide = false;
                 break;
         }

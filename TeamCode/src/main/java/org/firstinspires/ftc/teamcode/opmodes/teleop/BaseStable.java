@@ -120,6 +120,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Bearing to Target", robot.subsystems.turret.bearingToTarget());
+                telemetry.addData("Raw Data", robot.subsystems.odometry.getRawAprilTagData());
         }
     }
 
@@ -172,7 +173,7 @@ public abstract class BaseStable extends CommandOpMode
         Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
         Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
 
-        Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakePower);
+        Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakeRPM);
         Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
         Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
         Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
@@ -252,8 +253,9 @@ public abstract class BaseStable extends CommandOpMode
         driverLeftTrigger
                 .and(driverRightTrigger)
                 //.and(outtakeReady)
-                .whileActiveOnce(transferOpen)
-                .whileActiveOnce(intakeTransfer);
+                //.whileActiveOnce(transferOpen)
+                .whileActiveContinuous(intakeTransfer)
+                .whileActiveOnce(transferOpen);
 
 
         // Outtake: Right trigger spins up flywheel

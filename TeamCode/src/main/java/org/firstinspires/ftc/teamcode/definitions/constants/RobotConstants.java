@@ -144,6 +144,8 @@ public class RobotConstants
         public static double CLOSED_INTAKE_ANGLE = 0; // An angle where the trapdoor blocks balls from entering
         @Sorter(sort = 4)
         public static double CLOSED_FULL_TRANSFER_ANGLE = 210;
+
+        public static double CLOSED_SHOOTING_TRANSFER_ANGLE = 60;
         @Sorter(sort = 5)
         public static double TRANSFER_ANGLE = 100;
 
@@ -174,7 +176,7 @@ public class RobotConstants
         public static String NAME = "intake";
 
         @Sorter(sort = 1)
-        public static double intakePower = 0.6;
+        public static double intakeRPM = 1300;
         @Sorter(sort = 2)
         public static double outtakePower = 0.5;
         @Sorter(sort = 3)

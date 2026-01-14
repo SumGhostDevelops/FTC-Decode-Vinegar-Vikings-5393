@@ -13,19 +13,19 @@ public class IntakeCommands
     public static class In extends CommandBase
     {
         protected final Intake intake;
-        private final DoubleSupplier power;
+        private final DoubleSupplier RPM;
 
-        public In(org.firstinspires.ftc.teamcode.subsystems.Intake intake, DoubleSupplier power)
+        public In(org.firstinspires.ftc.teamcode.subsystems.Intake intake, DoubleSupplier RPM)
         {
             this.intake = intake;
-            this.power = power;
+            this.RPM = RPM;
             addRequirements(intake);
         }
 
         @Override
         public void execute()
         {
-            intake.in(power.getAsDouble());
+            intake.in(RPM.getAsDouble());
         }
 
         @Override
