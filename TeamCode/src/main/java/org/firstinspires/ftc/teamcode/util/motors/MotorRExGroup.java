@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
  *
  * @author Jackson
  */
-public class MotorExPlusGroup implements Iterable<MotorExPlus>
+public class MotorRExGroup implements Iterable<MotorREx>
 {
-    private final MotorExPlus[] group;
+    private final MotorREx[] group;
 
     /**
      * Create a new MotorGroup with the provided Motors.
@@ -25,9 +25,9 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
      * @param leader    The leader motor.
      * @param followers The follower motors which follow the leader motor's protocols.
      */
-    public MotorExPlusGroup(@NonNull MotorExPlus leader, MotorExPlus... followers)
+    public MotorRExGroup(@NonNull MotorREx leader, MotorREx... followers)
     {
-        group = new MotorExPlus[followers.length + 1];
+        group = new MotorREx[followers.length + 1];
         group[0] = leader;
         System.arraycopy(followers, 0, group, 1, followers.length);
     }
@@ -48,7 +48,7 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
 
     public void setRPM(int rpm)
     {
-        for (MotorExPlus motor : group)
+        for (MotorREx motor : group)
         {
             motor.setRPM(rpm);
         }
@@ -96,20 +96,20 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
     public List<Double> getRPMs()
     {
         return Arrays.stream(group)
-                .map(MotorExPlus::getRPM)
+                .map(MotorREx::getRPM)
                 .collect(Collectors.toList());
     }
 
     public List<Double> getAccelerations()
     {
         return Arrays.stream(group)
-                .map(MotorExPlus::getRPMAcceleration)
+                .map(MotorREx::getRPMAcceleration)
                 .collect(Collectors.toList());
     }
 
     @NonNull
     @Override
-    public Iterator<MotorExPlus> iterator()
+    public Iterator<MotorREx> iterator()
     {
         return Arrays.asList(group).iterator();
     }
@@ -216,7 +216,7 @@ public class MotorExPlusGroup implements Iterable<MotorExPlus>
      * @param isInverted The state of inversion true is inverted.
      * @return This object for chaining purposes.
      */
-    public MotorExPlusGroup setInverted(boolean isInverted)
+    public MotorRExGroup setInverted(boolean isInverted)
     {
         for (Motor motor : group)
         {

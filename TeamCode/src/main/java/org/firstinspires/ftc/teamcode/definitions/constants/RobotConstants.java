@@ -120,7 +120,7 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double GEAR_RATIO = 19.2 * 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         @Sorter(sort = 3)
-        public static int TOLERANCE = 10; // in ticks
+        public static int TOLERANCE = 5; // in ticks
 
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
@@ -128,6 +128,9 @@ public class RobotConstants
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(90, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         @Sorter(sort = 6)
         public static boolean autoAimToGoal = true;
+
+        @Sorter(sort = 7)
+        public static double pCoeff = 1;
     }
 
     @Configurable
