@@ -122,9 +122,6 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Bearing to Target", robot.subsystems.turret.bearingToTarget());
-                telemetry.addData("Strafe Encoder", robot.hw.dwStrf.getPosition());
-                telemetry.addData("Fwd Encoder", robot.hw.dwFwd.getPosition());
-                telemetry.addData("Raw Data", robot.subsystems.odometry.getRawAprilTagData());
         }
     }
 
@@ -136,8 +133,9 @@ public abstract class BaseStable extends CommandOpMode
         displayTelemetry();
         telemetry.update();
         // Draw robot position on Panels Dashboard Field panel
-        FieldDrawing.drawRobot(
+        FieldDrawing.draw(
                 robot.subsystems.odometry.getPose(),
+                robot.subsystems.odometry.getFuturePose(RobotConstants.Odometry.FUTURE_POSE_TIME),
                 robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES),
                 robot.team.goal.coord
         );

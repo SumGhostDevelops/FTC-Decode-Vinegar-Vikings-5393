@@ -18,14 +18,15 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
  */
 public class FieldDrawing
 {
-    // Robot radius in inches
     public static final double ROBOT_RADIUS = 9.0;
-
     private static final FieldManager panelsField = PanelsField.INSTANCE.getField();
 
     // Styles - Using stroke width for visibility
     private static final Style robotStyle = new Style(
             "#3F51B5", "#3F51B5", 2.0  // Material Blue, filled with stroke
+    );
+    private static final Style futurePoseStyle = new Style(
+            "2DE6AE", "2DE6AE", 2.0
     );
     private static final Style directionStyle = new Style(
             "#FF5722", "#FF5722", 3.0  // Material Deep Orange, thicker stroke
@@ -50,116 +51,119 @@ public class FieldDrawing
     }
 
     /**
-     * Draws the robot on the field at the given pose.
-     * Uses FTC Standard coordinate system (center of field is origin).
+     * Draws a robot, heading, optional turret, and optional target using explicit styles.
+     * This is the new generic draw method for all robot/field visualizations.
      *
-     * @param robotPose The robot's current pose
+     * @param pose           The robot pose
+     * @param turretAngleRad Turret angle in radians (field-absolute), or null to skip
+     * @param targetCoord    Target field coordinate (or null to skip)
      */
-    public static void drawRobot(Pose2d robotPose)
+    public static void draw(Pose2d pose, Pose2d futurePose, Double turretAngleRad, FieldCoordinate targetCoord)
     {
-        drawRobot(robotPose, null, null);
-    }
+        if (pose == null) return;
+        drawRobotBody(pose, robotStyle);
+        drawRobotHeading(pose, directionStyle);
 
-    /**
-     * Draws the robot on the field with turret direction.
-     *
-     * @param robotPose             The robot's current pose
-     * @param turretAbsoluteHeading The turret's absolute heading on the field (or null to skip)
-     */
-    public static void drawRobot(Pose2d robotPose, Double turretAbsoluteHeading)
-    {
-        drawRobot(robotPose, turretAbsoluteHeading, null);
-    }
-
-    /**
-     * Draws the robot on the field with turret direction and target point.
-     *
-     * @param robotPose             The robot's current pose
-     * @param turretAbsoluteHeading The turret's absolute heading on the field in degrees (or null to skip)
-     * @param targetCoord           The target coordinate the turret is aiming at (or null to skip)
-     */
-    public static void drawRobot(Pose2d robotPose, Double turretAbsoluteHeading, FieldCoordinate targetCoord)
-    {
-        if (robotPose == null)
+        if (futurePose != null)
         {
-            return;
+            drawRobotBody(futurePose, robotStyle);
+            drawRobotHeading(futurePose, directionStyle);
         }
-
-        // Convert pose to RIGHT_HAND coordinates (corner origin) in inches
-        // This matches the PEDRO_PATHING preset which expects (0,0) at corner
-        Pose2d convertedPose = robotPose
-                .toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND)
-                .toDistanceUnit(DistanceUnit.INCH);
-
-        double x = convertedPose.coord.x.magnitude;
-        double y = convertedPose.coord.y.magnitude;
-        double headingRad = convertedPose.heading.getAngle(AngleUnit.RADIANS);
-
-        if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(headingRad))
+        if (turretAngleRad != null)
         {
-            return;
-        }
-
-        // Draw robot body (filled circle)
-        panelsField.setStyle(robotStyle);
-        panelsField.moveCursor(x, y);
-        panelsField.circle(ROBOT_RADIUS);
-
-        // Draw a smaller inner circle to make it more visible
-        panelsField.moveCursor(x, y);
-        panelsField.circle(ROBOT_RADIUS * 0.6);
-
-        // Draw direction indicator (line from center extending past the robot edge)
-        double dirX1 = x;
-        double dirY1 = y;
-        double dirX2 = x + (ROBOT_RADIUS * 1.5) * Math.cos(headingRad);
-        double dirY2 = y + (ROBOT_RADIUS * 1.5) * Math.sin(headingRad);
-
-        panelsField.setStyle(directionStyle);
-        panelsField.moveCursor(dirX1, dirY1);
-        panelsField.line(dirX2, dirY2);
-
-        // Draw turret direction if provided (extends past the robot edge)
-        if (turretAbsoluteHeading != null)
-        {
-            double turretRad = Math.toRadians(turretAbsoluteHeading);
-            double turretX1 = x;
-            double turretY1 = y;
-            double turretX2 = x + (ROBOT_RADIUS * 1.8) * Math.cos(turretRad);
-            double turretY2 = y + (ROBOT_RADIUS * 1.8) * Math.sin(turretRad);
-
+            drawAngle(pose, turretAngleRad, ROBOT_RADIUS * 1.8, turretStyle);
+            // Draw a small circle at the turret end
+            Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+            double x = converted.coord.x.magnitude;
+            double y = converted.coord.y.magnitude;
+            double x2 = x + (ROBOT_RADIUS * 1.8) * Math.cos(turretAngleRad);
+            double y2 = y + (ROBOT_RADIUS * 1.8) * Math.sin(turretAngleRad);
             panelsField.setStyle(turretStyle);
-            panelsField.moveCursor(turretX1, turretY1);
-            panelsField.line(turretX2, turretY2);
-
-            // Draw a small circle at the turret end for visibility
-            panelsField.moveCursor(turretX2, turretY2);
+            panelsField.moveCursor(x2, y2);
             panelsField.circle(2);
         }
-
-        // Draw target point if provided
         if (targetCoord != null)
         {
-            FieldCoordinate convertedTarget = targetCoord
-                    .toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND)
-                    .toDistanceUnit(DistanceUnit.INCH);
-
+            drawFieldCoordinate(targetCoord, targetStyle, 6);
+            // Draw an X through the target
+            FieldCoordinate convertedTarget = targetCoord.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
             double targetX = convertedTarget.x.magnitude;
             double targetY = convertedTarget.y.magnitude;
-
-            // Draw target marker (larger circle for visibility)
-            panelsField.setStyle(targetMarkerStyle);
-            panelsField.moveCursor(targetX, targetY);
-            panelsField.circle(6);
-
-            // Draw an X through the target
-            panelsField.setStyle(targetStyle);
             double markerSize = 4;
+            panelsField.setStyle(targetStyle);
             panelsField.moveCursor(targetX - markerSize, targetY - markerSize);
             panelsField.line(targetX + markerSize, targetY + markerSize);
             panelsField.moveCursor(targetX - markerSize, targetY + markerSize);
             panelsField.line(targetX + markerSize, targetY - markerSize);
         }
+    }
+
+    /**
+     * Draws the robot body (circle) at the given pose.
+     */
+    public static void drawRobotBody(Pose2d pose, Style style)
+    {
+        if (pose == null || style == null) return;
+        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+        double x = converted.coord.x.magnitude;
+        double y = converted.coord.y.magnitude;
+        panelsField.setStyle(style);
+        panelsField.moveCursor(x, y);
+        panelsField.circle(ROBOT_RADIUS);
+        panelsField.moveCursor(x, y);
+        panelsField.circle(ROBOT_RADIUS * 0.6);
+    }
+
+    /**
+     * Draws the robot heading (line) at the given pose.
+     */
+    public static void drawRobotHeading(Pose2d pose, Style style)
+    {
+        if (pose == null || style == null) return;
+        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+        double x = converted.coord.x.magnitude;
+        double y = converted.coord.y.magnitude;
+        double headingRad = converted.heading.getAngle(AngleUnit.RADIANS);
+        double x2 = x + (ROBOT_RADIUS * 1.5) * Math.cos(headingRad);
+        double y2 = y + (ROBOT_RADIUS * 1.5) * Math.sin(headingRad);
+        panelsField.setStyle(style);
+        panelsField.moveCursor(x, y);
+        panelsField.line(x2, y2);
+    }
+
+    /**
+     * Draws a field coordinate as a circle.
+     */
+    public static void drawFieldCoordinate(FieldCoordinate coord, Style style, double radius)
+    {
+        if (coord == null || style == null) return;
+        FieldCoordinate converted = coord.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+        double x = converted.x.magnitude;
+        double y = converted.y.magnitude;
+        panelsField.setStyle(style);
+        panelsField.moveCursor(x, y);
+        panelsField.circle(radius);
+    }
+
+    /**
+     * Draws an angle (e.g., turret or custom) from the robot's position.
+     *
+     * @param pose     The robot pose (origin for the angle)
+     * @param angleRad The angle in radians (field-absolute)
+     * @param length   The length of the line
+     * @param style    The style to use
+     */
+    public static void drawAngle(Pose2d pose, double angleRad, double length, Style style)
+    {
+        if (pose == null || style == null) return;
+        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+        double x = converted.coord.x.magnitude;
+        double y = converted.coord.y.magnitude;
+        double x2 = x + length * Math.cos(angleRad);
+        double y2 = y + length * Math.sin(angleRad);
+        panelsField.setStyle(style);
+        panelsField.moveCursor(x, y);
+        panelsField.line(x2, y2);
     }
 
     /**
@@ -171,4 +175,3 @@ public class FieldDrawing
         panelsField.update();
     }
 }
-

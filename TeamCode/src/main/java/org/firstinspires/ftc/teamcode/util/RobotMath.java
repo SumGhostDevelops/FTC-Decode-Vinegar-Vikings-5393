@@ -79,7 +79,7 @@ public class RobotMath
          * @param gearRatio Ratio from input to Output (ex: 20:1 = 20.0)
          * @return
          */
-        public static int angleToTicks(Angle angle, int PPR, double gearRatio)
+        public static int angleToTicks(Angle angle, double PPR, double gearRatio)
         {
             angle = angle.toUnit(AngleUnit.DEGREES);
 
@@ -95,7 +95,7 @@ public class RobotMath
          * @param gearRatio Ratio from input to Output (ex: 20:1 = 20.0)
          * @return
          */
-        public static int angleToTicks(UnnormalizedAngle angle, int PPR, double gearRatio)
+        public static int angleToTicks(UnnormalizedAngle angle, double PPR, double gearRatio)
         {
             angle = angle.toUnit(UnnormalizedAngleUnit.DEGREES);
 
@@ -112,7 +112,7 @@ public class RobotMath
          * @param gearRatio gear ratio from motor/encoder input to output (e.g. 20.0 for 20:1)
          * @return an {@link Angle} in degrees (normalized)
          */
-        public static Angle ticksToAngle(int ticks, int PPR, double gearRatio)
+        public static Angle ticksToAngle(int ticks, double PPR, double gearRatio)
         {
             double tickPerDegree = (PPR * gearRatio) / 360.0;
 

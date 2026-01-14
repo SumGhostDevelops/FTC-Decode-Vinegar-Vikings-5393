@@ -7,9 +7,9 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor.Encoder;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.DeadwheelHandler;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
+import org.firstinspires.ftc.teamcode.util.kinematics.PoseVelocityTracker;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
@@ -29,6 +29,11 @@ public class OdometryControlHub extends SubsystemBase
     private static final AngleUnit aUnit = AngleUnit.RADIANS;
 
     private DeadwheelHandler dwHandler;
+
+    /**
+     * Tracks pose over time to compute velocity and acceleration for prediction.
+     */
+    private final PoseVelocityTracker velocityTracker;
 
     /**
      * Offset added to IMU yaw to get field-absolute heading.
@@ -63,6 +68,9 @@ public class OdometryControlHub extends SubsystemBase
 
         // Initialize driverForward to the reference pose heading so getDriverHeading() starts at 0
         this.driverForward = referencePose.heading.toUnit(aUnit);
+
+        // Initialize velocity tracker with buffer size of 20 samples (~300ms at 50Hz)
+        this.velocityTracker = new PoseVelocityTracker(20);
 
         // create handler with current encoder baselines (likely zero after reset)
         this.dwHandler = new DeadwheelHandler(referencePose, dwPar.getPosition(), dwPerp.getPosition());
@@ -178,30 +186,78 @@ public class OdometryControlHub extends SubsystemBase
     }
 
     /**
-     * Gets raw AprilTag detection data for debugging. Does not modify robot state.
-     * @return String with raw AprilTag pose data, or null if no tag detected
+     * Based on kinematics, returns a future pose {@code seconds} time into the future.
+     * Uses current velocity and acceleration data to extrapolate position.
+     * @param seconds Time in the future to predict
+     * @return The predicted Pose2d
      */
-    public String getRawAprilTagData()
+    public Pose2d getFuturePose(double seconds)
     {
-        webcam.updateDetections();
-        Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
-        if (possibleTag.isEmpty()) return null;
+        return velocityTracker.getFuturePose(seconds, getPose());
+    }
 
-        AprilTagDetection tag = possibleTag.get();
-        return String.format(
-            "ID=%d | Raw XYZ: (%.2f, %.2f, %.2f) %s | Yaw: %.1f° | Converted Pose: (%.2f, %.2f) in, range: %.2f, heading: %.1f°, yaw: %.2f",
-            tag.id,
-            tag.robotPose.getPosition().x,
-            tag.robotPose.getPosition().y,
-            tag.robotPose.getPosition().z,
-            tag.robotPose.getPosition().unit.toString(),
-            tag.robotPose.getOrientation().getYaw(AngleUnit.DEGREES),
-            Pose2d.fromPose3D(tag.robotPose).coord.x.getDistance(DistanceUnit.INCH),
-            Pose2d.fromPose3D(tag.robotPose).coord.y.getDistance(DistanceUnit.INCH),
-            tag.ftcPose.range,
-            Pose2d.fromPose3D(tag.robotPose).heading.getAngle(AngleUnit.DEGREES),
-            tag.ftcPose.yaw
-        );
+    /**
+     * @return The current velocity in the X direction (inches/second)
+     */
+    public double getVelocityX()
+    {
+        return velocityTracker.getVelocityX();
+    }
+
+    /**
+     * @return The current velocity in the Y direction (inches/second)
+     */
+    public double getVelocityY()
+    {
+        return velocityTracker.getVelocityY();
+    }
+
+    /**
+     * @return The current angular velocity (radians/second)
+     */
+    public double getAngularVelocity()
+    {
+        return velocityTracker.getAngularVelocity();
+    }
+
+    /**
+     * @return The current linear speed (inches/second)
+     */
+    public double getSpeed()
+    {
+        return velocityTracker.getSpeed();
+    }
+
+    /**
+     * @return The current acceleration in the X direction (inches/second²)
+     */
+    public double getAccelerationX()
+    {
+        return velocityTracker.getAccelerationX();
+    }
+
+    /**
+     * @return The current acceleration in the Y direction (inches/second²)
+     */
+    public double getAccelerationY()
+    {
+        return velocityTracker.getAccelerationY();
+    }
+
+    /**
+     * @return The current angular acceleration (radians/second²)
+     */
+    public double getAngularAcceleration()
+    {
+        return velocityTracker.getAngularAcceleration();
+    }
+
+    /**
+     * @return The current linear acceleration magnitude (inches/second²)
+     */
+    public double getAccelerationMagnitude()
+    {
+        return velocityTracker.getAccelerationMagnitude();
     }
 
     @Override
@@ -209,6 +265,9 @@ public class OdometryControlHub extends SubsystemBase
     {
         // pass the ABSOLUTE heading into the deadwheel handler for correct field-relative position integration
         dwHandler.updatePose(dwPar.getPosition(), dwPerp.getPosition(), getAngle());
+
+        // Update velocity tracker with current pose for kinematics calculations
+        velocityTracker.update(System.nanoTime() / 1_000_000_000.0, getPose());
     }
 
     /**

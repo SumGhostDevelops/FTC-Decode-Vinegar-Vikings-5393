@@ -116,7 +116,7 @@ public class RobotConstants
         public static String NAME = "turret";
 
         @Sorter(sort = 1)
-        public static int PPR = 28;
+        public static double PPR = 537.7;
         @Sorter(sort = 2)
         public static double GEAR_RATIO = 19.2 * 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         @Sorter(sort = 3)
@@ -201,6 +201,8 @@ public class RobotConstants
     {
         @Sorter(sort = 0)
         public static Pose2d DEFAULT_POSE = new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(90, AngleUnit.DEGREES));
+        @Sorter(sort = 1)
+        public static double FUTURE_POSE_TIME = 1.0;
 
         @IgnoreConfigurable
         public static class IMU
