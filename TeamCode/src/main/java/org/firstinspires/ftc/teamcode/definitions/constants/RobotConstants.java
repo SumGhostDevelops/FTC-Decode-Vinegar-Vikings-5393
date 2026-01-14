@@ -29,6 +29,7 @@ public class RobotConstants
     {
         public static boolean SET_AUTOCLEAR = true;
         public static boolean SET_AUTOCLEAR_LOGS = true;
+        public static double LOG_AUTOCLEAR_DELAY = 10;
     }
 
     public static class AprilTags

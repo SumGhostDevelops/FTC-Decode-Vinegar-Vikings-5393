@@ -28,13 +28,6 @@ public class OdometryCommands
         public Localize(OdometryControlHub odometry, Telemetry telemetry)
         {
             super(() -> {
-                // Get raw data before localization for debugging
-                String rawData = odometry.getRawAprilTagData();
-                if (rawData != null)
-                {
-                    telemetry.log().add("AprilTag: " + rawData);
-                }
-
                 boolean success = odometry.localize();
                 if (success)
                 {

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.Robot;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -37,6 +39,8 @@ public abstract class BaseStable extends CommandOpMode
     protected Team team;
     protected RobotContext robot;
     private final Timer timer = new Timer(120, TimeUnit.SECONDS);
+    private final ElapsedTime logTimer = new ElapsedTime();
+    private double lastCleared = logTimer.seconds();
 
     @Override
     public void initialize()
@@ -70,7 +74,11 @@ public abstract class BaseStable extends CommandOpMode
     protected void displayTelemetry()
     {
         if (RobotConstants.Telemetry.SET_AUTOCLEAR) telemetry.clear();
-        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS) telemetry.log().clear();
+        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS && Math.abs(logTimer.seconds() - lastCleared) > RobotConstants.Telemetry.LOG_AUTOCLEAR_DELAY)
+        {
+            telemetry.log().clear();
+            lastCleared = logTimer.seconds();
+        }
 
         switch (RobotConstants.General.PRESET_OPTION)
         {
