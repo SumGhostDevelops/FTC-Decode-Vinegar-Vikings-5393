@@ -181,9 +181,9 @@ public class RobotConstants
         @Sorter(sort = 1)
         public static double intakeRPM = 1300;
         @Sorter(sort = 2)
-        public static double outtakePower = 0.5;
+        public static double outtakePower = 1300;
         @Sorter(sort = 3)
-        public static double transferPassPower = 0.7;
+        public static double transferPassRPM = 1620;
         @Sorter(sort = 4)
         public static double transferPassPowerSpeed = 0.5;
         @Sorter(sort = 5)

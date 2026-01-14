@@ -120,6 +120,8 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Bearing to Target", robot.subsystems.turret.bearingToTarget());
+                telemetry.addData("Strafe Encoder", robot.hw.dwStrf.getPosition());
+                telemetry.addData("Fwd Encoder", robot.hw.dwFwd.getPosition());
                 telemetry.addData("Raw Data", robot.subsystems.odometry.getRawAprilTagData());
         }
     }
@@ -174,7 +176,7 @@ public abstract class BaseStable extends CommandOpMode
         Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
 
         Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakeRPM);
-        Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassPower);
+        Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassRPM);
         Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
         Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
         Command transferCloseIntake = new TransferCommands.CloseIntake(subsystems.transfer);

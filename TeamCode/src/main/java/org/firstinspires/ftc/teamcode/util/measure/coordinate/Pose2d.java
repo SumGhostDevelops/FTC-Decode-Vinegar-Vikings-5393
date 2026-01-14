@@ -140,6 +140,6 @@ public class Pose2d
                 new Distance(-pose.getPosition().x, pose.getPosition().unit),
                 FieldCoordinate.CoordinateSystem.FTC_STD);
 
-        return new Pose2d(coord, new Angle((pose.getOrientation().getYaw(AngleUnit.RADIANS))+Math.PI/2, AngleUnit.RADIANS));
+        return new Pose2d(coord, new Angle((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS));
     }
 }

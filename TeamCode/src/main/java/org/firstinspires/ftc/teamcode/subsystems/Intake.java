@@ -19,9 +19,9 @@ public class Intake extends SubsystemBase
         intake.setRPM(Math.abs(RPM));
     }
 
-    public void out(double power)
+    public void out(double RPM)
     {
-        intake.setRPM(-Math.abs(power));
+        intake.setRPM(-Math.abs(RPM));
     }
 
     public void stop()

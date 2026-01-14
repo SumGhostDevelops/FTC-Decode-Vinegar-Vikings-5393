@@ -137,7 +137,7 @@ public class OdometryControlHub extends SubsystemBase
         // Compute new headingOffset so getAngle() returns true field-absolute heading
         // headingOffset = estimatedPose.heading - currentIMUYaw
         Angle currentImuYaw = getIMUYaw(aUnit);
-        headingOffset = estimatedPose.heading.toUnit(aUnit).minus((currentImuYaw).plus(new Angle(Math.PI/2,AngleUnit.RADIANS)));
+        headingOffset = estimatedPose.heading.toUnit(aUnit).minus((currentImuYaw));
 
         // Update driverForward so getDriverHeading() still returns the same value
         // getDriverHeading() = getAngle() - driverForward = currentDriverHeading
