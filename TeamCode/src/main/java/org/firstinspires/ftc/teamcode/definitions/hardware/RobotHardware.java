@@ -122,11 +122,12 @@ public class RobotHardware
 
         try
         {
-            turret = new MotorXP(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_312);
+            turret = new MotorXP(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_435);
             turret.motorEx.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             turret.motorEx.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            turret.motorEx.setPositionPIDFCoefficients(RobotConstants.Turret.pCoeff);
             turret.setRunMode(Motor.RunMode.PositionControl);
+            double[] pidf = RobotConstants.Turret.pidf;
+            turret.motorEx.setVelocityPIDFCoefficients(pidf[0], pidf[1], pidf[2], pidf[3]);
             turret.setTargetPosition(0);
             turret.setPositionTolerance(RobotConstants.Turret.TOLERANCE); // Allow 5 ticks tolerance for atTargetPosition()
         }
@@ -150,7 +151,7 @@ public class RobotHardware
         try
         {
             intake = new MotorXP(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620);
-            intake.setRunMode(Motor.RunMode.RawPower);
+            intake.setRunMode(Motor.RunMode.VelocityControl);
             intake.motorEx.setDirection(DcMotorSimple.Direction.REVERSE);
             intake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         }

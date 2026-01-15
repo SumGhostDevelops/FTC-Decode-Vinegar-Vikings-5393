@@ -22,6 +22,7 @@ public class RobotConstants
         public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = false;
+        public static boolean TWO_PERSON_OPERATION = false;
     }
 
     @Configurable
@@ -83,7 +84,7 @@ public class RobotConstants
         public static int BASE_RPM = 3700;
 
         @Sorter(sort = 3)
-        public static boolean IDLE_BY_DEFAULT = false;
+        public static boolean ON_BY_DEFAULT = false;
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = true;
 
@@ -124,9 +125,10 @@ public class RobotConstants
         @Sorter(sort = 1)
         public static double PPR = 537.7;
         @Sorter(sort = 2)
-        public static double GEAR_RATIO = 19.2 * 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
+        public static double GEAR_RATIO = 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
+        public static double TICKS_PER_REV = 17482 / 10.0;
         @Sorter(sort = 3)
-        public static int TOLERANCE = 5; // in ticks
+        public static int TOLERANCE = 50; // in ticks
 
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
@@ -136,7 +138,7 @@ public class RobotConstants
         public static boolean autoAimToGoal = true;
 
         @Sorter(sort = 7)
-        public static double pCoeff = 1;
+        public static double[] pidf = new double[]{7, 1, -2, 1};
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;

@@ -28,12 +28,12 @@ public class ConstantsPresets
             case DEFAULT:
                 break;
             case TESTING:
-                RobotConstants.Outtake.IDLE_BY_DEFAULT = false;
+                RobotConstants.Outtake.ON_BY_DEFAULT = false;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
                 RobotConstants.General.REGRESSION_TESTING_MODE = true;
                 break;
             case COMPETITION:
-                RobotConstants.Outtake.IDLE_BY_DEFAULT = true;
+                RobotConstants.Outtake.ON_BY_DEFAULT = true;
                 RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
                 RobotConstants.Turret.autoAimToGoal = true;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = true;

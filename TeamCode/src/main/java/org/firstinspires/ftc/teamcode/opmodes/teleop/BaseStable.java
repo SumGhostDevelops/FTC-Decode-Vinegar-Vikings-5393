@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.Robot;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -123,12 +122,15 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Acceleration (in/sec^2)", Math.hypot(robot.subsystems.odometry.getAccelerationX(), robot.subsystems.odometry.getAccelerationY()));
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
+                telemetry.addLine("--- Intake ---");
+                telemetry.addData("RPM", robot.subsystems.intake.getRPM());
                 telemetry.addLine("--- Outtake ---");
                 telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
                 telemetry.addData("RPM", robot.subsystems.outtake.getRPM());
                 telemetry.addData("Acceleration", robot.subsystems.outtake.getRPMAcceleration());
                 telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
                 telemetry.addLine("--- Turret ---");
+                telemetry.addData("Is At Target", robot.subsystems.turret.isAtTarget());
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Bearing to Target", robot.subsystems.turret.bearingToTarget());
@@ -146,7 +148,7 @@ public abstract class BaseStable extends CommandOpMode
         FieldDrawing.draw(
                 robot.subsystems.odometry.getPose(),
                 robot.subsystems.odometry.getFuturePose(RobotConstants.Turret.FUTURE_POSE_TIME),
-                robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES),
+                robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS),
                 robot.team.goal.coord
         );
         FieldDrawing.sendPacket();
@@ -175,120 +177,141 @@ public abstract class BaseStable extends CommandOpMode
 
     public void bindKeys()
     {
+        // 1. Setup local references and shared triggers
         GamepadEx driver = robot.gamepads.driver;
         GamepadEx coDriver = robot.gamepads.coDriver;
-        Subsystems subsystems = robot.subsystems;
+        Subsystems s = robot.subsystems;
 
         Trigger opModeIsActive = new Trigger(this::opModeIsActive);
-        Trigger outtakeReady = new Trigger(subsystems.outtake::isReady);
+        Trigger turretReady = new Trigger(s.turret::isAtTarget);
+        Trigger outtakeReady = new Trigger(s.outtake::isReady);
 
-        Trigger driverLeftTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
-        Trigger driverRightTrigger = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
+        // Define Raw Triggers
+        Trigger dLT = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
+        Trigger dRT = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
+        Trigger cdLT = new Trigger(() -> coDriver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
+        Trigger cdRT = new Trigger(() -> coDriver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
 
-        Command intakeIntake = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.intakeRPM);
-        Command intakeTransfer = new IntakeCommands.In(subsystems.intake, () -> RobotConstants.Intake.transferPassRPM);
-        Command transferOpen = new TransferCommands.OpenTransfer(subsystems.transfer);
-        Command transferShoot = new TransferCommands.ShootingTransfer(subsystems.transfer);
-        Command transferCloseIntake = new TransferCommands.CloseIntake(subsystems.transfer);
-        Command transferCloseTransfer = new TransferCommands.CloseTransfer(subsystems.transfer);
-        Command outtakeOn = new OuttakeCommands.On(subsystems.outtake, () -> RobotConstants.Outtake.IDLE_BY_DEFAULT);
+        // 2. Delegate to specialized binding methods
+        bindDriveControls(driver, s);
+        bindTurretControls(opModeIsActive, driver, s);
+        bindOuttakeControls(opModeIsActive, driver, s);
 
+        // Pass all triggers to the logic method
+        bindIntakeAndTransferLogic(opModeIsActive, dLT, dRT, cdLT, cdRT, turretReady, outtakeReady, s);
+        bindCoDriverControls(coDriver, s);
+    }
+
+    private void bindDriveControls(GamepadEx driver, Subsystems s)
+    {
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new DriveCommands.DecreaseSpeed(subsystems.drive));
+                .whenPressed(new DriveCommands.DecreaseSpeed(s.drive));
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new DriveCommands.IncreaseSpeed(subsystems.drive));
-
-        if (RobotConstants.General.PRESET_OPTION.equals(ConstantsPresets.Preset.TESTING))
-        {
-            driver.getGamepadButton(GamepadKeys.Button.A).toggleWhenPressed(subsystems.transfer::close, subsystems.transfer::open);
-        }
+                .whenPressed(new DriveCommands.IncreaseSpeed(s.drive));
         driver.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(subsystems.odometry));
-
-        // X button: Attempt AprilTag localization
-
+                .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(s.odometry));
         driver.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new OdometryCommands.Localize(subsystems.odometry, telemetry));
+                .whenPressed(new OdometryCommands.Localize(s.odometry, telemetry));
+    }
 
-        Supplier<Pose2d> turretPose;
-
-        if (RobotConstants.Turret.USE_FUTURE_POSE) turretPose = () -> subsystems.odometry.getFuturePose(RobotConstants.Turret.FUTURE_POSE_TIME);
-        else turretPose = () -> subsystems.odometry.getPose();
+    private void bindTurretControls(Trigger active, GamepadEx driver, Subsystems s)
+    {
+        Supplier<Pose2d> turretPose = getPoseSupplier(RobotConstants.Turret.USE_FUTURE_POSE, RobotConstants.Turret.FUTURE_POSE_TIME, s);
+        Command aimCmd = new TurretCommands.AimToGoal(s.turret, robot.team.goal.coord, turretPose);
 
         if (RobotConstants.Turret.autoAimToGoal)
         {
-            opModeIsActive.whileActiveContinuous(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, turretPose));
+            active.whileActiveContinuous(aimCmd);
         }
         else
         {
-            // Y button (held): Auto-aim turret to team's goal
-            driver.getGamepadButton(GamepadKeys.Button.Y)
-                    .toggleWhenPressed(new TurretCommands.AimToGoal(subsystems.turret, robot.team.goal.coord, turretPose));
+            driver.getGamepadButton(GamepadKeys.Button.Y).toggleWhenPressed(aimCmd);
         }
+    }
 
+    private void bindOuttakeControls(Trigger active, GamepadEx driver, Subsystems s)
+    {
         if (RobotConstants.General.REGRESSION_TESTING_MODE)
         {
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                    .whileHeld(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, 25));
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                    .whileHeld(new OuttakeCommands.ChangeTargetRPM(subsystems.outtake, -25));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 25));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -25));
         }
         else
         {
-            Supplier<Pose2d> outtakePose;
-            if (RobotConstants.Outtake.USE_FUTURE_POSE) outtakePose = () -> subsystems.odometry.getFuturePose(RobotConstants.Outtake.FUTURE_POSE_TIME);
-            else outtakePose = () -> subsystems.odometry.getPose();
-
-            opModeIsActive.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(subsystems.outtake, () -> outtakePose.get().distanceTo(team.goal.coord)));
+            Supplier<Pose2d> outtakePose = getPoseSupplier(RobotConstants.Outtake.USE_FUTURE_POSE, RobotConstants.Outtake.FUTURE_POSE_TIME, s);
+            active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(s.outtake, () -> outtakePose.get().distanceTo(team.goal.coord)));
         }
+    }
 
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whileHeld(new IntakeCommands.Out(subsystems.intake, () -> RobotConstants.Intake.outtakePower));
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whileHeld(new TransferCommands.CloseIntake(subsystems.transfer));
+    private void bindIntakeAndTransferLogic(Trigger active, Trigger dLT, Trigger dRT, Trigger cdLT, Trigger cdRT, Trigger turretReady, Trigger outtakeReady, Subsystems s)
+    {
+        boolean twoPerson = RobotConstants.General.TWO_PERSON_OPERATION;
 
-        if (RobotConstants.Intake.INTAKE_BY_DEFAULT)
+        // Abstract the Controls
+        Trigger intakeTrigger = twoPerson ? cdLT : dLT;
+        Trigger shootTrigger  = twoPerson ? cdRT : dRT;
+
+        // Shared Command Instances
+        Command intakeIn = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.intakeRPM);
+        Command intakeTransfer = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.transferPassRPM);
+        Command transferOpen = new TransferCommands.OpenTransfer(s.transfer);
+        Command transferClose = new TransferCommands.CloseTransfer(s.transfer);
+
+        /* --- 1. INTAKE LOGIC --- */
+        // Trigger if INTAKE_BY_DEFAULT is on, OR if the manual intake trigger is held.
+        // We add .and(shootTrigger.negate()) to ensure intake stops when we try to score.
+        Trigger shouldIntake = (RobotConstants.Intake.INTAKE_BY_DEFAULT ? active : intakeTrigger)
+                .and(shootTrigger.negate());
+
+        shouldIntake.whileActiveOnce(intakeIn).whileActiveOnce(transferClose);
+
+        /* --- 2. THE START CONDITION (canScore) --- */
+        boolean isSemiAuto = RobotConstants.Intake.INTAKE_BY_DEFAULT || RobotConstants.Outtake.ON_BY_DEFAULT;
+
+        Trigger canScore = isSemiAuto
+                ? shootTrigger.and(turretReady).and(outtakeReady)
+                : intakeTrigger.and(shootTrigger).and(turretReady).and(outtakeReady);
+
+        /* --- 3. THE PERSISTENCE/EXIT CONDITION (keepScoring) --- */
+        Trigger keepScoring = isSemiAuto
+                ? shootTrigger.and(turretReady)
+                : intakeTrigger.and(shootTrigger).and(turretReady);
+
+        // Bindings for scoring
+        canScore.whenActive(intakeTransfer).whenActive(transferOpen);
+        keepScoring.negate().cancelWhenActive(intakeTransfer).cancelWhenActive(transferOpen);
+
+        /* --- 4. FLYWHEEL POWER --- */
+        if (RobotConstants.Outtake.ON_BY_DEFAULT)
         {
-            // Intake mode: Automatic
-            // If the op mode is active, and we are not holding down the left trigger, turn the intake on
-            opModeIsActive
-                    .and(driverLeftTrigger.negate())
-                    .whileActiveOnce(intakeIntake);
+            active.whileActiveOnce(new OuttakeCommands.On(s.outtake, () -> true));
         }
         else
         {
-            // Intake mode: Left trigger held, right trigger NOT pressed
-            // Runs intake continuously while conditions are met
-            // While we are holding down the left trigger, and we are not holding down the right trigger, turn the intake on
-            driverLeftTrigger
-                    .and(driverRightTrigger.negate())
-                    .whileActiveOnce(intakeIntake);
+            shootTrigger.whileActiveOnce(new OuttakeCommands.On(s.outtake, () -> true));
         }
 
-        // Intake Mode: Set transfer to the intake/blocking mode
-        // If we are holding down the left trigger, and we are not holding down the right trigger, set the transfer to a blocking state
-        driverLeftTrigger
-                .and(driverRightTrigger.negate())
-                .whileActiveOnce(transferCloseTransfer);
+        /* --- 5. MANUAL OVERRIDES (Driver D-Pad) --- */
+        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                .whileHeld(new IntakeCommands.Out(s.intake, () -> RobotConstants.Intake.outtakePower));
+        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                .whileHeld(new TransferCommands.CloseIntake(s.transfer));
+    }
 
-        driverLeftTrigger
-                .and(driverRightTrigger)
-                //.and(outtakeReady)
-                //.whileActiveOnce(transferOpen)
-                .whileActiveContinuous(intakeTransfer)
-                .whileActiveOnce(transferOpen);
+    private void bindCoDriverControls(GamepadEx coDriver, Subsystems s)
+    {
+        coDriver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.BLUE_GOAL));
+        coDriver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.RED_GOAL));
+        coDriver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.BLUE_LOADING_ZONE));
+        coDriver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.RED_LOADING_ZONE));
+        coDriver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.SMALL_TRIANGLE));
+    }
 
-
-        // Outtake: Right trigger spins up flywheel
-        // While the right trigger is held down, turn the intake on
-        driverRightTrigger
-                .whileActiveOnce(outtakeOn);
-
-        // Co driver localization
-        coDriver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_GOAL));
-        coDriver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_GOAL));
-        coDriver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.BLUE_LOADING_ZONE));
-        coDriver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.RED_LOADING_ZONE));
-        coDriver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(() -> subsystems.odometry.updateReferencePose(CornersCoordinates.SMALL_TRIANGLE));
+    /**
+     * Helper to avoid duplicating FuturePose logic
+     */
+    private Supplier<Pose2d> getPoseSupplier(boolean useFuture, double time, Subsystems s)
+    {
+        return useFuture ? () -> s.odometry.getFuturePose(time) : s.odometry::getPose;
     }
 }
