@@ -8,6 +8,13 @@ public abstract class Base extends LinearOpMode
 {
     protected Team team;
 
+    protected enum AutoStrat{
+        BASIC,
+        REGULAR,
+        GATE
+
+    }
+
     @Override
     public void runOpMode() throws InterruptedException
     {
