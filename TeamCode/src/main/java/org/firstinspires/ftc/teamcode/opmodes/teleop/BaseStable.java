@@ -84,10 +84,10 @@ public abstract class BaseStable extends CommandOpMode
             case DEFAULT:
             case COMPETITION:
                 telemetry.addLine("--- Co Driver Keybinds ---");
-                telemetry.addLine("DPAD UP: BLUE GOAL");
-                telemetry.addLine("DPAD RIGHT: RED GOAL");
-                telemetry.addLine("DPAD DOWN: BLUE LOADING ZONE");
-                telemetry.addLine("DPAD LEFT: RED LOADING ZONE");
+                telemetry.addLine("Y: BLUE GOAL");
+                telemetry.addLine("B: RED GOAL");
+                telemetry.addLine("A: BLUE LOADING ZONE");
+                telemetry.addLine("X: RED LOADING ZONE");
                 telemetry.addLine("RIGHT BUMPER: SMALL/FAR TRIANGLE");
                 telemetry.addLine("------");
                 telemetry.addData("Team", team);
@@ -183,7 +183,7 @@ public abstract class BaseStable extends CommandOpMode
         Subsystems s = robot.subsystems;
 
         Trigger opModeIsActive = new Trigger(this::opModeIsActive);
-        Trigger turretReady = new Trigger(s.turret::isAtTarget);
+        Trigger turretReady = new Trigger(() -> Math.abs(s.turret.bearingToTarget().toUnit(AngleUnit.DEGREES).measure) < 8.5);
         Trigger outtakeReady = new Trigger(s.outtake::isReady);
 
         // Define Raw Triggers

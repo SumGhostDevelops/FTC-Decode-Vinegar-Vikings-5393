@@ -128,6 +128,7 @@ public class RobotHardware
             turret.setRunMode(Motor.RunMode.PositionControl);
             double[] pidf = RobotConstants.Turret.pidf;
             turret.motorEx.setVelocityPIDFCoefficients(pidf[0], pidf[1], pidf[2], pidf[3]);
+            //turret.motorEx.setPositionPIDFCoefficients(pidf[0]);
             turret.setTargetPosition(0);
             turret.setPositionTolerance(RobotConstants.Turret.TOLERANCE); // Allow 5 ticks tolerance for atTargetPosition()
         }

@@ -133,12 +133,12 @@ public class RobotConstants
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
         @Sorter(sort = 5)
-        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(90, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
+        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-180, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(90, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         @Sorter(sort = 6)
         public static boolean autoAimToGoal = true;
 
         @Sorter(sort = 7)
-        public static double[] pidf = new double[]{7, 1, -2, 1};
+        public static double[] pidf = new double[]{10, 1, 9, 1};
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;
