@@ -284,18 +284,16 @@ public abstract class BaseStable extends CommandOpMode
         /* --- 4. FLYWHEEL POWER --- */
         if (RobotConstants.Outtake.ON_BY_DEFAULT)
         {
-            active.whileActiveOnce(new OuttakeCommands.On(s.outtake, () -> true));
+            active.whileActiveOnce(new OuttakeCommands.On(s.outtake, () -> false));
         }
         else
         {
-            shootTrigger.whileActiveOnce(new OuttakeCommands.On(s.outtake, () -> true));
+            shootTrigger.whileActiveOnce(new OuttakeCommands.On(s.outtake, () -> false));
         }
 
         /* --- 5. MANUAL OVERRIDES (Driver D-Pad) --- */
         robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
                 .whileHeld(new IntakeCommands.Out(s.intake, () -> RobotConstants.Intake.outtakePower));
-        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whileHeld(new TransferCommands.CloseIntake(s.transfer));
     }
 
     private void bindCoDriverControls(GamepadEx coDriver, Subsystems s)
