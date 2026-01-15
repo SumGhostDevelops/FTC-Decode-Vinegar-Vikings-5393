@@ -1,17 +1,17 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous.full;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.Far;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
+import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 
 
-@Autonomous(name = "RedFullVikingsAutonomous", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
+@Autonomous(name = "FarRedAuto", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
 public class Red extends Base
 {
 

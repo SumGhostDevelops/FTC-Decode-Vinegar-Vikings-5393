@@ -1,5 +1,5 @@
 // java
-package org.firstinspires.ftc.teamcode.opmodes.autonomous.basic;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.Close.Basic;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 
-@Autonomous(name = "BlueBetterAuto")
+@Autonomous(name = "BasicClosecBlueAuto", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
 public class Blue extends Base {
 
     @Configurable

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous.basic;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.Close;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -8,5 +8,9 @@ public abstract class Base extends LinearOpMode
 {
     protected Team team;
 
+    @Override
+    public void runOpMode() throws InterruptedException
+    {
 
+    }
 }
