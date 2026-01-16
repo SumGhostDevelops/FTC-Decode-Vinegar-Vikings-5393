@@ -215,7 +215,7 @@ public class RobotHardware
             dwFwd = backLeft.encoder;
             dwFwd.setDirection(Motor.Direction.REVERSE);
             dwStrf = backRight.encoder;
-            dwStrf.setDirection(Motor.Direction.FORWARD);
+            dwStrf.setDirection(Motor.Direction.REVERSE);
             dwFwd.reset();
             dwStrf.reset();
         }
