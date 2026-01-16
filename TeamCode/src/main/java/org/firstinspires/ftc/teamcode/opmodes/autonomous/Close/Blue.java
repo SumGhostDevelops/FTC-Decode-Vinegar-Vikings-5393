@@ -30,10 +30,13 @@ public class Blue extends Base {
         telemetry.update();
         if (gamepad1.dpad_up) {
             autoStrat = AutoStrat.GATE;
+            telemetry.update();
         } else if (gamepad1.dpad_right) {
             autoStrat = AutoStrat.REGULAR;
+            telemetry.update();
         } else if (gamepad1.dpad_down) {
             autoStrat = AutoStrat.BASIC;
+            telemetry.update();
         }
         telemetry.update();
         telemetry.addLine("--- SELECT AUTO STRATEGY ---");
