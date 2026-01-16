@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
+import org.firstinspires.ftc.teamcode.util.RobotMath;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.MotorXP;
 
@@ -148,10 +149,9 @@ public class Outtake extends SubsystemBase {
         }
 
         lastDistance = dist;
-        double distance = dist.toUnit(DistanceUnit.INCH).magnitude;
 
         // regression is in inches
-        setTargetRPM(0.00444146*Math.pow(distance, 2) + 14.06355 * distance + 2167.42661);
+        setTargetRPM(RobotMath.Outtake.rpmLUT(dist));
     }
 
     public double getTargetRPM()

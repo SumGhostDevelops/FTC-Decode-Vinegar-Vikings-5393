@@ -8,21 +8,30 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 /**
- * Tracks Pose2d data points over time and computes velocity and acceleration
- * using linear regression (OLS). This is analogous to MotorAccelerationTracker
- * but operates on Pose2d instead of a single scalar.
+ * Tracks Pose2d data points over time and computes velocity and acceleration.
  *
- * Velocities are computed as:
- * - vX: velocity in X direction (inches/second)
- * - vY: velocity in Y direction (inches/second)
- * - vHeading: angular velocity (radians/second)
- *
- * Accelerations are computed as the derivative of velocities.
+ * IMPROVEMENTS:
+ * - Uses a time-bounded window (e.g., 100ms) for regression instead of full buffer capacity.
+ * This dramatically reduces lag during starts/stops.
+ * - Uses Low-Pass Filtered finite differences for acceleration to capture sudden impulses.
  */
 public class PoseVelocityTracker
 {
     private static final DistanceUnit INTERNAL_DIST_UNIT = DistanceUnit.INCH;
     private static final AngleUnit INTERNAL_ANGLE_UNIT = AngleUnit.RADIANS;
+
+    // Time horizon for velocity calculation.
+    // 0.1s (100ms) provides a good balance between noise rejection and fast reaction.
+    // If the robot stops, the old motion data "falls off" this window in 0.1s.
+    private static final double WINDOW_TIME_HORIZON = 0.1;
+
+    // Minimum time interval between samples (seconds)
+    // Lowered to 5ms to allow for high-frequency control loops.
+    private final double MIN_UPDATE_INTERVAL = 0.005;
+
+    // Smoothing factor for Acceleration (0.0 = no new data, 1.0 = no smoothing)
+    // Acceleration is naturally noisy, so we smooth it slightly.
+    private final double ACCEL_SMOOTHING = 0.6;
 
     private final int capacity;
     private final double[] times;
@@ -35,18 +44,15 @@ public class PoseVelocityTracker
 
     private double lastAddTimestamp = 0;
 
-    // Cached velocity values (first derivative)
+    // Cached velocity values
     private double lastVX = 0;
     private double lastVY = 0;
     private double lastVHeading = 0;
 
-    // Cached acceleration values (second derivative)
+    // Cached acceleration values
     private double lastAX = 0;
     private double lastAY = 0;
     private double lastAHeading = 0;
-
-    // Minimum time interval between samples (seconds)
-    private final double MIN_UPDATE_INTERVAL = 0.015;
 
     public PoseVelocityTracker(int bufferSize)
     {
@@ -65,15 +71,16 @@ public class PoseVelocityTracker
      */
     public void update(double currentTimeSeconds, Pose2d pose)
     {
-        // Check if enough time has passed (except for first sample)
+        // 1. Frequency Cap
         if (size > 0 && (currentTimeSeconds - lastAddTimestamp < MIN_UPDATE_INTERVAL))
         {
             return;
         }
 
+        double dt = currentTimeSeconds - lastAddTimestamp; // Delta time since last accepted update
         lastAddTimestamp = currentTimeSeconds;
 
-        // Convert pose to internal units
+        // 2. Data Normalization
         Pose2d normalizedPose = pose
                 .toDistanceUnit(INTERNAL_DIST_UNIT)
                 .toAngleUnit(INTERNAL_ANGLE_UNIT);
@@ -82,7 +89,7 @@ public class PoseVelocityTracker
         double y = normalizedPose.coord.y.magnitude;
         double heading = normalizedPose.heading.measure;
 
-        // Handle heading wraparound - unwrap heading relative to previous sample
+        // 3. Handle Heading Wraparound
         if (size > 0)
         {
             int lastIndex = (head + size - 1) % capacity;
@@ -90,7 +97,7 @@ public class PoseVelocityTracker
             heading = unwrapAngle(lastHeading, heading);
         }
 
-        // Add to circular buffer
+        // 4. Add to Circular Buffer
         if (size < capacity)
         {
             int index = (head + size) % capacity;
@@ -109,35 +116,58 @@ public class PoseVelocityTracker
             head = (head + 1) % capacity;
         }
 
-        // Need at least 3 points for reliable regression
-        if (size < 3)
+        if (size < 2) return;
+
+        // 5. Determine Analysis Window
+        // We only look back 'WINDOW_TIME_HORIZON' seconds to determine current velocity.
+        // This ensures old data doesn't drag down the average.
+        int windowCount = 0;
+        for (int i = 0; i < size; i++)
         {
-            return;
+            int index = (head + size - 1 - i) % capacity; // Iterate backwards
+            double sampleTime = times[index];
+            windowCount++;
+            if (currentTimeSeconds - sampleTime > WINDOW_TIME_HORIZON)
+            {
+                break;
+            }
         }
 
-        // Calculate velocities (first derivatives) using linear regression
-        double[] regressionResults = calculateLinearRegression(times, xPositions);
-        lastVX = regressionResults[0]; // slope is velocity
+        // Ensure we have at least 2 points for a line, but prefer at least 3 for regression
+        windowCount = Math.max(2, windowCount);
 
-        regressionResults = calculateLinearRegression(times, yPositions);
-        lastVY = regressionResults[0];
+        // 6. Calculate Velocity (Linear Regression on recent window)
+        // Store previous velocities to calculate acceleration later
+        double prevVX = lastVX;
+        double prevVY = lastVY;
+        double prevVHeading = lastVHeading;
 
-        regressionResults = calculateLinearRegression(times, headings);
-        lastVHeading = regressionResults[0];
+        double[] vXResults = calculateLinearRegression(times, xPositions, windowCount);
+        double[] vYResults = calculateLinearRegression(times, yPositions, windowCount);
+        double[] vHResults = calculateLinearRegression(times, headings, windowCount);
 
-        // For acceleration, we need to track velocity over time
-        // Use quadratic regression to get acceleration directly
-        if (size >= 5) // Need more points for reliable second derivative
+        lastVX = vXResults[0];
+        lastVY = vYResults[0];
+        lastVHeading = vHResults[0];
+
+        // 7. Calculate Acceleration (Finite Difference + Low Pass Filter)
+        // Regression for acceleration is too slow/unstable for sudden stops.
+        // We use the change in velocity over the change in time.
+        if (size > 2 && dt > 0)
         {
-            lastAX = calculateQuadraticAcceleration(times, xPositions);
-            lastAY = calculateQuadraticAcceleration(times, yPositions);
-            lastAHeading = calculateQuadraticAcceleration(times, headings);
+            double rawAX = (lastVX - prevVX) / dt;
+            double rawAY = (lastVY - prevVY) / dt;
+            double rawAH = (lastVHeading - prevVHeading) / dt;
+
+            // Apply Exponential Moving Average (Low Pass Filter)
+            lastAX = (ACCEL_SMOOTHING * rawAX) + ((1 - ACCEL_SMOOTHING) * lastAX);
+            lastAY = (ACCEL_SMOOTHING * rawAY) + ((1 - ACCEL_SMOOTHING) * lastAY);
+            lastAHeading = (ACCEL_SMOOTHING * rawAH) + ((1 - ACCEL_SMOOTHING) * lastAHeading);
         }
     }
 
     /**
      * Unwraps an angle to avoid discontinuities at ±π.
-     * Returns the unwrapped angle that is closest to the reference.
      */
     private double unwrapAngle(double reference, double angle)
     {
@@ -148,19 +178,28 @@ public class PoseVelocityTracker
     }
 
     /**
-     * Calculates linear regression (OLS) and returns [slope, intercept].
+     * Calculates linear regression (OLS) on the last 'count' elements of the buffer.
+     * @return [slope, intercept]
      */
-    private double[] calculateLinearRegression(double[] timeData, double[] valueData)
+    private double[] calculateLinearRegression(double[] timeData, double[] valueData, int count)
     {
-        double n = size;
+        double n = count;
         double sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
 
-        double startTime = timeData[head];
+        // Start index for the window
+        // (head + size - count) points to the start of the recent window
+        int startIndex = (head + size - count);
+        // Fix negative modulo if count is close to capacity (though math handles it, this is safe)
+        while(startIndex < 0) startIndex += capacity;
+        startIndex %= capacity;
 
-        for (int i = 0; i < size; i++)
+        // Use the oldest time in the WINDOW as t=0 to keep numbers small
+        double t0 = timeData[startIndex];
+
+        for (int i = 0; i < count; i++)
         {
-            int index = (head + i) % capacity;
-            double x = timeData[index] - startTime;
+            int index = (startIndex + i) % capacity;
+            double x = timeData[index] - t0;
             double y = valueData[index];
 
             sumX += x;
@@ -172,7 +211,8 @@ public class PoseVelocityTracker
         double denominator = (n * sumXX) - (sumX * sumX);
         if (Math.abs(denominator) < 1e-9)
         {
-            return new double[]{0, sumY / n}; // Return average as intercept if degenerate
+            // Fallback: If denominator is 0 (all times same), return 0 slope
+            return new double[]{0, sumY / n};
         }
 
         double slope = ((n * sumXY) - (sumX * sumY)) / denominator;
@@ -182,79 +222,7 @@ public class PoseVelocityTracker
     }
 
     /**
-     * Calculates acceleration using quadratic regression.
-     * Fits y = a*t² + b*t + c, acceleration = 2*a
-     */
-    private double calculateQuadraticAcceleration(double[] timeData, double[] valueData)
-    {
-        // Use least squares for quadratic fit
-        double n = size;
-        double sumT = 0, sumT2 = 0, sumT3 = 0, sumT4 = 0;
-        double sumY = 0, sumTY = 0, sumT2Y = 0;
-
-        double startTime = timeData[head];
-
-        for (int i = 0; i < size; i++)
-        {
-            int index = (head + i) % capacity;
-            double t = timeData[index] - startTime;
-            double y = valueData[index];
-
-            double t2 = t * t;
-            double t3 = t2 * t;
-            double t4 = t2 * t2;
-
-            sumT += t;
-            sumT2 += t2;
-            sumT3 += t3;
-            sumT4 += t4;
-            sumY += y;
-            sumTY += t * y;
-            sumT2Y += t2 * y;
-        }
-
-        // Solve the normal equations for quadratic regression
-        // Using Cramer's rule for 3x3 system
-        double[][] A = {
-                {sumT4, sumT3, sumT2},
-                {sumT3, sumT2, sumT},
-                {sumT2, sumT, n}
-        };
-        double[] B = {sumT2Y, sumTY, sumY};
-
-        double detA = determinant3x3(A);
-        if (Math.abs(detA) < 1e-12)
-        {
-            return 0;
-        }
-
-        // Replace first column with B to get coefficient 'a'
-        double[][] A_a = {
-                {B[0], sumT3, sumT2},
-                {B[1], sumT2, sumT},
-                {B[2], sumT, n}
-        };
-
-        double a = determinant3x3(A_a) / detA;
-
-        // Acceleration is 2*a (second derivative of at² + bt + c)
-        return 2 * a;
-    }
-
-    private double determinant3x3(double[][] m)
-    {
-        return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
-                - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
-                + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
-    }
-
-    /**
      * Predicts the future pose after a given time delta.
-     * Uses current velocity and acceleration for prediction.
-     *
-     * @param seconds Time in the future to predict (seconds)
-     * @param currentPose The current pose to extrapolate from
-     * @return The predicted Pose2d
      */
     public Pose2d getFuturePose(double seconds, Pose2d currentPose)
     {
@@ -266,7 +234,6 @@ public class PoseVelocityTracker
         double currentY = normalizedPose.coord.y.magnitude;
         double currentHeading = normalizedPose.heading.measure;
 
-        // Kinematic equation: x = x0 + v*t + 0.5*a*t²
         double t = seconds;
         double t2 = t * t;
 
@@ -284,67 +251,25 @@ public class PoseVelocityTracker
         );
     }
 
-    // Getters for velocities (in internal units: inches/sec, radians/sec)
+    // --- Getters ---
 
-    public double getVelocityX()
-    {
-        return lastVX;
-    }
+    public double getVelocityX() { return lastVX; }
+    public double getVelocityY() { return lastVY; }
+    public double getAngularVelocity() { return lastVHeading; }
+    public double getSpeed() { return Math.sqrt(lastVX * lastVX + lastVY * lastVY); }
 
-    public double getVelocityY()
-    {
-        return lastVY;
-    }
-
-    public double getAngularVelocity()
-    {
-        return lastVHeading;
-    }
-
-    /**
-     * @return The linear speed (magnitude of velocity vector) in inches/second
-     */
-    public double getSpeed()
-    {
-        return Math.sqrt(lastVX * lastVX + lastVY * lastVY);
-    }
-
-    // Getters for accelerations (in internal units: inches/sec², radians/sec²)
-
-    public double getAccelerationX()
-    {
-        return lastAX;
-    }
-
-    public double getAccelerationY()
-    {
-        return lastAY;
-    }
-
-    public double getAngularAcceleration()
-    {
-        return lastAHeading;
-    }
-
-    /**
-     * @return The linear acceleration magnitude in inches/second²
-     */
-    public double getAccelerationMagnitude()
-    {
-        return Math.sqrt(lastAX * lastAX + lastAY * lastAY);
-    }
+    public double getAccelerationX() { return lastAX; }
+    public double getAccelerationY() { return lastAY; }
+    public double getAngularAcceleration() { return lastAHeading; }
+    public double getAccelerationMagnitude() { return Math.sqrt(lastAX * lastAX + lastAY * lastAY); }
 
     public void reset()
     {
         size = 0;
         head = 0;
         lastAddTimestamp = 0;
-        lastVX = 0;
-        lastVY = 0;
-        lastVHeading = 0;
-        lastAX = 0;
-        lastAY = 0;
-        lastAHeading = 0;
+        lastVX = 0; lastVY = 0; lastVHeading = 0;
+        lastAX = 0; lastAY = 0; lastAHeading = 0;
     }
 
     public int getSampleCount()
@@ -352,4 +277,3 @@ public class PoseVelocityTracker
         return size;
     }
 }
-

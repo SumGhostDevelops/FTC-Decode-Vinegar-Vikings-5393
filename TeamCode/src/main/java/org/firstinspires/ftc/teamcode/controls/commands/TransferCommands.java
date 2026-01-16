@@ -14,6 +14,27 @@ import java.util.concurrent.TimeUnit;
 public class TransferCommands
 {
     /**
+     * Default command that maintains the transfer in its closed intake position.
+     * This ensures the transfer always returns to its initial position when no other commands are running.
+     */
+    public static class DefaultPosition extends CommandBase
+    {
+        private final Transfer transfer;
+
+        public DefaultPosition(Transfer transfer)
+        {
+            this.transfer = transfer;
+            addRequirements(transfer);
+        }
+
+        @Override
+        public void execute()
+        {
+            transfer.close(Transfer.CloseType.INTAKE);
+        }
+    }
+
+    /**
      * Allows balls to be moved into the outtake.
      */
     public static class OpenTransfer extends CommandBase

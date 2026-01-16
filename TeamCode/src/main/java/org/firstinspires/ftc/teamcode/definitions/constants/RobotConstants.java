@@ -19,9 +19,10 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
         public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = false;
+        public static boolean TWO_PERSON_OPERATION = false;
     }
 
     @Configurable
@@ -56,7 +57,7 @@ public class RobotConstants
         @Configurable
         public static class Speed
         {
-            public static double DEFAULT = 0.75;
+            public static double DEFAULT = 1.0;
             public static double MAXIMUM = 1.0;
             public static double MINIMUM = 0.25;
             public static double CHANGE = 0.25;
@@ -83,7 +84,7 @@ public class RobotConstants
         public static int BASE_RPM = 3700;
 
         @Sorter(sort = 3)
-        public static boolean IDLE_BY_DEFAULT = false;
+        public static boolean ON_BY_DEFAULT = false;
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = true;
 
@@ -124,19 +125,20 @@ public class RobotConstants
         @Sorter(sort = 1)
         public static double PPR = 537.7;
         @Sorter(sort = 2)
-        public static double GEAR_RATIO = 19.2 * 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
+        public static double GEAR_RATIO = 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
+        public static double TICKS_PER_REV = 17482 / 10.0;
         @Sorter(sort = 3)
-        public static int TOLERANCE = 5; // in ticks
+        public static int TOLERANCE = 50; // in ticks
 
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
         @Sorter(sort = 5)
-        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(90, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
+        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         @Sorter(sort = 6)
         public static boolean autoAimToGoal = true;
 
         @Sorter(sort = 7)
-        public static double pCoeff = 1;
+        public static double[] pidf = new double[]{10, 1, 1, 1};
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;
@@ -155,11 +157,11 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
         @Sorter(sort = 3)
-        public static double CLOSED_INTAKE_ANGLE = 0; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSED_INTAKE_ANGLE = 20; // An angle where the trapdoor blocks balls from entering
         @Sorter(sort = 4)
-        public static double CLOSED_FULL_TRANSFER_ANGLE = 210;
+        public static double CLOSED_FULL_TRANSFER_ANGLE = 20;
 
-        public static double CLOSED_SHOOTING_TRANSFER_ANGLE = 60;
+        public static double CLOSED_SHOOTING_TRANSFER_ANGLE = 20;
         @Sorter(sort = 5)
         public static double TRANSFER_ANGLE = 100;
 
