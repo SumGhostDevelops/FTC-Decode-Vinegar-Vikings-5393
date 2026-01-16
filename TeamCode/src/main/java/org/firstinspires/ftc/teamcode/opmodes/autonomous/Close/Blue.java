@@ -27,7 +27,7 @@ public class Blue extends Base {
     public void runOpMode() throws InterruptedException {
         team = Team.BLUE;
         super.runOpMode();
-
+        telemetry.update();
         if (gamepad1.dpad_up) {
             autoStrat = AutoStrat.GATE;
         } else if (gamepad1.dpad_right) {
@@ -35,7 +35,7 @@ public class Blue extends Base {
         } else if (gamepad1.dpad_down) {
             autoStrat = AutoStrat.BASIC;
         }
-
+        telemetry.update();
         telemetry.addLine("--- SELECT AUTO STRATEGY ---");
         telemetry.addData("Selected", autoStrat);
         telemetry.addLine("\nControls:");
