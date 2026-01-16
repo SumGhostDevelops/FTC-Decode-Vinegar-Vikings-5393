@@ -147,20 +147,20 @@ public class Blue extends Base {
                     follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.Gate1);
                     break;
-                case Gate1:
+                case ToThree:
                     follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.Gate2);
                     break;
-                case Gate2:
+                case ToThreeFull:
                     follower.followPath(paths.bottomBalls);
                     setPathState(Paths.PathState.ToEatGate);
                     break;
-                case ToEatGate:
+                case bottomBalls:
                     // intake();
                     follower.followPath(paths.bottomBallsEat);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
-                case ToShoot_3:
+                case bottomBallsEat:
                     break;
             }
         }
@@ -292,15 +292,15 @@ public class Blue extends Base {
     public static class Paths {
 
         public PathChain ToShoot,
-                ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree,
-                ToThreeFull, ToRandom, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+                ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
+                ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
         // Gate-specific paths used in buildPathsGate
         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
                 bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, finalPose;
 
         public enum PathState {
             ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree,
-            ToThreeFull, ToRandom, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+            ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
             bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose
