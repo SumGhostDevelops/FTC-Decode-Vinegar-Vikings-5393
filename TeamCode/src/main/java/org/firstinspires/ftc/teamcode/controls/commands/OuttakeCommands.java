@@ -95,9 +95,20 @@ public class OuttakeCommands
         }
     }
 
-    public static class UpdateRPMBasedOnDistance extends InstantCommand
+    public static class UpdateRPMBasedOnDistance extends CommandBase
     {
+        private final Outtake outtake;
+        private final Supplier<Distance> distance;
+
         public UpdateRPMBasedOnDistance(Outtake outtake, Supplier<Distance> distance)
+        {
+            this.outtake = outtake;
+            this.distance = distance;
+            // Note: Do not add requirements - this command should run alongside other outtake commands
+        }
+
+        @Override
+        public void execute()
         {
             outtake.setTargetRPMFromDistance(distance.get());
         }

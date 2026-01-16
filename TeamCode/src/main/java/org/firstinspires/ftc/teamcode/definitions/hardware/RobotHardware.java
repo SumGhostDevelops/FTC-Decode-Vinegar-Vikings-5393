@@ -141,7 +141,7 @@ public class RobotHardware
         try
         {
             transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.NAME, RobotConstants.Transfer.SERVO_RANGE, AngleUnit.DEGREES);
-            transfer.set(RobotConstants.Transfer.CLOSED_FULL_TRANSFER_ANGLE);
+            transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
         }
         catch (Exception e)
         {

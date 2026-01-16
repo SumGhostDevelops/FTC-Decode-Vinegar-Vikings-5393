@@ -35,8 +35,10 @@ public class ConstantsPresets
             case COMPETITION:
                 RobotConstants.Outtake.ON_BY_DEFAULT = true;
                 RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
+                RobotConstants.General.REGRESSION_TESTING_MODE = false;
                 RobotConstants.Turret.autoAimToGoal = true;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = true;
+                RobotConstants.General.TWO_PERSON_OPERATION = true;
                 break;
         }
     }

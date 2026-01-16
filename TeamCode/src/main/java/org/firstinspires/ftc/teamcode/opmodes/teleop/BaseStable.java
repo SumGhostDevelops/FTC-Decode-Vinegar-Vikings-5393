@@ -52,6 +52,9 @@ public abstract class BaseStable extends CommandOpMode
 
         register(robot.subsystems.drive, robot.subsystems.intake, robot.subsystems.transfer, robot.subsystems.turret, robot.subsystems.outtake, robot.subsystems.odometry);
 
+        // Set the default command for transfer to maintain its initial position
+        robot.subsystems.transfer.setDefaultCommand(new TransferCommands.DefaultPosition(robot.subsystems.transfer));
+
         DoubleSupplier x = () -> gamepad1.left_stick_x; // Counteract imperfect strafing
         DoubleSupplier y = () -> -gamepad1.left_stick_y; // Y is inverted
         DoubleSupplier rx = () -> gamepad1.right_stick_x;
@@ -236,7 +239,7 @@ public abstract class BaseStable extends CommandOpMode
             driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 25));
             driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -25));
         }
-        else
+        if (RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT)
         {
             Supplier<Pose2d> outtakePose = getPoseSupplier(RobotConstants.Outtake.USE_FUTURE_POSE, RobotConstants.Outtake.FUTURE_POSE_TIME, s);
             active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(s.outtake, () -> outtakePose.get().distanceTo(team.goal.coord)));
@@ -263,7 +266,7 @@ public abstract class BaseStable extends CommandOpMode
         Trigger shouldIntake = (RobotConstants.Intake.INTAKE_BY_DEFAULT ? active : intakeTrigger)
                 .and(shootTrigger.negate());
 
-        shouldIntake.whileActiveOnce(intakeIn).whileActiveOnce(transferClose);
+        shouldIntake.whileActiveContinuous(intakeIn).whileActiveContinuous(transferClose);
 
         /* --- 2. THE START CONDITION (canScore) --- */
         boolean isSemiAuto = RobotConstants.Intake.INTAKE_BY_DEFAULT || RobotConstants.Outtake.ON_BY_DEFAULT;
@@ -284,11 +287,11 @@ public abstract class BaseStable extends CommandOpMode
         /* --- 4. FLYWHEEL POWER --- */
         if (RobotConstants.Outtake.ON_BY_DEFAULT)
         {
-            active.whileActiveOnce(new OuttakeCommands.On(s.outtake, () -> false));
+            active.whileActiveContinuous(new OuttakeCommands.On(s.outtake, () -> false));
         }
         else
         {
-            shootTrigger.whileActiveOnce(new OuttakeCommands.On(s.outtake, () -> false));
+            shootTrigger.whileActiveContinuous(new OuttakeCommands.On(s.outtake, () -> false));
         }
 
         /* --- 5. MANUAL OVERRIDES (Driver D-Pad) --- */

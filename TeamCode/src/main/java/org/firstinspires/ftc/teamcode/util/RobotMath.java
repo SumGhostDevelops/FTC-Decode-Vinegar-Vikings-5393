@@ -154,7 +154,7 @@ public class RobotMath
     {
         private static final InterpLUT lut = new InterpLUT();
         private static boolean lutInitialized = false;
-        private static final DistanceUnit dUnit = DistanceUnit.METER;
+        private static final DistanceUnit dUnit = DistanceUnit.INCH;
 
         /**
          * Initialize the look up table.
@@ -163,16 +163,15 @@ public class RobotMath
         {
             // make sure all distances have .toUnit(dUnit)
             // distance, rpm
-            //Adding each val with a key
-            /*
-            lut.add(1.529, 2250);
-            lut.add(1.911, 2400);
-            lut.add(3.872, 3300);
-            lut.add(2.934, 2950);
-
-
-             */
-            //generating final equation
+            // inches
+            lut.add(0, 4100);
+            lut.add(50.32, 4100);
+            lut.add(59.63, 4300);
+            lut.add(70.25, 4400);
+            lut.add(86.79, 4800);
+            lut.add(97.81, 5000);
+            lut.add(108.49, 5400);
+            lut.add(Math.hypot(144, 144), 5400);
             lut.createLUT();
             lutInitialized = true;
         }
@@ -184,8 +183,16 @@ public class RobotMath
          */
         public static double rpmLUT(Distance dist)
         {
-            double meters = dist.toUnit(DistanceUnit.METER).magnitude;
-            return -223.05528*meters*meters + 1691.10697*meters + 34.64716;
+            if (!lutInitialized)
+            {
+                initLUT();
+            }
+
+            return lut.get(dist.toUnit(dUnit).magnitude);
+
+            //double distance = dist.toUnit(dUnit).magnitude;
+
+            //return 0.172932 * distance * distance - 6.07764 * distance + 3996.30357;
         }
     }
 }
