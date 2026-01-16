@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class PedroConstants {
     // get mass later
-    static double mass = 6.7;
+    static double mass = 10; // kg, this is the mass of the robot without any game elements
 
     public static FollowerConstants followerConstants = new FollowerConstants().mass(mass);
 
