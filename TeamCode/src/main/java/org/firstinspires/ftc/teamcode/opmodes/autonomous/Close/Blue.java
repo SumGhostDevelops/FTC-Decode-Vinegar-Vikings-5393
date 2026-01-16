@@ -27,33 +27,35 @@ public class Blue extends Base {
     public void runOpMode() throws InterruptedException {
         team = Team.BLUE;
         super.runOpMode();
-        telemetry.update();
-        if (gamepad1.dpad_up) {
-            autoStrat = AutoStrat.GATE;
-            telemetry.update();
-        } else if (gamepad1.dpad_right) {
-            autoStrat = AutoStrat.REGULAR;
-            telemetry.update();
-        } else if (gamepad1.dpad_down) {
-            autoStrat = AutoStrat.BASIC;
+        while (opModeInInit()) {
+            // --- Move your selection logic inside this loop ---
+            if (gamepad1.dpad_up) {
+                autoStrat = AutoStrat.GATE;
+            } else if (gamepad1.dpad_right) {
+                autoStrat = AutoStrat.REGULAR;
+            } else if (gamepad1.dpad_down) {
+                autoStrat = AutoStrat.BASIC;
+            }
+
+            // --- Keep your telemetry inside the loop for live feedback ---
+            telemetry.addLine("--- SELECT AUTO STRATEGY ---");
+            telemetry.addData("Selected", autoStrat);
+            telemetry.addLine("\nControls:");
+            telemetry.addLine("DPAD UP: 12 Ball (GATE)");
+            telemetry.addLine("DPAD RIGHT: 9 Ball (REGULAR)");
+            telemetry.addLine("DPAD DOWN: 3 Ball (BASIC)");
             telemetry.update();
         }
-        telemetry.update();
-        telemetry.addLine("--- SELECT AUTO STRATEGY ---");
-        telemetry.addData("Selected", autoStrat);
-        telemetry.addLine("\nControls:");
-        telemetry.addLine("DPAD UP: 12 Ball");
-        telemetry.addLine("DPAD RIGHT: 9 Ball");
-        telemetry.addLine("DPAD DOWN: 3 Ball");
-        telemetry.update();
 
+        // Now the selection is locked in. Initialize paths and timers.
         initAuto();
 
+        // The OpMode will wait here until you press START
         waitForStart();
+
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
 
-            follower.followPath(paths.ToShoot);
 
             while (opModeIsActive() && !isStopRequested()) {
                 handlePathing();
