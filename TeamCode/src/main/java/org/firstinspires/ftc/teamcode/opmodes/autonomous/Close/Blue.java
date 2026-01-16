@@ -45,20 +45,10 @@ public class Blue extends Base {
         initAuto();
 
         waitForStart();
-        waitForStart();
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
 
-            if(autoStrat == AutoStrat.BASIC) {
-                follower.followPath(paths.ToShoot);
-
-            }else if (autoStrat == AutoStrat.REGULAR) {
-
-                follower.followPath(paths.ToShoot);
-
-            }else{
-                follower.followPath(paths.ToShoot);
-            }
+            follower.followPath(paths.ToShoot);
 
             while (opModeIsActive() && !isStopRequested()) {
                 handlePathing();
@@ -79,15 +69,7 @@ public class Blue extends Base {
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
 
-        if(autoStrat == AutoStrat.BASIC) {
-            // Basic Start
-        }else if (autoStrat == AutoStrat.REGULAR) {
-
-            setPathState(Paths.PathState.ToShoot);
-
-        }else{
-            // Gate Start
-        }
+        setPathState(Paths.PathState.ToShoot);
 
 
     }
@@ -100,14 +82,13 @@ public class Blue extends Base {
     private void handlePathing() {
         switch (autoStrat){
 
-               case BASIC:
+            case BASIC:
                    PathBasic();
                     break;
-                case GATE:
+            case REGULAR:
                     PathRegular();
                     break;
-                case REGULAR:
-                default:
+            case GATE:
                     PathGate();
                     break;
             }
