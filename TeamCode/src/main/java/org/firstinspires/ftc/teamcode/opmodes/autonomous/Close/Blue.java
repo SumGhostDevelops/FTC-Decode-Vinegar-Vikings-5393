@@ -11,6 +11,8 @@ import com.pedropathing.util.Timer;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 
+import java.util.Objects;
+
 @Autonomous(name = "CloseBlueAuto", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
 public class Blue extends Base {
 
@@ -98,14 +100,8 @@ public class Blue extends Base {
     private void PathBasic() {
         // This check ensures we only try to start a new path *after* the current one is complete.
         if (!follower.isBusy()) {
-            switch (currentPathState) {
-
-                case ToShoot:
-                    follower.followPath(paths.ToShoot, true);
-
-                    break;
-
-
+            if (Objects.requireNonNull(currentPathState) == Paths.PathState.ToShoot) {
+                follower.followPath(paths.ToShoot, true);
             }
         }
     }
