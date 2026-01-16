@@ -21,6 +21,7 @@ public class Red extends Base
 
     private Paths.PathState currentPathState;
 
+    private AutoStrat autoStrat = AutoStrat.REGULAR;
 
     @Override
     public void runOpMode() throws InterruptedException
