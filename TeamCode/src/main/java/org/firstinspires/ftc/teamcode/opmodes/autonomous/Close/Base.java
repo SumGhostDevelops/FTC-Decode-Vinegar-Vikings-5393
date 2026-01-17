@@ -14,6 +14,12 @@ public abstract class Base extends LinearOpMode
         GATE
 
     }
+    public void Shoot(){
+        // add logic to shoot
+    }
+    public void Intake(){
+        // add logic to intake
+    }
 
     @Override
     public void runOpMode() throws InterruptedException
