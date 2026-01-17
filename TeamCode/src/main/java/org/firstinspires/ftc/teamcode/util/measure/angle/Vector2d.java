@@ -146,6 +146,6 @@ public class Vector2d
     @Override
     public String toString()
     {
-        return getDistance().toString() + "; " + getDirection().toString();
+        return getDistance().toString() + "@ " + getDirection().toString();
     }
 }

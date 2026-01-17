@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.DeadwheelHandl
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 import org.firstinspires.ftc.teamcode.util.kinematics.PoseVelocityTracker;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.Vector2d;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
@@ -210,6 +211,11 @@ public class OdometryControlHub extends SubsystemBase
     public double getVelocityY()
     {
         return velocityTracker.getVelocityY();
+    }
+
+    public Vector2d getVelocity()
+    {
+        return new Vector2d(new Distance(getVelocityX(), DistanceUnit.INCH), new Distance(getVelocityY(), DistanceUnit.INCH));
     }
 
     /**

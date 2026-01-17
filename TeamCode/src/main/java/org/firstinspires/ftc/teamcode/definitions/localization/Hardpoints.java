@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
  * All coordinates have their pose facing up or toward the goal
  */
 @Configurable
-public class CornersCoordinates
+public class Hardpoints
 {
     private static final DistanceUnit INCH = DistanceUnit.INCH;
     private static final AngleUnit DEGREES = AngleUnit.DEGREES;
