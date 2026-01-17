@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
-import org.firstinspires.ftc.teamcode.definitions.localization.CornersCoordinates;
+import org.firstinspires.ftc.teamcode.definitions.localization.Hardpoints;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
@@ -97,7 +97,9 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Remaining Time", timer.remainingTime() + "/120");
                 telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
                 telemetry.addLine("--- Odometry ---");
+                telemetry.addData("Robot Moving", robot.subsystems.odometry.getVelocity().getDistance().toUnit(DistanceUnit.INCH).magnitude > RobotConstants.Odometry.inchesPerSecondCountsAsMoving);
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Velocity", robot.subsystems.odometry.getVelocity().toAngleUnit(AngleUnit.DEGREES));
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
                 telemetry.addLine("--- Outtake ---");
@@ -150,7 +152,7 @@ public abstract class BaseStable extends CommandOpMode
         // Draw robot position on Panels Dashboard Field panel
         FieldDrawing.draw(
                 robot.subsystems.odometry.getPose(),
-                robot.subsystems.odometry.getFuturePose(RobotConstants.Turret.FUTURE_POSE_TIME),
+                null, //robot.subsystems.odometry.getFuturePose(RobotConstants.Turret.FUTURE_POSE_TIME),
                 robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS),
                 robot.team.goal.coord
         );
@@ -188,6 +190,7 @@ public abstract class BaseStable extends CommandOpMode
         Trigger opModeIsActive = new Trigger(this::opModeIsActive);
         Trigger turretReady = new Trigger(() -> Math.abs(s.turret.bearingToTarget().toUnit(AngleUnit.DEGREES).measure) < 8.5);
         Trigger outtakeReady = new Trigger(s.outtake::isReady);
+        Trigger robotMoving = new Trigger(() -> s.odometry.getVelocity().getDistance().toUnit(DistanceUnit.INCH).magnitude > RobotConstants.Odometry.inchesPerSecondCountsAsMoving);
 
         // Define Raw Triggers
         Trigger dLT = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
@@ -198,7 +201,7 @@ public abstract class BaseStable extends CommandOpMode
         // 2. Delegate to specialized binding methods
         bindDriveControls(driver, s);
         bindTurretControls(opModeIsActive, driver, s);
-        bindOuttakeControls(opModeIsActive, driver, s);
+        bindOuttakeControls(opModeIsActive, robotMoving, driver, s);
 
         // Pass all triggers to the logic method
         bindIntakeAndTransferLogic(opModeIsActive, dLT, dRT, cdLT, cdRT, turretReady, outtakeReady, s);
@@ -232,8 +235,11 @@ public abstract class BaseStable extends CommandOpMode
         }
     }
 
-    private void bindOuttakeControls(Trigger active, GamepadEx driver, Subsystems s)
+    private void bindOuttakeControls(Trigger active, Trigger robotMoving, GamepadEx driver, Subsystems s)
     {
+        Supplier<Pose2d> outtakePose = getPoseSupplier(RobotConstants.Outtake.USE_FUTURE_POSE, RobotConstants.Outtake.FUTURE_POSE_TIME, s);
+        Command updateRPM = new OuttakeCommands.UpdateRPMBasedOnDistance(s.outtake, () -> outtakePose.get().distanceTo(team.goal.coord));
+
         if (RobotConstants.General.REGRESSION_TESTING_MODE)
         {
             driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 25));
@@ -241,9 +247,11 @@ public abstract class BaseStable extends CommandOpMode
         }
         if (RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT)
         {
-            Supplier<Pose2d> outtakePose = getPoseSupplier(RobotConstants.Outtake.USE_FUTURE_POSE, RobotConstants.Outtake.FUTURE_POSE_TIME, s);
-            active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(s.outtake, () -> outtakePose.get().distanceTo(team.goal.coord)));
+            active.whileActiveContinuous(updateRPM);
         }
+
+        robotMoving.whenActive(s.outtake::enableRPMRatio).whenActive(updateRPM);
+        robotMoving.whenInactive(s.outtake::disableRPMRatio).whenInactive(updateRPM);
     }
 
     private void bindIntakeAndTransferLogic(Trigger active, Trigger dLT, Trigger dRT, Trigger cdLT, Trigger cdRT, Trigger turretReady, Trigger outtakeReady, Subsystems s)
@@ -266,7 +274,7 @@ public abstract class BaseStable extends CommandOpMode
         Trigger shouldIntake = (RobotConstants.Intake.INTAKE_BY_DEFAULT ? active : intakeTrigger)
                 .and(shootTrigger.negate());
 
-        shouldIntake.whileActiveContinuous(intakeIn).whileActiveContinuous(transferClose);
+        shouldIntake.and(cdLT.negate()).and(cdRT.negate()).whileActiveContinuous(intakeIn).whileActiveContinuous(transferClose);
 
         /* --- 2. THE START CONDITION (canScore) --- */
         boolean isSemiAuto = RobotConstants.Intake.INTAKE_BY_DEFAULT || RobotConstants.Outtake.ON_BY_DEFAULT;
@@ -301,11 +309,11 @@ public abstract class BaseStable extends CommandOpMode
 
     private void bindCoDriverControls(GamepadEx coDriver, Subsystems s)
     {
-        coDriver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.BLUE_GOAL));
-        coDriver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.RED_GOAL));
-        coDriver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.BLUE_LOADING_ZONE));
-        coDriver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.RED_LOADING_ZONE));
-        coDriver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.SMALL_TRIANGLE));
+        coDriver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> s.odometry.updateReferencePose(Hardpoints.BLUE_GOAL));
+        coDriver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> s.odometry.updateReferencePose(Hardpoints.RED_GOAL));
+        coDriver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> s.odometry.updateReferencePose(Hardpoints.BLUE_LOADING_ZONE));
+        coDriver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> s.odometry.updateReferencePose(Hardpoints.RED_LOADING_ZONE));
+        coDriver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(() -> s.odometry.updateReferencePose(Hardpoints.SMALL_TRIANGLE));
     }
 
     /**

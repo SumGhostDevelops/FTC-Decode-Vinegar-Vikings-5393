@@ -93,6 +93,8 @@ public class RobotConstants
         @Sorter(sort = 6)
         public static double FUTURE_POSE_TIME = 1.0;
 
+        public static double RPM_WHILE_MOVING_RATIO = 1.0;
+
         @IgnoreConfigurable
         public static class Name
         {
@@ -216,6 +218,8 @@ public class RobotConstants
         public static Pose2d DEFAULT_POSE = new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(90, AngleUnit.DEGREES));
         @Sorter(sort = 1)
         public static double FUTURE_POSE_TIME = 1.0;
+
+        public static double inchesPerSecondCountsAsMoving = 10;
 
         @IgnoreConfigurable
         public static class IMU

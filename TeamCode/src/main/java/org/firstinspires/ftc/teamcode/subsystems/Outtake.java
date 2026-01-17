@@ -29,6 +29,9 @@ public class Outtake extends SubsystemBase {
     // Tolerance to avoid tiny floating-point updates (adjust as needed)
     private static final double RPM_EPS = 1.0;
 
+    private boolean rpmRatioEnabled = false;
+    private double rpmRatio = RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
+
     public Outtake(MotorXP motor)
     {
         this.motor = motor;
@@ -108,7 +111,8 @@ public class Outtake extends SubsystemBase {
             return;
         }
 
-        targetRPM = newRPM;
+        if (rpmRatioEnabled) targetRPM = newRPM * rpmRatio;
+        else targetRPM = newRPM;
 
         // If motor is active, compute desired rpm for current state and update only if needed
         double desired;
@@ -152,6 +156,21 @@ public class Outtake extends SubsystemBase {
 
         // regression is in inches
         setTargetRPM(RobotMath.Outtake.rpmLUT(dist));
+    }
+
+    public void enableRPMRatio()
+    {
+        rpmRatioEnabled = true;
+    }
+
+    public void disableRPMRatio()
+    {
+        rpmRatioEnabled = false;
+    }
+
+    public boolean getRPMRatio()
+    {
+        return rpmRatioEnabled;
     }
 
     public double getTargetRPM()
