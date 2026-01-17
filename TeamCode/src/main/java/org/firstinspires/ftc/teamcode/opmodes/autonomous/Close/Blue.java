@@ -108,6 +108,15 @@ public class Blue extends Base {
                 Shoot();
                 follower.followPath(paths.ToShoot, true);
             }
+            switch (currentPathState){
+                case ToShoot:
+                    Shoot();
+                    follower.followPath(paths.ToShoot, true);
+                    break;
+                case FinalPose:
+                    // end path
+                    follower.followPath(paths.FinalPose, true);
+            }
         }
     }
     private void PathRegular() {
@@ -317,14 +326,14 @@ public class Blue extends Base {
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
         // Gate-specific paths used in buildPathsGate
         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
-                bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, finalPose;
+                bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, FinalPose, finalPose;
 
         public enum PathState {
             ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree,
             ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
-            bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose
+            bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPose
         }
 
         public Paths(Follower follower, AutoStrat strat) {
@@ -347,12 +356,17 @@ public class Blue extends Base {
                         // Tune these poses if the robot drives too far or in the wrong direction.
             final Pose startPose = new Pose(80, 8.3);
             final Pose shootPose = new Pose(80, 27); // adjust values if distance is incorrect
+            final Pose finalPose = new Pose(19.000, 106.000);
 
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, shootPose))
                     .setTangentHeadingInterpolation()
                     .build();
 
+            FinalPose = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, finalPose))
+                    .setConstantHeadingInterpolation(Math.toRadians(142))
+                    .build();
 
         }
         private void buildPathsReg(Follower follower) {
