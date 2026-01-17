@@ -75,7 +75,6 @@ public class Blue extends Base {
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-
         setPathState(Paths.PathState.ToShoot);
 
 
@@ -106,7 +105,17 @@ public class Blue extends Base {
         // This check ensures we only try to start a new path *after* the current one is complete.
         if (!follower.isBusy()) {
             if (Objects.requireNonNull(currentPathState) == Paths.PathState.ToShoot) {
+                Shoot();
                 follower.followPath(paths.ToShoot, true);
+            }
+            switch (currentPathState){
+                case ToShoot:
+                    Shoot();
+                    follower.followPath(paths.ToShoot, true);
+                    break;
+                case FinalPose:
+                    // end path
+                    follower.followPath(paths.FinalPose, true);
             }
         }
     }
@@ -116,52 +125,57 @@ public class Blue extends Base {
             switch (currentPathState) {
                 // The logic is now: when a state is finished, start the NEXT path and set the NEXT state.
                 case ToShoot:
-                    // shoot();
+                    Shoot();
                     follower.followPath(paths.ToBallOne); // Start NEXT path
                     setPathState(Paths.PathState.ToBallOne); // Set NEXT state
                     break;
                 case ToBallOne:
+                    Intake();
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
                 case ToBallOneFull:
-                    // intake();
+                    // has ball
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
                 case ToShoot_1:
-                    // shoot();
+                    Shoot();
                     follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
                 case ToBallTwo:
+                    Intake();
                     follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
                 case ToBallTwoFull:
-                    // intake();
+                    // has ball
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
                 case ToShoot_2:
-                    // shoot();
+                    Shoot();
                     follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.Gate1);
                     break;
                 case ToThree:
+                    Intake();
                     follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.Gate2);
                     break;
                 case ToThreeFull:
+                    // has ball
                     follower.followPath(paths.bottomBalls);
                     setPathState(Paths.PathState.ToEatGate);
                     break;
                 case bottomBalls:
-                    // intake();
+                   Intake();
                     follower.followPath(paths.bottomBallsEat);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
                 case bottomBallsEat:
+                    Shoot();
                     break;
             }
         }
@@ -173,38 +187,45 @@ public class Blue extends Base {
 
                 // --- Start: go shoot first ---
                 case ToShoot:
+                    Shoot();
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
                 // --- Ball 1 sequence ---
                 case ToBallOne:
+                   Intake();
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
 
                 case ToBallOneFull:
+                    //full ball
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
                 case ToShoot_1:
+                    Shoot();
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.Gate);
                     break;
 
                 // --- Gate cycle 1 ---
                 case Gate:
+
                     follower.followPath(paths.Gate);
                     setPathState(Paths.PathState.Eat);
                     break;
 
                 case Eat:
+                    // intake
                     follower.followPath(paths.Eat);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
                 case ToShoot_2:
+                    Shoot();
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.Gate_2);
                     break;
@@ -216,11 +237,13 @@ public class Blue extends Base {
                     break;
 
                 case Eat_2:
+                   Intake();
                     follower.followPath(paths.Eat_2);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
 
                 case ToShoot_3:
+                    Shoot();
                     follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.Gate_3);
                     break;
@@ -232,11 +255,13 @@ public class Blue extends Base {
                     break;
 
                 case Eat_3:
+                   Intake();
                     follower.followPath(paths.Eat_3);
                     setPathState(Paths.PathState.ToShoot_4);
                     break;
 
                 case ToShoot_4:
+                    Shoot();
                     follower.followPath(paths.ToShoot_4);
                     setPathState(Paths.PathState.bottomBalls);
                     break;
@@ -248,11 +273,13 @@ public class Blue extends Base {
                     break;
 
                 case bottomBallsEat:
+                   Intake();
                     follower.followPath(paths.bottomBallsEat);
                     setPathState(Paths.PathState.ToShoot_5);
                     break;
 
                 case ToShoot_5:
+                    Shoot();
                     follower.followPath(paths.ToShoot_5);
                     setPathState(Paths.PathState.upperBalls);
                     break;
@@ -264,6 +291,7 @@ public class Blue extends Base {
                     break;
 
                 case upperEat:
+                   Intake();
                     follower.followPath(paths.upperEat);
                     setPathState(Paths.PathState.upperTurn);
                     break;
@@ -274,6 +302,7 @@ public class Blue extends Base {
                     break;
 
                 case toShoot:
+                    Shoot();
                     follower.followPath(paths.toShoot);
                     setPathState(Paths.PathState.finalPose);
                     break;
@@ -297,14 +326,14 @@ public class Blue extends Base {
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
         // Gate-specific paths used in buildPathsGate
         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
-                bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, finalPose;
+                bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, FinalPose, finalPose;
 
         public enum PathState {
             ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree,
             ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
-            bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose
+            bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPose
         }
 
         public Paths(Follower follower, AutoStrat strat) {
@@ -327,12 +356,17 @@ public class Blue extends Base {
                         // Tune these poses if the robot drives too far or in the wrong direction.
             final Pose startPose = new Pose(80, 8.3);
             final Pose shootPose = new Pose(80, 27); // adjust values if distance is incorrect
+            final Pose finalPose = new Pose(19.000, 106.000);
 
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, shootPose))
                     .setTangentHeadingInterpolation()
                     .build();
 
+            FinalPose = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, finalPose))
+                    .setConstantHeadingInterpolation(Math.toRadians(142))
+                    .build();
 
         }
         private void buildPathsReg(Follower follower) {

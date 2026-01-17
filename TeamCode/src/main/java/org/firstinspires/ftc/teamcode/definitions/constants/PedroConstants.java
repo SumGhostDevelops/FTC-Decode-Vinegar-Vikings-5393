@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class PedroConstants {
     // get mass later
-    static double mass = 10; // kg, this is the mass of the robot without any game elements
+    static double mass = 11.3398; // kg, this is the mass of the robot without any game elements
 
     public static FollowerConstants followerConstants = new FollowerConstants().mass(mass);
 
@@ -31,7 +31,8 @@ public class PedroConstants {
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .xVelocity(222.64501842436727);
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()

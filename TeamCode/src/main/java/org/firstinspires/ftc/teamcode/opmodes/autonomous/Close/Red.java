@@ -33,11 +33,34 @@ public class Red extends Base
 
         team = Team.RED;
         super.runOpMode();
+        while (opModeInInit()) {
+            // --- Move your selection logic inside this loop ---
+            if (gamepad1.dpad_up) {
+                autoStrat = AutoStrat.GATE;
+            } else if (gamepad1.dpad_right) {
+                autoStrat = AutoStrat.REGULAR;
+            } else if (gamepad1.dpad_down) {
+                autoStrat = AutoStrat.BASIC;
+            }
 
+            // --- Keep your telemetry inside the loop for live feedback ---
+            telemetry.addLine("--- SELECT AUTO STRATEGY ---");
+            telemetry.addData("Selected", autoStrat);
+            telemetry.addLine("\nControls:");
+            telemetry.addLine("DPAD UP: 12 Ball (GATE)");
+            telemetry.addLine("DPAD RIGHT: 9 Ball (REGULAR)");
+            telemetry.addLine("DPAD DOWN: 3 Ball (BASIC)");
+            telemetry.update();
+        }
+
+        // Now the selection is locked in. Initialize paths and timers.
+        initAuto();
+
+        // The OpMode will wait here until you press START
+        waitForStart();
 
         if (opModeIsActive() && !isStopRequested()) {
             opModeTimer.resetTimer();
-            follower.followPath(paths.ToShoot);
 
 
             while (opModeIsActive() && !isStopRequested()) {
@@ -50,7 +73,6 @@ public class Red extends Base
                 telemetry.update();
             }
         }
-
     }
 
 
@@ -86,10 +108,20 @@ public class Red extends Base
     private void PathBasic() {
         // This check ensures we only try to start a new path *after* the current one is complete.
         if (!follower.isBusy()) {
-            if (Objects.requireNonNull(currentPathState) == Paths.PathState.ToShoot) {
-                follower.followPath(paths.ToShoot, true);
+
+                switch (currentPathState){
+
+                    case ToShoot:
+                        Shoot();
+                        follower.followPath(paths.ToShoot);
+                        setPathState(Paths.PathState.Move);
+                        break;
+                    case Move:
+                        // end path
+                        follower.followPath(paths.Move, true); // true if you want hold/end
+                        break;
+                }
             }
-        }
     }
     private void PathRegular() {
         // This check ensures we only try to start a new path *after* the current one is complete.
@@ -97,53 +129,62 @@ public class Red extends Base
             switch (currentPathState) {
                 // The logic is now: when a state is finished, start the NEXT path and set the NEXT state.
                 case ToShoot:
-                    // shoot();
+                    Shoot();
                     follower.followPath(paths.ToBallOne); // Start NEXT path
                     setPathState(Paths.PathState.ToBallOne); // Set NEXT state
                     break;
                 case ToBallOne:
+                    Intake();
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
                 case ToBallOneFull:
-                    // intake();
+                    // has ball
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
                 case ToShoot_1:
-                    // shoot();
+                    Shoot();
                     follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
                 case ToBallTwo:
+                    Intake();
                     follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
                 case ToBallTwoFull:
-                    // intake();
+                    // has ball
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
                 case ToShoot_2:
-                    // shoot();
+                    Shoot();
                     follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.Gate1);
                     break;
                 case ToThree:
+                    Intake();
                     follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.Gate2);
                     break;
                 case ToThreeFull:
+                    // has ball
                     follower.followPath(paths.bottomBalls);
                     setPathState(Paths.PathState.ToEatGate);
                     break;
                 case bottomBalls:
-                    // intake();
+                   Intake();
                     follower.followPath(paths.bottomBallsEat);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
                 case bottomBallsEat:
+                    Shoot();
+                    setPathState(Paths.PathState.FinalPose);
                     break;
+                    case FinalPose:
+                    follower.followPath(paths.FinalPose, true); // true if you want hold/end
+                        break;
             }
         }
     }
@@ -154,38 +195,45 @@ public class Red extends Base
 
                 // --- Start: go shoot first ---
                 case ToShoot:
+                    Shoot();
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
                 // --- Ball 1 sequence ---
                 case ToBallOne:
+                   Intake();
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
 
                 case ToBallOneFull:
+                    //full ball
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
                 case ToShoot_1:
+                    Shoot();
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.Gate);
                     break;
 
                 // --- Gate cycle 1 ---
                 case Gate:
+
                     follower.followPath(paths.Gate);
                     setPathState(Paths.PathState.Eat);
                     break;
 
                 case Eat:
+                    // intake
                     follower.followPath(paths.Eat);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
                 case ToShoot_2:
+                    Shoot();
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.Gate_2);
                     break;
@@ -197,11 +245,13 @@ public class Red extends Base
                     break;
 
                 case Eat_2:
+                   Intake();
                     follower.followPath(paths.Eat_2);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
 
                 case ToShoot_3:
+                    Shoot();
                     follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.Gate_3);
                     break;
@@ -213,11 +263,13 @@ public class Red extends Base
                     break;
 
                 case Eat_3:
+                   Intake();
                     follower.followPath(paths.Eat_3);
                     setPathState(Paths.PathState.ToShoot_4);
                     break;
 
                 case ToShoot_4:
+                    Shoot();
                     follower.followPath(paths.ToShoot_4);
                     setPathState(Paths.PathState.bottomBalls);
                     break;
@@ -229,11 +281,13 @@ public class Red extends Base
                     break;
 
                 case bottomBallsEat:
+                   Intake();
                     follower.followPath(paths.bottomBallsEat);
                     setPathState(Paths.PathState.ToShoot_5);
                     break;
 
                 case ToShoot_5:
+                    Shoot();
                     follower.followPath(paths.ToShoot_5);
                     setPathState(Paths.PathState.upperBalls);
                     break;
@@ -245,6 +299,7 @@ public class Red extends Base
                     break;
 
                 case upperEat:
+                   Intake();
                     follower.followPath(paths.upperEat);
                     setPathState(Paths.PathState.upperTurn);
                     break;
@@ -255,6 +310,7 @@ public class Red extends Base
                     break;
 
                 case toShoot:
+                    Shoot();
                     follower.followPath(paths.toShoot);
                     setPathState(Paths.PathState.finalPose);
                     break;
@@ -277,15 +333,15 @@ public class Red extends Base
                 ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
         // Gate-specific paths used in buildPathsGate
-        Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
-                bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, finalPose;
+        Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, Move,
+                bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, FinalPose, finalPose;
 
         public enum PathState {
             ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree,
-            ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+            ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4, Move,
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
-            bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose
+            bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPose
         }
 
         public Paths(Follower follower, AutoStrat strat) {
@@ -306,12 +362,17 @@ public class Red extends Base
 
         private void buildPathsBasic(Follower follower) {
                         // Tune these poses if the robot drives too far or in the wrong direction.
-            final Pose startPose = new Pose(80, 8.3);
-            final Pose shootPose = new Pose(80, 27); // adjust values if distance is incorrect
+            final Pose startPose = new Pose(123, 125);
+            final Pose shootPose = new Pose(101, 108);
+            final Pose randomPose = new Pose(125,106);
 
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, shootPose))
                     .setTangentHeadingInterpolation()
+                    .build();
+            Move = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, randomPose))
+                    .setConstantHeadingInterpolation(Math.toRadians(38))
                     .build();
 
 
@@ -320,95 +381,80 @@ public class Red extends Base
 
 
     // --- Pose definitions ---
-    final Pose startPose         = new Pose(65.000, 9.000);
-    final Pose ballOneLinePose   = new Pose(40.000, 36.000);
-    final Pose ballOneFullPose   = new Pose(19.000, 36.000);
-    final Pose shootPose         = new Pose(69.000, 68.000);
-    final Pose ballTwoLinePose   = new Pose(41.000, 60.000);
-    final Pose ballTwoFullPose   = new Pose(19.000, 60.000);
-    final Pose ballThreeLinePose = new Pose(40.000, 84.000);
-    final Pose ballThreeFullPose = new Pose(19.000, 84.000);
-    final Pose gateLinePose      = new Pose(54.000, 84.000);
-    final Pose gatePushPose      = new Pose(49.000, 79.000);
+            final Pose startPose         = new Pose(124.0, 123.0);
+            final Pose shootPose         = new Pose(90.0, 97.200);
+            final Pose ballOneLinePose   = new Pose(90.0, 84.0);
+            final Pose ballOneFullPose   = new Pose(125.0, 84.0);
+            final Pose ballTwoLinePose   = new Pose(90.0, 97.200);
+            final Pose ballTwoFullPose   = new Pose(90.0, 58.0);
+            final Pose ballThreeLinePose = new Pose(130.0, 58.0);
+            final Pose ballThreeFullPose = new Pose(90.0, 97.200);
+            final Pose gateLinePose      = new Pose(90.0, 35.0);
+            final Pose gatePushPose      = new Pose(135.771, 34.971);
+            final Pose finalPose         = new Pose(118.0, 96.0); // New pose added here
 
-            ToBallOne = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    startPose,
-                                    ballOneLinePose
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
-                    .build();
-
-            ToBallOneFull = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    ballOneLinePose,
-                                    ballOneFullPose
-                            )
-                    ).setTangentHeadingInterpolation()
-                    .build();
-
-            ToShoot_1 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    ballOneFullPose,
-                                    shootPose
-                            )
-                    ).setConstantHeadingInterpolation(Math.toRadians(144))
+                 ToShoot = follower.pathBuilder().addPath(
+            new BezierLine(
+                    startPose,
+                    shootPose
+            )
+                         ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                     .build();
 
             ToBallTwo = follower.pathBuilder().addPath(
                             new BezierLine(
                                     shootPose,
-                                    ballTwoLinePose
+                                    ballTwoFullPose // Using ballTwoFullPose directly as per your new path logic
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(180))
+                    ).setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(0))
                     .build();
 
             ToBallTwoFull = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    ballTwoLinePose,
-                                    ballTwoFullPose
+                                    ballTwoFullPose,
+                                    ballThreeLinePose // Using ballThreeLinePose as per your new path logic
                             )
                     ).setTangentHeadingInterpolation()
                     .build();
 
             ToShoot_2 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    ballTwoFullPose,
+                                    ballThreeLinePose,
                                     shootPose
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(144))
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                     .build();
 
             ToThree = follower.pathBuilder().addPath(
                             new BezierLine(
                                     shootPose,
-                                    ballThreeLinePose
+                                    gateLinePose // Using gateLinePose as per your new path logic
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(180))
+                    ).setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(0))
                     .build();
 
             ToThreeFull = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    ballThreeLinePose,
-                                    ballThreeFullPose
+                                    gateLinePose,
+                                    gatePushPose
                             )
                     ).setTangentHeadingInterpolation()
                     .build();
 
-            bottomBalls = follower.pathBuilder().addPath(
+            ToShoot_3 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    ballThreeFullPose,
-                                    gateLinePose
+                                    gatePushPose,
+                                    shootPose
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(136))
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                     .build();
 
-            bottomBallsEat = follower.pathBuilder().addPath(
+            FinalPose = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    gateLinePose,
-                                    gatePushPose
+                                    shootPose,
+                                    finalPose
                             )
-                    ).setConstantHeadingInterpolation(Math.toRadians(136))
+                    ).setConstantHeadingInterpolation(Math.toRadians(37))
                     .build();
         }
         private void buildPathsGate(Follower follower) {
@@ -645,5 +691,4 @@ public class Red extends Base
 
 
     }
-
 }
