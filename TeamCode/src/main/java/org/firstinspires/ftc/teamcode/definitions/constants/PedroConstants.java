@@ -18,7 +18,8 @@ public class PedroConstants {
     // get mass later
     static double mass = 11.3398; // kg, this is the mass of the robot without any game elements
 
-    public static FollowerConstants followerConstants = new FollowerConstants().mass(mass);
+    public static FollowerConstants followerConstants = new FollowerConstants().mass(mass)
+            .forwardZeroPowerAcceleration(-347.24285869156);
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -32,14 +33,15 @@ public class PedroConstants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(222.64501842436727);
+            .xVelocity(222.64501842436727)
+            .yVelocity(168.03253138683195);
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
             .forwardEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT)
             .strafeEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT)
             .forwardEncoderDirection(Encoder.REVERSE)
-            .strafeEncoderDirection(Encoder.REVERSE)
+            .strafeEncoderDirection(Encoder.FORWARD)
             .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             // <- corrected to use Strafe offset
             .strafePodX(RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
