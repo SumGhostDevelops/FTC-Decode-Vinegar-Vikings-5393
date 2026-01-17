@@ -106,6 +106,7 @@ public class RobotConstants
         public static class Coefficients
         {
             public static double[] veloCoeffs = new double[]{10, 3, 2, 0};
+            public static double[] movingVelocoeffs = new double[]{20, 3, 2, 0};
         }
 
         @Configurable
@@ -159,13 +160,14 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
         @Sorter(sort = 3)
-        public static double CLOSED_INTAKE_ANGLE = 210; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSED_INTAKE_ANGLE = 180; // An angle where the trapdoor blocks balls from entering
         @Sorter(sort = 4)
-        public static double CLOSED_FULL_TRANSFER_ANGLE = 210;
+        public static double CLOSED_FULL_TRANSFER_ANGLE = 180;
 
-        public static double CLOSED_SHOOTING_TRANSFER_ANGLE = 210;
+        public static double CLOSED_SHOOTING_TRANSFER_ANGLE = 230;
         @Sorter(sort = 5)
         public static double TRANSFER_ANGLE = 100;
+
 
         @Sorter(sort = 6)
         public static double autoCloseMs = 500; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
@@ -300,7 +302,7 @@ public class RobotConstants
             {
                 // Distance from the center to the STRAFE wheel along the X-axis (LONGITUDINAL)
                 // Positive if FORWARD of center, Negative if BACKWARD of center
-                public static Distance OFFSET = new Distance(-7.81, DistanceUnit.INCH);
+                public static Distance OFFSET = new Distance(-6.31, DistanceUnit.INCH);
             }
         }
     }

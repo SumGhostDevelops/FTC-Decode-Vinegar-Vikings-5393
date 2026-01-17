@@ -40,7 +40,7 @@ public class PedroConstants {
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
             .forwardEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT)
             .strafeEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT)
-            .forwardEncoderDirection(Encoder.REVERSE)
+            .forwardEncoderDirection(Encoder.FORWARD)
             .strafeEncoderDirection(Encoder.FORWARD)
             .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             // <- corrected to use Strafe offset
