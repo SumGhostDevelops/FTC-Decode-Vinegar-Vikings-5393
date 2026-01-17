@@ -300,7 +300,7 @@ public class RobotConstants
             {
                 // Distance from the center to the STRAFE wheel along the X-axis (LONGITUDINAL)
                 // Positive if FORWARD of center, Negative if BACKWARD of center
-                public static Distance OFFSET = new Distance(-7.81, DistanceUnit.INCH);
+                public static Distance OFFSET = new Distance(-6.31, DistanceUnit.INCH);
             }
         }
     }
