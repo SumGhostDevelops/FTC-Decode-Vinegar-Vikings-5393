@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.definitions.constants;
 
 
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -19,7 +20,10 @@ public class PedroConstants {
     static double mass = 11.3398; // kg, this is the mass of the robot without any game elements
 
     public static FollowerConstants followerConstants = new FollowerConstants().mass(mass)
-            .forwardZeroPowerAcceleration(-347.24285869156);
+            .forwardZeroPowerAcceleration(-70.6038)
+            .lateralZeroPowerAcceleration(-130.811)
+            .translationalPIDFCoefficients(new PIDFCoefficients(.028,0,.001,.019))
+            .headingPIDFCoefficients(new PIDFCoefficients(1,0,.01,.001));
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -35,14 +39,20 @@ public class PedroConstants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .xVelocity(222.64501842436727)
             .yVelocity(168.03253138683195);
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(
+            0.99,
+            100,
+            1,
+            1
+    );
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
             .forwardEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT)
             .strafeEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT)
             .forwardEncoderDirection(Encoder.FORWARD)
-            .strafeEncoderDirection(Encoder.FORWARD)
-            .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
+            .strafeEncoderDirection(Encoder.REVERSE)
+
+                        .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             // <- corrected to use Strafe offset
             .strafePodX(RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             .IMU_HardwareMapName("imu")
