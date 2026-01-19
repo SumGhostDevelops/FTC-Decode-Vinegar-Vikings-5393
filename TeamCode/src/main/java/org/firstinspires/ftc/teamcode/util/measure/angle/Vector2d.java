@@ -2,130 +2,158 @@ package org.firstinspires.ftc.teamcode.util.measure.angle;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem; // Import your Enum
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem.Direction;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 /**
  * Describes the {@link Vector2d#x} and {@link Vector2d#y} components which form a {@link Vector2d}.
  * Enforces the {@link DistanceUnit} of {@link Vector2d#x} and {@link AngleUnit#RADIANS} of the {@link Vector2d} direction by default.
+ * <p>
+ * Note: Unlike FieldCoordinate, Vector2d represents a displacement or quantity.
+ * Coordinate System conversions only affect rotation/orientation, not origin translation.
  */
 public class Vector2d
 {
-    public final DistanceUnit distUnit;
-    public final AngleUnit angUnit;
-
     public final Distance x;
     public final Distance y;
+    public final CoordinateSystem coordSys; // Added Coordinate System
 
-    public Vector2d(Distance x, Distance y)
-    {
-        this(x, y, x.unit);
-    }
+    public final DistanceUnit distUnit;
+    public final AngleUnit angUnit = AngleUnit.RADIANS;
 
-    public Vector2d(Distance x, Distance y, DistanceUnit distUnit)
-    {
-        this(x, y, distUnit, AngleUnit.RADIANS);
-    }
+    // --- Constructors ---
 
-    public Vector2d(Distance x, Distance y, AngleUnit angUnit)
+    public Vector2d(Distance x, Distance y, CoordinateSystem coordSys)
     {
-        this(x, y, x.unit, angUnit);
-    }
-
-    public Vector2d(Distance x, Distance y, DistanceUnit distUnit, AngleUnit angUnit)
-    {
-        this.distUnit = distUnit;
-        this.angUnit = angUnit;
+        this.coordSys = coordSys;
 
         // x and y will always be the same set DistanceUnit
-        this.x = x.toUnit(distUnit);
-        this.y = y.toUnit(distUnit);
+        this.x = x;
+        this.y = y.toUnit(x.unit);
+        this.distUnit = x.unit;
     }
 
+    // --- Standard Getters ---
+
     /**
-     * @return The {@link Distance} of the {@link Vector2d} vector
+     * @return The magnitude of the vector
      */
-    public Distance getDistance()
+    public Distance getLength()
     {
-        return new Distance(Math.hypot(x.magnitude, y.magnitude), distUnit);
+        return new Distance(Math.hypot(x.magnitude, y.magnitude), x.unit);
     }
 
     /**
-     * @return The {@link Angle} of the {@link Vector2d} vector
+     * @return The angle of the vector relative to its Coordinate System's positive X-axis
      */
     public Angle getDirection()
     {
-        Angle angleRads = new Angle(Math.atan2(y.magnitude, x.magnitude), AngleUnit.RADIANS);
-
-        return angleRads.toUnit(angUnit);
+        return new Angle(Math.atan2(y.magnitude, x.magnitude), angUnit);
     }
 
-    /**
-     * @param distanceUnit
-     * @return The {@link Vector2d} with {@code x}, {@code y}, and relevant calculations converted to the {@link DistanceUnit}
-     */
+    // --- Unit Converters ---
+
     public Vector2d toDistanceUnit(DistanceUnit distanceUnit)
     {
-        if (isDistanceUnit(distanceUnit))
-        {
-            return this;
-        }
-
-        return new Vector2d(x, y, distanceUnit);
+        if (isDistanceUnit(distanceUnit)) return this;
+        return new Vector2d(x.toUnit(distanceUnit), y.toUnit(distanceUnit), coordSys);
     }
 
+    // --- Coordinate System Conversion (The Core Logic) ---
+
     /**
-     * @param angleUnit
-     * @return The {@link Vector2d} with relevant calculations converted to the {@link AngleUnit}
+     * Converts this Vector to a different Coordinate System.
+     * <p>
+     * NOTE: This performs a ROTATION only. Vectors have magnitude and direction, not position.
+     * The origin offset of the CoordinateSystem is ignored.
      */
-    public Vector2d toAngleUnit(AngleUnit angleUnit)
+    public Vector2d toCoordinateSystem(CoordinateSystem targetSys)
     {
-        if (isAngleUnit(angleUnit))
-        {
-            return this;
-        }
+        if (this.coordSys == targetSys) return this;
 
-        return new Vector2d(x, y, angleUnit);
+        // 1. Convert Local (This) -> Universal Vector
+        // V_global = (x * AxisX_global) + (y * AxisY_global)
+        double[] xBasis = getUniversalBasis(this.coordSys.positiveX);
+        double[] yBasis = getUniversalBasis(this.coordSys.positiveY);
+
+        double xMag = this.x.magnitude; // Use raw magnitude in current unit
+        double yMag = this.y.magnitude;
+
+        double globalX = (xMag * xBasis[0]) + (yMag * yBasis[0]);
+        double globalY = (xMag * xBasis[1]) + (yMag * yBasis[1]);
+
+        // 2. Convert Universal -> Target Vector
+        // Project Global onto Target Axes (Dot Product)
+        // V_target = (V_global . TargetAxisX, V_global . TargetAxisY)
+        double[] targetXBasis = getUniversalBasis(targetSys.positiveX);
+        double[] targetYBasis = getUniversalBasis(targetSys.positiveY);
+
+        double newXMag = (globalX * targetXBasis[0]) + (globalY * targetXBasis[1]);
+        double newYMag = (globalX * targetYBasis[0]) + (globalY * targetYBasis[1]);
+
+        return new Vector2d(
+                new Distance(newXMag, x.unit),
+                new Distance(newYMag, y.unit),
+                targetSys
+        );
     }
 
-    /**
-     * @return The negated {@link Vector2d}, where the {@code x} and {@code y} magnitudes are negated.
-     */
+    // --- Math Operations ---
+
     public Vector2d inverse()
     {
-        return new Vector2d(new Distance(-x.magnitude, x.unit), new Distance(-y.magnitude, y.unit), distUnit, angUnit);
+        return new Vector2d(x.multiply(-1), y.multiply(-1), coordSys);
     }
 
     /**
-     * Calculates this {@link Vector2d} + the other {@link Vector2d}
-     * @param b
-     * @return The calculated {@link Vector2d}
+     * Calculates this + b.
+     * Automatically converts 'b' to this CoordinateSystem before adding.
      */
     public Vector2d plus(Vector2d b)
     {
-        Distance xResult = this.x.plus(b.x);
-        Distance yResult = this.y.plus(b.y);
+        // Ensure systems match
+        Vector2d convertedB = b.toCoordinateSystem(this.coordSys);
 
-        return new Vector2d(xResult, yResult, xResult.unit, this.angUnit);
+        Distance xResult = this.x.plus(convertedB.x);
+        Distance yResult = this.y.plus(convertedB.y);
+
+        return new Vector2d(xResult, yResult, this.coordSys);
     }
 
     /**
-     * Calculates this {@link Vector2d} - the other {@link Vector2d}
-     * @param b
-     * @return The calculated {@link Vector2d}
+     * Calculates this - b.
+     * Automatically converts 'b' to this CoordinateSystem before subtracting.
      */
     public Vector2d minus(Vector2d b)
     {
         return plus(b.inverse());
     }
 
-    public boolean isDistanceUnit(DistanceUnit distanceUnit)
+    /**
+     * Helper to get Universal Basis Vectors (Matches CoordinateSystem logic).
+     * Universal Frame: X=Audience, Y=Blue
+     */
+    private double[] getUniversalBasis(Direction dir)
     {
-        return (this.distUnit == distanceUnit);
+        switch (dir)
+        {
+            case AUDIENCE:  return new double[]{ 1.0,  0.0};
+            case BACKSTAGE: return new double[]{-1.0,  0.0};
+            case BLUE:      return new double[]{ 0.0,  1.0};
+            case RED:       return new double[]{ 0.0, -1.0};
+            default:        return new double[]{ 0.0,  0.0};
+        }
     }
 
-    public boolean isAngleUnit(AngleUnit angleUnit)
+    public DistanceUnit getDistanceUnit()
     {
-        return (this.angUnit == angleUnit);
+        return distUnit;
+    }
+
+    public boolean isDistanceUnit(DistanceUnit unit)
+    {
+        return distUnit.equals(unit);
     }
 
     @Override
@@ -134,18 +162,18 @@ public class Vector2d
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
-        Vector2d otherVector = (Vector2d) obj;
-        return x.equals(otherVector.x) && y.equals(otherVector.y);
-    }
+        Vector2d other = (Vector2d) obj;
 
-    public boolean equals(Vector2d otherVector)
-    {
-        return equals((Object) otherVector);
+        // Convert other to THIS system for apples-to-apples comparison
+        Vector2d convertedOther = other.toCoordinateSystem(this.coordSys).toDistanceUnit(x.unit);
+
+        // Use Distance.equals for fuzzy comparison
+        return this.x.equals(convertedOther.x) && this.y.equals(convertedOther.y);
     }
 
     @Override
     public String toString()
     {
-        return getDistance().toString() + "; " + getDirection().toString();
+        return String.format("%s; %s (%s)", getLength(), getDirection(), coordSys.name());
     }
 }

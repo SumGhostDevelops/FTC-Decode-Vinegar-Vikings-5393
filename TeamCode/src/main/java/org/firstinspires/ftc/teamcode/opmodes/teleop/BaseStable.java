@@ -214,7 +214,7 @@ public abstract class BaseStable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(s.odometry));
         driver.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new OdometryCommands.Localize(s.odometry, telemetry));
+                .whenPressed(new OdometryCommands.LocalizeWithRumble(s.odometry, telemetry, driver.gamepad));
     }
 
     private void bindTurretControls(Trigger active, GamepadEx driver, Subsystems s)
@@ -301,11 +301,6 @@ public abstract class BaseStable extends CommandOpMode
 
     private void bindCoDriverControls(GamepadEx coDriver, Subsystems s)
     {
-        coDriver.getGamepadButton(GamepadKeys.Button.Y).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.BLUE_GOAL));
-        coDriver.getGamepadButton(GamepadKeys.Button.B).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.RED_GOAL));
-        coDriver.getGamepadButton(GamepadKeys.Button.A).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.BLUE_LOADING_ZONE));
-        coDriver.getGamepadButton(GamepadKeys.Button.X).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.RED_LOADING_ZONE));
-        coDriver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(() -> s.odometry.updateReferencePose(CornersCoordinates.SMALL_TRIANGLE));
     }
 
     /**

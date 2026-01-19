@@ -2,12 +2,17 @@ package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
+import org.firstinspires.ftc.teamcode.definitions.constants.Team;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.DeadwheelHandler;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.Vector2d;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
@@ -17,111 +22,123 @@ import java.util.Optional;
 
 public class OdometryPinpoint extends SubsystemBase
 {
-    public final Webcam webcam;
     private final Pinpoint pinpoint;
+    private final Webcam webcam;
 
-    private static final DistanceUnit dUnit = DistanceUnit.METER;
-    private static final AngleUnit aUnit = AngleUnit.RADIANS;
+    private static final AngleUnit aUnit = AngleUnit.DEGREES;
+    private static final DistanceUnit dUnit = DistanceUnit.INCH;
 
     /**
-     * Offset added to Pinpoint heading to get field-absolute heading.
-     * After localize(): headingOffset = AprilTag heading - Pinpoint heading at that moment
+     * Offset added to IMU yaw to get field-absolute heading.
+     * After localize(): headingOffset = AprilTag heading - IMU yaw at that moment
      */
-    private Angle headingOffset = new Angle(0, aUnit);
+    private Angle headingOffset;
 
     /**
      * The field-absolute heading that the driver considers "forward" for field-centric driving.
      */
-    private Angle driverForward = new Angle(0, aUnit);
+    private Angle driverForward;
 
-    /**
-     * Initializes the odometry, sets the position to the center of the field, and the forward-angle to the robot's current heading
-     * @param webcam
-     * @param pinpoint
-     */
-    public OdometryPinpoint(WebcamName webcam, Pinpoint pinpoint)
+    public OdometryPinpoint(Pinpoint pinpoint, Webcam webcam)
     {
-        this(webcam, pinpoint, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.FTC_STD), new Angle(pinpoint.getHeading(aUnit), aUnit)));
+        this(pinpoint, webcam, new Pose2d(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES)));
     }
 
-    /**
-     * @param webcam
-     * @param pinpoint
-     * @param referencePose The reference (could be the initial) pose of the robot, to determine its absolute position and heading
-     */
-    public OdometryPinpoint(WebcamName webcam, Pinpoint pinpoint, Pose2d referencePose)
+    public OdometryPinpoint(Pinpoint pinpoint, Webcam webcam, Pose2d referencePose)
     {
-        this.webcam = new Webcam(webcam);
         this.pinpoint = pinpoint;
-        pinpoint.setPosition(referencePose.toPose2D());
+        this.webcam = webcam;
+
+        this.pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
     }
 
     /**
-     * @return The field-absolute heading of the robot (Pinpoint heading + headingOffset)
+     * @return The yaw, as reported directly by the Pinpoint
+     */
+    public Angle getIMUYaw()
+    {
+        return new Angle(pinpoint.getHeading(aUnit), aUnit);
+    }
+
+    /**
+     * @return The absolute heading of the robot
      */
     public Angle getAngle()
     {
-        return new Angle(pinpoint.getHeading(aUnit), aUnit).plus(headingOffset);
+        return getIMUYaw().plus(headingOffset);
     }
 
     /**
-     * @return A version of the robot heading where straight-ahead (in the view of the driver) is 0 degrees.
+     * @return A heading where forward is 0
      */
     public Angle getDriverHeading()
     {
         return getAngle().minus(driverForward);
     }
 
+    /**
+     * @return The field coordinate of the robot
+     */
     public FieldCoordinate getFieldCoord()
     {
-        Distance x = new Distance(pinpoint.getPosX(dUnit), dUnit);
-        Distance y = new Distance(pinpoint.getPosY(dUnit), dUnit);
-
-        return new FieldCoordinate(x, y);
+        return new FieldCoordinate(
+                new Distance(pinpoint.getPosX(dUnit), dUnit),
+                new Distance(pinpoint.getPosY(dUnit), dUnit),
+                CoordinateSystem.DECODE_FTC
+        );
     }
 
+    /**
+     * @return The pose of the robot
+     */
     public Pose2d getPose()
     {
-        return new Pose2d(getFieldCoord(), getAngle());
+        return Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
     }
 
     /**
-     * Resets the current position to 0,0,0 and recalibrates the Odometry Computer's internal IMU. <br><br>
-     * <strong> Robot MUST be stationary </strong> <br><br>
-     * Device takes a large number of samples, and uses those as the gyroscope zero-offset. This takes approximately 0.25 seconds.
+     * @return A vector of the velocity
      */
-    public void resetPosAndHeading()
+    public Vector2d getVelocity()
     {
-        pinpoint.resetPosAndIMU();
+        return new Vector2d(
+                new Distance(pinpoint.getVelX(dUnit), dUnit),
+                new Distance(pinpoint.getVelY(dUnit), dUnit),
+                CoordinateSystem.DECODE_FTC
+        );
     }
 
     /**
-     * Sets the driver's forward angle to the robot's current absolute heading.
-     * Call this when the robot is facing the direction the driver considers "forward".
-     * Note: This assumes the robot is facing field-forward (0°) for absolute heading purposes.
-     * If not, call localize() afterward to correct the absolute heading.
+     * @return The velocity of the robot
      */
-    public void setForwardAngle()
+    public UnnormalizedAngle getHeadingVelocity()
     {
-        headingOffset = new Angle(0, aUnit);
-        driverForward = new Angle(pinpoint.getHeading(aUnit), aUnit);
+        return new UnnormalizedAngle(pinpoint.getHeadingVelocity(aUnit.getUnnormalized()), aUnit.getUnnormalized());
     }
 
     /**
-     * Resets the Pinpoint IMU so that, when facing the Angle immediately prior to this being called, the Angle returned is 0.
+     * Sets the current field-absolute heading as the driver's "forward" direction.
+     * Call this AFTER localization to set which direction the driver considers forward
+     * for field-centric driving, without affecting the absolute heading calibration.
      */
-    public void resetAngle()
+    public void setDriverForwardFromCurrent()
     {
-        pinpoint.recalibrateIMU();
+        driverForward = getAngle();
+    }
+
+    public void updateReferencePose(Pose2d referencePose)
+    {
+        headingOffset = referencePose.heading;
+        driverForward = referencePose.heading;
+
+        pinpoint.setPosition(referencePose.toPose2D());
     }
 
     /**
-     * Attempts to relocalize the robot. Camera must be facing a goal AprilTag to work.
-     * This sets the robot's absolute position AND heading on the field based on AprilTag detection.
-     * The driver's relative forward reference is preserved so field-centric driving remains consistent.
-     * @return If the re-localization was successful or not
+     * Localizes using an AprilTag
+     * @return If the localization was successful or not
      */
-    public boolean localize()
+    public boolean localizeWithAprilTag()
     {
         // verify the apriltag exists
         webcam.updateDetections();
@@ -130,23 +147,47 @@ public class OdometryPinpoint extends SubsystemBase
         if (possibleTag.isEmpty()) return false;
 
         // get the apriltag and the pose it has estimated
+        // Note: robotPose already accounts for camera offset since we configured
+        // the AprilTagProcessor with setCameraPose() in the Webcam class
         AprilTagDetection tag = possibleTag.get();
-        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose);
+        Pose2d estimatedPose = Pose2d.fromPose3DWebcam(tag.robotPose);
 
         // Preserve driver's relative heading before we change headingOffset
+        // currentDriverHeading = getAngle() - driverForward
         Angle currentDriverHeading = getAngle().minus(driverForward);
 
         // Compute new headingOffset so getAngle() returns true field-absolute heading
-        // headingOffset = estimatedPose.heading - currentPinpointHeading
-        Angle currentPinpointHeading = new Angle(pinpoint.getHeading(aUnit), aUnit);
-        headingOffset = estimatedPose.heading.toUnit(aUnit).minus(currentPinpointHeading);
+        // headingOffset = estimatedPose.heading - currentIMUYaw
+        Angle currentImuYaw = getIMUYaw();
+        headingOffset = estimatedPose.heading.minus((currentImuYaw));
 
         // Update driverForward so getDriverHeading() still returns the same value
+        // getDriverHeading() = getAngle() - driverForward = currentDriverHeading
+        // driverForward = getAngle() - currentDriverHeading = estimatedPose.heading - currentDriverHeading
         driverForward = estimatedPose.heading.toUnit(aUnit).minus(currentDriverHeading);
 
-        // Set the position to the pinpoint
+        // set pinpoint to track from new estimated pose
         pinpoint.setPosition(estimatedPose.toPose2D());
 
+        return true;
+    }
+
+    /**
+     * Localizes using an AprilTag, and automatically sets the driver forward direction (if enabled)
+     * @param team
+     * @return If localization was successful or not
+     */
+    public boolean localizeWithAprilTag(Team team)
+    {
+        if (!localizeWithAprilTag())
+        {
+            return false;
+        }
+
+        if (RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM)
+        {
+            driverForward = team.forwardAngle;
+        }
 
         return true;
     }
@@ -157,9 +198,6 @@ public class OdometryPinpoint extends SubsystemBase
         pinpoint.update();
     }
 
-    /**
-     * Closes the {@link Webcam}
-     */
     public void close()
     {
         webcam.close();

@@ -20,12 +20,26 @@ public class Coordinate
     }
 
     /**
+     * Returns the vector between the two coordinates. Assumes that they are in the same system.
+     * @param otherCoord
+     * @return The {@link Vector2d} vector to the other {@link Coordinate}
+     */
+    public Vector2d vectorTo(Coordinate otherCoord)
+    {
+        Distance dx = otherCoord.x.minus(this.x).toUnit(DistanceUnit.METER);
+        Distance dy = otherCoord.y.minus(this.y).toUnit(DistanceUnit.METER);
+
+        // use GENERIC system for raw vectors
+        return new Vector2d(dx, dy, CoordinateSystem.GENERIC);
+    }
+
+    /**
      * @param otherCoord
      * @return The {@link Distance} to the other {@link Coordinate}
      */
     public Distance distanceTo(Coordinate otherCoord)
     {
-        return vectorTo(otherCoord).getDistance();
+        return vectorTo(otherCoord).getLength();
     }
 
     /**
@@ -35,23 +49,6 @@ public class Coordinate
     public Angle angleTo(Coordinate otherCoord)
     {
         return vectorTo(otherCoord).getDirection();
-    }
-
-    /**
-     * @param otherCoord
-     * @return The {@link Vector2d} vector to the other {@link Coordinate}
-     */
-    public Vector2d vectorTo(Coordinate otherCoord)
-    {
-        DistanceUnit unit = DistanceUnit.METER;
-
-        Coordinate thisCoord = this.toDistanceUnit(unit);
-        otherCoord = otherCoord.toDistanceUnit(unit);
-
-        Distance xDistance = otherCoord.x.minus(thisCoord.x);
-        Distance yDistance = otherCoord.y.minus(thisCoord.y);
-
-        return new Vector2d(xDistance, yDistance);
     }
 
     /**
@@ -73,11 +70,6 @@ public class Coordinate
         Distance newY = y.plus(translation.y);
 
         return new Coordinate(newX, newY);
-    }
-
-    private Coordinate toComparableStandard()
-    {
-        return new Coordinate(x.toUnit(DistanceUnit.METER), y.toUnit(DistanceUnit.METER));
     }
 
     /**
@@ -109,6 +101,6 @@ public class Coordinate
     @Override
     public String toString()
     {
-        return "x = " + x.toString() + ", y = " + y.toString();
+        return "x=" + x.toString() + ", y=" + y.toString();
     }
 }

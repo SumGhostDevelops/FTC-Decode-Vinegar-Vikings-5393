@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.util.measure.coordinate;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Vector2d;
@@ -397,7 +396,8 @@ public class CoordinateUnitTests
         );
         Vector2d translation = new Vector2d(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
         
         Coordinate translated = coord.translate(translation);
@@ -414,7 +414,8 @@ public class CoordinateUnitTests
         );
         Vector2d translation = new Vector2d(
             new Distance(-2.0, DistanceUnit.METER),
-            new Distance(-3.0, DistanceUnit.METER)
+            new Distance(-3.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
         
         Coordinate translated = coord.translate(translation);
@@ -431,7 +432,8 @@ public class CoordinateUnitTests
         );
         Vector2d translation = new Vector2d(
             new Distance(0.0, DistanceUnit.METER),
-            new Distance(0.0, DistanceUnit.METER)
+            new Distance(0.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
         
         Coordinate translated = coord.translate(translation);
@@ -448,7 +450,8 @@ public class CoordinateUnitTests
         );
         Vector2d translation = new Vector2d(
             new Distance(100.0, DistanceUnit.CM),
-            new Distance(200.0, DistanceUnit.CM)
+            new Distance(200.0, DistanceUnit.CM),
+            CoordinateSystem.DECODE_FTC
         );
         
         Coordinate translated = coord.translate(translation);
@@ -645,11 +648,13 @@ public class CoordinateUnitTests
         );
         Vector2d translation1 = new Vector2d(
             new Distance(1.0, DistanceUnit.METER),
-            new Distance(2.0, DistanceUnit.METER)
+            new Distance(2.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
         Vector2d translation2 = new Vector2d(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
         
         Coordinate result = coord.translate(translation1).translate(translation2);
@@ -666,7 +671,8 @@ public class CoordinateUnitTests
         );
         Vector2d translation = new Vector2d(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
         
         Coordinate result = coord.translate(translation).translate(translation.inverse());

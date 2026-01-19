@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.util.measure.angle;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -20,7 +21,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         assertEquals(3.0, v.x.magnitude, DELTA);
         assertEquals(4.0, v.y.magnitude, DELTA);
@@ -33,7 +34,34 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y, DistanceUnit.CM);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
+        Vector2d converted = v.toDistanceUnit(DistanceUnit.CM);
+
+        assertEquals(300.0, converted.x.magnitude, DELTA);
+        assertEquals(400.0, converted.y.magnitude, DELTA);
+        assertEquals(DistanceUnit.CM, converted.distUnit);
+        assertEquals(AngleUnit.RADIANS, converted.angUnit);
+    }
+
+    @Test
+    public void constructor_threeArgs_angleUnit()
+    {
+        Distance x = new Distance(3.0, DistanceUnit.METER);
+        Distance y = new Distance(4.0, DistanceUnit.METER);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
+
+        assertEquals(3.0, v.x.magnitude, DELTA);
+        assertEquals(4.0, v.y.magnitude, DELTA);
+        assertEquals(DistanceUnit.METER, v.distUnit);
+        assertEquals(AngleUnit.RADIANS, v.angUnit);
+    }
+
+    @Test
+    public void constructor_fourArgs()
+    {
+        Distance x = new Distance(3.0, DistanceUnit.METER);
+        Distance y = new Distance(4.0, DistanceUnit.METER);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC).toDistanceUnit(DistanceUnit.CM);
 
         assertEquals(300.0, v.x.magnitude, DELTA);
         assertEquals(400.0, v.y.magnitude, DELTA);
@@ -42,37 +70,11 @@ public class Vector2dUnitTests
     }
 
     @Test
-    public void constructor_threeArgs_angleUnit()
-    {
-        Distance x = new Distance(3.0, DistanceUnit.METER);
-        Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y, AngleUnit.DEGREES);
-
-        assertEquals(3.0, v.x.magnitude, DELTA);
-        assertEquals(4.0, v.y.magnitude, DELTA);
-        assertEquals(DistanceUnit.METER, v.distUnit);
-        assertEquals(AngleUnit.DEGREES, v.angUnit);
-    }
-
-    @Test
-    public void constructor_fourArgs()
-    {
-        Distance x = new Distance(3.0, DistanceUnit.METER);
-        Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y, DistanceUnit.CM, AngleUnit.DEGREES);
-
-        assertEquals(300.0, v.x.magnitude, DELTA);
-        assertEquals(400.0, v.y.magnitude, DELTA);
-        assertEquals(DistanceUnit.CM, v.distUnit);
-        assertEquals(AngleUnit.DEGREES, v.angUnit);
-    }
-
-    @Test
     public void constructor_convertsXYToSameUnit()
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(200.0, DistanceUnit.CM);
-        Vector2d v = new Vector2d(x, y, DistanceUnit.METER);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC).toDistanceUnit(DistanceUnit.METER);
 
         assertEquals(1.0, v.x.magnitude, DELTA);
         assertEquals(2.0, v.y.magnitude, DELTA);
@@ -85,7 +87,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(0.0, DistanceUnit.METER);
         Distance y = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         assertEquals(0.0, v.x.magnitude, DELTA);
         assertEquals(0.0, v.y.magnitude, DELTA);
@@ -96,7 +98,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(-3.0, DistanceUnit.METER);
         Distance y = new Distance(-4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         assertEquals(-3.0, v.x.magnitude, DELTA);
         assertEquals(-4.0, v.y.magnitude, DELTA);
@@ -105,69 +107,69 @@ public class Vector2dUnitTests
     // ==================== getDistance() Tests ====================
 
     @Test
-    public void getDistance_345Triangle()
+    public void getLength_345Triangle()
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Distance distance = v.getDistance();
+        Distance distance = v.getLength();
         assertEquals(5.0, distance.magnitude, DELTA);
         assertEquals(DistanceUnit.METER, distance.unit);
     }
 
     @Test
-    public void getDistance_xOnly()
+    public void getLength_xOnly()
     {
         Distance x = new Distance(5.0, DistanceUnit.METER);
         Distance y = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Distance distance = v.getDistance();
+        Distance distance = v.getLength();
         assertEquals(5.0, distance.magnitude, DELTA);
     }
 
     @Test
-    public void getDistance_yOnly()
+    public void getLength_yOnly()
     {
         Distance x = new Distance(0.0, DistanceUnit.METER);
         Distance y = new Distance(5.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Distance distance = v.getDistance();
+        Distance distance = v.getLength();
         assertEquals(5.0, distance.magnitude, DELTA);
     }
 
     @Test
-    public void getDistance_zeroVector()
+    public void getLength_zeroVector()
     {
         Distance x = new Distance(0.0, DistanceUnit.METER);
         Distance y = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Distance distance = v.getDistance();
+        Distance distance = v.getLength();
         assertEquals(0.0, distance.magnitude, DELTA);
     }
 
     @Test
-    public void getDistance_negativeComponents()
+    public void getLength_negativeComponents()
     {
         Distance x = new Distance(-3.0, DistanceUnit.METER);
         Distance y = new Distance(-4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Distance distance = v.getDistance();
+        Distance distance = v.getLength();
         assertEquals(5.0, distance.magnitude, DELTA);
     }
 
     @Test
-    public void getDistance_differentUnits()
+    public void getLength_differentUnits()
     {
         Distance x = new Distance(300.0, DistanceUnit.CM);
         Distance y = new Distance(400.0, DistanceUnit.CM);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Distance distance = v.getDistance();
+        Distance distance = v.getLength();
         assertEquals(500.0, distance.magnitude, DELTA);
         assertEquals(DistanceUnit.CM, distance.unit);
     }
@@ -179,7 +181,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
         assertEquals(Math.PI / 4, direction.measure, DELTA);
@@ -191,7 +193,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(-1.0, DistanceUnit.METER);
         Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
         assertEquals(3 * Math.PI / 4, direction.measure, DELTA);
@@ -202,7 +204,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(-1.0, DistanceUnit.METER);
         Distance y = new Distance(-1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
         assertEquals(-3 * Math.PI / 4, direction.measure, DELTA);
@@ -213,7 +215,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(-1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
         assertEquals(-Math.PI / 4, direction.measure, DELTA);
@@ -224,7 +226,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(5.0, DistanceUnit.METER);
         Distance y = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
         assertEquals(0.0, direction.measure, DELTA);
@@ -235,7 +237,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(0.0, DistanceUnit.METER);
         Distance y = new Distance(5.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
         assertEquals(Math.PI / 2, direction.measure, DELTA);
@@ -246,7 +248,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(-5.0, DistanceUnit.METER);
         Distance y = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
         assertTrue(Math.abs(direction.measure - Math.PI) < DELTA || Math.abs(direction.measure + Math.PI) < DELTA);
@@ -257,7 +259,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(0.0, DistanceUnit.METER);
         Distance y = new Distance(-5.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
         assertEquals(-Math.PI / 2, direction.measure, DELTA);
@@ -268,11 +270,11 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y, AngleUnit.DEGREES);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Angle direction = v.getDirection();
-        assertEquals(45.0, direction.measure, DELTA);
-        assertEquals(AngleUnit.DEGREES, direction.unit);
+        assertEquals(Math.PI / 4, direction.measure, DELTA);
+        assertEquals(AngleUnit.RADIANS, direction.unit);
     }
 
     // ==================== toDistanceUnit() Tests ====================
@@ -282,7 +284,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Vector2d converted = v.toDistanceUnit(DistanceUnit.METER);
         assertSame(v, converted);
@@ -293,7 +295,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(2.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Vector2d converted = v.toDistanceUnit(DistanceUnit.CM);
         assertEquals(100.0, converted.x.magnitude, DELTA);
@@ -306,39 +308,12 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(100.0, DistanceUnit.CM);
         Distance y = new Distance(200.0, DistanceUnit.CM);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Vector2d converted = v.toDistanceUnit(DistanceUnit.METER);
         assertEquals(1.0, converted.x.magnitude, DELTA);
         assertEquals(2.0, converted.y.magnitude, DELTA);
         assertEquals(DistanceUnit.METER, converted.distUnit);
-    }
-
-    // ==================== toAngleUnit() Tests ====================
-
-    @Test
-    public void toAngleUnit_sameUnit_returnsSameInstance()
-    {
-        Distance x = new Distance(1.0, DistanceUnit.METER);
-        Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
-
-        Vector2d converted = v.toAngleUnit(AngleUnit.RADIANS);
-        assertSame(v, converted);
-    }
-
-    @Test
-    public void toAngleUnit_radiansToDegrees()
-    {
-        Distance x = new Distance(1.0, DistanceUnit.METER);
-        Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
-
-        Vector2d converted = v.toAngleUnit(AngleUnit.DEGREES);
-        assertEquals(AngleUnit.DEGREES, converted.angUnit);
-        // X and Y should remain unchanged
-        assertEquals(1.0, converted.x.magnitude, DELTA);
-        assertEquals(1.0, converted.y.magnitude, DELTA);
     }
 
     // ==================== inverse() Tests ====================
@@ -348,7 +323,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Vector2d inverted = v.inverse();
         assertEquals(-3.0, inverted.x.magnitude, DELTA);
@@ -360,7 +335,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(-3.0, DistanceUnit.METER);
         Distance y = new Distance(-4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Vector2d inverted = v.inverse();
         assertEquals(3.0, inverted.x.magnitude, DELTA);
@@ -372,7 +347,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(0.0, DistanceUnit.METER);
         Distance y = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Vector2d inverted = v.inverse();
         assertEquals(0.0, inverted.x.magnitude, DELTA);
@@ -384,11 +359,11 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.CM);
         Distance y = new Distance(4.0, DistanceUnit.CM);
-        Vector2d v = new Vector2d(x, y, DistanceUnit.CM, AngleUnit.DEGREES);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC).toDistanceUnit(DistanceUnit.CM);
 
         Vector2d inverted = v.inverse();
         assertEquals(DistanceUnit.CM, inverted.distUnit);
-        assertEquals(AngleUnit.DEGREES, inverted.angUnit);
+        assertEquals(AngleUnit.RADIANS, inverted.angUnit);
     }
 
     @Test
@@ -396,11 +371,13 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Vector2d doubleInverted = v.inverse().inverse();
-        assertEquals(v.x.magnitude, doubleInverted.x.magnitude, DELTA);
-        assertEquals(v.y.magnitude, doubleInverted.y.magnitude, DELTA);
+        Vector2d inverted = v.inverse();
+        Vector2d invertedAgain = inverted.inverse();
+
+        assertEquals(v.x.magnitude, invertedAgain.x.magnitude, DELTA);
+        assertEquals(v.y.magnitude, invertedAgain.y.magnitude, DELTA);
     }
 
     // ==================== plus() Tests ====================
@@ -410,11 +387,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(1.0, DistanceUnit.METER);
         Distance y1 = new Distance(2.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(3.0, DistanceUnit.METER);
         Distance y2 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.plus(v2);
         assertEquals(4.0, result.x.magnitude, DELTA);
@@ -426,11 +403,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(1.0, DistanceUnit.METER);
         Distance y1 = new Distance(2.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(100.0, DistanceUnit.CM);
         Distance y2 = new Distance(200.0, DistanceUnit.CM);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.plus(v2);
         assertEquals(2.0, result.x.magnitude, DELTA);
@@ -443,11 +420,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(3.0, DistanceUnit.METER);
         Distance y1 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(0.0, DistanceUnit.METER);
         Distance y2 = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.plus(v2);
         assertEquals(3.0, result.x.magnitude, DELTA);
@@ -459,11 +436,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(5.0, DistanceUnit.METER);
         Distance y1 = new Distance(5.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(-3.0, DistanceUnit.METER);
         Distance y2 = new Distance(-2.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.plus(v2);
         assertEquals(2.0, result.x.magnitude, DELTA);
@@ -477,11 +454,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(5.0, DistanceUnit.METER);
         Distance y1 = new Distance(6.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(2.0, DistanceUnit.METER);
         Distance y2 = new Distance(3.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.minus(v2);
         assertEquals(3.0, result.x.magnitude, DELTA);
@@ -493,11 +470,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(2.0, DistanceUnit.METER);
         Distance y1 = new Distance(3.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(100.0, DistanceUnit.CM);
         Distance y2 = new Distance(100.0, DistanceUnit.CM);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.minus(v2);
         assertEquals(1.0, result.x.magnitude, DELTA);
@@ -509,11 +486,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(1.0, DistanceUnit.METER);
         Distance y1 = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(3.0, DistanceUnit.METER);
         Distance y2 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.minus(v2);
         assertEquals(-2.0, result.x.magnitude, DELTA);
@@ -525,11 +502,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(3.0, DistanceUnit.METER);
         Distance y1 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(0.0, DistanceUnit.METER);
         Distance y2 = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.minus(v2);
         assertEquals(3.0, result.x.magnitude, DELTA);
@@ -543,7 +520,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         assertTrue(v.isDistanceUnit(DistanceUnit.METER));
     }
@@ -553,7 +530,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         assertFalse(v.isDistanceUnit(DistanceUnit.CM));
         assertFalse(v.isDistanceUnit(DistanceUnit.MM));
@@ -567,9 +544,9 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y); // default is RADIANS
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC); // default is RADIANS
 
-        assertTrue(v.isAngleUnit(AngleUnit.RADIANS));
+        assertEquals(AngleUnit.RADIANS, v.angUnit);
     }
 
     @Test
@@ -577,9 +554,9 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y); // default is RADIANS
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC); // default is RADIANS
 
-        assertFalse(v.isAngleUnit(AngleUnit.DEGREES));
+        assertNotEquals(AngleUnit.DEGREES, v.angUnit);
     }
 
     // ==================== equals() Tests ====================
@@ -589,7 +566,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         assertTrue(v.equals(v));
     }
@@ -599,11 +576,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(3.0, DistanceUnit.METER);
         Distance y1 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(3.0, DistanceUnit.METER);
         Distance y2 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         assertTrue(v1.equals(v2));
     }
@@ -613,11 +590,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(1.0, DistanceUnit.METER);
         Distance y1 = new Distance(2.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(100.0, DistanceUnit.CM);
         Distance y2 = new Distance(200.0, DistanceUnit.CM);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         assertTrue(v1.equals(v2));
     }
@@ -627,11 +604,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(3.0, DistanceUnit.METER);
         Distance y1 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(5.0, DistanceUnit.METER);
         Distance y2 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         assertFalse(v1.equals(v2));
     }
@@ -641,11 +618,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(3.0, DistanceUnit.METER);
         Distance y1 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(3.0, DistanceUnit.METER);
         Distance y2 = new Distance(5.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         assertFalse(v1.equals(v2));
     }
@@ -655,7 +632,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         assertFalse(v.equals(null));
     }
@@ -665,7 +642,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         assertFalse(v.equals("not a vector"));
     }
@@ -675,11 +652,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(0.0, DistanceUnit.METER);
         Distance y1 = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(0.0, DistanceUnit.CM);
         Distance y2 = new Distance(0.0, DistanceUnit.CM);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         assertTrue(v1.equals(v2));
     }
@@ -691,9 +668,9 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1.0, DistanceUnit.METER);
         Distance y = new Distance(0.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        assertEquals(1.0, v.getDistance().magnitude, DELTA);
+        assertEquals(1.0, v.getLength().magnitude, DELTA);
         assertEquals(0.0, v.getDirection().measure, DELTA);
     }
 
@@ -702,9 +679,9 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(0.0, DistanceUnit.METER);
         Distance y = new Distance(1.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        assertEquals(1.0, v.getDistance().magnitude, DELTA);
+        assertEquals(1.0, v.getLength().magnitude, DELTA);
         assertEquals(Math.PI / 2, v.getDirection().measure, DELTA);
     }
 
@@ -713,9 +690,9 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1e10, DistanceUnit.METER);
         Distance y = new Distance(1e10, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Distance distance = v.getDistance();
+        Distance distance = v.getLength();
         assertEquals(Math.sqrt(2) * 1e10, distance.magnitude, 1e2);
     }
 
@@ -724,9 +701,9 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(1e-10, DistanceUnit.METER);
         Distance y = new Distance(1e-10, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
-        Distance distance = v.getDistance();
+        Distance distance = v.getLength();
         assertEquals(Math.sqrt(2) * 1e-10, distance.magnitude, 1e-18);
     }
 
@@ -735,11 +712,11 @@ public class Vector2dUnitTests
     {
         Distance x1 = new Distance(1.0, DistanceUnit.METER);
         Distance y1 = new Distance(2.0, DistanceUnit.METER);
-        Vector2d v1 = new Vector2d(x1, y1);
+        Vector2d v1 = new Vector2d(x1, y1, CoordinateSystem.DECODE_FTC);
 
         Distance x2 = new Distance(3.0, DistanceUnit.METER);
         Distance y2 = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v2 = new Vector2d(x2, y2);
+        Vector2d v2 = new Vector2d(x2, y2, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v1.plus(v2).minus(v1);
         assertEquals(3.0, result.x.magnitude, DELTA);
@@ -751,7 +728,7 @@ public class Vector2dUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        Vector2d v = new Vector2d(x, y);
+        Vector2d v = new Vector2d(x, y, CoordinateSystem.DECODE_FTC);
 
         Vector2d result = v.plus(v.inverse());
         assertEquals(0.0, result.x.magnitude, DELTA);

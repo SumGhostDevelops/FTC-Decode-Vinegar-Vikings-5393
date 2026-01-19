@@ -6,6 +6,7 @@ import com.bylazar.field.Style;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
@@ -73,7 +74,7 @@ public class FieldDrawing
         {
             drawAngle(pose, turretAngleRad, ROBOT_RADIUS * 1.8, turretStyle);
             // Draw a small circle at the turret end
-            Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+            Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
             double x = converted.coord.x.magnitude;
             double y = converted.coord.y.magnitude;
             double x2 = x + (ROBOT_RADIUS * 1.8) * Math.cos(turretAngleRad);
@@ -86,7 +87,7 @@ public class FieldDrawing
         {
             drawFieldCoordinate(targetCoord, targetStyle, 6);
             // Draw an X through the target
-            FieldCoordinate convertedTarget = targetCoord.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+            FieldCoordinate convertedTarget = targetCoord.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
             double targetX = convertedTarget.x.magnitude;
             double targetY = convertedTarget.y.magnitude;
             double markerSize = 4;
@@ -104,7 +105,7 @@ public class FieldDrawing
     public static void drawRobotBody(Pose2d pose, Style style)
     {
         if (pose == null || style == null) return;
-        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+        Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
         double x = converted.coord.x.magnitude;
         double y = converted.coord.y.magnitude;
         panelsField.setStyle(style);
@@ -120,7 +121,7 @@ public class FieldDrawing
     public static void drawRobotHeading(Pose2d pose, Style style)
     {
         if (pose == null || style == null) return;
-        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+        Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
         double x = converted.coord.x.magnitude;
         double y = converted.coord.y.magnitude;
         double headingRad = converted.heading.getAngle(AngleUnit.RADIANS);
@@ -137,7 +138,7 @@ public class FieldDrawing
     public static void drawFieldCoordinate(FieldCoordinate coord, Style style, double radius)
     {
         if (coord == null || style == null) return;
-        FieldCoordinate converted = coord.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+        FieldCoordinate converted = coord.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
         double x = converted.x.magnitude;
         double y = converted.y.magnitude;
         panelsField.setStyle(style);
@@ -156,7 +157,7 @@ public class FieldDrawing
     public static void drawAngle(Pose2d pose, double angleRad, double length, Style style)
     {
         if (pose == null || style == null) return;
-        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND).toDistanceUnit(DistanceUnit.INCH);
+        Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
         double x = converted.coord.x.magnitude;
         double y = converted.coord.y.magnitude;
         double x2 = x + length * Math.cos(angleRad);

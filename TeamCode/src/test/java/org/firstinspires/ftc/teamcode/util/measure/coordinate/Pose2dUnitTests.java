@@ -28,7 +28,7 @@ public class Pose2dUnitTests
         assertEquals(3.0, pose.coord.x.magnitude, DELTA);
         assertEquals(4.0, pose.coord.y.magnitude, DELTA);
         assertEquals(45.0, pose.heading.measure, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.RIGHT_HAND, pose.coord.coordSys);
+        assertEquals(CoordinateSystem.DECODE_PEDROPATH, pose.coord.coordSys);
     }
 
     @Test
@@ -37,7 +37,7 @@ public class Pose2dUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
             new Distance(4.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
         Angle heading = new Angle(90.0, AngleUnit.DEGREES);
 
@@ -46,7 +46,7 @@ public class Pose2dUnitTests
         assertEquals(3.0, pose.coord.x.magnitude, DELTA);
         assertEquals(4.0, pose.coord.y.magnitude, DELTA);
         assertEquals(90.0, pose.heading.measure, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.FTC_STD, pose.coord.coordSys);
+        assertEquals(CoordinateSystem.DECODE_FTC, pose.coord.coordSys);
     }
 
     @Test
@@ -140,12 +140,12 @@ public class Pose2dUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
             new Distance(2.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
         Pose2d pose = new Pose2d(coord, new Angle(45.0, AngleUnit.DEGREES));
 
         Pose2d converted = pose.toDistanceUnit(DistanceUnit.CM);
-        assertEquals(FieldCoordinate.CoordinateSystem.FTC_STD, converted.coord.coordSys);
+        assertEquals(CoordinateSystem.DECODE_FTC, converted.coord.coordSys);
     }
 
     // ==================== toCoordinateSystem() Tests ====================
@@ -159,7 +159,7 @@ public class Pose2dUnitTests
             new Angle(45.0, AngleUnit.DEGREES)
         );
 
-        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND);
+        Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
         assertSame(pose, converted);
     }
 
@@ -172,10 +172,10 @@ public class Pose2dUnitTests
             new Angle(45.0, AngleUnit.DEGREES)
         );
 
-        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD);
+        Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
         assertEquals(0.0, converted.coord.x.magnitude, DELTA);
         assertEquals(0.0, converted.coord.y.magnitude, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.FTC_STD, converted.coord.coordSys);
+        assertEquals(CoordinateSystem.DECODE_FTC, converted.coord.coordSys);
     }
 
     @Test
@@ -187,7 +187,7 @@ public class Pose2dUnitTests
             new Angle(90.0, AngleUnit.DEGREES)
         );
 
-        Pose2d converted = pose.toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD);
+        Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
         assertEquals(90.0, converted.heading.measure, DELTA);
     }
 
@@ -315,7 +315,8 @@ public class Pose2dUnitTests
         );
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         Distance distance = pose.distanceTo(coord);
@@ -372,7 +373,8 @@ public class Pose2dUnitTests
         );
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
-            new Distance(1.0, DistanceUnit.METER)
+            new Distance(1.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         Angle angle = pose.angleTo(coord);
@@ -471,7 +473,8 @@ public class Pose2dUnitTests
         );
         FieldCoordinate target = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
-            new Distance(0.0, DistanceUnit.METER)
+            new Distance(0.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         Angle bearing = pose.bearingTo(target);
@@ -488,7 +491,8 @@ public class Pose2dUnitTests
         );
         FieldCoordinate target = new FieldCoordinate(
             new Distance(0.0, DistanceUnit.METER),
-            new Distance(-1.0, DistanceUnit.METER)
+            new Distance(-1.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         // Target is at -90 degrees (-PI/2)
@@ -544,12 +548,12 @@ public class Pose2dUnitTests
         org.firstinspires.ftc.robotcore.external.navigation.Pose3D pose3D =
             new org.firstinspires.ftc.robotcore.external.navigation.Pose3D(position, orientation);
 
-        Pose2d pose2d = Pose2d.fromPose3D(pose3D);
+        Pose2d pose2d = Pose2d.fromPose3D(pose3D, CoordinateSystem.DECODE_FTC);
 
         assertEquals(1.0, pose2d.coord.x.magnitude, DELTA);
         assertEquals(2.0, pose2d.coord.y.magnitude, DELTA);
         assertEquals(Math.PI / 4, pose2d.heading.measure, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.FTC_STD, pose2d.coord.coordSys);
+        assertEquals(CoordinateSystem.DECODE_FTC, pose2d.coord.coordSys);
     }
 
     // ==================== Edge Cases ====================
@@ -566,10 +570,10 @@ public class Pose2dUnitTests
         Pose2d result = original
             .toDistanceUnit(DistanceUnit.CM)
             .toAngleUnit(AngleUnit.RADIANS)
-            .toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD)
+            .toCoordinateSystem(CoordinateSystem.DECODE_FTC)
             .toDistanceUnit(DistanceUnit.METER)
             .toAngleUnit(AngleUnit.DEGREES)
-            .toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND)
+            .toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH)
             .toDistanceUnit(DistanceUnit.INCH);
 
         assertEquals(36.0, result.coord.x.magnitude, 1e-6);
@@ -613,7 +617,8 @@ public class Pose2dUnitTests
         // Target directly in front of the pose's heading
         FieldCoordinate targetAhead = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
-            new Distance(1.0, DistanceUnit.METER)
+            new Distance(1.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         Angle bearing = pose.bearingTo(targetAhead);

@@ -21,11 +21,11 @@ public class FieldCoordinateUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        FieldCoordinate coord = new FieldCoordinate(x, y);
+        FieldCoordinate coord = new FieldCoordinate(x, y, CoordinateSystem.DECODE_PEDROPATH);
 
         assertEquals(3.0, coord.x.magnitude, DELTA);
         assertEquals(4.0, coord.y.magnitude, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.RIGHT_HAND, coord.coordSys);
+        assertEquals(CoordinateSystem.DECODE_PEDROPATH, coord.coordSys);
     }
 
     @Test
@@ -33,11 +33,11 @@ public class FieldCoordinateUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        FieldCoordinate coord = new FieldCoordinate(x, y, FieldCoordinate.CoordinateSystem.RIGHT_HAND);
+        FieldCoordinate coord = new FieldCoordinate(x, y, CoordinateSystem.DECODE_PEDROPATH);
 
         assertEquals(3.0, coord.x.magnitude, DELTA);
         assertEquals(4.0, coord.y.magnitude, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.RIGHT_HAND, coord.coordSys);
+        assertEquals(CoordinateSystem.DECODE_PEDROPATH, coord.coordSys);
     }
 
     @Test
@@ -45,11 +45,11 @@ public class FieldCoordinateUnitTests
     {
         Distance x = new Distance(3.0, DistanceUnit.METER);
         Distance y = new Distance(4.0, DistanceUnit.METER);
-        FieldCoordinate coord = new FieldCoordinate(x, y, FieldCoordinate.CoordinateSystem.FTC_STD);
+        FieldCoordinate coord = new FieldCoordinate(x, y, CoordinateSystem.DECODE_FTC);
 
         assertEquals(3.0, coord.x.magnitude, DELTA);
         assertEquals(4.0, coord.y.magnitude, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.FTC_STD, coord.coordSys);
+        assertEquals(CoordinateSystem.DECODE_FTC, coord.coordSys);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class FieldCoordinateUnitTests
     {
         Distance x = new Distance(0.0, DistanceUnit.METER);
         Distance y = new Distance(0.0, DistanceUnit.METER);
-        FieldCoordinate coord = new FieldCoordinate(x, y);
+        FieldCoordinate coord = new FieldCoordinate(x, y, CoordinateSystem.DECODE_PEDROPATH);
 
         assertEquals(0.0, coord.x.magnitude, DELTA);
         assertEquals(0.0, coord.y.magnitude, DELTA);
@@ -68,7 +68,7 @@ public class FieldCoordinateUnitTests
     {
         Distance x = new Distance(-3.0, DistanceUnit.METER);
         Distance y = new Distance(-4.0, DistanceUnit.METER);
-        FieldCoordinate coord = new FieldCoordinate(x, y);
+        FieldCoordinate coord = new FieldCoordinate(x, y, CoordinateSystem.DECODE_PEDROPATH);
 
         assertEquals(-3.0, coord.x.magnitude, DELTA);
         assertEquals(-4.0, coord.y.magnitude, DELTA);
@@ -81,7 +81,8 @@ public class FieldCoordinateUnitTests
     {
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
-            new Distance(2.0, DistanceUnit.METER)
+            new Distance(2.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         FieldCoordinate converted = coord.toDistanceUnit(DistanceUnit.METER);
@@ -93,7 +94,8 @@ public class FieldCoordinateUnitTests
     {
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
-            new Distance(2.0, DistanceUnit.METER)
+            new Distance(2.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         FieldCoordinate converted = coord.toDistanceUnit(DistanceUnit.CM);
@@ -109,11 +111,11 @@ public class FieldCoordinateUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
             new Distance(2.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
 
         FieldCoordinate converted = coord.toDistanceUnit(DistanceUnit.CM);
-        assertEquals(FieldCoordinate.CoordinateSystem.FTC_STD, converted.coordSys);
+        assertEquals(CoordinateSystem.DECODE_FTC, converted.coordSys);
     }
 
     // ==================== toCoordinateSystem() Tests ====================
@@ -124,10 +126,10 @@ public class FieldCoordinateUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(0.0, DistanceUnit.INCH),
             new Distance(0.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
-        FieldCoordinate converted = coord.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND);
+        FieldCoordinate converted = coord.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
         assertSame(coord, converted);
     }
 
@@ -139,13 +141,13 @@ public class FieldCoordinateUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(72.0, DistanceUnit.INCH),
             new Distance(72.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
-        FieldCoordinate converted = coord.toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD);
+        FieldCoordinate converted = coord.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
         assertEquals(0.0, converted.x.magnitude, DELTA);
         assertEquals(0.0, converted.y.magnitude, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.FTC_STD, converted.coordSys);
+        assertEquals(CoordinateSystem.DECODE_FTC, converted.coordSys);
     }
 
     @Test
@@ -156,13 +158,13 @@ public class FieldCoordinateUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(0.0, DistanceUnit.INCH),
             new Distance(0.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
 
-        FieldCoordinate converted = coord.toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND);
+        FieldCoordinate converted = coord.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
         assertEquals(72.0, converted.x.magnitude, DELTA);
         assertEquals(72.0, converted.y.magnitude, DELTA);
-        assertEquals(FieldCoordinate.CoordinateSystem.RIGHT_HAND, converted.coordSys);
+        assertEquals(CoordinateSystem.DECODE_PEDROPATH, converted.coordSys);
     }
 
     @Test
@@ -171,12 +173,12 @@ public class FieldCoordinateUnitTests
         FieldCoordinate original = new FieldCoordinate(
             new Distance(36.0, DistanceUnit.INCH),
             new Distance(48.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         FieldCoordinate roundTrip = original
-            .toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD)
-            .toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND);
+            .toCoordinateSystem(CoordinateSystem.DECODE_FTC)
+            .toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
 
         assertEquals(36.0, roundTrip.x.magnitude, DELTA);
         assertEquals(48.0, roundTrip.y.magnitude, DELTA);
@@ -188,10 +190,10 @@ public class FieldCoordinateUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(100.0, DistanceUnit.CM),
             new Distance(200.0, DistanceUnit.CM),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
-        FieldCoordinate converted = coord.toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD);
+        FieldCoordinate converted = coord.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
         assertEquals(DistanceUnit.CM, converted.x.unit);
         assertEquals(DistanceUnit.CM, converted.y.unit);
     }
@@ -203,11 +205,13 @@ public class FieldCoordinateUnitTests
     {
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
-            new Distance(2.0, DistanceUnit.METER)
+            new Distance(2.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
         Vector2d translation = new Vector2d(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
 
         FieldCoordinate translated = coord.translate(translation);
@@ -221,15 +225,16 @@ public class FieldCoordinateUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
             new Distance(2.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
         Vector2d translation = new Vector2d(
             new Distance(1.0, DistanceUnit.METER),
-            new Distance(1.0, DistanceUnit.METER)
+            new Distance(1.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
 
         FieldCoordinate translated = coord.translate(translation);
-        assertEquals(FieldCoordinate.CoordinateSystem.FTC_STD, translated.coordSys);
+        assertEquals(CoordinateSystem.DECODE_FTC, translated.coordSys);
     }
 
     @Test
@@ -237,11 +242,13 @@ public class FieldCoordinateUnitTests
     {
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(5.0, DistanceUnit.METER),
-            new Distance(5.0, DistanceUnit.METER)
+            new Distance(5.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
         Vector2d translation = new Vector2d(
             new Distance(-2.0, DistanceUnit.METER),
-            new Distance(-3.0, DistanceUnit.METER)
+            new Distance(-3.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_FTC
         );
 
         FieldCoordinate translated = coord.translate(translation);
@@ -257,12 +264,12 @@ public class FieldCoordinateUnitTests
         FieldCoordinate a = new FieldCoordinate(
             new Distance(0.0, DistanceUnit.METER),
             new Distance(0.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
         FieldCoordinate b = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
             new Distance(4.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         Distance distance = a.distanceTo(b);
@@ -277,12 +284,12 @@ public class FieldCoordinateUnitTests
         FieldCoordinate a = new FieldCoordinate(
             new Distance(72.0, DistanceUnit.INCH),
             new Distance(72.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
         FieldCoordinate b = new FieldCoordinate(
             new Distance(0.0, DistanceUnit.INCH),
             new Distance(0.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
 
         Distance distance = a.distanceTo(b);
@@ -295,12 +302,12 @@ public class FieldCoordinateUnitTests
         FieldCoordinate a = new FieldCoordinate(
             new Distance(10.0, DistanceUnit.INCH),
             new Distance(10.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
         FieldCoordinate b = new FieldCoordinate(
             new Distance(-50.0, DistanceUnit.INCH),
             new Distance(-50.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
 
         Distance distanceAB = a.distanceTo(b);
@@ -316,12 +323,12 @@ public class FieldCoordinateUnitTests
         FieldCoordinate origin = new FieldCoordinate(
             new Distance(0.0, DistanceUnit.METER),
             new Distance(0.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
         FieldCoordinate other = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
             new Distance(1.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         Angle angle = origin.angleTo(other);
@@ -334,17 +341,19 @@ public class FieldCoordinateUnitTests
         FieldCoordinate origin = new FieldCoordinate(
             new Distance(72.0, DistanceUnit.INCH),
             new Distance(72.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
-        // (1, 1) in FTC_STD = (73, 73) in RIGHT_HAND
+        // (1, 1) in FTC_STD converts to PedroPath (73, 71) due to axis rotation
+        // PedroPath X+ = BLUE (FTC Y+), Y+ = BACKSTAGE (FTC X-)
         FieldCoordinate other = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.INCH),
             new Distance(1.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
 
+        // From (72, 72) to (73, 71): dx=1, dy=-1, angle = atan2(-1, 1) = -π/4
         Angle angle = origin.angleTo(other);
-        assertEquals(Math.PI / 4, angle.measure, DELTA);
+        assertEquals(-Math.PI / 4, angle.measure, DELTA);
     }
 
     // ==================== isCoordinateSystem() Tests ====================
@@ -355,10 +364,10 @@ public class FieldCoordinateUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
             new Distance(2.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+                CoordinateSystem.DECODE_PEDROPATH
         );
 
-        assertTrue(coord.isCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND));
+        assertTrue(coord.isCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
     }
 
     @Test
@@ -367,10 +376,10 @@ public class FieldCoordinateUnitTests
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
             new Distance(2.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+                CoordinateSystem.DECODE_FTC
         );
 
-        assertFalse(coord.isCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD));
+        assertFalse(coord.isCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
     }
 
     // ==================== equals() Tests ====================
@@ -380,7 +389,8 @@ public class FieldCoordinateUnitTests
     {
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         assertTrue(coord.equals(coord));
@@ -392,12 +402,12 @@ public class FieldCoordinateUnitTests
         FieldCoordinate a = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
             new Distance(4.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
         FieldCoordinate b = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
             new Distance(4.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         assertTrue(a.equals(b));
@@ -410,12 +420,12 @@ public class FieldCoordinateUnitTests
         FieldCoordinate a = new FieldCoordinate(
             new Distance(72.0, DistanceUnit.INCH),
             new Distance(72.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
         FieldCoordinate b = new FieldCoordinate(
             new Distance(0.0, DistanceUnit.INCH),
             new Distance(0.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.FTC_STD
+            CoordinateSystem.DECODE_FTC
         );
 
         assertTrue(a.equals(b));
@@ -427,12 +437,12 @@ public class FieldCoordinateUnitTests
         FieldCoordinate a = new FieldCoordinate(
             new Distance(1.0, DistanceUnit.METER),
             new Distance(2.0, DistanceUnit.METER),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
         FieldCoordinate b = new FieldCoordinate(
             new Distance(100.0, DistanceUnit.CM),
             new Distance(200.0, DistanceUnit.CM),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         assertTrue(a.equals(b));
@@ -443,11 +453,13 @@ public class FieldCoordinateUnitTests
     {
         FieldCoordinate a = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
         FieldCoordinate b = new FieldCoordinate(
             new Distance(5.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         assertFalse(a.equals(b));
@@ -458,7 +470,8 @@ public class FieldCoordinateUnitTests
     {
         FieldCoordinate coord = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         assertFalse(coord.equals(null));
@@ -469,7 +482,8 @@ public class FieldCoordinateUnitTests
     {
         FieldCoordinate fieldCoord = new FieldCoordinate(
             new Distance(3.0, DistanceUnit.METER),
-            new Distance(4.0, DistanceUnit.METER)
+            new Distance(4.0, DistanceUnit.METER),
+            CoordinateSystem.DECODE_PEDROPATH
         );
         Coordinate baseCoord = new Coordinate(
             new Distance(3.0, DistanceUnit.METER),
@@ -489,12 +503,14 @@ public class FieldCoordinateUnitTests
         FieldCoordinate rightHandOrigin = new FieldCoordinate(
             new Distance(0.0, DistanceUnit.INCH),
             new Distance(0.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         // Convert to FTC_STD
-        FieldCoordinate ftcStd = rightHandOrigin.toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD);
-        assertEquals(-72.0, ftcStd.x.magnitude, DELTA);
+        // PedroPath (0,0) is the corner toward audience (FTC X+) and toward red (FTC Y-)
+        // With PedroPath X+ = BLUE and Y+ = BACKSTAGE, origin at FTC (72, -72)
+        FieldCoordinate ftcStd = rightHandOrigin.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
+        assertEquals(72.0, ftcStd.x.magnitude, DELTA);
         assertEquals(-72.0, ftcStd.y.magnitude, DELTA);
     }
 
@@ -504,14 +520,14 @@ public class FieldCoordinateUnitTests
         FieldCoordinate original = new FieldCoordinate(
             new Distance(36.0, DistanceUnit.INCH),
             new Distance(48.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
         FieldCoordinate result = original
             .toDistanceUnit(DistanceUnit.CM)
-            .toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD)
+            .toCoordinateSystem(CoordinateSystem.DECODE_FTC)
             .toDistanceUnit(DistanceUnit.METER)
-            .toCoordinateSystem(FieldCoordinate.CoordinateSystem.RIGHT_HAND)
+            .toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH)
             .toDistanceUnit(DistanceUnit.INCH);
 
         assertEquals(36.0, result.x.magnitude, 1e-6);
@@ -522,17 +538,18 @@ public class FieldCoordinateUnitTests
     public void edgeCase_fieldBoundaries()
     {
         // Full field is 144 x 144 inches
-        // In RIGHT_HAND, corners are (0,0), (144,0), (0,144), (144,144)
-        // In FTC_STD, corners are (-72,-72), (72,-72), (-72,72), (72,72)
+        // In PedroPath (X+ = BLUE, Y+ = BACKSTAGE), corners are (0,0), (144,0), (0,144), (144,144)
+        // PedroPath (144, 144) = toward blue (FTC Y+) and toward backstage (FTC X-)
+        // So it maps to FTC (-72, 72)
 
         FieldCoordinate rightHandCorner = new FieldCoordinate(
             new Distance(144.0, DistanceUnit.INCH),
             new Distance(144.0, DistanceUnit.INCH),
-            FieldCoordinate.CoordinateSystem.RIGHT_HAND
+            CoordinateSystem.DECODE_PEDROPATH
         );
 
-        FieldCoordinate ftcStdCorner = rightHandCorner.toCoordinateSystem(FieldCoordinate.CoordinateSystem.FTC_STD);
-        assertEquals(72.0, ftcStdCorner.x.magnitude, DELTA);
+        FieldCoordinate ftcStdCorner = rightHandCorner.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
+        assertEquals(-72.0, ftcStdCorner.x.magnitude, DELTA);
         assertEquals(72.0, ftcStdCorner.y.magnitude, DELTA);
     }
 }

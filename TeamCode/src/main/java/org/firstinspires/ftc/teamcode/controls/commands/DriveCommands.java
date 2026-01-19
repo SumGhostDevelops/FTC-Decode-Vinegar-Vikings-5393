@@ -55,7 +55,7 @@ public class DriveCommands
     {
         public IncreaseSpeed(Drive drive)
         {
-            super(drive::increaseSpeed, drive);
+            super(drive::increaseSpeed);
         }
     }
 
@@ -63,7 +63,7 @@ public class DriveCommands
     {
         public DecreaseSpeed(Drive drive)
         {
-            super(drive::decreaseSpeed, drive);
+            super(drive::decreaseSpeed);
         }
     }
 }

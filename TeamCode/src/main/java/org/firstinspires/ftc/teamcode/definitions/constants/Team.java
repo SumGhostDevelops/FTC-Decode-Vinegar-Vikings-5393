@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.definitions.constants;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
@@ -15,11 +16,11 @@ public enum Team
 
     // Enum constants.
     // You can change these default coordinates and IDs as needed.
-    RED("red", new Goal(24, new FieldCoordinate(new Distance(140, DistanceUnit.INCH), new Distance(140, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND)), new Base(new FieldCoordinate(new Distance(38.5, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND)), new Pose2d(new FieldCoordinate(new Distance(41, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(180, AngleUnit.DEGREES)), new Angle(0, AngleUnit.DEGREES)),
+    RED("red", new Goal(24, new FieldCoordinate(new Distance(140, DistanceUnit.INCH), new Distance(140, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Base(new FieldCoordinate(new Distance(38.5, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Pose2d(new FieldCoordinate(new Distance(41, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new Angle(180, AngleUnit.DEGREES)), new Angle(0, AngleUnit.DEGREES)),
 
-    BLUE("blue", new Goal(20, new FieldCoordinate(new Distance(4, DistanceUnit.INCH), new Distance(140, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND)), new Base(new FieldCoordinate(new Distance(105.25, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND)), new Pose2d(new FieldCoordinate(new Distance(103, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(0, AngleUnit.DEGREES)), new Angle(180, AngleUnit.DEGREES)),
+    BLUE("blue", new Goal(20, new FieldCoordinate(new Distance(4, DistanceUnit.INCH), new Distance(140, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Base(new FieldCoordinate(new Distance(105.25, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Pose2d(new FieldCoordinate(new Distance(103, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new Angle(0, AngleUnit.DEGREES)), new Angle(180, AngleUnit.DEGREES)),
 
-    NONE("none", new Goal(-1, new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(140.5, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND)), new Base(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND)), new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.RIGHT_HAND), new Angle(180, AngleUnit.DEGREES)), new Angle(90, AngleUnit.DEGREES));
+    NONE("none", new Goal(-1, new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(140.5, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Base(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new Angle(180, AngleUnit.DEGREES)), new Angle(90, AngleUnit.DEGREES));
 
     // --- Enum Fields and Methods ---
     public final String color;

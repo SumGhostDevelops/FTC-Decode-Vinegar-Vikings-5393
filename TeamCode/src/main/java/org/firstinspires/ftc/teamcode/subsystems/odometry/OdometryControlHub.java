@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.DeadwheelHandl
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
 import org.firstinspires.ftc.teamcode.util.kinematics.PoseVelocityTracker;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
@@ -48,7 +49,7 @@ public class OdometryControlHub extends SubsystemBase
 
     public OdometryControlHub(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp)
     {
-        this(webcam, imu, dwPar, dwPerp, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), FieldCoordinate.CoordinateSystem.FTC_STD), new Angle(90, AngleUnit.DEGREES)));
+        this(webcam, imu, dwPar, dwPerp, new Pose2d(new FieldCoordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new Angle(90, AngleUnit.DEGREES)));
     }
 
     public OdometryControlHub(WebcamName webcam, IMU imu, Encoder dwPar, Encoder dwPerp, Pose2d referencePose)
@@ -136,7 +137,7 @@ public class OdometryControlHub extends SubsystemBase
         // Note: robotPose already accounts for camera offset since we configured
         // the AprilTagProcessor with setCameraPose() in the Webcam class
         AprilTagDetection tag = possibleTag.get();
-        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose);
+        Pose2d estimatedPose = Pose2d.fromPose3DWebcam(tag.robotPose);
 
         // Preserve driver's relative heading before we change headingOffset
         // currentDriverHeading = getAngle() - driverForward

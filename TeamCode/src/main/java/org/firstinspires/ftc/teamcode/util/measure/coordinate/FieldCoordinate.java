@@ -4,6 +4,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Vector2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 
 /**
  * Describes a {@link FieldCoordinate} in context of the FTC field
@@ -15,15 +16,10 @@ public class FieldCoordinate extends Coordinate
     /**
      * RIGHT_HAND sets the red alliance loading zone to (0, 0). FTC_STD (STANDARD) sets the center of the field to (0, 0). Both coordinate systems are audience down/goals up.
      */
-    public enum CoordinateSystem
-    {
-        RIGHT_HAND,
-        FTC_STD,
-    }
 
     public FieldCoordinate(Distance x, Distance y)
     {
-        this(x, y, CoordinateSystem.RIGHT_HAND); // right hand cause ftc standard is dumb
+        this(x, y, CoordinateSystem.DECODE_PEDROPATH); // default to right-hand origin
     }
 
     public FieldCoordinate(Distance x, Distance y, CoordinateSystem coordSys)
@@ -32,31 +28,38 @@ public class FieldCoordinate extends Coordinate
         this.coordSys = coordSys;
     }
 
-    /**
-     * @param distanceUnit
-     * @return The transformed {@link FieldCoordinate} to the specified {@link DistanceUnit}
-     */
-    public FieldCoordinate toDistanceUnit(DistanceUnit distanceUnit)
+    public FieldCoordinate(double xInch, double yInch, CoordinateSystem coordSys)
     {
-        if (this.isDistanceUnit(distanceUnit)) return this;
-
-        return new FieldCoordinate(x.toUnit(distanceUnit), y.toUnit(distanceUnit), coordSys);
+        this(new Distance(xInch, DistanceUnit.INCH), new Distance(yInch, DistanceUnit.INCH), coordSys);
     }
 
     /**
-     * @param coordSys
+     * @param unit
+     * @return The transformed {@link FieldCoordinate} to the specified {@link DistanceUnit}
+     */
+    public FieldCoordinate toDistanceUnit(DistanceUnit unit)
+    {
+        if (this.isDistanceUnit(unit)) return this;
+
+        return new FieldCoordinate(x.toUnit(unit), y.toUnit(unit), coordSys);
+    }
+
+    /**
+     * @param targetSys
      * @return The transformed {@link FieldCoordinate} to the specified {@link CoordinateSystem}
      */
-    public FieldCoordinate toCoordinateSystem(CoordinateSystem coordSys)
+    public FieldCoordinate toCoordinateSystem(CoordinateSystem targetSys)
     {
-        if (this.isCoordinateSystem(coordSys)) return this;
+        if (this.coordSys == targetSys) return this;
 
-        Distance offset = new Distance(72, DistanceUnit.INCH); // see the javadoc for CoordinateSystem
-        Vector2d translation = (coordSys == CoordinateSystem.RIGHT_HAND)
-                ? new Vector2d(offset, offset) // FTC -> right_hand, add 72, 72
-                : new Vector2d(offset, offset).inverse(); // right_hand -> ftc, subtract 72, 72
+        // 1. Convert THIS -> Universal
+        Coordinate universalPoint = this.coordSys.toUniversal(this.x, this.y);
 
-        return new FieldCoordinate(x.plus(translation.x), y.plus(translation.y), coordSys);
+        // 2. Convert Universal -> TARGET
+        Coordinate targetPoint = targetSys.fromUniversal(universalPoint);
+
+        // Preserve the original distance unit
+        return new FieldCoordinate(targetPoint.x.toUnit(this.x.unit), targetPoint.y.toUnit(this.y.unit), targetSys);
     }
 
     @Override
@@ -65,11 +68,9 @@ public class FieldCoordinate extends Coordinate
         return new FieldCoordinate(x.plus(translation.x), y.plus(translation.y), coordSys);
     }
 
-    private FieldCoordinate toComparableStandard()
+    public Vector2d vectorTo(FieldCoordinate otherCoord)
     {
-        return this
-                .toDistanceUnit(DistanceUnit.METER)
-                .toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
+        return super.vectorTo(otherCoord.toCoordinateSystem(this.coordSys));
     }
 
     /**
@@ -104,30 +105,18 @@ public class FieldCoordinate extends Coordinate
     @Override
     public boolean equals(Object obj)
     {
-        if (this == obj)
-        {
-            return true;
-        }
-
-        if (!(obj instanceof FieldCoordinate))
-        {
-            return false;
-        }
-
-        FieldCoordinate otherCoord = (FieldCoordinate) obj;
-
-        FieldCoordinate thisCoord = this
-                .toDistanceUnit(DistanceUnit.METER)
-                .toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
-        otherCoord = otherCoord
-                .toDistanceUnit(DistanceUnit.METER)
-                .toCoordinateSystem(CoordinateSystem.RIGHT_HAND);
-        return thisCoord.x.equals(otherCoord.x) && thisCoord.y.equals(otherCoord.y);
+        if (this == obj) return true;
+        if (!(obj instanceof FieldCoordinate)) return false;
+        FieldCoordinate other = (FieldCoordinate) obj;
+        // Convert both to universal (FTC standard)
+        FieldCoordinate thisUniv = this.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
+        FieldCoordinate otherUniv = other.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
+        return thisUniv.x.equals(otherUniv.x) && thisUniv.y.equals(otherUniv.y);
     }
 
     @Override
     public String toString()
     {
-        return super.toString() + "(" + coordSys.toString() + ")";
+        return coordSys.toString() + ": " + super.toString();
     }
 }
