@@ -116,14 +116,20 @@ public class Pose2d
 
     /**
      * Convert our custom {@link Pose2d} to the FTC Standard {@link Pose2D}
-     * @return The converted {@link Pose2D}
      */
     public Pose2D toPose2D()
     {
-        // make sure all of the values are even and as they should be (toAngleUnit()) is technically overkill but why not
-        Pose2d verifiedPose = this.toAngleUnit(AngleUnit.RADIANS).toDistanceUnit(DistanceUnit.METER).toCoordinateSystem(CoordinateSystem.DECODE_FTC);
+        // 1. Convert Heading directly
+        double headingRad = this.heading.getAngle(AngleUnit.RADIANS);
 
-        return new Pose2D(verifiedPose.coord.x.unit, verifiedPose.coord.x.magnitude, verifiedPose.coord.y.magnitude, verifiedPose.heading.unit, verifiedPose.heading.measure);
+        // 2. Convert Coordinate to Universal (FTC Standard) directly
+        Coordinate univCoord = this.coord.coordSys.toUniversal(this.coord.x, this.coord.y);
+
+        // 3. Extract Meters directly
+        double xMeter = univCoord.x.getDistance(DistanceUnit.METER);
+        double yMeter = univCoord.y.getDistance(DistanceUnit.METER);
+
+        return new Pose2D(DistanceUnit.METER, xMeter, yMeter, AngleUnit.RADIANS, headingRad);
     }
 
     public Pose2d toCoordSys(CoordinateSystem targetCoordSys)

@@ -76,6 +76,7 @@ public class RobotConstants
     @Configurable
     public static class Outtake
     {
+        public static final double RPM_WHILE_MOVING_RATIO = 0.8;
         @Sorter(sort = 0)
         public static int PPR = 28;
         @Sorter(sort = 1)

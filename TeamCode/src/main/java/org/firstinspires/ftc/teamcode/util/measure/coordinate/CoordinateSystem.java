@@ -5,25 +5,28 @@ import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 public enum CoordinateSystem
 {
-    // FTC Standard: 0,0 at field center. X+ points to Audience, Y+ points to Blue.
+    // FTC Standard: 0,0 at field center.
     DECODE_FTC(Direction.AUDIENCE, Direction.BLUE, Direction.UP,
             new Coordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH))),
 
-    // PedroPath: X+ points Blue, Y+ points Backstage. Field center is at (72, 72).
+    // PedroPath: Field center is at (72, 72).
     DECODE_PEDROPATH(Direction.BLUE, Direction.BACKSTAGE, Direction.UP,
             new Coordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH))),
 
-    GENERIC(Direction.UP, Direction.UP, Direction.UP, null);
+    // Safe default for center to avoid NPEs if used accidentally
+    GENERIC(Direction.UP, Direction.UP, Direction.UP,
+            new Coordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH)));
 
-    public enum Direction
-    {
-        RED, BLUE, AUDIENCE, BACKSTAGE, UP, DOWN
-    }
+    public enum Direction { RED, BLUE, AUDIENCE, BACKSTAGE, UP, DOWN }
 
     public final Direction positiveX;
     public final Direction positiveY;
     public final Direction positiveZ;
-    public final Coordinate center; // The field center position in THIS coordinate system's own coordinates
+    public final Coordinate center;
+
+    // Cache basis vectors to avoid switch statements at runtime
+    private final double[] xBasis;
+    private final double[] yBasis;
 
     CoordinateSystem(Direction positiveX, Direction positiveY, Direction positiveZ, Coordinate center)
     {
@@ -31,80 +34,69 @@ public enum CoordinateSystem
         this.positiveY = positiveY;
         this.positiveZ = positiveZ;
         this.center = center;
+
+        // Pre-calculate basis vectors
+        this.xBasis = calculateBasis(positiveX);
+        this.yBasis = calculateBasis(positiveY);
     }
 
-    /**
-     * Converts a Local Coordinate (in THIS system) -> Universal Field Coordinate (FTC Standard)
-     * Logic:
-     * 1. Calculate offset from field center in local coordinates
-     * 2. Rotate the offset vector to universal axes
-     * 3. Universal center is (0,0), so the rotated offset IS the universal coordinate
-     */
+    public static double[] calculateBasis(Direction dir) {
+        switch (dir) {
+            case AUDIENCE:  return new double[]{ 1.0,  0.0};
+            case BACKSTAGE: return new double[]{-1.0,  0.0};
+            case BLUE:      return new double[]{ 0.0,  1.0};
+            case RED:       return new double[]{ 0.0, -1.0};
+            default:        return new double[]{ 0.0,  0.0}; // Default identity
+        }
+    }
+
     public Coordinate toUniversal(Distance localX, Distance localY)
     {
-        double[] xBasis = getUniversalUnitVector(this.positiveX);
-        double[] yBasis = getUniversalUnitVector(this.positiveY);
+        if (this == GENERIC) return new Coordinate(localX, localY);
 
-        // 1. Calculate offset from field center in local coordinates
-        Distance offsetX = localX.minus(center.x);
-        Distance offsetY = localY.minus(center.y);
+        // Optimization: Use raw double math to avoid creating 3-4 intermediate Distance objects
+        // We normalize to INCHES for the math, then wrap at the end.
+        double xInch = localX.getDistance(DistanceUnit.INCH);
+        double yInch = localY.getDistance(DistanceUnit.INCH);
+        double centerX = center.x.getDistance(DistanceUnit.INCH);
+        double centerY = center.y.getDistance(DistanceUnit.INCH);
 
-        // 2. Rotate offset to universal axes
-        // globalX = offsetX * xBasis[0] + offsetY * yBasis[0]
-        // globalY = offsetX * xBasis[1] + offsetY * yBasis[1]
-        Distance globalX = offsetX.multiply(xBasis[0]).plus(offsetY.multiply(yBasis[0]));
-        Distance globalY = offsetX.multiply(xBasis[1]).plus(offsetY.multiply(yBasis[1]));
+        // 1. Offset
+        double offX = xInch - centerX;
+        double offY = yInch - centerY;
 
-        return new Coordinate(globalX, globalY);
+        // 2. Rotate (Dot Product)
+        double globalXVal = offX * xBasis[0] + offY * yBasis[0];
+        double globalYVal = offX * xBasis[1] + offY * yBasis[1];
+
+        return new Coordinate(
+                new Distance(globalXVal, DistanceUnit.INCH),
+                new Distance(globalYVal, DistanceUnit.INCH)
+        );
     }
 
-    /**
-     * Converts a Universal Field Coordinate -> Local Coordinate (in THIS system)
-     * Logic:
-     * 1. Universal coords are already offset from universal center (0,0)
-     * 2. Rotate universal offset to local axes (inverse rotation)
-     * 3. Add local center to get local coordinates
-     */
     public Coordinate fromUniversal(Distance globalX, Distance globalY)
     {
-        double[] xBasis = getUniversalUnitVector(this.positiveX);
-        double[] yBasis = getUniversalUnitVector(this.positiveY);
+        if (this == GENERIC) return new Coordinate(globalX, globalY);
 
-        // Inverse rotation: project universal offset onto local axes
-        // localOffsetX = globalX * xBasis[0] + globalY * xBasis[1]
-        // localOffsetY = globalX * yBasis[0] + globalY * yBasis[1]
-        Distance localOffsetX = globalX.multiply(xBasis[0]).plus(globalY.multiply(xBasis[1]));
-        Distance localOffsetY = globalX.multiply(yBasis[0]).plus(globalY.multiply(yBasis[1]));
+        double gX = globalX.getDistance(DistanceUnit.INCH);
+        double gY = globalY.getDistance(DistanceUnit.INCH);
+        double centerX = center.x.getDistance(DistanceUnit.INCH);
+        double centerY = center.y.getDistance(DistanceUnit.INCH);
 
-        // Add local center to get local coordinates
-        Distance localX = localOffsetX.plus(center.x);
-        Distance localY = localOffsetY.plus(center.y);
+        // Inverse rotation
+        double localOffX = gX * xBasis[0] + gY * xBasis[1];
+        double localOffY = gX * yBasis[0] + gY * yBasis[1];
 
-        return new Coordinate(localX, localY);
+        // Add Center
+        return new Coordinate(
+                new Distance(localOffX + centerX, DistanceUnit.INCH),
+                new Distance(localOffY + centerY, DistanceUnit.INCH)
+        );
     }
 
     public Coordinate fromUniversal(Coordinate globalCoordinate)
     {
         return fromUniversal(globalCoordinate.x, globalCoordinate.y);
-    }
-
-    /**
-     * Defines the Universal Basis Vectors (FTC Standard Definition)
-     * X+ = Audience, Y+ = Blue
-     */
-    private double[] getUniversalUnitVector(Direction dir)
-    {
-        // If Generic, we treat it as a standard identity vector (1,0) for internal math
-        // But realistically, we should prevent converting GENERIC <-> FIELD
-        if (this == GENERIC) return new double[]{1.0, 0.0};
-
-        switch (dir)
-        {
-            case AUDIENCE:  return new double[]{ 1.0,  0.0}; // Universal X
-            case BACKSTAGE: return new double[]{-1.0,  0.0}; // -Universal X
-            case BLUE:      return new double[]{ 0.0,  1.0}; // Universal Y
-            case RED:       return new double[]{ 0.0, -1.0}; // -Universal Y
-            default:        return new double[]{ 0.0,  0.0};
-        }
     }
 }

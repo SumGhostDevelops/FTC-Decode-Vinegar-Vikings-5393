@@ -7,6 +7,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  */
 public class Distance
 {
+    public static final Distance ZERO = new Distance(0, DistanceUnit.INCH);
+
     public final double magnitude;
     public final DistanceUnit unit;
 
@@ -46,8 +48,9 @@ public class Distance
      */
     public Distance plus(Distance b)
     {
-        double bDist = b.getDistance(this.unit);
+        if (b.magnitude == 0) return this;
 
+        double bDist = b.getDistance(this.unit);
         return new Distance(this.magnitude + bDist, this.unit);
     }
 
@@ -58,6 +61,8 @@ public class Distance
      */
     public Distance minus(Distance b)
     {
+        if (b.magnitude == 0) return this;
+
         double bDist = b.getDistance(this.unit);
 
         return new Distance(this.magnitude - bDist, this.unit);
