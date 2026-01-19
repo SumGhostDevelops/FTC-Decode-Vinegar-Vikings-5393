@@ -28,6 +28,8 @@ public class Turret extends SubsystemBase
      */
     public boolean lockToPosition = true;
 
+    public final Angle tolerance = new Angle(2, AngleUnit.DEGREES);
+
     public Turret(MotorEx turretMotor, Angle initialRelativeAngle, boolean shouldLock)
     {
         this(turretMotor, initialRelativeAngle);
@@ -71,6 +73,12 @@ public class Turret extends SubsystemBase
         int minTicks = angleToTicks(turnLimits[0]);
         int maxTicks = angleToTicks(turnLimits[1]);
         this.targetPosition = Math.max(minTicks, Math.min(maxTicks, targetTicks));
+
+        if (isAtTarget())
+        {
+            return;
+        }
+
         aim();
     }
 
@@ -230,6 +238,11 @@ public class Turret extends SubsystemBase
             {
                 turretMotor.motorEx.setPower(0); // set the turret power to 0
             }
+        }
+
+        if (Math.abs(bearingToTarget().toUnit(AngleUnit.DEGREES).measure) < tolerance.toUnit(AngleUnit.DEGREES).measure)
+        {
+            turretMotor.motorEx.setPower(0);
         }
     }
 }

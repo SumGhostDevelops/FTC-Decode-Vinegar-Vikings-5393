@@ -137,7 +137,7 @@ public class OdometryControlHub extends SubsystemBase
         // Note: robotPose already accounts for camera offset since we configured
         // the AprilTagProcessor with setCameraPose() in the Webcam class
         AprilTagDetection tag = possibleTag.get();
-        Pose2d estimatedPose = Pose2d.fromPose3DWebcam(tag.robotPose);
+        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
 
         // Preserve driver's relative heading before we change headingOffset
         // currentDriverHeading = getAngle() - driverForward

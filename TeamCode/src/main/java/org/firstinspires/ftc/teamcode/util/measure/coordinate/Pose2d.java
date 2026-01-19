@@ -60,19 +60,6 @@ public class Pose2d
         return new Pose2d(coord, new Angle((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS));
     }
 
-    /**
-     * Converts a {@link Pose3D} into a more useful {@link Pose2d}
-     *
-     * @param pose The 3D pose to convert to a 2D pose
-     * @return The converted {@link Pose2d}
-     */
-    public static Pose2d fromPose3DWebcam(Pose3D pose)
-    {
-        Pose2d unfixed = fromPose3D(pose, CoordinateSystem.DECODE_FTC);
-
-        return new Pose2d(new FieldCoordinate(unfixed.coord.y, unfixed.coord.x.multiply(-1), unfixed.coord.coordSys), unfixed.heading);
-    }
-
     public Pose2d toDistanceUnit(DistanceUnit distanceUnit)
     {
         if (coord.isDistanceUnit(distanceUnit))

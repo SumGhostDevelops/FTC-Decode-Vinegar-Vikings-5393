@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.measure.angle;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
+import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.junit.Test;
 import static org.junit.Assert.*;

@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.util.RobotMath;
 
 public class Motor2
 {
-    private final MotorEx motor;
+    public final MotorEx motor;
     private final VoltageSensor battery;
 
     private double targetRPM = 0;

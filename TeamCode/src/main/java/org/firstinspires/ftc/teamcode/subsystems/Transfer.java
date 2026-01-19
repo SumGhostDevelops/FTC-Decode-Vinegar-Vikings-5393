@@ -9,19 +9,18 @@ public class Transfer extends SubsystemBase
 {
 
     private final ServoEx transfer;
-    private boolean leftSide = false;
 
     public enum CloseType
     {
         /**
          * Moves the transfer servo in a manner that balls are allowed to enter the ball pit: backward, for transferring
          */
-        TRANSFER,
+        BACKWARD,
         SHOOT,
         /**
          * Moves the transfer in a manner that balls are not allowed to enter the ball pit: forward, for intaking
          */
-        INTAKE
+        FORWARD
     }
     public Transfer(ServoEx transfer)
     {
@@ -33,46 +32,24 @@ public class Transfer extends SubsystemBase
         transfer.set(RobotConstants.Transfer.OPEN_ANGLE);
     }
 
-    public void transfer()
-    {
-        transfer.set(RobotConstants.Transfer.TRANSFER_ANGLE);
-    }
-
     public void close()
     {
         transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
-        leftSide = true;
     }
 
     public void close(CloseType type)
     {
         switch (type)
         {
-            case INTAKE:
+            case FORWARD:
                 transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
-                leftSide = true;
                 break;
-            case TRANSFER:
+            case BACKWARD:
                 transfer.set(RobotConstants.Transfer.CLOSED_FULL_TRANSFER_ANGLE);
-                leftSide = false;
                 break;
             case SHOOT:
                 transfer.set(RobotConstants.Transfer.CLOSED_SHOOTING_TRANSFER_ANGLE);
-                leftSide = false;
                 break;
-        }
-    }
-    public void flip()
-    {
-        if (leftSide)
-        {
-            transfer.set(-90);
-            leftSide = false;
-        }
-        else
-        {
-            transfer.set(180);
-            leftSide = true;
         }
     }
 }

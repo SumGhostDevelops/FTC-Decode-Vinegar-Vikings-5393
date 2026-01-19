@@ -97,6 +97,11 @@ public class Distance
         return new Distance(this.magnitude / scalar, this.unit);
     }
 
+    public Distance negative()
+    {
+        return multiply(-1.0);
+    }
+
     public boolean isUnit(DistanceUnit distanceUnit)
     {
         return (this.unit == distanceUnit);

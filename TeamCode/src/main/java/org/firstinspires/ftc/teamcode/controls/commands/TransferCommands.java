@@ -30,7 +30,7 @@ public class TransferCommands
         @Override
         public void execute()
         {
-            transfer.close(Transfer.CloseType.INTAKE);
+            transfer.close(Transfer.CloseType.FORWARD);
         }
     }
 
@@ -62,7 +62,7 @@ public class TransferCommands
         @Override
         public void end(boolean interrupted)
         {
-            transfer.close(Transfer.CloseType.TRANSFER);
+            transfer.close(Transfer.CloseType.BACKWARD);
         }
     }
 
@@ -79,7 +79,7 @@ public class TransferCommands
         @Override
         public void execute()
         {
-            transfer.close(Transfer.CloseType.INTAKE);
+            transfer.close(Transfer.CloseType.FORWARD);
         }
 
         // Never changes position when ending
@@ -98,7 +98,7 @@ public class TransferCommands
         @Override
         public void execute()
         {
-            transfer.close(Transfer.CloseType.TRANSFER);
+            transfer.close(Transfer.CloseType.BACKWARD);
         }
 
         // Never changes position when ending
