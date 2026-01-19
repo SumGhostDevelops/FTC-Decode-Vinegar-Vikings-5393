@@ -20,7 +20,7 @@ Blue extends Base {
     private Follower follower;
 
     private Paths.PathState currentPathState;
-
+    private AutoStrat autoStrat = AutoStrat.REGULAR;
     @Override
     public void runOpMode() throws InterruptedException {
         team = Team.BLUE;

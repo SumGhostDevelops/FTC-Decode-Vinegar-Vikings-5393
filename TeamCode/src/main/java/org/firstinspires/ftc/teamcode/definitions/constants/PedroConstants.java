@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.definitions.constants;
 
 
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -16,9 +17,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class PedroConstants {
     // get mass later
-    static double mass = 6.7;
+    static double mass = 11.3398; // kg, this is the mass of the robot without any game elements
 
-    public static FollowerConstants followerConstants = new FollowerConstants().mass(mass);
+    public static FollowerConstants followerConstants = new FollowerConstants().mass(mass)
+            .forwardZeroPowerAcceleration(-70.6038)
+            .lateralZeroPowerAcceleration(-130.811)
+            .translationalPIDFCoefficients(new PIDFCoefficients(.028,0,.001,.019))
+            .headingPIDFCoefficients(new PIDFCoefficients(1,0,.01,.001));
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -30,16 +35,25 @@ public class PedroConstants {
             // typical sign layout: left motors reversed, right motors forward
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .xVelocity(222.64501842436727)
+            .yVelocity(168.03253138683195);
+    //drive
+    public static PathConstraints pathConstraints = new PathConstraints(
+            0.99,
+            100,
+            1,
+            1
+    );
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
             .forwardEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT)
             .strafeEncoder_HardwareMapName(RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT)
-            .forwardEncoderDirection(Encoder.REVERSE)
-            .strafeEncoderDirection(Encoder.FORWARD)
-            .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
+            .forwardEncoderDirection(Encoder.FORWARD)
+            .strafeEncoderDirection(Encoder.REVERSE)
+
+                        .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             // <- corrected to use Strafe offset
             .strafePodX(RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             .IMU_HardwareMapName("imu")
