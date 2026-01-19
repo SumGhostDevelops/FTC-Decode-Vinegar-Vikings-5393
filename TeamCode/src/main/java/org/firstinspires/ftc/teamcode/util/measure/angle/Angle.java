@@ -22,6 +22,17 @@ public class Angle
     }
 
     // Converters
+
+    /**
+     * @param angleUnit The angle unit to get the unnormalized version of
+     * @return The unnormalized {@link UnnormalizedAngleUnit} version of the {@link AngleUnit}
+     * @see AngleUnit#getUnnormalized()
+     */
+    public static UnnormalizedAngleUnit getUnnormalizedUnit(AngleUnit angleUnit)
+    {
+        return angleUnit.getUnnormalized();
+    }
+
     /**
      * @param newUnit
      * @return The {@link Angle} in the new {@link AngleUnit}
@@ -38,6 +49,7 @@ public class Angle
 
     /**
      * Converts an {@link Angle} to an {@link UnnormalizedAngle}
+     *
      * @param newUnit
      * @return The {@link UnnormalizedAngle} in the new {@link UnnormalizedAngleUnit}
      */
@@ -50,8 +62,8 @@ public class Angle
     }
 
     /**
-     * @see #toUnit(UnnormalizedAngleUnit)
      * @return The {@link UnnormalizedAngle} in the {@link Angle}'s equivalent {@link UnnormalizedAngleUnit}
+     * @see #toUnit(UnnormalizedAngleUnit)
      */
     public UnnormalizedAngle toUnnormalized()
     {
@@ -74,6 +86,7 @@ public class Angle
 
     /**
      * Converts the {@link Angle}'s signed quantity to an unsigned quantity [0, 360) / [0, 2Pi)
+     *
      * @return The unsigned quantity of the {@link Angle} in the {@link Angle}'s {@link AngleUnit}
      */
     public double getUnsignedAngle()
@@ -81,8 +94,11 @@ public class Angle
         return getUnsignedAngle(this.unit);
     }
 
+    // Calculations
+
     /**
      * Converts the {@link Angle}'s signed quantity to an unsigned quantity [0, 360) / [0, 2Pi)
+     *
      * @param newUnit
      * @return The unsigned quantity of the {@link Angle} in the specified {@link AngleUnit}
      */
@@ -92,12 +108,11 @@ public class Angle
         return MathUtils.normalizeAngle(convertedAngle, true, newUnit);
     }
 
-    // Calculations
-
     /**
      * Calculates this {@link Angle} + another {@link Angle}
-     * @* @param other The second {@link Angle}
+     *
      * @return The resulting {@link Angle}, in this {@link Angle}'s {@link AngleUnit}
+     * @* @param other The second {@link Angle}
      */
     public Angle plus(Angle other)
     {
@@ -108,6 +123,7 @@ public class Angle
 
     /**
      * Calculates this {@link Angle} - another {@link Angle}
+     *
      * @param other The second {@link Angle}
      * @return The resulting {@link Angle}, in this {@link Angle}'s {@link AngleUnit}
      */
@@ -116,16 +132,6 @@ public class Angle
         double otherAngle = other.getAngle(this.unit);
 
         return new Angle(this.measure - otherAngle, this.unit);
-    }
-
-    /**
-     * @see AngleUnit#getUnnormalized()
-     * @param angleUnit The angle unit to get the unnormalized version of
-     * @return The unnormalized {@link UnnormalizedAngleUnit} version of the {@link AngleUnit}
-     */
-    public static UnnormalizedAngleUnit getUnnormalizedUnit(AngleUnit angleUnit)
-    {
-        return angleUnit.getUnnormalized();
     }
 
     public boolean isUnit(AngleUnit angleUnit)
@@ -139,8 +145,10 @@ public class Angle
         switch (this.unit)
         {
             default:
-            case DEGREES: return String.format(Locale.getDefault(), "%.3f degrees", measure);
-            case RADIANS: return String.format(Locale.getDefault(), "%.3f radians", measure);
+            case DEGREES:
+                return String.format(Locale.getDefault(), "%.3f degrees", measure);
+            case RADIANS:
+                return String.format(Locale.getDefault(), "%.3f radians", measure);
         }
     }
 }

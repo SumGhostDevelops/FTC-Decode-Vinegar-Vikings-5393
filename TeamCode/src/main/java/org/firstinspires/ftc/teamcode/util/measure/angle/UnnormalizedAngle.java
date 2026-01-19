@@ -22,6 +22,22 @@ public class UnnormalizedAngle
     }
 
     /**
+     * @param angleUnit
+     * @return The normalized {@link AngleUnit} version of the {@link UnnormalizedAngleUnit}
+     */
+    public static AngleUnit getNormalizedUnit(UnnormalizedAngleUnit angleUnit)
+    {
+        switch (angleUnit)
+        {
+            default:
+            case DEGREES:
+                return AngleUnit.DEGREES;
+            case RADIANS:
+                return AngleUnit.RADIANS;
+        }
+    }
+
+    /**
      * @param finalUnit
      * @return The {@link UnnormalizedAngle} in the new {@link UnnormalizedAngleUnit}
      */
@@ -37,6 +53,7 @@ public class UnnormalizedAngle
 
     /**
      * Converts an {@link UnnormalizedAngle} to an {@link Angle}
+     *
      * @param newUnit
      * @return The {@link Angle} in the new {@link AngleUnit}
      */
@@ -82,6 +99,7 @@ public class UnnormalizedAngle
 
     /**
      * Calculates this {@link UnnormalizedAngle} + another {@link UnnormalizedAngle}
+     *
      * @param b The second {@link UnnormalizedAngle}
      * @return The resulting {@link UnnormalizedAngle}, in this {@link UnnormalizedAngle}'s {@link UnnormalizedAngleUnit}
      */
@@ -94,6 +112,7 @@ public class UnnormalizedAngle
 
     /**
      * Calculates this {@link UnnormalizedAngle} - another {@link UnnormalizedAngle}
+     *
      * @param b The second {@link UnnormalizedAngle}
      * @return The resulting {@link UnnormalizedAngle}, in this {@link UnnormalizedAngle}'s {@link UnnormalizedAngleUnit}
      */
@@ -104,28 +123,16 @@ public class UnnormalizedAngle
         return new UnnormalizedAngle(this.measure - bAngle, this.unit);
     }
 
-    /**
-     * @param angleUnit
-     * @return The normalized {@link AngleUnit} version of the {@link UnnormalizedAngleUnit}
-     */
-    public static AngleUnit getNormalizedUnit(UnnormalizedAngleUnit angleUnit)
-    {
-        switch (angleUnit)
-        {
-            default:
-            case DEGREES: return AngleUnit.DEGREES;
-            case RADIANS: return AngleUnit.RADIANS;
-        }
-    }
-
     @Override
     public String toString()
     {
         switch (this.unit)
         {
             default:
-            case DEGREES: return String.format(Locale.getDefault(), "%.3f degrees", measure);
-            case RADIANS: return String.format(Locale.getDefault(), "%.3f radians", measure);
+            case DEGREES:
+                return String.format(Locale.getDefault(), "%.3f degrees", measure);
+            case RADIANS:
+                return String.format(Locale.getDefault(), "%.3f radians", measure);
         }
     }
 }

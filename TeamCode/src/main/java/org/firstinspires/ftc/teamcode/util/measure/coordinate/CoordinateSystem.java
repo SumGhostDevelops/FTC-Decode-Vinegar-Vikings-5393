@@ -17,17 +17,13 @@ public enum CoordinateSystem
     GENERIC(Direction.UP, Direction.UP, Direction.UP,
             new Coordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH)));
 
-    public enum Direction { RED, BLUE, AUDIENCE, BACKSTAGE, UP, DOWN }
-
     public final Direction positiveX;
     public final Direction positiveY;
     public final Direction positiveZ;
     public final Coordinate center;
-
     // Cache basis vectors to avoid switch statements at runtime
     private final double[] xBasis;
     private final double[] yBasis;
-
     CoordinateSystem(Direction positiveX, Direction positiveY, Direction positiveZ, Coordinate center)
     {
         this.positiveX = positiveX;
@@ -40,13 +36,20 @@ public enum CoordinateSystem
         this.yBasis = calculateBasis(positiveY);
     }
 
-    public static double[] calculateBasis(Direction dir) {
-        switch (dir) {
-            case AUDIENCE:  return new double[]{ 1.0,  0.0};
-            case BACKSTAGE: return new double[]{-1.0,  0.0};
-            case BLUE:      return new double[]{ 0.0,  1.0};
-            case RED:       return new double[]{ 0.0, -1.0};
-            default:        return new double[]{ 0.0,  0.0}; // Default identity
+    public static double[] calculateBasis(Direction dir)
+    {
+        switch (dir)
+        {
+            case AUDIENCE:
+                return new double[]{1.0, 0.0};
+            case BACKSTAGE:
+                return new double[]{-1.0, 0.0};
+            case BLUE:
+                return new double[]{0.0, 1.0};
+            case RED:
+                return new double[]{0.0, -1.0};
+            default:
+                return new double[]{0.0, 0.0}; // Default identity
         }
     }
 
@@ -99,4 +102,6 @@ public enum CoordinateSystem
     {
         return fromUniversal(globalCoordinate.x, globalCoordinate.y);
     }
+
+    public enum Direction {RED, BLUE, AUDIENCE, BACKSTAGE, UP, DOWN}
 }

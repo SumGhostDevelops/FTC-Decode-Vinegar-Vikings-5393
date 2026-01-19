@@ -30,6 +30,49 @@ public class Pose2d
         this.heading = heading;
     }
 
+    public static Pose2d fromPose2D(Pose2D pose, CoordinateSystem coordSys)
+    {
+        FieldCoordinate coord = new FieldCoordinate(
+                new Distance(pose.getX(DistanceUnit.INCH), DistanceUnit.INCH),
+                new Distance(pose.getY(DistanceUnit.INCH), DistanceUnit.INCH),
+                coordSys
+        );
+
+        Angle angle = new Angle(pose.getHeading(AngleUnit.DEGREES), AngleUnit.DEGREES);
+
+        return new Pose2d(coord, angle);
+    }
+
+    /**
+     * Converts a {@link Pose3D} into a more useful {@link Pose2d}
+     *
+     * @param pose     The 3D pose to convert to a 2D pose
+     * @param coordSys The coordinate system to use for the 2D pose
+     * @return The converted {@link Pose2d}
+     */
+    public static Pose2d fromPose3D(Pose3D pose, CoordinateSystem coordSys)
+    {
+        FieldCoordinate coord = new FieldCoordinate(
+                new Distance(pose.getPosition().x, pose.getPosition().unit),
+                new Distance(pose.getPosition().y, pose.getPosition().unit),
+                coordSys);
+
+        return new Pose2d(coord, new Angle((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS));
+    }
+
+    /**
+     * Converts a {@link Pose3D} into a more useful {@link Pose2d}
+     *
+     * @param pose The 3D pose to convert to a 2D pose
+     * @return The converted {@link Pose2d}
+     */
+    public static Pose2d fromPose3DWebcam(Pose3D pose)
+    {
+        Pose2d unfixed = fromPose3D(pose, CoordinateSystem.DECODE_FTC);
+
+        return new Pose2d(new FieldCoordinate(unfixed.coord.y, unfixed.coord.x.multiply(-1), unfixed.coord.coordSys), unfixed.heading);
+    }
+
     public Pose2d toDistanceUnit(DistanceUnit distanceUnit)
     {
         if (coord.isDistanceUnit(distanceUnit))
@@ -135,47 +178,6 @@ public class Pose2d
     public Pose2d toCoordSys(CoordinateSystem targetCoordSys)
     {
         return new Pose2d(this.coord.toCoordinateSystem(targetCoordSys), this.heading);
-    }
-
-    public static Pose2d fromPose2D(Pose2D pose, CoordinateSystem coordSys)
-    {
-        FieldCoordinate coord = new FieldCoordinate(
-                        new Distance(pose.getX(DistanceUnit.INCH), DistanceUnit.INCH),
-                        new Distance(pose.getY(DistanceUnit.INCH), DistanceUnit.INCH),
-                        coordSys
-                );
-
-        Angle angle = new Angle(pose.getHeading(AngleUnit.DEGREES), AngleUnit.DEGREES);
-
-        return new Pose2d(coord, angle);
-    }
-
-    /**
-     * Converts a {@link Pose3D} into a more useful {@link Pose2d}
-     * @param pose The 3D pose to convert to a 2D pose
-     * @param coordSys The coordinate system to use for the 2D pose
-     * @return The converted {@link Pose2d}
-     */
-    public static Pose2d fromPose3D(Pose3D pose, CoordinateSystem coordSys)
-    {
-        FieldCoordinate coord = new FieldCoordinate(
-                new Distance(pose.getPosition().x, pose.getPosition().unit),
-                new Distance(pose.getPosition().y, pose.getPosition().unit),
-                coordSys);
-
-        return new Pose2d(coord, new Angle((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS));
-    }
-
-    /**
-     * Converts a {@link Pose3D} into a more useful {@link Pose2d}
-     * @param pose The 3D pose to convert to a 2D pose
-     * @return The converted {@link Pose2d}
-     */
-    public static Pose2d fromPose3DWebcam(Pose3D pose)
-    {
-        Pose2d unfixed = fromPose3D(pose, CoordinateSystem.DECODE_FTC);
-
-        return new Pose2d(new FieldCoordinate(unfixed.coord.y, unfixed.coord.x.multiply(-1), unfixed.coord.coordSys), unfixed.heading);
     }
 
     @Override

@@ -43,6 +43,7 @@ public class Distance
 
     /**
      * Calculates this {@link Distance} + another {@link Distance}
+     *
      * @param b The second Distance
      * @return The resulting {@link Distance}, in this {@link Distance}'s {@link DistanceUnit}
      */
@@ -56,6 +57,7 @@ public class Distance
 
     /**
      * Calculates this {@link Distance} - another {@link Distance}
+     *
      * @param b The second Distance
      * @return The resulting {@link Distance}, in this {@link Distance}'s {@link DistanceUnit}
      */
@@ -70,6 +72,7 @@ public class Distance
 
     /**
      * Calculates this {@link Distance} * a scalar
+     *
      * @param scalar The scalar to multiply by
      * @return The resulting {@link Distance}
      */
@@ -80,6 +83,7 @@ public class Distance
 
     /**
      * Calculates this {@link Distance} / a scalar
+     *
      * @param scalar The scalar to divide by
      * @return The resulting {@link Distance}
      * @throws IllegalArgumentException if {@code scalar} is zero

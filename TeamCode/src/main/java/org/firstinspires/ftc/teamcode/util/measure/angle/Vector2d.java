@@ -24,8 +24,15 @@ public class Vector2d
     }
 
     // ... (Keep standard Getters: getLength, getDirection) ...
-    public Distance getLength() { return new Distance(Math.hypot(x.magnitude, y.magnitude), x.unit); }
-    public Angle getDirection() { return new Angle(Math.atan2(y.magnitude, x.magnitude), angUnit); }
+    public Distance getLength()
+    {
+        return new Distance(Math.hypot(x.magnitude, y.magnitude), x.unit);
+    }
+
+    public Angle getDirection()
+    {
+        return new Angle(Math.atan2(y.magnitude, x.magnitude), angUnit);
+    }
 
     public Vector2d toDistanceUnit(DistanceUnit distanceUnit)
     {
@@ -68,20 +75,34 @@ public class Vector2d
         );
     }
 
-    // ... (Keep plus, minus, inverse) ...
     // Small optimization: check for empty addition
-    public Vector2d plus(Vector2d b) {
+    public Vector2d plus(Vector2d b)
+    {
         if (b.x.magnitude == 0 && b.y.magnitude == 0) return this;
 
         Vector2d convertedB = b.toCoordinateSystem(this.coordSys);
         return new Vector2d(this.x.plus(convertedB.x), this.y.plus(convertedB.y), this.coordSys);
     }
 
-    // ... (Keep existing toString, equals, etc) ...
-    public Vector2d inverse() { return new Vector2d(x.multiply(-1), y.multiply(-1), coordSys); }
-    public Vector2d minus(Vector2d b) { return plus(b.inverse()); }
-    public DistanceUnit getDistanceUnit() { return distUnit; }
-    public boolean isDistanceUnit(DistanceUnit unit) { return distUnit.equals(unit); }
+    public Vector2d inverse()
+    {
+        return new Vector2d(x.multiply(-1), y.multiply(-1), coordSys);
+    }
+
+    public Vector2d minus(Vector2d b)
+    {
+        return plus(b.inverse());
+    }
+
+    public DistanceUnit getDistanceUnit()
+    {
+        return distUnit;
+    }
+
+    public boolean isDistanceUnit(DistanceUnit unit)
+    {
+        return distUnit.equals(unit);
+    }
 
     @Override
     public boolean equals(Object obj)
@@ -93,7 +114,8 @@ public class Vector2d
 
         // Optimization: If they are the exact same coordinate system and unit,
         // we can skip the heavy 'toCoordinateSystem' conversion logic.
-        if (this.coordSys == other.coordSys && this.distUnit == other.distUnit) {
+        if (this.coordSys == other.coordSys && this.distUnit == other.distUnit)
+        {
             return this.x.equals(other.x) && this.y.equals(other.y);
         }
 
@@ -105,5 +127,8 @@ public class Vector2d
     }
 
     @Override
-    public String toString() { return String.format("%s; %s (%s)", getLength(), getDirection(), coordSys.name()); }
+    public String toString()
+    {
+        return String.format("%s; %s (%s)", getLength(), getDirection(), coordSys.name());
+    }
 }

@@ -21,6 +21,7 @@ public class Coordinate
 
     /**
      * Returns the vector between the two coordinates. Assumes that they are in the same system.
+     *
      * @param otherCoord
      * @return The {@link Vector2d} vector to the other {@link Coordinate}
      */
