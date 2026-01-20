@@ -75,6 +75,10 @@ public class Blue extends Base {
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
+
+        follower.setStartingPose(paths.startPose);
+        follower.update();
+
         setPathState(Paths.PathState.ToShoot);
 
 
@@ -321,6 +325,7 @@ public class Blue extends Base {
 
     public static class Paths {
 
+        public Pose startPose = new Pose(123, 125);
         public PathChain ToShoot,
                 ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
@@ -354,7 +359,7 @@ public class Blue extends Base {
 
         private void buildPathsBasic(Follower follower) {
                         // Tune these poses if the robot drives too far or in the wrong direction.
-            final Pose startPose = new Pose(80, 8.3);
+            startPose = new Pose(80, 8.3);
             final Pose shootPose = new Pose(80, 27); // adjust values if distance is incorrect
             final Pose finalPose = new Pose(19.000, 106.000);
 
@@ -373,7 +378,7 @@ public class Blue extends Base {
 
 
     // --- Pose definitions ---
-    final Pose startPose         = new Pose(65.000, 9.000);
+    startPose         = new Pose(65.000, 9.000);
     final Pose ballOneLinePose   = new Pose(40.000, 36.000);
     final Pose ballOneFullPose   = new Pose(19.000, 36.000);
     final Pose shootPose         = new Pose(69.000, 68.000);
@@ -465,7 +470,7 @@ public class Blue extends Base {
                     .build();
         }
         private void buildPathsGate(Follower follower) {
-            final Pose startPose = new Pose(67.000, 8.000);
+           startPose = new Pose(67.000, 8.000);
             final Pose shootPose =  new Pose(71.000, 71.000);
             final Pose ballOneLinePose =  new Pose(56.000, 60.000);
             final Pose ballOneFullPose = new Pose(56.000, 60.000);

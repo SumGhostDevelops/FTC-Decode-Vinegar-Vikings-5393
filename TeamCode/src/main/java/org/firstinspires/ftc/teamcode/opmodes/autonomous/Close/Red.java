@@ -80,6 +80,11 @@ public class Red extends Base
         follower = PedroConstants.createFollower(hardwareMap);
         paths = new Paths(follower, autoStrat);
         timer = new Timer();
+
+
+        follower.setStartingPose(paths.startPose);
+        follower.update();
+
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
         setPathState(Paths.PathState.ToShoot);
@@ -113,8 +118,10 @@ public class Red extends Base
 
                     case ToShoot:
                         Shoot();
+
                         follower.followPath(paths.ToShoot);
                         setPathState(Paths.PathState.Move);
+
                         break;
                     case Move:
                         // end path
@@ -328,6 +335,7 @@ public class Red extends Base
 
 
     public static class Paths {
+        public Pose startPose = new Pose(123, 125);
 
         public PathChain ToShoot,
                 ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
@@ -362,7 +370,7 @@ public class Red extends Base
 
         private void buildPathsBasic(Follower follower) {
                         // Tune these poses if the robot drives too far or in the wrong direction.
-            final Pose startPose = new Pose(123, 125);
+                startPose = new Pose(123, 125);
             final Pose shootPose = new Pose(101, 108);
             final Pose randomPose = new Pose(125,106);
 
@@ -381,7 +389,7 @@ public class Red extends Base
 
 
     // --- Pose definitions ---
-            final Pose startPose         = new Pose(124.0, 123.0);
+                        startPose         = new Pose(124.0, 123.0);
             final Pose shootPose         = new Pose(90.0, 97.200);
             final Pose ballOneLinePose   = new Pose(90.0, 84.0);
             final Pose ballOneFullPose   = new Pose(125.0, 84.0);
@@ -392,7 +400,6 @@ public class Red extends Base
             final Pose gateLinePose      = new Pose(90.0, 35.0);
             final Pose gatePushPose      = new Pose(135.771, 34.971);
             final Pose finalPose         = new Pose(118.0, 96.0); // New pose added here
-
                  ToShoot = follower.pathBuilder().addPath(
             new BezierLine(
                     startPose,
@@ -458,7 +465,7 @@ public class Red extends Base
                     .build();
         }
         private void buildPathsGate(Follower follower) {
-            final Pose startPose = new Pose(67.000, 8.000);
+            startPose = new Pose(67.000, 8.000);
             final Pose shootPose =  new Pose(71.000, 71.000);
             final Pose ballOneLinePose =  new Pose(56.000, 60.000);
             final Pose ballOneFullPose = new Pose(56.000, 60.000);
