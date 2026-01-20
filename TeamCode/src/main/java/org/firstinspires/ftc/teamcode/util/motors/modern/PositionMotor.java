@@ -146,7 +146,7 @@ public class PositionMotor extends PowerMotor
         {
             stopMotor();
         }
-        else if (!stopped)
+        else
         {
             setTargetDistance(targetDistance);
         }

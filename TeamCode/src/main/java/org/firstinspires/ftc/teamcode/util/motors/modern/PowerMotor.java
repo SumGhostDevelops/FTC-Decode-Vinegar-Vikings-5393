@@ -10,7 +10,7 @@ public class PowerMotor
 {
     protected final MotorEx motorEx;
     protected VoltageSensor battery;
-    protected double voltageCompensation = 13.0;
+    private double voltageCompensation = 13.0;
 
     protected boolean stopped = false;
 

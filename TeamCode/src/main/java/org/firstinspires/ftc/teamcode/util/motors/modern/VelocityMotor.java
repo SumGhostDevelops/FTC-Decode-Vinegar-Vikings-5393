@@ -118,7 +118,7 @@ public class VelocityMotor extends PowerMotor
             motorEx.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
         }
 
-        if (!stopped) setRPM(targetRPM);
+        setRPM(targetRPM);
     }
 
     public enum Controller { Simple, BangBang }
