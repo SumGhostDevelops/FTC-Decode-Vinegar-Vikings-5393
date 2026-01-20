@@ -48,9 +48,15 @@ Blue extends Base {
         follower = PedroConstants.createFollower(hardwareMap);
         paths = new Paths(follower);
         timer = new Timer();
+
+        follower.setStartingPose(paths.startPose);
+        follower.update();
+
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
         setPathState(Paths.PathState.ToShoot);
+
+
     }
 
     public void setPathState(Paths.PathState pathState) {
@@ -137,7 +143,7 @@ Blue extends Base {
 
     public static class Paths {
 
-
+        public Pose startPose =  new Pose(20.000, 123.000);
         public PathChain ToShoot,
                 ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree,
                 ToThreeFull, ToRandom, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4;
