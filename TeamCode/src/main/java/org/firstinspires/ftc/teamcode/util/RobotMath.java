@@ -13,7 +13,7 @@ public class RobotMath
 {
     public static double clamp(double value, double minValue, double maxValue)
     {
-        return  Math.max(minValue, Math.min(value, maxValue));
+        return Math.max(minValue, Math.min(value, maxValue));
     }
 
     public static int clamp(int value, int minValue, int maxValue)
