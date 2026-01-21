@@ -13,7 +13,6 @@ import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
@@ -27,7 +26,7 @@ public class RobotHardware
     public Motor.Encoder dwFwd, dwStrf;
     public ServoEx transfer;
     public IMU imu;
-    public List<LynxModule> allHubs;
+    public List<LynxModule> hubs;
     public Pinpoint pinpoint;
     public WebcamName webcam;
     public VoltageSensor battery;
@@ -140,7 +139,7 @@ public class RobotHardware
 
         try
         {
-            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.NAME, RobotConstants.Transfer.SERVO_RANGE, AngleUnit.DEGREES);
+            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.NAME, 0, 360);
             transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
         }
         catch (Exception e)
@@ -200,12 +199,9 @@ public class RobotHardware
             imu.initialize(parameters);
             imu.resetYaw();
 
-            allHubs = hardwareMap.getAll(LynxModule.class);
+            hubs = hardwareMap.getAll(LynxModule.class);
 
-            for (LynxModule hub : allHubs)
-            {
-                hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-            }
+            hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
         }
         catch (Exception e)
         {
@@ -257,21 +253,6 @@ public class RobotHardware
 
     public void clearHubCache()
     {
-        for (LynxModule hub : allHubs) {
-            hub.clearBulkCache();
-        }
+        hubs.forEach(LynxModule::clearBulkCache);
     }
-
-    /*
-    public MotorExPlusGroup getOuttakeMotorExPlusGroup()
-    {
-        return new MotorExPlusGroup(outtakeLeft, outtakeRight);
-    }
-
-    public MotorExPlus[] getOuttakeArray()
-    {
-        return new MotorExPlus[]{outtakeLeft, outtakeRight};
-    }
-
-     */
 }
