@@ -125,9 +125,7 @@ public class PositionMotor extends PowerMotor
 
         this.targetDistance = targetDistance;
 
-        double voltageScale = getVoltageScale();
-
-        double output = controller.calculate(motorEx.getDistance(), targetDistance) * power * voltageScale;
+        double output = controller.calculate(motorEx.getDistance(), targetDistance) * power;
         setPower(MathUtil.clamp(output, -1, 1));
     }
 
