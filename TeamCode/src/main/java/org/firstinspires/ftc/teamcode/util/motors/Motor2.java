@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.teamcode.util.RobotMath;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
 
 public class Motor2
 {
@@ -82,7 +82,7 @@ public class Motor2
 
     public void setPower(double power)
     {
-        power = RobotMath.clamp(power, 0, 1);
+        power = MathUtil.clamp(power, 0, 1);
 
         switch (controller)
         {

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.util.InterpLUT;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -9,16 +10,16 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
-public class RobotMath
+public class MathUtil
 {
     public static double clamp(double value, double minValue, double maxValue)
     {
-        return Math.max(minValue, Math.min(value, maxValue));
+        return Range.clip(value, minValue, maxValue);
     }
 
     public static int clamp(int value, int minValue, int maxValue)
     {
-        return clamp(value, minValue, maxValue);
+        return Range.clip(value, minValue, maxValue);
     }
 
     public static class Motor

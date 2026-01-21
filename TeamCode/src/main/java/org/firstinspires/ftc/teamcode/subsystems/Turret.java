@@ -9,7 +9,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
-import org.firstinspires.ftc.teamcode.util.RobotMath;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
@@ -207,17 +207,17 @@ public class Turret extends SubsystemBase
 
     private int angleToTicks(Angle angle)
     {
-        return RobotMath.Motor.angleToTicks(angle, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
+        return MathUtil.Motor.angleToTicks(angle, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
     }
 
     private int angleToTicks(UnnormalizedAngle angle)
     {
-        return RobotMath.Motor.angleToTicks(angle, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
+        return MathUtil.Motor.angleToTicks(angle, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
     }
 
     public Angle bearingToTarget()
     {
-        return RobotMath.Motor.ticksToAngle(turretMotor.motorEx.getCurrentPosition() - targetPosition, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
+        return MathUtil.Motor.ticksToAngle(turretMotor.motorEx.getCurrentPosition() - targetPosition, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
     }
 
     public boolean isAtTarget()

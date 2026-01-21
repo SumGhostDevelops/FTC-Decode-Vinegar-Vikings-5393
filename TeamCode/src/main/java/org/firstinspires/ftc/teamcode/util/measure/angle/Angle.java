@@ -84,6 +84,16 @@ public class Angle
         return newUnit.fromUnit(this.unit, measure);
     }
 
+    public double getDegrees()
+    {
+        return getAngle(AngleUnit.DEGREES);
+    }
+
+    public double getRadians()
+    {
+        return getAngle(AngleUnit.RADIANS);
+    }
+
     /**
      * Converts the {@link Angle}'s signed quantity to an unsigned quantity [0, 360) / [0, 2Pi)
      *

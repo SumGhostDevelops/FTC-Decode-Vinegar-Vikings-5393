@@ -4,16 +4,33 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.teamcode.util.RobotMath;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
 
+/**
+ * The PowerMotor class provides an abstraction for controlling a motor with additional
+ * functionalities such as voltage compensation, encoder direction, and distance per pulse.
+ */
 public class PowerMotor
 {
+    // The motor object that this class wraps around
     protected final MotorEx motorEx;
+
+    // Voltage sensor for battery monitoring
     protected VoltageSensor battery;
+
+    // Voltage compensation value
     private double voltageCompensation = 13.0;
 
+    // Flag to indicate if the motor is stopped
     protected boolean stopped = false;
 
+    /**
+     * Constructor to initialize the PowerMotor with a MotorEx instance.
+     * Sets the motor to run in raw power mode.
+     *
+     * @param motorEx The MotorEx instance to be controlled.
+     */
     public PowerMotor(MotorEx motorEx)
     {
         this.motorEx = motorEx;
@@ -21,6 +38,24 @@ public class PowerMotor
         motorEx.setRunMode(Motor.RunMode.RawPower);
     }
 
+    /**
+     * Constructor to initialize the PowerMotor with a MotorEx instance and a VoltageSensor.
+     *
+     * @param motorEx The MotorEx instance to be controlled.
+     * @param battery The VoltageSensor for monitoring battery voltage.
+     */
+    public PowerMotor(MotorEx motorEx, VoltageSensor battery)
+    {
+        this(motorEx);
+        this.battery = battery;
+    }
+
+    /**
+     * Sets the direction of the motor.
+     *
+     * @param direction The desired motor direction (FORWARD or REVERSE).
+     * @return The current PowerMotor instance for method chaining.
+     */
     public PowerMotor setMotorDirection(Motor.Direction direction)
     {
         motorEx.setInverted(direction == Motor.Direction.REVERSE);
@@ -28,6 +63,12 @@ public class PowerMotor
         return this;
     }
 
+    /**
+     * Sets the direction of the encoder.
+     *
+     * @param direction The desired encoder direction (FORWARD or REVERSE).
+     * @return The current PowerMotor instance for method chaining.
+     */
     public PowerMotor setEncoderDirection(Motor.Direction direction)
     {
         motorEx.encoder.setDirection(direction);
@@ -35,6 +76,12 @@ public class PowerMotor
         return this;
     }
 
+    /**
+     * Sets the zero power behavior of the motor.
+     *
+     * @param behavior The desired zero power behavior (e.g., BRAKE or FLOAT).
+     * @return The current PowerMotor instance for method chaining.
+     */
     public PowerMotor setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior)
     {
         motorEx.setZeroPowerBehavior(behavior);
@@ -43,9 +90,10 @@ public class PowerMotor
     }
 
     /**
+     * Sets the distance per pulse for the motor's encoder.
      *
-     * @param distancePerPulse The desired distance per pulse (in units per tick)
-     * @return
+     * @param distancePerPulse The desired distance per pulse (in units per tick).
+     * @return The current PowerMotor instance for method chaining.
      * @see <a href="https://www.chiefdelphi.com/t/encoder-distance-per-pulse/156742/4">What is Encoder Distance per Pulse?</a>
      */
     public PowerMotor setDistancePerPulse(double distancePerPulse)
@@ -56,10 +104,11 @@ public class PowerMotor
     }
 
     /**
-     * Typically for velocity; in terms of revolutions completed
-     * @param inputGearRatio
-     * @param outputGearRatio
-     * @return
+     * Sets the distance per pulse based on gear ratios, typically for velocity calculations.
+     *
+     * @param inputGearRatio  The input gear ratio.
+     * @param outputGearRatio The output gear ratio.
+     * @return The current PowerMotor instance for method chaining.
      */
     public PowerMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio)
     {
@@ -67,39 +116,58 @@ public class PowerMotor
     }
 
     /**
-     * Typically for position; in terms of displacement in degrees/radians
-     * @param inputGearRatio
-     * @param outputGearRatio
-     * @param inRadians
-     * @return
+     * Sets the distance per pulse based on gear ratios and whether the measurement is in radians.
+     * Typically used for position calculations.
+     *
+     * @param inputGearRatio  The input gear ratio.
+     * @param outputGearRatio The output gear ratio.
+     * @param angleUnit       If the measurement should be in degrees or radians.
+     * @return The current PowerMotor instance for method chaining.
      */
-    public PowerMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio, boolean inRadians)
+    public PowerMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio, AngleUnit angleUnit)
     {
-        double revolution = inRadians ? Math.PI * 2 : 360.0;
+        double revolution = (angleUnit == AngleUnit.RADIANS) ? Math.PI * 2 : 360.0;
 
         return setDistancePerPulse((revolution / motorEx.getCPR()) * (inputGearRatio / outputGearRatio));
     }
 
-    protected PowerMotor setVoltageCompensation(double volts)
+    /**
+     * Sets the voltage compensation value for the motor.
+     *
+     * @param volts The desired voltage compensation value.
+     * @return The current PowerMotor instance for method chaining.
+     */
+    public PowerMotor setVoltageCompensation(double volts)
     {
         voltageCompensation = volts;
 
         return this;
     }
 
+    /**
+     * Gets the current RPM (Revolutions Per Minute) of the motor.
+     *
+     * @return The current RPM of the motor.
+     */
     public double getRPM()
     {
         return tpsToRpm(motorEx.getCorrectedVelocity());
     }
 
+    /**
+     * Gets the current acceleration in RPM^2 of the motor.
+     *
+     * @return The current acceleration in RPM^2.
+     */
     public double getRPMAcceleration()
     {
         return tps2ToRpm2(motorEx.getAcceleration());
     }
 
     /**
-     * ticks of the motor
-     * @return
+     * Gets the current position of the motor in ticks.
+     *
+     * @return The current position in ticks.
      */
     public int getPosition()
     {
@@ -107,35 +175,55 @@ public class PowerMotor
     }
 
     /**
-     * distance travelled
-     * @return
+     * Gets the distance traveled by the motor.
+     *
+     * @return The distance traveled.
      */
     public double getDistance()
     {
         return motorEx.getDistance();
     }
 
+    /**
+     * Calculates the voltage scale factor based on the current battery voltage.
+     * Ensures the effective voltage does not drop below 10.0V to prevent large multipliers.
+     *
+     * @return The voltage scale factor.
+     */
     public double getVoltageScale()
     {
-        if (battery == null)
-        {
-            return 1.0;
-        }
+        if (battery == null) return 1.0;
 
-        return voltageCompensation / battery.getVoltage();
+        // Get voltage, but don't let it drop below 10.0V in the math
+        // This prevents massive multipliers if the sensor glitches
+        double effectiveVoltage = Math.max(battery.getVoltage(), 10.0);
+
+        return voltageCompensation / effectiveVoltage;
     }
 
+    /**
+     * Updates the motor's encoder velocity.
+     */
     public void update()
     {
         motorEx.encoder.getRawVelocity();
     }
 
+    /**
+     * Sets the power of the motor, applying voltage compensation if necessary.
+     *
+     * @param power The desired power level (-1 to 1).
+     */
     public void setPower(double power)
     {
         stopped = false;
-        motorEx.set(RobotMath.clamp(power, -1, 1));
+        motorEx.set(MathUtil.clamp(power * getVoltageScale(), -1, 1));
     }
 
+    /**
+     * Stops the motor by setting its power to zero.
+     * Ensures the motor is not stopped multiple times unnecessarily.
+     */
     public void stopMotor()
     {
         if (stopped) return;
@@ -144,11 +232,20 @@ public class PowerMotor
         stopped = true;
     }
 
+    /**
+     * Resets the motor's encoder to zero.
+     */
     public void resetEncoder()
     {
         motorEx.resetEncoder();
     }
 
+    /**
+     * Converts ticks per second (tps) to revolutions per minute (RPM).
+     *
+     * @param tps The ticks per second.
+     * @return The equivalent RPM.
+     */
     protected double tpsToRpm(double tps)
     {
         double ppr = motorEx.getCPR();
@@ -158,11 +255,23 @@ public class PowerMotor
         return (tps / ppr) * 60.0;
     }
 
+    /**
+     * Converts revolutions per minute (RPM) to ticks per second (tps).
+     *
+     * @param rpm The revolutions per minute.
+     * @return The equivalent ticks per second.
+     */
     protected double rpmToTps(double rpm)
     {
         return (rpm * motorEx.getCPR()) / 60.0;
     }
 
+    /**
+     * Converts the second derivative of ticks per second (tps^2) to RPM^2.
+     *
+     * @param tps2 The second derivative of ticks per second.
+     * @return The equivalent RPM^2.
+     */
     protected double tps2ToRpm2(double tps2)
     {
         double factor = 60.0 / motorEx.getCPR();

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.teamcode.util.RobotMath;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
 
 /**
  * A fancier version of {@link MotorEx}
@@ -107,7 +107,7 @@ public class MotorXP extends MotorEx
 
     public double getVelocity()
     {
-        return RobotMath.Motor.rpmToTps(getRPM(), super.getCPR());
+        return MathUtil.Motor.rpmToTps(getRPM(), super.getCPR());
     }
 
     // Bypass the SolversLib PIDF velocity controller whatever cus it sucks
@@ -117,7 +117,7 @@ public class MotorXP extends MotorEx
      */
     public void setVelocity(double velocity)
     {
-        targetRPM = RobotMath.Motor.tpsToRpm(velocity, super.getCPR());
+        targetRPM = MathUtil.Motor.tpsToRpm(velocity, super.getCPR());
         super.motorEx.setVelocity(velocity);
     }
 
@@ -128,12 +128,12 @@ public class MotorXP extends MotorEx
         {
             return 0.0;
         }
-        return RobotMath.Motor.tpsToRpm(super.getVelocity(), cpr);
+        return MathUtil.Motor.tpsToRpm(super.getVelocity(), cpr);
     }
 
     public void setRPM(double rpm)
     {
-        setVelocity(RobotMath.Motor.rpmToTps(rpm, super.getCPR()));
+        setVelocity(MathUtil.Motor.rpmToTps(rpm, super.getCPR()));
     }
 
     public double getAcceleration()
@@ -148,7 +148,7 @@ public class MotorXP extends MotorEx
         {
             return 0.0;
         }
-        return RobotMath.Motor.tps2ToRpm2(getAcceleration(), cpr);
+        return MathUtil.Motor.tps2ToRpm2(getAcceleration(), cpr);
     }
 
     /**
@@ -189,7 +189,7 @@ public class MotorXP extends MotorEx
     }
 
     @Override
-    public void setRunMode(RunMode runMode)
+    public Motor setRunMode(RunMode runMode)
     {
         switch (runMode)
         {
@@ -209,6 +209,7 @@ public class MotorXP extends MotorEx
                 break;
             }
         }
+        return null;
     }
 
     public void setRunMode(DcMotor.RunMode runMode)

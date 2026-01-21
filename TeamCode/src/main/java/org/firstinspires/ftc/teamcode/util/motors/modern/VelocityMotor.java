@@ -1,105 +1,232 @@
 package org.firstinspires.ftc.teamcode.util.motors.modern;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.teamcode.util.RobotMath;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.util.controller.BangBangController;
+import org.firstinspires.ftc.teamcode.util.controller.TakeBackHalfController;
 
+/**
+ * The VelocityMotor class extends the PowerMotor class to provide additional
+ * functionality for controlling motor velocity using various control algorithms.
+ */
 public class VelocityMotor extends PowerMotor
 {
-    private final VoltageSensor battery;
-    private double voltageCompensation;
+    // The type of velocity controller being used (e.g., PIDF, BangBang, TakeBackHalf)
+    private VelocityController controllerType;
 
-    private Controller controller;
-    // BangBangController
+    // The controller instance used for velocity control
+    private PIDFController controller;
 
+    // PIDF coefficients for the controller
+    private PIDFCoefficients coefficients = new PIDFCoefficients(1, 1, 1, 1);
+
+    // Target RPM for the motor
     private double targetRPM = 0.0;
 
+    // Tolerance for RPM caching
     private double rpmCachingTolerance = 25;
 
+    /**
+     * Constructor to initialize the VelocityMotor with a MotorEx instance and a VoltageSensor.
+     * Sets the default controller type to PIDF and the zero power behavior to FLOAT.
+     *
+     * @param motorEx The MotorEx instance to be controlled.
+     * @param battery The VoltageSensor for monitoring battery voltage.
+     */
     public VelocityMotor(MotorEx motorEx, VoltageSensor battery)
     {
-        super(motorEx);
-        this.battery = battery;
+        super(motorEx, battery);
 
         motorEx.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-        setController(Controller.Simple);
+        setControllerType(VelocityController.PIDF);
     }
 
-    public VelocityMotor setVoltageCompensation(double volts)
+    /**
+     * Sets the type of velocity controller to be used (e.g., PIDF, BangBang, TakeBackHalf).
+     *
+     * @param velocityController The desired velocity controller type.
+     * @return The current VelocityMotor instance for method chaining.
+     */
+    public VelocityMotor setControllerType(VelocityController velocityController)
     {
-        super.setVoltageCompensation(volts);
+        this.controllerType = velocityController;
 
-        return this;
-    }
-
-    public VelocityMotor setController(Controller controller)
-    {
-        this.controller = controller;
-
-        switch (controller)
+        switch (velocityController)
         {
-            case Simple:
-                motorEx.setRunMode(Motor.RunMode.PositionControl);
+            case PIDF:
+                controller = new PIDFController(coefficients);
                 break;
             case BangBang:
-                motorEx.setRunMode(Motor.RunMode.RawPower);
+                controller = new BangBangController(coefficients.p, coefficients.f);
                 break;
+            case TakeBackHalf:
+                controller = new TakeBackHalfController(coefficients.i);
         }
-
-        return this;
-    }
-
-    public VelocityMotor setRpmCachingTolerance(double rpm)
-    {
-        rpmCachingTolerance = RobotMath.clamp(25, 0, Double.POSITIVE_INFINITY);
 
         return this;
     }
 
     /**
-     * Like setRPM, but maintains a scale of the motor's max RPM
-     * @param scale
+     * Sets the PIDF coefficients for the velocity controller.
+     *
+     * @param kp Proportional gain.
+     * @param ki Integral gain.
+     * @param kd Derivative gain.
+     * @param kf Feedforward gain.
+     * @return The current VelocityMotor instance for method chaining.
+     */
+    public VelocityMotor setPIDF(double kp, double ki, double kd, double kf)
+    {
+        return setPIDF(new PIDFCoefficients(kp, ki, kd, kf));
+    }
+
+    /**
+     * Sets the PIDF coefficients for the velocity controller.
+     *
+     * @param coefficients The PIDFCoefficients object containing the PIDF values.
+     * @return The current VelocityMotor instance for method chaining.
+     */
+    public VelocityMotor setPIDF(PIDFCoefficients coefficients)
+    {
+        this.coefficients = coefficients;
+        controller.setCoefficients(coefficients);
+
+        return this;
+    }
+
+    /**
+     * Sets the tolerance for the velocity controller.
+     *
+     * @param rpmTolerance   The tolerance for RPM.
+     * @param accelTolerance The tolerance for acceleration.
+     * @return The current VelocityMotor instance for method chaining.
+     */
+    public VelocityMotor setTolerance(double rpmTolerance, double accelTolerance)
+    {
+        controller.setTolerance(rpmTolerance, accelTolerance);
+
+        return this;
+    }
+
+    /**
+     * Overriding the zero power behavior is not allowed for VelocityMotor.
+     *
+     * @param behavior The zero power behavior (ignored).
+     * @return The current VelocityMotor instance for method chaining.
+     */
+    public VelocityMotor setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior)
+    {
+        return this;
+    }
+
+    /**
+     * Sets the target RPM as a scale of the motor's maximum RPM.
+     *
+     * @param scale The scale (0 to 1) of the motor's maximum RPM.
      */
     public void setScale(double scale)
     {
-        scale = RobotMath.clamp(scale, 0, 1);
+        scale = MathUtil.clamp(scale, 0, 1);
 
-        setRPM(scale * motorEx.getMaxRPM());
+        setTargetRPM(scale * motorEx.getMaxRPM());
     }
 
-    public void setRPM(double rpm)
-    {
-        rpm = RobotMath.clamp(rpm, 0, motorEx.getMaxRPM());
-
-        if (Math.abs(rpm - targetRPM) < rpmCachingTolerance) return;
-
-        stopped = false;
-        double voltageScale = getVoltageScale();
-
-        switch (controller)
-        {
-            case Simple:
-                motorEx.setVelocity(rpmToTps(rpm));
-                break;
-            case BangBang:
-                // voltage scale here maybe
-                break;
-        }
-    }
-
+    /**
+     * Gets the current target RPM of the motor.
+     *
+     * @return The target RPM.
+     */
     public double getTargetRPM()
     {
         return targetRPM;
     }
 
+    /**
+     * Sets the target RPM for the motor.
+     *
+     * @param rpm The desired target RPM.
+     */
+    public void setTargetRPM(double rpm)
+    {
+        this.targetRPM = MathUtil.clamp(rpm, 0, motorEx.getMaxRPM());
+    }
+
+    /**
+     * Gets the RPM caching tolerance.
+     *
+     * @return The RPM caching tolerance.
+     */
     public double getRpmCachingTolerance()
     {
         return rpmCachingTolerance;
     }
 
+    /**
+     * Sets the RPM caching tolerance.
+     *
+     * @param rpm The desired RPM caching tolerance.
+     * @return The current VelocityMotor instance for method chaining.
+     */
+    public VelocityMotor setRpmCachingTolerance(double rpm)
+    {
+        rpmCachingTolerance = MathUtil.clamp(25, 0, Double.POSITIVE_INFINITY);
+
+        return this;
+    }
+
+    /**
+     * Checks if the motor is at the set point (target RPM).
+     *
+     * @return True if the motor is at the set point, false otherwise.
+     */
+    public boolean atSetPoint()
+    {
+        return controller.atSetPoint();
+    }
+
+    /**
+     * Updates the motor's velocity control loop.
+     * If the target RPM is zero or less, the motor is stopped.
+     * Otherwise, the controller calculates the output power to achieve the target RPM.
+     */
+    @Override
+    public void update()
+    {
+        super.update();
+
+        if (targetRPM <= 0)
+        {
+            stopMotor();
+            return;
+        }
+
+        double currentRPM = getRPM();
+        double output = 0;
+
+        // Calculate base output
+        switch (controllerType)
+        {
+            case PIDF:
+            case TakeBackHalf:
+                output = controller.calculate(currentRPM, targetRPM);
+                break;
+            case BangBang:
+                output = (currentRPM < targetRPM) ? 1.0 : 0.0;
+                break;
+        }
+
+        // Send to motor (clamped in PowerMotor.setPower)
+        setPower(output);
+    }
+
+    /**
+     * Stops the motor and resets the target RPM to zero.
+     */
     @Override
     public void stopMotor()
     {
@@ -107,19 +234,9 @@ public class VelocityMotor extends PowerMotor
         targetRPM = 0.0;
     }
 
-    @Override
-    public void update()
-    {
-        super.update();
-
-        // enforce that velocity motors should always be set to float mode
-        if (motorEx.motor.getZeroPowerBehavior() != DcMotor.ZeroPowerBehavior.FLOAT)
-        {
-            motorEx.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-        }
-
-        setRPM(targetRPM);
-    }
-
-    public enum Controller { Simple, BangBang }
+    /**
+     * Enum representing the types of velocity controllers available.
+     */
+    public enum VelocityController
+    {PIDF, BangBang, TakeBackHalf}
 }

@@ -19,6 +19,11 @@ public class Coordinate
         this.y = y;
     }
 
+    public double[] getCoordinate(DistanceUnit unit)
+    {
+        return new double[]{x.getDistance(unit), y.getDistance(unit)};
+    }
+
     /**
      * Returns the vector between the two coordinates. Assumes that they are in the same system.
      *

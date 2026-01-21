@@ -79,6 +79,16 @@ public class UnnormalizedAngle
         return newUnit.fromUnit(this.unit, measure);
     }
 
+    public double getDegrees()
+    {
+        return getAngle(UnnormalizedAngleUnit.DEGREES);
+    }
+
+    public double getRadians()
+    {
+        return getAngle(UnnormalizedAngleUnit.RADIANS);
+    }
+
     /**
      * @return The quantity of the wrapped {@link UnnormalizedAngle} in the {@link UnnormalizedAngle}'s {@link UnnormalizedAngleUnit}
      */

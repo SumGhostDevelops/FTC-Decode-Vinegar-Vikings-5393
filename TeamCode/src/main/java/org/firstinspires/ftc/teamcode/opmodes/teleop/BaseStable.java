@@ -6,6 +6,7 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.util.Timing;
 import com.seattlesolvers.solverslib.util.Timing.Timer;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -39,12 +40,17 @@ public abstract class BaseStable extends CommandOpMode
     private final Timer timer = new Timer(120, TimeUnit.SECONDS);
     private final ElapsedTime logTimer = new ElapsedTime();
     private double lastCleared = logTimer.seconds();
+    private Timing.Stopwatch stopwatch;
 
     @Override
     public void initialize()
     {
+        stopwatch = new Timing.Stopwatch(TimeUnit.MILLISECONDS);
+        stopwatch.start();
         ConstantsPresets.applyPreset();
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
+        telemetry.log().add("RobotContext initialized in " + stopwatch.deltaTime() + "ms");
+        telemetry.update();
 
         // Initialize Panels Field with FTC Standard coordinates
         FieldDrawing.init();
@@ -63,6 +69,9 @@ public abstract class BaseStable extends CommandOpMode
 
         bindKeys();
 
+        telemetry.log().add("Subsystems initialized in " + stopwatch.deltaTime() + "ms");
+        telemetry.update();
+
         telemetry.setAutoClear(RobotConstants.Telemetry.SET_AUTOCLEAR);
         telemetry.addData("Status", "Initialized for " + team);
         displayTelemetry();
@@ -74,6 +83,8 @@ public abstract class BaseStable extends CommandOpMode
      */
     protected void displayTelemetry()
     {
+        telemetry.addData("Loop Time", stopwatch.deltaTime() + "ms");
+
         if (RobotConstants.Telemetry.SET_AUTOCLEAR) telemetry.clear();
         if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS && Math.abs(logTimer.seconds() - lastCleared) > RobotConstants.Telemetry.LOG_AUTOCLEAR_DELAY)
         {

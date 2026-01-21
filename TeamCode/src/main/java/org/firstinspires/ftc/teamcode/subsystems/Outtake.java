@@ -5,7 +5,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
-import org.firstinspires.ftc.teamcode.util.RobotMath;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.MotorXP;
 
@@ -155,7 +155,7 @@ public class Outtake extends SubsystemBase {
         lastDistance = dist;
 
         // regression is in inches
-        setTargetRPM(RobotMath.Outtake.rpmLUT(dist));
+        setTargetRPM(MathUtil.Outtake.rpmLUT(dist));
     }
 
     public void enableRPMRatio()

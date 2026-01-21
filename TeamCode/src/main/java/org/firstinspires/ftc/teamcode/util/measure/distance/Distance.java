@@ -41,6 +41,26 @@ public class Distance
         return newUnit.fromUnit(this.unit, magnitude);
     }
 
+    public double getMM()
+    {
+        return getDistance(DistanceUnit.MM);
+    }
+
+    public double getCM()
+    {
+        return getDistance(DistanceUnit.CM);
+    }
+
+    public double getInch()
+    {
+        return getDistance(DistanceUnit.INCH);
+    }
+
+    public double getMeter()
+    {
+        return getDistance(DistanceUnit.METER);
+    }
+
     /**
      * Calculates this {@link Distance} + another {@link Distance}
      *

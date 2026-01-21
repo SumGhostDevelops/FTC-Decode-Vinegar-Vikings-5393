@@ -32,6 +32,11 @@ public class FieldCoordinate extends Coordinate
         this(new Distance(xInch, DistanceUnit.INCH), new Distance(yInch, DistanceUnit.INCH), coordSys);
     }
 
+    public double[] getCoordinate(DistanceUnit unit, CoordinateSystem coordSys)
+    {
+        return toCoordinateSystem(coordSys).getCoordinate(unit);
+    }
+
     /**
      * @param unit
      * @return The transformed {@link FieldCoordinate} to the specified {@link DistanceUnit}
