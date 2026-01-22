@@ -131,8 +131,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Coordinate", robot.subsystems.odometry.getPose());
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
-                telemetry.addData("Velocity (in/sec)", Math.hypot(robot.subsystems.odometry.getVelocityX(), robot.subsystems.odometry.getVelocityY()));
-                telemetry.addData("Acceleration (in/sec^2)", Math.hypot(robot.subsystems.odometry.getAccelerationX(), robot.subsystems.odometry.getAccelerationY()));
+                telemetry.addData("Velocity (in/sec)", robot.subsystems.odometry.getVelocity());
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
                 telemetry.addLine("--- Intake ---");
@@ -160,7 +159,7 @@ public abstract class BaseStable extends CommandOpMode
         // Draw robot position on Panels Dashboard Field panel
         FieldDrawing.draw(
                 robot.subsystems.odometry.getPose(),
-                robot.subsystems.odometry.getFuturePose(RobotConstants.Turret.FUTURE_POSE_TIME),
+                null,
                 robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS),
                 robot.team.goal.coord
         );
@@ -318,6 +317,8 @@ public abstract class BaseStable extends CommandOpMode
      */
     private Supplier<Pose2d> getPoseSupplier(boolean useFuture, double time, Subsystems s)
     {
-        return useFuture ? () -> s.odometry.getFuturePose(time) : s.odometry::getPose;
+        //return useFuture ? () -> s.odometry.getFuturePose(time) : s.odometry::getPose;
+
+        return s.odometry::getPose;
     }
 }

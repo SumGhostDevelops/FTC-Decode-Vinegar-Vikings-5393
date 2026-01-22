@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.OdometryControlHub;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.OdometryPinpoint;
 
 public class OdometryCommands
 {
@@ -14,7 +15,7 @@ public class OdometryCommands
      */
     public static class SetDriverForwardFromCurrent extends InstantCommand
     {
-        public SetDriverForwardFromCurrent(OdometryControlHub odometry)
+        public SetDriverForwardFromCurrent(OdometryPinpoint odometry)
         {
             super(odometry::setDriverForwardFromCurrent, odometry);
         }
@@ -26,10 +27,10 @@ public class OdometryCommands
      */
     public static class Localize extends InstantCommand
     {
-        public Localize(OdometryControlHub odometry, Telemetry telemetry)
+        public Localize(OdometryPinpoint odometry, Telemetry telemetry)
         {
             super(() -> {
-                boolean success = odometry.localize();
+                boolean success = odometry.localizeWithAprilTag();
                 if (success)
                 {
                     telemetry.log().add("Localization successful!");
@@ -48,10 +49,10 @@ public class OdometryCommands
      */
     public static class LocalizeWithRumble extends InstantCommand
     {
-        public LocalizeWithRumble(OdometryControlHub odometry, Telemetry telemetry, Gamepad gamepad)
+        public LocalizeWithRumble(OdometryPinpoint odometry, Telemetry telemetry, Gamepad gamepad)
         {
             super(() -> {
-                boolean success = odometry.localize();
+                boolean success = odometry.localizeWithAprilTag();
                 if (success)
                 {
                     telemetry.log().add("Localization successful!");

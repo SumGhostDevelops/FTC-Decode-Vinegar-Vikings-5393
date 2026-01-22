@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
@@ -38,15 +39,15 @@ public class OdometryPinpoint extends SubsystemBase
      */
     private Angle driverForward;
 
-    public OdometryPinpoint(Pinpoint pinpoint, Webcam webcam)
+    public OdometryPinpoint(Pinpoint pinpoint, WebcamName webcam)
     {
         this(pinpoint, webcam, new Pose2d(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES)));
     }
 
-    public OdometryPinpoint(Pinpoint pinpoint, Webcam webcam, Pose2d referencePose)
+    public OdometryPinpoint(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
     {
         this.pinpoint = pinpoint;
-        this.webcam = webcam;
+        this.webcam = new Webcam(webcam);
 
         this.pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
     }

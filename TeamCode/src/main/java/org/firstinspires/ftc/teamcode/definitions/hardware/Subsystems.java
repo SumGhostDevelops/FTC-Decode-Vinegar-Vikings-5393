@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.OdometryControlHub;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.OdometryPinpoint;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
@@ -20,7 +21,7 @@ public class Subsystems
     public final Outtake outtake;
     public final Turret turret;
 
-    public OdometryControlHub odometry;
+    public OdometryPinpoint odometry;
 
     public Subsystems(RobotHardware hw, Team team)
     {
@@ -29,6 +30,6 @@ public class Subsystems
         this.transfer = new Transfer(hw.transfer);
         this.outtake = new Outtake(hw.outtake);
         this.turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, true);
-        this.odometry = new OdometryControlHub(hw.webcam, hw.imu, hw.dwFwd, hw.dwStrf, new Pose2d(team.base.coord, new Angle(90, AngleUnit.DEGREES)));
+        this.odometry = new OdometryPinpoint(hw.pinpoint, hw.webcam, new Pose2d(team.base.coord, new Angle(90, AngleUnit.DEGREES)));
     }
 }
