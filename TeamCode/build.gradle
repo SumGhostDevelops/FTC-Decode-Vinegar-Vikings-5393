@@ -56,7 +56,7 @@ dependencies {
 
     // SolversLib: Latest Stable Version
     implementation "org.solverslib:core:0.3.4-beta1" // core
-    implementation "org.solverslib:pedroPathing:0.3.4-beta1" // pedroPathing
+    implementation "org.solverslib:pedroPathing:0.3.3" // pedroPathing
 
     // Pedro Pathing
     implementation 'com.pedropathing:ftc:2.0.5'
