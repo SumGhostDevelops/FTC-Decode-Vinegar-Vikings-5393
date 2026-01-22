@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.definitions.constants;
 
 
+import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
@@ -22,8 +23,9 @@ public class PedroConstants {
     public static FollowerConstants followerConstants = new FollowerConstants().mass(mass)
             .forwardZeroPowerAcceleration(-70.6038)
             .lateralZeroPowerAcceleration(-130.811)
-            .translationalPIDFCoefficients(new PIDFCoefficients(.028,0,.001,.019))
-            .headingPIDFCoefficients(new PIDFCoefficients(1,0,.01,.001));
+            .translationalPIDFCoefficients(new PIDFCoefficients(.13,0,.0001,.019))
+            .headingPIDFCoefficients(new PIDFCoefficients(1,0,.01,.001))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(.025,0,.00001,.6,.01));
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -37,8 +39,8 @@ public class PedroConstants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(222.64501842436727)
-            .yVelocity(168.03253138683195);
+            .xVelocity(-31.40130638956564)
+            .yVelocity(-61.18830882220879);
     //drive
     public static PathConstraints pathConstraints = new PathConstraints(
             0.99,
@@ -56,6 +58,8 @@ public class PedroConstants {
                         .forwardPodY(RobotConstants.Odometry.Deadwheels.Forward.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             // <- corrected to use Strafe offset
             .strafePodX(RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
+            .forwardTicksToInches(0.00052844)
+         .strafeTicksToInches((0.00042844))
             .IMU_HardwareMapName("imu")
             .IMU_Orientation(
                     new RevHubOrientationOnRobot(
