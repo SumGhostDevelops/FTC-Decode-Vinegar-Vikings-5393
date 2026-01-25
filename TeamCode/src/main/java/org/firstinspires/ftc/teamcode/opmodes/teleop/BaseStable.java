@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
 import java.util.concurrent.TimeUnit;
@@ -128,10 +129,10 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Team", team);
                 telemetry.addData("Distance to Goal", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
                 telemetry.addLine("--- Odometry ---");
-                telemetry.addData("Coordinate", robot.subsystems.odometry.getPose());
+                telemetry.addData("Coordinate", robot.subsystems.odometry.getPose().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
-                telemetry.addData("Velocity (in/sec)", robot.subsystems.odometry.getVelocity());
+                telemetry.addData("Velocity (in/sec)", robot.subsystems.odometry.getVelocity().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
                 telemetry.addLine("--- Intake ---");
