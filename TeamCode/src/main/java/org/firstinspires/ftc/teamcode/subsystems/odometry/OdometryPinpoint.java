@@ -29,12 +29,6 @@ public class OdometryPinpoint extends SubsystemBase
     private static final DistanceUnit dUnit = DistanceUnit.INCH;
 
     /**
-     * Offset added to IMU yaw to get field-absolute heading.
-     * After localize(): headingOffset = AprilTag heading - IMU yaw at that moment
-     */
-    private Angle headingOffset;
-
-    /**
      * The field-absolute heading that the driver considers "forward" for field-centric driving.
      */
     private Angle driverForward;
@@ -65,7 +59,7 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public Angle getAngle()
     {
-        return getIMUYaw().plus(headingOffset);
+        return getIMUYaw();
     }
 
     /**
@@ -128,7 +122,6 @@ public class OdometryPinpoint extends SubsystemBase
 
     public void updateReferencePose(Pose2d referencePose)
     {
-        headingOffset = referencePose.heading;
         driverForward = referencePose.heading;
 
         pinpoint.setPosition(referencePose.toPose2D());
@@ -146,27 +139,16 @@ public class OdometryPinpoint extends SubsystemBase
         Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
         if (possibleTag.isEmpty()) return false;
 
-        // get the apriltag and the pose it has estimated
-        // Note: robotPose already accounts for camera offset since we configured
-        // the AprilTagProcessor with setCameraPose() in the Webcam class
         AprilTagDetection tag = possibleTag.get();
         Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
 
-        // Preserve driver's relative heading before we change headingOffset
-        // currentDriverHeading = getAngle() - driverForward
+        // Preserve driver's relative heading before resetting hardware
         Angle currentDriverHeading = getAngle().minus(driverForward);
 
-        // Compute new headingOffset so getAngle() returns true field-absolute heading
-        // headingOffset = estimatedPose.heading - currentIMUYaw
-        Angle currentImuYaw = getIMUYaw();
-        headingOffset = estimatedPose.heading.minus((currentImuYaw));
+        // Update driverForward based on the new absolute estimate
+        driverForward = estimatedPose.heading.minus(currentDriverHeading);
 
-        // Update driverForward so getDriverHeading() still returns the same value
-        // getDriverHeading() = getAngle() - driverForward = currentDriverHeading
-        // driverForward = getAngle() - currentDriverHeading = estimatedPose.heading - currentDriverHeading
-        driverForward = estimatedPose.heading.toUnit(aUnit).minus(currentDriverHeading);
-
-        // set pinpoint to track from new estimated pose
+        // Set hardware to the new estimated pose (translation and rotation)
         pinpoint.setPosition(estimatedPose.toPose2D());
 
         return true;
