@@ -126,8 +126,16 @@ public class Angle
      */
     public Angle plus(Angle other)
     {
-        double otherAngle = other.getAngle(this.unit);
+        if (other == null)
+        {
+            throw new IllegalStateException("Angle.plus(): other Angle is null");
+        }
+        if (other.unit == null)
+        {
+            throw new IllegalStateException("Angle.plus(): other.unit is null");
+        }
 
+        double otherAngle = other.getAngle(this.unit);
         return new Angle(this.measure + otherAngle, this.unit);
     }
 

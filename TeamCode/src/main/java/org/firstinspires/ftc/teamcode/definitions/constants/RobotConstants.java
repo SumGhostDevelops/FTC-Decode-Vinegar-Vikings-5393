@@ -20,7 +20,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static boolean TWO_PERSON_OPERATION = false;
@@ -292,7 +292,7 @@ public class RobotConstants
             {
                 // Distance from the center to the FORWARD wheel along the Y-axis (LATERAL)
                 // Positive if LEFT of center, Negative if RIGHT of center
-                public static Distance OFFSET = new Distance(6.68, DistanceUnit.INCH);
+                public static Distance OFFSET = new Distance(36.5, DistanceUnit.MM);
             }
 
             @Configurable

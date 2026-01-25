@@ -49,8 +49,14 @@ public class OdometryPinpoint extends SubsystemBase
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
 
-        this.pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
+        headingOffset = referencePose.heading;
+        driverForward = referencePose.heading;
+
+        this.pinpoint.setPosition(
+                referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D()
+        );
     }
+
 
     /**
      * @return The yaw, as reported directly by the Pinpoint
@@ -81,9 +87,16 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public FieldCoordinate getFieldCoord()
     {
+        double rx = pinpoint.getPosX(dUnit);
+        double ry = pinpoint.getPosY(dUnit);
+
+        // Rotate -90°: (x, y) -> ( y, -x )
+        double fx = ry;
+        double fy = -rx;
+
         return new FieldCoordinate(
-                new Distance(pinpoint.getPosX(dUnit), dUnit),
-                new Distance(pinpoint.getPosY(dUnit), dUnit),
+                new Distance(fx, dUnit),
+                new Distance(fy, dUnit),
                 CoordinateSystem.DECODE_FTC
         );
     }
@@ -93,7 +106,29 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public Pose2d getPose()
     {
-        return Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
+        Pose2d raw = Pose2d.fromPose2D(
+                pinpoint.getPosition(),
+                CoordinateSystem.DECODE_FTC
+        );
+
+        // Rotate position
+        double rx = raw.coord.x.magnitude;
+        double ry = raw.coord.y.magnitude;
+
+        double fx = ry;
+        double fy = -rx;
+
+        // Rotate heading
+        Angle heading = raw.heading.minus(new Angle(90, AngleUnit.DEGREES));
+
+        return new Pose2d(
+                new FieldCoordinate(
+                        new Distance(fx, raw.coord.x.unit),
+                        new Distance(fy, raw.coord.y.unit),
+                        CoordinateSystem.DECODE_FTC
+                ),
+                heading
+        );
     }
 
     /**
@@ -101,9 +136,12 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public Vector2d getVelocity()
     {
+        double vx = pinpoint.getVelX(dUnit);
+        double vy = pinpoint.getVelY(dUnit);
+
         return new Vector2d(
-                new Distance(pinpoint.getVelX(dUnit), dUnit),
-                new Distance(pinpoint.getVelY(dUnit), dUnit),
+                new Distance(vy, dUnit),
+                new Distance(-vx, dUnit),
                 CoordinateSystem.DECODE_FTC
         );
     }
