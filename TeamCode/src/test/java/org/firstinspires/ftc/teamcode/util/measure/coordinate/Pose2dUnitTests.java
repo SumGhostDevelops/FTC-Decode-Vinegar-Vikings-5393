@@ -360,4 +360,65 @@ public class Pose2dUnitTests
         Angle bearing = pose.bearingTo(target);
         assertEquals(Math.PI / 2, bearing.measure, DELTA);
     }
+
+    @Test
+    public void bearingTo_CrossSystem_RobotFacingBlue_TargetIsRed()
+    {
+        // Robot at Center, Facing Blue (FTC 90 deg / Pedro 0 deg)
+        // We initialize it in FTC system
+        Pose2d robot = new Pose2d(
+                new Distance(0, DistanceUnit.INCH),
+                new Distance(0, DistanceUnit.INCH),
+                new Angle(90, AngleUnit.DEGREES),
+                CoordinateSystem.DECODE_FTC
+        );
+
+        // Target is Red Alliance Wall (FTC -Y / Pedro -X)
+        // Center is (72,72) Pedro. Red is -X direction. Target at (0, 72).
+        FieldCoordinate redWallTarget = new FieldCoordinate(
+                new Distance(0, DistanceUnit.INCH),
+                new Distance(72, DistanceUnit.INCH),
+                CoordinateSystem.DECODE_PEDROPATH
+        );
+
+        // Robot faces Blue (Forward). Target is Red (Behind).
+        // Bearing should be 180 degrees (or -180).
+        Angle bearing = robot.bearingTo(redWallTarget);
+
+        // Normalize to [-180, 180] for assertion
+        double deg = bearing.getDegrees();
+        assertEquals(180.0, Math.abs(deg), DELTA);
+    }
+
+    @Test
+    public void bearingTo_SystemIndependence()
+    {
+        // Scenario: Robot at Center, Facing Audience (FTC 0 deg)
+        // Target is Blue Wall (FTC 90 deg relative to field)
+        // Expected Bearing: +90 degrees (Left)
+
+        // Case A: Robot defined in FTC
+        Pose2d robotFTC = new Pose2d(
+                new Distance(0, DistanceUnit.INCH),
+                new Distance(0, DistanceUnit.INCH),
+                new Angle(0, AngleUnit.DEGREES),
+                CoordinateSystem.DECODE_FTC
+        );
+
+        FieldCoordinate target = new FieldCoordinate(
+                new Distance(0, DistanceUnit.INCH),
+                new Distance(48, DistanceUnit.INCH), // Towards Blue
+                CoordinateSystem.DECODE_FTC
+        );
+
+        assertEquals(90.0, robotFTC.bearingTo(target).getDegrees(), DELTA);
+
+        // Case B: Same Robot, converted to Pedro
+        // Facing Audience in Pedro is -90 deg.
+        Pose2d robotPedro = robotFTC.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
+
+        // Bearing should STILL be +90 (Target is to the Left of the robot)
+        // This verifies that converting the Pose didn't break the relative geometry
+        assertEquals(90.0, robotPedro.bearingTo(target).getDegrees(), DELTA);
+    }
 }

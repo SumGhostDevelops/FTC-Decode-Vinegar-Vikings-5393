@@ -21,14 +21,14 @@ public class Pose2d
      */
     public Pose2d(Distance x, Distance y, Angle heading, CoordinateSystem coordinateSystem)
     {
-        this.coord = new FieldCoordinate(x, y);
+        this.coord = new FieldCoordinate(x, y, coordinateSystem);
         this.heading = new FieldHeading(heading, coordinateSystem);
     }
 
     public Pose2d(FieldCoordinate coord, FieldHeading heading)
     {
         this.coord = coord;
-        this.heading = heading;
+        this.heading = heading.toSystem(coord.coordSys);
     }
 
     public static Pose2d fromPose2D(Pose2D pose, CoordinateSystem coordSys)
@@ -46,10 +46,6 @@ public class Pose2d
 
     /**
      * Converts a {@link Pose3D} into a more useful {@link Pose2d}
-     *
-     * @param pose     The 3D pose to convert to a 2D pose
-     * @param coordSys The coordinate system to use for the 2D pose
-     * @return The converted {@link Pose2d}
      */
     public static Pose2d fromPose3D(Pose3D pose, CoordinateSystem coordSys)
     {
@@ -78,7 +74,11 @@ public class Pose2d
             return this;
         }
 
-        return new Pose2d(coord.toCoordinateSystem(coordSys), heading);
+        // Fix: Explicitly convert the heading to the target system as well
+        return new Pose2d(
+                coord.toCoordinateSystem(coordSys),
+                heading.toSystem(coordSys)
+        );
     }
 
     public Pose2d toAngleUnit(AngleUnit angleUnit)
@@ -145,27 +145,14 @@ public class Pose2d
         return this.coord.angleTo(otherCoord);
     }
 
-    /**
-     * Convert our custom {@link Pose2d} to the FTC Standard {@link Pose2D}
-     */
     public Pose2D toPose2D()
     {
-        // 1. Convert Heading directly
         double headingRad = this.heading.angle.getRadians();
-
-        // 2. Convert Coordinate to Universal (FTC Standard) directly
         Coordinate univCoord = this.coord.coordSys.toUniversal(this.coord.x, this.coord.y);
-
-        // 3. Extract Meters directly
         double xMeter = univCoord.x.getDistance(DistanceUnit.METER);
         double yMeter = univCoord.y.getDistance(DistanceUnit.METER);
 
         return new Pose2D(DistanceUnit.METER, xMeter, yMeter, AngleUnit.RADIANS, headingRad);
-    }
-
-    public Pose2d toCoordSys(CoordinateSystem targetCoordSys)
-    {
-        return new Pose2d(this.coord.toCoordinateSystem(targetCoordSys), this.heading);
     }
 
     @Override

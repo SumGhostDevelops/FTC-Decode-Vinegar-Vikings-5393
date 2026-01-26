@@ -66,10 +66,44 @@ public class FieldHeadingUnitTests
     @Test
     public void toAngleUnit_convertsInternalAngle()
     {
-        FieldHeading deg = new FieldHeading(180, AngleUnit.DEGREES, CoordinateSystem.DECODE_FTC);
+        // Use 90 degrees (PI/2) instead of 180 (PI) to avoid normalization ambiguity (-PI vs PI)
+        FieldHeading deg = new FieldHeading(90, AngleUnit.DEGREES, CoordinateSystem.DECODE_FTC);
         FieldHeading rad = deg.toAngleUnit(AngleUnit.RADIANS);
 
-        assertEquals(Math.PI, rad.angle.measure, DELTA);
+        assertEquals(Math.PI / 2, rad.angle.measure, DELTA);
         assertEquals(AngleUnit.RADIANS, rad.angle.unit);
+    }
+
+    @Test
+    public void normalization_BoundaryCheck_PedroToFTC()
+    {
+        // 180 degrees in Pedro (Facing Red Alliance)
+        // FTC: Pedro 0 is Blue (FTC 90). Pedro 180 is Red (FTC 270 or -90).
+        FieldHeading pedroRed = new FieldHeading(180, AngleUnit.DEGREES, CoordinateSystem.DECODE_PEDROPATH);
+
+        FieldHeading ftcRed = pedroRed.toSystem(CoordinateSystem.DECODE_FTC);
+
+        // We expect -90 or 270.
+        // If your Angle class normalizes to [-180, 180), expect -90.
+        // If [0, 360), expect 270.
+        // Assuming [-180, 180) based on typical FTC usage:
+
+        double deg = ftcRed.angle.getDegrees();
+        assertEquals(-90.0, deg, DELTA);
+    }
+
+    @Test
+    public void arithmetic_MixedSystems_ZeroSum()
+    {
+        // Heading A: 0 deg Pedro (Facing Blue)
+        FieldHeading h1 = new FieldHeading(0, AngleUnit.DEGREES, CoordinateSystem.DECODE_PEDROPATH);
+
+        // Heading B: 90 deg FTC (Facing Blue)
+        FieldHeading h2 = new FieldHeading(90, AngleUnit.DEGREES, CoordinateSystem.DECODE_FTC);
+
+        // h1 - h2 should be 0 (they are the same physical direction)
+        FieldHeading diff = h1.minus(h2);
+
+        assertEquals(0.0, diff.angle.measure, DELTA);
     }
 }

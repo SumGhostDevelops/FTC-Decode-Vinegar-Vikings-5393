@@ -122,4 +122,56 @@ public class FieldCoordinateUnitTests
         Angle angle = origin.angleTo(other);
         assertEquals(-Math.PI / 4, angle.measure, DELTA);
     }
+
+    @Test
+    public void distanceTo_CrossSystem_CenterToCenter()
+    {
+        // FTC Center is (0, 0)
+        FieldCoordinate centerFTC = new FieldCoordinate(
+                new Distance(0, DistanceUnit.INCH),
+                new Distance(0, DistanceUnit.INCH),
+                CoordinateSystem.DECODE_FTC
+        );
+
+        // Pedro Center is (72, 72)
+        FieldCoordinate centerPedro = new FieldCoordinate(
+                new Distance(72, DistanceUnit.INCH),
+                new Distance(72, DistanceUnit.INCH),
+                CoordinateSystem.DECODE_PEDROPATH
+        );
+
+        // Distance should be 0, regardless of raw values
+        assertEquals(0.0, centerFTC.distanceTo(centerPedro).magnitude, DELTA);
+        assertEquals(0.0, centerPedro.distanceTo(centerFTC).magnitude, DELTA);
+    }
+
+    @Test
+    public void angleTo_CrossSystem_Quadrants()
+    {
+        // Origin at Field Center
+        FieldCoordinate center = new FieldCoordinate(
+                new Distance(0, DistanceUnit.INCH),
+                new Distance(0, DistanceUnit.INCH),
+                CoordinateSystem.DECODE_FTC
+        );
+
+        // Target: 10 inches towards Blue Alliance (FTC +Y)
+        // In Pedro, Blue is +X. Center is (72,72). So target is (82, 72).
+        FieldCoordinate targetBlue = new FieldCoordinate(
+                new Distance(82, DistanceUnit.INCH),
+                new Distance(72, DistanceUnit.INCH),
+                CoordinateSystem.DECODE_PEDROPATH
+        );
+
+        // Angle in FTC system: Towards +Y is 90 degrees (PI/2)
+        Angle angleInFTC = center.angleTo(targetBlue);
+        assertEquals(Math.PI / 2, angleInFTC.getRadians(), DELTA);
+
+        // Angle in Pedro system: Towards +X is 0 degrees
+        // center.toSystem(PEDRO) -> (72,72). targetBlue -> (82,72).
+        // Vector is (10, 0). Angle is 0.
+        Angle angleInPedro = center.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH)
+                .angleTo(targetBlue);
+        assertEquals(0.0, angleInPedro.getRadians(), DELTA);
+    }
 }
