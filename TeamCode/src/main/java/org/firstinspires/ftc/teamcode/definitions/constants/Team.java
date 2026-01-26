@@ -2,7 +2,8 @@ package org.firstinspires.ftc.teamcode.definitions.constants;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
@@ -16,18 +17,36 @@ public enum Team
 
     // Enum constants.
     // You can change these default coordinates and IDs as needed.
-    RED("red", new Goal(24, new FieldCoordinate(new Distance(140, DistanceUnit.INCH), new Distance(140, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Base(new FieldCoordinate(new Distance(38.5, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Pose2d(new FieldCoordinate(new Distance(41, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new Angle(180, AngleUnit.DEGREES)), new Angle(0, AngleUnit.DEGREES)),
+    RED(
+            "red",
+            new Goal(24, coord(138, 138)),
+            new Base(coord(38.5, 33.5)),
+            new Pose2d(coord(41, 9), deg(90)),
+            deg(0)
+    ),
 
-    BLUE("blue", new Goal(20, new FieldCoordinate(new Distance(4, DistanceUnit.INCH), new Distance(140, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Base(new FieldCoordinate(new Distance(105.25, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Pose2d(new FieldCoordinate(new Distance(103, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new Angle(0, AngleUnit.DEGREES)), new Angle(180, AngleUnit.DEGREES)),
+    BLUE(
+            "blue",
+            new Goal(20, coord(6, 138)),
+            new Base(coord(105.25, 33.5)),
+            new Pose2d(coord(103, 9), deg(90)),
+            deg(180)
+    ),
 
-    NONE("none", new Goal(-1, new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(140.5, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Base(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(33.5, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH)), new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(9, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new Angle(180, AngleUnit.DEGREES)), new Angle(90, AngleUnit.DEGREES));
+    NONE(
+            "none",
+            new Goal(-1, coord(72, 140.5)),
+            new Base(coord(72, 33.5)),
+            new Pose2d(coord(72, 9), deg(90)),
+            deg(90)
+    );
 
     // --- Enum Fields and Methods ---
     public final String color;
     public final Goal goal;
     public final Base base;
     public final Pose2d initialPose; // currently configured for an 18in x 18in robot, starting in the small triangle corner
-    public final Angle forwardAngle;
+    public final FieldHeading forwardAngle;
 
     // --- Nested Data Structures ---
 
@@ -38,13 +57,40 @@ public enum Team
      * @param base  The team's base
      * @param color The team's color
      */
-    Team(String color, Goal goal, Base base, Pose2d initialPose, Angle forwardAngle)
+    Team(String color, Goal goal, Base base, Pose2d initialPose, FieldHeading forwardAngle)
     {
         this.color = color;
         this.goal = goal;
         this.base = base;
         this.initialPose = initialPose;
         this.forwardAngle = forwardAngle;
+    }
+
+    // --- Helper Methods to reduce visual noise ---
+
+    /**
+     * inches and in pedropath coordinate system
+     * @param x
+     * @param y
+     * @return
+     */
+    private static FieldCoordinate coord(double x, double y)
+    {
+        return new FieldCoordinate(
+                new Distance(x, DistanceUnit.INCH),
+                new Distance(y, DistanceUnit.INCH),
+                CoordinateSystem.DECODE_PEDROPATH
+        );
+    }
+
+    /**
+     * degrees and in pedropath coordinate system
+     * @param degrees
+     * @return
+     */
+    private static FieldHeading deg(double degrees)
+    {
+        return new FieldHeading(new Angle(degrees, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH);
     }
 
     /**

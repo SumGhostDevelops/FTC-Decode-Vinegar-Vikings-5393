@@ -4,7 +4,7 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drive;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;

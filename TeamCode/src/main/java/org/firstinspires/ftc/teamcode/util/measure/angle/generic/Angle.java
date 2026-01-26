@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.measure.angle;
+package org.firstinspires.ftc.teamcode.util.measure.angle.generic;
 
 import com.seattlesolvers.solverslib.util.MathUtils;
 

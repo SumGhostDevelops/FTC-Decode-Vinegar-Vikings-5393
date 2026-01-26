@@ -10,8 +10,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
-import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
@@ -112,6 +113,26 @@ public class Turret extends SubsystemBase
     }
 
     /**
+     * Calculates the absolute FieldHeading of the turret.
+     * <p>
+     * Logic: FieldHeading = RobotHeading + (TurretRelative - InitialRelative)
+     * This accounts for the fact that InitialRelative usually defines "Forward" (e.g. 90deg),
+     * so we must subtract it to map "Turret Forward" to "Robot Forward" (0 offset).
+     *
+     * @param robotHeading The robot's current field heading
+     * @return The absolute heading of the turret in the same coordinate system as the robot heading.
+     */
+    public FieldHeading getFieldHeading(FieldHeading robotHeading)
+    {
+        // Calculate the physical offset of the turret from the robot's forward vector.
+        Angle turretOffset = getRelativeAngle().minus(initialRelativeAngle);
+
+        // Apply this offset to the robot's heading.
+        // We construct a new FieldHeading using the robot's system.
+        return new FieldHeading(robotHeading.angle.plus(turretOffset), robotHeading.system);
+    }
+
+    /**
      * @param robotAngle
      * @return The absolute {@link Angle} of the turret based on the relative {@link Angle} and the robot's {@link Angle}
      * @see #getAbsoluteUnnormalizedAngle(UnnormalizedAngle)
@@ -129,7 +150,10 @@ public class Turret extends SubsystemBase
      */
     public UnnormalizedAngle getAbsoluteUnnormalizedAngle(UnnormalizedAngle robotAngle)
     {
-        return getRelativeUnnormalizedAngle().plus(robotAngle);
+        // Converts initialRelativeAngle to unnormalized for the subtraction to be unit-consistent
+        UnnormalizedAngle initialUnnormalized = initialRelativeAngle.toUnit(UnnormalizedAngleUnit.DEGREES);
+
+        return getRelativeUnnormalizedAngle().plus(robotAngle).minus(initialUnnormalized);
     }
 
     /**

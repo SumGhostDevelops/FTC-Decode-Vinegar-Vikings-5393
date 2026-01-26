@@ -9,8 +9,9 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
-import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
@@ -20,7 +21,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
 
-public class OdometryPinpoint extends SubsystemBase
+public class Odometry extends SubsystemBase
 {
     private final Pinpoint pinpoint;
     private final Webcam webcam;
@@ -31,26 +32,21 @@ public class OdometryPinpoint extends SubsystemBase
     /**
      * The field-absolute heading that the driver considers "forward" for field-centric driving.
      */
-    private Angle driverForward;
+    private FieldHeading driverForward;
 
-    public OdometryPinpoint(Pinpoint pinpoint, WebcamName webcam)
+    public Odometry(Pinpoint pinpoint, WebcamName webcam)
     {
-        this(pinpoint, webcam, new Pose2d(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES)));
+        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
     }
 
-    public OdometryPinpoint(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
+    public Odometry(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
     {
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
 
-        headingOffset = referencePose.heading;
-        driverForward = referencePose.heading;
-
-        this.pinpoint.setPosition(
-                referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D()
-        );
+        this.pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
+        this.driverForward = referencePose.heading;
     }
-
 
     /**
      * @return The yaw, as reported directly by the Pinpoint
@@ -63,9 +59,9 @@ public class OdometryPinpoint extends SubsystemBase
     /**
      * @return The absolute heading of the robot
      */
-    public Angle getAngle()
+    public FieldHeading getFieldAngle()
     {
-        return getIMUYaw();
+        return new FieldHeading(getIMUYaw(), CoordinateSystem.DECODE_FTC);
     }
 
     /**
@@ -73,7 +69,7 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public Angle getDriverHeading()
     {
-        return getAngle().minus(driverForward);
+        return getFieldAngle().minus(driverForward).angle;
     }
 
     /**
@@ -81,16 +77,9 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public FieldCoordinate getFieldCoord()
     {
-        double rx = pinpoint.getPosX(dUnit);
-        double ry = pinpoint.getPosY(dUnit);
-
-        // Rotate -90°: (x, y) -> ( y, -x )
-        double fx = ry;
-        double fy = -rx;
-
         return new FieldCoordinate(
-                new Distance(fx, dUnit),
-                new Distance(fy, dUnit),
+                new Distance(pinpoint.getPosX(dUnit), dUnit),
+                new Distance(pinpoint.getPosY(dUnit), dUnit),
                 CoordinateSystem.DECODE_FTC
         );
     }
@@ -100,29 +89,7 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public Pose2d getPose()
     {
-        Pose2d raw = Pose2d.fromPose2D(
-                pinpoint.getPosition(),
-                CoordinateSystem.DECODE_FTC
-        );
-
-        // Rotate position
-        double rx = raw.coord.x.magnitude;
-        double ry = raw.coord.y.magnitude;
-
-        double fx = ry;
-        double fy = -rx;
-
-        // Rotate heading
-        Angle heading = raw.heading.minus(new Angle(90, AngleUnit.DEGREES));
-
-        return new Pose2d(
-                new FieldCoordinate(
-                        new Distance(fx, raw.coord.x.unit),
-                        new Distance(fy, raw.coord.y.unit),
-                        CoordinateSystem.DECODE_FTC
-                ),
-                heading
-        );
+        return Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
     }
 
     /**
@@ -130,12 +97,9 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public Vector2d getVelocity()
     {
-        double vx = pinpoint.getVelX(dUnit);
-        double vy = pinpoint.getVelY(dUnit);
-
         return new Vector2d(
-                new Distance(vy, dUnit),
-                new Distance(-vx, dUnit),
+                new Distance(pinpoint.getVelX(dUnit), dUnit),
+                new Distance(pinpoint.getVelY(dUnit), dUnit),
                 CoordinateSystem.DECODE_FTC
         );
     }
@@ -155,7 +119,7 @@ public class OdometryPinpoint extends SubsystemBase
      */
     public void setDriverForwardFromCurrent()
     {
-        driverForward = getAngle();
+        driverForward = getFieldAngle();
     }
 
     public void updateReferencePose(Pose2d referencePose)
@@ -181,7 +145,7 @@ public class OdometryPinpoint extends SubsystemBase
         Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
 
         // Preserve driver's relative heading before resetting hardware
-        Angle currentDriverHeading = getAngle().minus(driverForward);
+        FieldHeading currentDriverHeading = getFieldAngle().minus(driverForward);
 
         // Update driverForward based on the new absolute estimate
         driverForward = estimatedPose.heading.minus(currentDriverHeading);

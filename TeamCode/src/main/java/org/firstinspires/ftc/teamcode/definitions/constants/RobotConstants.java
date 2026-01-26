@@ -8,12 +8,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.Drive.DriveMode;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
-import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 
 public class RobotConstants
 {
@@ -215,7 +216,7 @@ public class RobotConstants
     public static class Odometry
     {
         @Sorter(sort = 0)
-        public static Pose2d DEFAULT_POSE = new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new Angle(90, AngleUnit.DEGREES));
+        public static Pose2d DEFAULT_POSE = new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new FieldHeading(new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
         @Sorter(sort = 1)
         public static double FUTURE_POSE_TIME = 1.0;
 

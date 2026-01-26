@@ -2,7 +2,8 @@ package org.firstinspires.ftc.teamcode.util.kinematics;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
@@ -87,7 +88,7 @@ public class PoseVelocityTracker
 
         double x = normalizedPose.coord.x.magnitude;
         double y = normalizedPose.coord.y.magnitude;
-        double heading = normalizedPose.heading.measure;
+        double heading = normalizedPose.heading.angle.measure;
 
         // 3. Handle Heading Wraparound
         if (size > 0)
@@ -232,7 +233,7 @@ public class PoseVelocityTracker
 
         double currentX = normalizedPose.coord.x.magnitude;
         double currentY = normalizedPose.coord.y.magnitude;
-        double currentHeading = normalizedPose.heading.measure;
+        double currentHeading = normalizedPose.heading.angle.measure;
 
         double t = seconds;
         double t2 = t * t;
@@ -247,7 +248,7 @@ public class PoseVelocityTracker
                         new Distance(futureY, INTERNAL_DIST_UNIT),
                         currentPose.coord.coordSys
                 ),
-                new Angle(futureHeading, INTERNAL_ANGLE_UNIT)
+                new FieldHeading(new Angle(futureHeading, INTERNAL_ANGLE_UNIT), currentPose.coord.coordSys)
         );
     }
 
