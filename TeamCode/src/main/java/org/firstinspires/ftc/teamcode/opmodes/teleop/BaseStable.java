@@ -121,7 +121,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addLine("--- Odometry ---");
                 telemetry.addData("Coordinate", robot.subsystems.odometry.getPose().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addData("Relative Heading", robot.subsystems.odometry.getDriverHeading().toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
-                telemetry.addData("Absolute Heading", robot.subsystems.odometry.getFieldAngle().toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading", robot.subsystems.odometry.getFieldAngle().toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES).toSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addData("Velocity (in/sec)", robot.subsystems.odometry.getVelocity().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
