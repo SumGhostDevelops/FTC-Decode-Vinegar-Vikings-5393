@@ -21,7 +21,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
 
-public class OdometryPinpoint extends SubsystemBase
+public class Odometry extends SubsystemBase
 {
     private final Pinpoint pinpoint;
     private final Webcam webcam;
@@ -34,18 +34,18 @@ public class OdometryPinpoint extends SubsystemBase
      */
     private FieldHeading driverForward;
 
-    public OdometryPinpoint(Pinpoint pinpoint, WebcamName webcam)
+    public Odometry(Pinpoint pinpoint, WebcamName webcam)
     {
         this(pinpoint, webcam, new Pose2d(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
     }
 
-    public OdometryPinpoint(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
+    public Odometry(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
     {
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
 
         this.pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
-        this.driverForward = getFieldAngle();
+        this.driverForward = referencePose.heading;
     }
 
     /**

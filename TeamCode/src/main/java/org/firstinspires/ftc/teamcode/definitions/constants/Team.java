@@ -21,7 +21,7 @@ public enum Team
             "red",
             new Goal(24, coord(138, 138)),
             new Base(coord(38.5, 33.5)),
-            new Pose2d(coord(41, 9), deg(180)),
+            new Pose2d(coord(41, 9), deg(0)),
             deg(0)
     ),
 
@@ -29,7 +29,7 @@ public enum Team
             "blue",
             new Goal(20, coord(6, 138)),
             new Base(coord(105.25, 33.5)),
-            new Pose2d(coord(103, 9), deg(0)),
+            new Pose2d(coord(103, 9), deg(180)),
             deg(180)
     ),
 
@@ -37,7 +37,7 @@ public enum Team
             "none",
             new Goal(-1, coord(72, 140.5)),
             new Base(coord(72, 33.5)),
-            new Pose2d(coord(72, 9), deg(180)),
+            new Pose2d(coord(72, 9), deg(90)),
             deg(90)
     );
 

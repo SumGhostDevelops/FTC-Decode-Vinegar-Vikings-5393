@@ -1,9 +1,7 @@
-package org.firstinspires.ftc.teamcode.util.measure.angle;
+package org.firstinspires.ftc.teamcode.util.measure.angle.generic;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
-import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
-import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
