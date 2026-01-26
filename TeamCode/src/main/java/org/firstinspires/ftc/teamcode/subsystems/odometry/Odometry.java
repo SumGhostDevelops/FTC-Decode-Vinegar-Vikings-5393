@@ -36,7 +36,7 @@ public class Odometry extends SubsystemBase
 
     public Odometry(Pinpoint pinpoint, WebcamName webcam)
     {
-        this(pinpoint, webcam, new Pose2d(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
+        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
     }
 
     public Odometry(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
