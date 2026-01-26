@@ -4,13 +4,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 public class Pose2d
 {
     public final FieldCoordinate coord;
-    public final Angle heading;
+    public final FieldHeading heading;
 
     /**
      * @param x       the x-coordinate distance component of the pose
@@ -18,13 +19,13 @@ public class Pose2d
      * @param heading the orientation angle of the pose
      * @see FieldCoordinate#FieldCoordinate(Distance, Distance)
      */
-    public Pose2d(Distance x, Distance y, Angle heading)
+    public Pose2d(Distance x, Distance y, Angle heading, CoordinateSystem coordinateSystem)
     {
         this.coord = new FieldCoordinate(x, y);
-        this.heading = heading;
+        this.heading = new FieldHeading(heading, coordinateSystem);
     }
 
-    public Pose2d(FieldCoordinate coord, Angle heading)
+    public Pose2d(FieldCoordinate coord, FieldHeading heading)
     {
         this.coord = coord;
         this.heading = heading;
@@ -38,9 +39,9 @@ public class Pose2d
                 coordSys
         );
 
-        Angle angle = new Angle(pose.getHeading(AngleUnit.DEGREES), AngleUnit.DEGREES);
+        FieldHeading heading = new FieldHeading(pose.getHeading(AngleUnit.DEGREES), AngleUnit.DEGREES, coordSys);
 
-        return new Pose2d(coord, angle);
+        return new Pose2d(coord, heading);
     }
 
     /**
@@ -57,7 +58,7 @@ public class Pose2d
                 new Distance(pose.getPosition().y, pose.getPosition().unit),
                 coordSys);
 
-        return new Pose2d(coord, new Angle((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS));
+        return new Pose2d(coord, new FieldHeading((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS, coordSys));
     }
 
     public Pose2d toDistanceUnit(DistanceUnit distanceUnit)
@@ -82,12 +83,12 @@ public class Pose2d
 
     public Pose2d toAngleUnit(AngleUnit angleUnit)
     {
-        if (heading.isUnit(angleUnit))
+        if (heading.angle.isUnit(angleUnit))
         {
             return this;
         }
 
-        return new Pose2d(coord, heading.toUnit(angleUnit));
+        return new Pose2d(coord, heading.toAngleUnit(angleUnit));
     }
 
     /**
@@ -123,7 +124,7 @@ public class Pose2d
      */
     public Angle bearingTo(FieldCoordinate otherCoord)
     {
-        return angleTo(otherCoord).minus(this.heading);
+        return angleTo(otherCoord).minus(this.heading.angle);
     }
 
     /**
@@ -150,7 +151,7 @@ public class Pose2d
     public Pose2D toPose2D()
     {
         // 1. Convert Heading directly
-        double headingRad = this.heading.getAngle(AngleUnit.RADIANS);
+        double headingRad = this.heading.angle.getRadians();
 
         // 2. Convert Coordinate to Universal (FTC Standard) directly
         Coordinate univCoord = this.coord.coordSys.toUniversal(this.coord.x, this.coord.y);

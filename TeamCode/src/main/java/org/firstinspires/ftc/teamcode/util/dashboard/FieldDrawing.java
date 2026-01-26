@@ -124,7 +124,7 @@ public class FieldDrawing
         Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
         double x = converted.coord.x.magnitude;
         double y = converted.coord.y.magnitude;
-        double headingRad = converted.heading.getAngle(AngleUnit.RADIANS);
+        double headingRad = converted.heading.angle.getRadians();
         double x2 = x + (ROBOT_RADIUS * 1.5) * Math.cos(headingRad);
         double y2 = y + (ROBOT_RADIUS * 1.5) * Math.sin(headingRad);
         panelsField.setStyle(style);

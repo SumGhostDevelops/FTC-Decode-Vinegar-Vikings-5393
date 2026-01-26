@@ -103,5 +103,12 @@ public enum CoordinateSystem
         return fromUniversal(globalCoordinate.x, globalCoordinate.y);
     }
 
+    public double getRotationOffsetRadians()
+    {
+        // atan2(y component of X-basis, x component of X-basis)
+        // This tells us the angle of this system's X-axis relative to the Universal X-axis
+        return Math.atan2(xBasis[1], xBasis[0]);
+    }
+
     public enum Direction {RED, BLUE, AUDIENCE, BACKSTAGE, UP, DOWN}
 }

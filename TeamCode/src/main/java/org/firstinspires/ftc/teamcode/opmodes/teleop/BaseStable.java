@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
@@ -108,7 +108,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Remaining Time", timer.remainingTime() + "/120");
                 telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
                 telemetry.addLine("--- Odometry ---");
-                telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getFieldAngle().toSystem(CoordinateSystem.DECODE_PEDROPATH).angle.getUnsignedAngle(AngleUnit.DEGREES));
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
                 telemetry.addLine("--- Outtake ---");
@@ -117,7 +117,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
                 telemetry.addLine("--- Turret ---");
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
-                telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()).toUnnormalized());
             case TESTING:
                 telemetry.addLine("--- Co Driver Keybinds ---");
                 telemetry.addLine("DPAD UP: BLUE GOAL");
@@ -131,7 +131,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addLine("--- Odometry ---");
                 telemetry.addData("Coordinate", robot.subsystems.odometry.getPose().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.odometry.getDriverHeading().getUnsignedAngle(AngleUnit.DEGREES));
-                telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getAngle().getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getFieldAngle().toUnnormalized());
                 telemetry.addData("Velocity (in/sec)", robot.subsystems.odometry.getVelocity().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
@@ -145,7 +145,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addLine("--- Turret ---");
                 telemetry.addData("Is At Target", robot.subsystems.turret.isAtTarget());
                 telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
-                telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(AngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()));
                 telemetry.addData("Bearing to Target", robot.subsystems.turret.bearingToTarget());
         }
     }
@@ -161,7 +161,7 @@ public abstract class BaseStable extends CommandOpMode
         FieldDrawing.draw(
                 robot.subsystems.odometry.getPose(),
                 null,
-                robot.subsystems.turret.getAbsoluteAngle(robot.subsystems.odometry.getAngle()).getUnsignedAngle(org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS),
+                robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()).angle.getRadians(),
                 robot.team.goal.coord
         );
         FieldDrawing.sendPacket();

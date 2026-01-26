@@ -6,8 +6,8 @@ import com.seattlesolvers.solverslib.util.InterpLUT;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
-import org.firstinspires.ftc.teamcode.util.measure.angle.Angle;
-import org.firstinspires.ftc.teamcode.util.measure.angle.UnnormalizedAngle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 public class MathUtil
