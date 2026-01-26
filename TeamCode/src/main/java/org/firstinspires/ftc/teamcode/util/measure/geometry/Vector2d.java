@@ -14,7 +14,7 @@ public class Vector2d
     public final Distance y;
     public final CoordinateSystem coordSys;
     public final DistanceUnit distUnit;
-    public final AngleUnit angUnit = AngleUnit.RADIANS;
+    public final AngleUnit angUnit = AngleUnit.DEGREES;
 
     public Vector2d(Distance x, Distance y, CoordinateSystem coordSys)
     {

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static java.lang.Thread.sleep;
+
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -44,7 +47,16 @@ public class Odometry extends SubsystemBase
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
 
+        long startTime = System.currentTimeMillis();
+        while (this.pinpoint.getDeviceStatus() != Pinpoint.DeviceStatus.READY
+                && (System.currentTimeMillis() - startTime) < 1000)
+        {
+            this.pinpoint.update();
+        }
+
         this.pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
+        this.pinpoint.update();
+
         this.driverForward = referencePose.heading;
     }
 
@@ -69,7 +81,7 @@ public class Odometry extends SubsystemBase
      */
     public Angle getDriverHeading()
     {
-        return getFieldAngle().minus(driverForward).angle;
+        return getFieldAngle().minus(driverForward).angle.minus(new Angle(90, AngleUnit.DEGREES));
     }
 
     /**
