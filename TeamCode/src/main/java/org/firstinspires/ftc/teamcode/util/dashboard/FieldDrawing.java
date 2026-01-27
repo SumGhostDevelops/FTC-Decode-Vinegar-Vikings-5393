@@ -6,6 +6,7 @@ import com.bylazar.field.Style;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
  * Designed for use with the Panels (bylazar) plugin.
  *
  * @author Vinegar Vikings - 5393
- * @version 2.0
+ * @version 2.1 - Updated for FieldHeading
  */
 public class FieldDrawing
 {
@@ -38,9 +39,6 @@ public class FieldDrawing
     private static final Style targetStyle = new Style(
             "#F44336", "#F44336", 2.0  // Material Red
     );
-    private static final Style targetMarkerStyle = new Style(
-            "#F44336", "#F44336", 2.0  // Material Red for target marker
-    );
 
     /**
      * Prepares Panels Field for using FTC Standard coordinate offsets.
@@ -53,13 +51,13 @@ public class FieldDrawing
 
     /**
      * Draws a robot, heading, optional turret, and optional target using explicit styles.
-     * This is the new generic draw method for all robot/field visualizations.
      *
      * @param pose           The robot pose
-     * @param turretAngleRad Turret angle in radians (field-absolute), or null to skip
+     * @param futurePose     The target/future robot pose (ghost), or null
+     * @param turretHeading  Turret absolute heading, or null to skip
      * @param targetCoord    Target field coordinate (or null to skip)
      */
-    public static void draw(Pose2d pose, Pose2d futurePose, Double turretAngleRad, FieldCoordinate targetCoord)
+    public static void draw(Pose2d pose, Pose2d futurePose, FieldHeading turretHeading, FieldCoordinate targetCoord)
     {
         if (pose == null) return;
         drawRobotBody(pose, robotStyle);
@@ -67,22 +65,32 @@ public class FieldDrawing
 
         if (futurePose != null)
         {
-            drawRobotBody(futurePose, robotStyle);
+            drawRobotBody(futurePose, futurePoseStyle); // Fixed style usage
             drawRobotHeading(futurePose, directionStyle);
         }
-        if (turretAngleRad != null)
+
+        if (turretHeading != null)
         {
-            drawAngle(pose, turretAngleRad, ROBOT_RADIUS * 1.8, turretStyle);
-            // Draw a small circle at the turret end
-            Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
-            double x = converted.coord.x.magnitude;
-            double y = converted.coord.y.magnitude;
-            double x2 = x + (ROBOT_RADIUS * 1.8) * Math.cos(turretAngleRad);
-            double y2 = y + (ROBOT_RADIUS * 1.8) * Math.sin(turretAngleRad);
+            // Convert everything to Pedro pathing system for drawing consistency
+            Pose2d robotPedro = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
+            FieldHeading turretPedro = turretHeading.toSystem(CoordinateSystem.DECODE_PEDROPATH);
+
+            double turretRad = turretPedro.angle.getRadians();
+
+            // Draw line representing turret barrel
+            drawAngle(pose, turretPedro, ROBOT_RADIUS * 1.8, turretStyle);
+
+            // Draw a small circle at the turret end (muzzle)
+            double x = robotPedro.coord.x.magnitude;
+            double y = robotPedro.coord.y.magnitude;
+            double x2 = x + (ROBOT_RADIUS * 1.8) * Math.cos(turretRad);
+            double y2 = y + (ROBOT_RADIUS * 1.8) * Math.sin(turretRad);
+
             panelsField.setStyle(turretStyle);
             panelsField.moveCursor(x2, y2);
             panelsField.circle(2);
         }
+
         if (targetCoord != null)
         {
             drawFieldCoordinate(targetCoord, targetStyle, 6);
@@ -91,6 +99,7 @@ public class FieldDrawing
             double targetX = convertedTarget.x.magnitude;
             double targetY = convertedTarget.y.magnitude;
             double markerSize = 4;
+
             panelsField.setStyle(targetStyle);
             panelsField.moveCursor(targetX - markerSize, targetY - markerSize);
             panelsField.line(targetX + markerSize, targetY + markerSize);
@@ -122,11 +131,14 @@ public class FieldDrawing
     {
         if (pose == null || style == null) return;
         Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
+
         double x = converted.coord.x.magnitude;
         double y = converted.coord.y.magnitude;
         double headingRad = converted.heading.angle.getRadians();
+
         double x2 = x + (ROBOT_RADIUS * 1.5) * Math.cos(headingRad);
         double y2 = y + (ROBOT_RADIUS * 1.5) * Math.sin(headingRad);
+
         panelsField.setStyle(style);
         panelsField.moveCursor(x, y);
         panelsField.line(x2, y2);
@@ -150,18 +162,25 @@ public class FieldDrawing
      * Draws an angle (e.g., turret or custom) from the robot's position.
      *
      * @param pose     The robot pose (origin for the angle)
-     * @param angleRad The angle in radians (field-absolute)
+     * @param heading  The heading to draw (automatically converted to match dashboard system)
      * @param length   The length of the line
      * @param style    The style to use
      */
-    public static void drawAngle(Pose2d pose, double angleRad, double length, Style style)
+    public static void drawAngle(Pose2d pose, FieldHeading heading, double length, Style style)
     {
-        if (pose == null || style == null) return;
-        Pose2d converted = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
-        double x = converted.coord.x.magnitude;
-        double y = converted.coord.y.magnitude;
+        if (pose == null || style == null || heading == null) return;
+
+        // Ensure both robot pose and draw angle are in the Dashboard's native system (Pedro)
+        Pose2d convertedPose = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
+        FieldHeading convertedHeading = heading.toSystem(CoordinateSystem.DECODE_PEDROPATH);
+
+        double x = convertedPose.coord.x.magnitude;
+        double y = convertedPose.coord.y.magnitude;
+        double angleRad = convertedHeading.angle.getRadians();
+
         double x2 = x + length * Math.cos(angleRad);
         double y2 = y + length * Math.sin(angleRad);
+
         panelsField.setStyle(style);
         panelsField.moveCursor(x, y);
         panelsField.line(x2, y2);
