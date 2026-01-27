@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Thread.sleep;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
@@ -86,7 +85,7 @@ public class Odometry extends SubsystemBase
     /**
      * @return The absolute heading of the robot
      */
-    public FieldHeading getFieldAngle()
+    public FieldHeading getFieldHeading()
     {
         return getPose().heading;
     }
@@ -96,14 +95,10 @@ public class Odometry extends SubsystemBase
      */
     public Angle getDriverHeading()
     {
-        // 1. Calculate the heading relative to the driver's forward offset
-        FieldHeading relativeHeading = getFieldAngle().minus(driverForward);
+        FieldHeading currentPedro = getFieldHeading().toSystem(CoordinateSystem.DECODE_PEDROPATH);
+        FieldHeading startPedro = driverForward.toSystem(CoordinateSystem.DECODE_PEDROPATH);
 
-        // 2. Convert this field heading into the Pedro Pathing system.
-        // In DECODE_PEDROPATH, the X-Axis is defined as 'Direction.BLUE' (Forward).
-        // Therefore, if we are facing Blue, this returns 0 degrees.
-        // This aligns perfectly with the Drive class math where 0 degrees = Forward X.
-        return relativeHeading.toSystem(CoordinateSystem.DECODE_PEDROPATH).angle;
+        return currentPedro.minus(startPedro).angle;
     }
 
     /**
@@ -153,7 +148,7 @@ public class Odometry extends SubsystemBase
      */
     public void setDriverForwardFromCurrent()
     {
-        driverForward = getFieldAngle();
+        driverForward = getFieldHeading();
     }
 
     public void updateReferencePose(Pose2d referencePose)
@@ -179,7 +174,7 @@ public class Odometry extends SubsystemBase
         Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
 
         // Preserve driver's relative heading before resetting hardware
-        FieldHeading currentDriverHeading = getFieldAngle().minus(driverForward);
+        FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
 
         // Update driverForward based on the new absolute estimate
         driverForward = estimatedPose.heading.minus(currentDriverHeading);

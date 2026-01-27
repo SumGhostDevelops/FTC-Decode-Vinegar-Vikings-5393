@@ -122,7 +122,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Coordinate", robot.subsystems.odometry.getPose().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addData("IMU Yaw", robot.subsystems.odometry.getIMUYaw());
                 telemetry.addData("Driver Heading", robot.subsystems.odometry.getDriverHeading());
-                telemetry.addData("Field Heading", robot.subsystems.odometry.getFieldAngle().toSystem(CoordinateSystem.DECODE_PEDROPATH));
+                telemetry.addData("Field Heading", robot.subsystems.odometry.getFieldHeading().toSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addData("Velocity (in/sec)", robot.subsystems.odometry.getVelocity().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
                 telemetry.addLine("--- Drive ---");
                 telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
@@ -136,7 +136,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addLine("--- Turret ---");
                 telemetry.addData("Is At Target", robot.subsystems.turret.isAtTarget());
                 telemetry.addData("Relative Heading", robot.subsystems.turret.getRelativeAngle().toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
-                telemetry.addData("Absolute Heading", robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()).toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
+                telemetry.addData("Absolute Heading", robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldHeading()).toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
                 telemetry.addData("Bearing to Target", robot.subsystems.turret.bearingToTarget());
         }
     }
@@ -152,7 +152,7 @@ public abstract class BaseStable extends CommandOpMode
         FieldDrawing.draw(
                 robot.subsystems.odometry.getPose(),
                 null,
-                robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()),
+                robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldHeading()),
                 robot.team.goal.coord
         );
         FieldDrawing.sendPacket();
