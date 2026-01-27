@@ -15,7 +15,7 @@ public abstract class Base extends LinearOpMode
         RobotContext robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
         telemetry.log().add("Waiting 20 seconds before moving.");
         Thread.sleep(20000);
-        robot.subsystems.drive.setDrivePowers(1, 0, 0);
+        robot.subsystems.drive.setDrivePowers(1, 1, 1, 1);
         telemetry.log().add("Moving for 1.5 seconds.");
         Thread.sleep(1500);
         robot.subsystems.drive.stop();
