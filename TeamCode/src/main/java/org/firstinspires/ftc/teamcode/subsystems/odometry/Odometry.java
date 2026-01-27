@@ -8,6 +8,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
@@ -36,6 +37,9 @@ public class Odometry extends SubsystemBase
      * The field-absolute heading that the driver considers "forward" for field-centric driving.
      */
     private FieldHeading driverForward;
+    
+    private boolean referencePoseWasSet = false;
+    private Pose2D referencePose;
 
     public Odometry(Pinpoint pinpoint, WebcamName webcam)
     {
@@ -47,6 +51,7 @@ public class Odometry extends SubsystemBase
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
 
+        /*
         long startTime = System.currentTimeMillis();
         while (this.pinpoint.getDeviceStatus() != Pinpoint.DeviceStatus.READY
                 && (System.currentTimeMillis() - startTime) < 1000)
@@ -56,6 +61,16 @@ public class Odometry extends SubsystemBase
 
         this.pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
         this.pinpoint.update();
+
+         */
+        this.referencePose = referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D();
+
+        if (!referencePoseWasSet && this.pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY)
+        {
+            this.pinpoint.setPosition(this.referencePose);
+            this.pinpoint.update();
+            referencePoseWasSet = true;
+        }
 
         this.driverForward = referencePose.heading;
     }
@@ -77,11 +92,18 @@ public class Odometry extends SubsystemBase
     }
 
     /**
-     * @return A heading where forward is 0
+     * @return A heading where 0 is conceptually "Forward" (aligned with Pedro X-Axis/Blue Alliance)
      */
     public Angle getDriverHeading()
     {
-        return getFieldAngle().minus(driverForward).angle.minus(new Angle(90, AngleUnit.DEGREES));
+        // 1. Calculate the heading relative to the driver's forward offset
+        FieldHeading relativeHeading = getFieldAngle().minus(driverForward);
+
+        // 2. Convert this field heading into the Pedro Pathing system.
+        // In DECODE_PEDROPATH, the X-Axis is defined as 'Direction.BLUE' (Forward).
+        // Therefore, if we are facing Blue, this returns 0 degrees.
+        // This aligns perfectly with the Drive class math where 0 degrees = Forward X.
+        return relativeHeading.toSystem(CoordinateSystem.DECODE_PEDROPATH).angle;
     }
 
     /**
@@ -191,6 +213,12 @@ public class Odometry extends SubsystemBase
     @Override
     public void periodic()
     {
+        if (!this.referencePoseWasSet && pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY)
+        {
+            this.pinpoint.setPosition(this.referencePose);
+            this.referencePoseWasSet = true;
+        }
+
         pinpoint.update();
     }
 
