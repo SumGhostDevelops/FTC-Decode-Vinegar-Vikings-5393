@@ -151,7 +151,7 @@ public abstract class BaseStable extends CommandOpMode
         FieldDrawing.draw(
                 robot.subsystems.odometry.getPose(),
                 null,
-                robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()).angle.getRadians(),
+                robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()),
                 robot.team.goal.coord
         );
         FieldDrawing.sendPacket();

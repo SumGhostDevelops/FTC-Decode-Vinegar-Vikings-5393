@@ -30,6 +30,11 @@ public class Drive extends SubsystemBase
         this.motors = driveMotors;
     }
 
+    public double getSpeed()
+    {
+        return speed;
+    }
+
     public void increaseSpeed()
     {
         speed = Math.min(speed + RobotConstants.Drive.Speed.CHANGE, RobotConstants.Drive.Speed.MAXIMUM);
