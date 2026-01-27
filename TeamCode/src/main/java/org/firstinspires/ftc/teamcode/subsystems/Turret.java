@@ -22,7 +22,7 @@ public class Turret extends SubsystemBase
     private final double degreePerTick;
     private Angle initialRelativeAngle;
 
-    public int targetPosition = 0;
+    public int targetPosition;
 
     /**
      * If true, the turret will continuously aim to the last {@link Turret#targetPosition} specified when {@link Turret#periodic()} is called.
@@ -42,6 +42,8 @@ public class Turret extends SubsystemBase
         this.initialRelativeAngle = initialRelativeAngle;
         //degreePerTick = 360.0 / (turretMotor.getCPR() * RobotConstants.Turret.GEAR_RATIO);
         degreePerTick = 360.0 / RobotConstants.Turret.TICKS_PER_REV;
+
+        this.targetPosition = turretMotor.getCurrentPosition();
     }
 
     /**
