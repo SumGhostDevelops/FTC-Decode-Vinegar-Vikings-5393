@@ -178,7 +178,7 @@ public class RobotHardware
             pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
             pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.FORWARD);
 
-            pinpoint.resetPosAndIMU();
+            pinpoint.recalibrateIMU();
         }
         catch (Exception e)
         {

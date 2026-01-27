@@ -80,7 +80,7 @@ public class Odometry extends SubsystemBase
      */
     public Angle getIMUYaw()
     {
-        return new Angle(pinpoint.getHeading(aUnit), aUnit);
+        return getPose().heading.toSystem(CoordinateSystem.DECODE_FTC).angle;
     }
 
     /**
@@ -88,7 +88,7 @@ public class Odometry extends SubsystemBase
      */
     public FieldHeading getFieldAngle()
     {
-        return new FieldHeading(getIMUYaw(), CoordinateSystem.DECODE_FTC);
+        return getPose().heading;
     }
 
     /**
