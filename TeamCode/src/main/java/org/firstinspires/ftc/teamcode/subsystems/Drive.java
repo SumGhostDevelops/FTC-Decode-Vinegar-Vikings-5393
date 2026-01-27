@@ -30,20 +30,14 @@ public class Drive extends SubsystemBase
         this.motors = driveMotors;
     }
 
-    public void toggleDriveMode()
+    public void increaseSpeed()
     {
-        switch (currentMode)
-        {
-            case FIELD_CENTRIC:
-                currentMode = DriveMode.ROBOT_CENTRIC_HYBRID;
-                break;
-            case ROBOT_CENTRIC_HYBRID:
-                currentMode = DriveMode.RAW_ROBOT_CENTRIC;
-                break;
-            case RAW_ROBOT_CENTRIC:
-                currentMode = DriveMode.FIELD_CENTRIC;
-                break;
-        }
+        speed = Math.min(speed + RobotConstants.Drive.Speed.CHANGE, RobotConstants.Drive.Speed.MAXIMUM);
+    }
+
+    public void decreaseSpeed()
+    {
+        speed = Math.max(speed - RobotConstants.Drive.Speed.CHANGE, RobotConstants.Drive.Speed.MINIMUM);
     }
 
     /**
