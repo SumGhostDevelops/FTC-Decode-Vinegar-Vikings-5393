@@ -325,7 +325,7 @@ public class Blue extends Base {
 
     public static class Paths {
 
-        public Pose startPose = new Pose(123, 125);
+        public Pose startPose = new Pose(123, 125, Math.toRadians(90));
         public PathChain ToShoot,
                 ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
@@ -359,7 +359,7 @@ public class Blue extends Base {
 
         private void buildPathsBasic(Follower follower) {
                         // Tune these poses if the robot drives too far or in the wrong direction.
-            startPose = new Pose(80, 8.3);
+            startPose = new Pose(80, 8.3, Math.toRadians(90) );
             final Pose shootPose = new Pose(80, 27); // adjust values if distance is incorrect
             final Pose finalPose = new Pose(80, 38.5);
 
@@ -378,7 +378,7 @@ public class Blue extends Base {
 
 
     // --- Pose definitions ---
-    startPose         = new Pose(65.000, 9.000);
+    startPose         = new Pose(65.000, 9.000, Math.toRadians(90));
     final Pose ballOneLinePose   = new Pose(40.000, 36.000);
     final Pose ballOneFullPose   = new Pose(19.000, 36.000);
     final Pose shootPose         = new Pose(69.000, 68.000);
@@ -470,7 +470,7 @@ public class Blue extends Base {
                     .build();
         }
         private void buildPathsGate(Follower follower) {
-           startPose = new Pose(67.000, 8.000);
+           startPose = new Pose(67.000, 8.000, Math.toRadians(90));
             final Pose shootPose =  new Pose(71.000, 71.000);
             final Pose ballOneLinePose =  new Pose(56.000, 60.000);
             final Pose ballOneFullPose = new Pose(56.000, 60.000);
