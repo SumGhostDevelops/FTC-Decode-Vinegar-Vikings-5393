@@ -64,6 +64,7 @@ public class Blue extends Base {
                 telemetry.addData("Current State", currentPathState);
                 telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
                 telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
+                telemetry.addData("Heading", follower.getHeading());
                 telemetry.update();
             }
         }
