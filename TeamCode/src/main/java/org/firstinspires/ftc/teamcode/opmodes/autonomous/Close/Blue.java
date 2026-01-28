@@ -109,10 +109,6 @@ public class Blue extends Base {
     private void PathBasic() {
         // This check ensures we only try to start a new path *after* the current one is complete.
         if (!follower.isBusy()) {
-            if (Objects.requireNonNull(currentPathState) == Paths.PathState.ToShoot) {
-                Shoot();
-                follower.followPath(paths.ToShoot, true);
-            }
             switch (currentPathState){
                 case ToShoot:
                     Shoot();
