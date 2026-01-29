@@ -12,6 +12,14 @@ import org.firstinspires.ftc.teamcode.util.MathUtil;
 /**
  * The PositionMotor class extends the PowerMotor class to provide additional
  * functionality for controlling motor position using various control algorithms.
+ * @see #usePower(double)
+ * @see #setPositionCoefficient(double)
+ * @see #setPIDF(double, double, double, double)
+ * @see #setPIDF(PIDFCoefficients)
+ * @see #setPositionTolerance(double)
+ * @see #setControllerType(PositionController)
+ * @see #setTargetDistance(double)
+ * @see #setZeroPowerBehavior(Motor.ZeroPowerBehavior)
  */
 public class PositionMotor extends PowerMotor
 {
@@ -108,6 +116,30 @@ public class PositionMotor extends PowerMotor
     public PositionMotor setPositionTolerance(double tolerance)
     {
         controller.setTolerance(tolerance);
+
+        return this;
+    }
+
+    @Override
+    public PositionMotor setVoltageCompensation(double volts)
+    {
+        super.setVoltageCompensation(volts);
+
+        return this;
+    }
+
+    @Override
+    public PositionMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio)
+    {
+        super.setDistancePerPulse(inputGearRatio, outputGearRatio);
+
+        return this;
+    }
+
+    @Override
+    public PositionMotor setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior)
+    {
+        super.setZeroPowerBehavior(behavior);
 
         return this;
     }

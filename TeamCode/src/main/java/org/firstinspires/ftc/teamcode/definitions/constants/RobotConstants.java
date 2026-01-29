@@ -133,7 +133,7 @@ public class RobotConstants
         public static double GEAR_RATIO = 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         public static double TICKS_PER_REV = 17482 / 10.0;
         @Sorter(sort = 3)
-        public static int TOLERANCE = 50; // in ticks
+        public static double TOLERANCE = 0.001; // in revolutions
 
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);

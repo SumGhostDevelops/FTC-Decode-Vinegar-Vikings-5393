@@ -125,6 +125,18 @@ public class VelocityMotor extends PowerMotor
     }
 
     /**
+     * @param volts The desired voltage compensation value.
+     * @return
+     */
+    @Override
+    public VelocityMotor setVoltageCompensation(double volts)
+    {
+        super.setVoltageCompensation(volts);
+
+        return this;
+    }
+
+    /**
      * Sets the target RPM as a scale of the motor's maximum RPM.
      *
      * @param scale The scale (0 to 1) of the motor's maximum RPM.

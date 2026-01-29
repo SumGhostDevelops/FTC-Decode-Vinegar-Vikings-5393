@@ -70,6 +70,16 @@ public class VelocityMotorGroup
         return this;
     }
 
+    public VelocityMotorGroup setVoltageCompensation(double volts)
+    {
+        for (VelocityMotor motor : group)
+        {
+            motor.setVoltageCompensation(volts);
+        }
+
+        return this;
+    }
+
     public double getTargetRPM()
     {
         return group[0].getTargetRPM();

@@ -125,6 +125,7 @@ public class RobotHardware
             VelocityMotor outtakeLeft = new VelocityMotor(new MotorEx(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_LEFT, Motor.GoBILDA.BARE), battery);
             // VelocityMotor outtakeRight = new MotorEx
             outtake = new VelocityMotorGroup(outtakeLeft)
+                    .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf)
                     .setPIDF(RobotConstants.Outtake.Coefficients.PIDF)
                     .setTolerance(RobotConstants.Outtake.Tolerance.RPM, RobotConstants.Outtake.Tolerance.RPM_ACCELERATION);
@@ -138,6 +139,10 @@ public class RobotHardware
         try
         {
             turret = new PositionMotor(new MotorEx(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_435), battery)
+                    .setVoltageCompensation(12) // 100% power >= 12 volts
+                    .usePower(1)
+                    .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
+                    .setDistancePerPulse(1, 4.5) // 1.0 = one full revolution; should probably make this in degrees
                     .setControllerType(PositionMotor.PositionController.SquIDF)
                     .setPIDF(RobotConstants.Turret.PIDF)
                     .setPositionTolerance(RobotConstants.Turret.TOLERANCE);
@@ -164,6 +169,7 @@ public class RobotHardware
         try
         {
             intake = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620))
+                    .setVoltageCompensation(12)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         }
