@@ -3,25 +3,26 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.util.motors.MotorXP;
+import org.firstinspires.ftc.teamcode.util.motors.modern.PowerMotor;
 
 public class Intake extends SubsystemBase
 {
 
-    private final MotorXP intake;
+    private final PowerMotor intake;
 
-    public Intake(MotorXP intake)
+    public Intake(PowerMotor intake)
     {
         this.intake = intake;
     }
 
-    public void in(double RPM)
+    public void in(double power)
     {
-        intake.setRPM(Math.abs(RPM));
+        intake.setPower(Math.abs(power));
     }
 
-    public void out(double RPM)
+    public void out(double power)
     {
-        intake.setRPM(-Math.abs(RPM));
+        intake.setPower(-Math.abs(power));
     }
 
     public void stop()

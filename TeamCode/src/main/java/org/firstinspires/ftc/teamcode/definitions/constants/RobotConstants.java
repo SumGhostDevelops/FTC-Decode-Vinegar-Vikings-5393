@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.definitions.constants;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.configurables.annotations.Sorter;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -106,7 +107,8 @@ public class RobotConstants
         @Configurable
         public static class Coefficients
         {
-            public static double[] veloCoeffs = new double[]{10, 3, 2, 0};
+            //public static double[] veloCoeffs = new double[]{10, 3, 2, 0};
+            public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 1);
         }
 
         @Configurable
@@ -141,7 +143,8 @@ public class RobotConstants
         public static boolean autoAimToGoal = true;
 
         @Sorter(sort = 7)
-        public static double[] pidf = new double[]{10, 1, 1, 1};
+        //public static double[] pidf = new double[]{10, 1, 1, 1};
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 1);
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;

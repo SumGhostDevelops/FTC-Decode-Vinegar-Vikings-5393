@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
+import org.firstinspires.ftc.teamcode.util.motors.modern.PowerMotor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,19 +16,17 @@ import java.util.stream.Collectors;
 
 public class Drive extends SubsystemBase
 {
-    private final MotorEx frontLeft, frontRight, backLeft, backRight;
-    private final MotorEx[] motors;
+    private final PowerMotor frontLeft, frontRight, backLeft, backRight;
 
     private double speed = RobotConstants.Drive.Speed.DEFAULT;
     private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
 
-    public Drive(MotorEx[] driveMotors)
+    public Drive(PowerMotor frontLeft, PowerMotor frontRight, PowerMotor backLeft, PowerMotor backRight)
     {
-        this.frontLeft = driveMotors[0];
-        this.frontRight = driveMotors[1];
-        this.backLeft = driveMotors[2];
-        this.backRight = driveMotors[3];
-        this.motors = driveMotors;
+        this.frontLeft = frontLeft;
+        this.frontRight = frontRight;
+        this.backLeft = backLeft;
+        this.backRight = backRight;
     }
 
     public double getSpeed()
@@ -114,30 +113,15 @@ public class Drive extends SubsystemBase
 
     public void setDrivePowers(double fl, double fr, double bl, double br)
     {
-        safeSetPower(frontLeft, fl);
-        safeSetPower(frontRight, fr);
-        safeSetPower(backLeft, bl);
-        safeSetPower(backRight, br);
-    }
-
-    private void safeSetPower(MotorEx motor, double power)
-    {
-        if (motor != null)
-        {
-            motor.set(power);
-        }
+        frontLeft.setPower(fl);
+        frontRight.setPower(fr);
+        backLeft.setPower(bl);
+        backRight.setPower(br);
     }
 
     public void stop()
     {
         setDrivePowers(0, 0, 0, 0);
-    }
-
-    public List<MotorEx> getEnabledMotors()
-    {
-        return Arrays.stream(motors)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
     }
 
     public enum DriveMode

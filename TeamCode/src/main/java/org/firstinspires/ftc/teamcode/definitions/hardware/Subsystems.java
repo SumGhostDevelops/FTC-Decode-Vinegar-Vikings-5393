@@ -22,7 +22,7 @@ public class Subsystems
 
     public Subsystems(RobotHardware hw, Team team)
     {
-        this.drive = new Drive(hw.getDriveArray());
+        this.drive = new Drive(hw.frontLeft, hw.frontRight, hw.backLeft, hw.backRight);
         this.intake = new Intake(hw.intake);
         this.transfer = new Transfer(hw.transfer);
         this.outtake = new Outtake(hw.outtake);
