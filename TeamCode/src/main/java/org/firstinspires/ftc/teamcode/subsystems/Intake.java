@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
-import org.firstinspires.ftc.teamcode.util.motors.MotorXP;
 import org.firstinspires.ftc.teamcode.util.motors.modern.PowerMotor;
 
 public class Intake extends SubsystemBase
@@ -15,12 +14,12 @@ public class Intake extends SubsystemBase
         this.intake = intake;
     }
 
-    public void in(double power)
+    public void intake(double power)
     {
         intake.setPower(Math.abs(power));
     }
 
-    public void out(double power)
+    public void reverse(double power)
     {
         intake.setPower(-Math.abs(power));
     }

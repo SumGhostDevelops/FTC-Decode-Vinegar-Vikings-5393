@@ -60,7 +60,7 @@ public abstract class BaseStable extends CommandOpMode
         register(robot.subsystems.drive, robot.subsystems.intake, robot.subsystems.transfer, robot.subsystems.turret, robot.subsystems.outtake, robot.subsystems.odometry);
 
         // Set the default command for transfer to maintain its initial position
-        robot.subsystems.transfer.setDefaultCommand(new TransferCommands.DefaultPosition(robot.subsystems.transfer));
+        robot.subsystems.transfer.setDefaultCommand(new TransferCommands.CloseIntake(robot.subsystems.transfer));
 
         DoubleSupplier x = () -> gamepad1.left_stick_x; // Counteract imperfect strafing
         DoubleSupplier y = () -> -gamepad1.left_stick_y; // Y is inverted
@@ -130,10 +130,11 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addLine("--- Intake ---");
                 telemetry.addData("RPM", robot.subsystems.intake.getRPM());
                 telemetry.addLine("--- Outtake ---");
+                telemetry.addData("State", robot.subsystems.outtake.getState());
                 telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
-                telemetry.addData("RPM", robot.subsystems.outtake.getRPM());
+                telemetry.addData("Current RPM", robot.subsystems.outtake.getRPM());
                 telemetry.addData("Acceleration", robot.subsystems.outtake.getRPMAcceleration());
-                telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
+                telemetry.addData("Is Stable", robot.subsystems.outtake.isStable());
                 telemetry.addLine("--- Turret ---");
                 telemetry.addData("Is At Target", robot.subsystems.turret.isAtTarget());
                 telemetry.addData("Relative Heading", robot.subsystems.turret.getRelativeAngle().toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
@@ -190,7 +191,7 @@ public abstract class BaseStable extends CommandOpMode
 
         Trigger opModeIsActive = new Trigger(this::opModeIsActive);
         Trigger turretReady = new Trigger(() -> Math.abs(s.turret.bearingToTarget().toUnit(AngleUnit.DEGREES).measure) < 8.5);
-        Trigger outtakeReady = new Trigger(s.outtake::isReady);
+        Trigger outtakeReady = new Trigger(s.outtake::isStable);
 
         // Define Raw Triggers
         Trigger dLT = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
@@ -260,8 +261,8 @@ public abstract class BaseStable extends CommandOpMode
         // Shared Command Instances
         Command intakeIn = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.intakeRPM);
         Command intakeTransfer = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.transferPassRPM);
-        Command transferOpen = new TransferCommands.OpenTransfer(s.transfer);
-        Command transferClose = new TransferCommands.CloseTransfer(s.transfer);
+        Command transferOpen = new TransferCommands.Open(s.transfer);
+        Command transferClose = new TransferCommands.CloseIntake(s.transfer);
 
         /* --- 1. INTAKE LOGIC --- */
         // Trigger if INTAKE_BY_DEFAULT is on, OR if the manual intake trigger is held.

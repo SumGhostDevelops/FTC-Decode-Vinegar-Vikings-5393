@@ -184,16 +184,17 @@ public class MathUtil
          */
         public static double rpmLUT(Distance dist)
         {
-            if (!lutInitialized)
-            {
-                initLUT();
-            }
-
             return lut.get(dist.toUnit(dUnit).magnitude);
 
             //double distance = dist.toUnit(dUnit).magnitude;
 
             //return 0.172932 * distance * distance - 6.07764 * distance + 3996.30357;
+        }
+
+        public static double rpmRegression(Distance dist)
+        {
+            double distance = dist.toUnit(dUnit).magnitude;
+            return 0.172932 * distance * distance - 6.07764 * distance + 3996.30357;
         }
     }
 }

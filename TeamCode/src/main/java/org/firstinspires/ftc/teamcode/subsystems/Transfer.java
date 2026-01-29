@@ -7,49 +7,47 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 
 public class Transfer extends SubsystemBase
 {
-
     private final ServoEx transfer;
 
-    public enum CloseType
-    {
-        /**
-         * Moves the transfer servo in a manner that balls are allowed to enter the ball pit: backward, for transferring
-         */
-        BACKWARD,
-        SHOOT,
-        /**
-         * Moves the transfer in a manner that balls are not allowed to enter the ball pit: forward, for intaking
-         */
-        FORWARD
-    }
     public Transfer(ServoEx transfer)
     {
         this.transfer = transfer;
     }
 
+    /**
+     * releases balls into the outtake
+     */
     public void open()
     {
-        transfer.set(RobotConstants.Transfer.OPEN_ANGLE);
+        setAngle(RobotConstants.Transfer.OPEN_ANGLE);
     }
 
+    /**
+     * closes the intake (closes forward)
+     */
     public void close()
     {
-        transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
+        setAngle(RobotConstants.Transfer.CLOSE_INTAKE_ANGLE);
     }
 
-    public void close(CloseType type)
+    public void setAngle(double angle)
     {
-        switch (type)
-        {
-            case FORWARD:
-                transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
-                break;
-            case BACKWARD:
-                transfer.set(RobotConstants.Transfer.CLOSED_FULL_TRANSFER_ANGLE);
-                break;
-            case SHOOT:
-                transfer.set(RobotConstants.Transfer.CLOSED_SHOOTING_TRANSFER_ANGLE);
-                break;
-        }
+        transfer.set(angle);
+    }
+
+    /**
+     * @return the last requested input/set position call
+     */
+    public double getPosition()
+    {
+        return transfer.get();
+    }
+
+    /**
+     * @return the raw position of the servo between 0 and 1
+     */
+    public double getRawPosition()
+    {
+        return transfer.getRawPosition();
     }
 }

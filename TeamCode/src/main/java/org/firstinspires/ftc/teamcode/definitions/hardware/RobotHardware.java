@@ -1,23 +1,18 @@
 package org.firstinspires.ftc.teamcode.definitions.hardware;
 
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
-import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
-import org.firstinspires.ftc.teamcode.util.motors.MotorXP;
 import org.firstinspires.ftc.teamcode.util.motors.modern.PositionMotor;
 import org.firstinspires.ftc.teamcode.util.motors.modern.PowerMotor;
 import org.firstinspires.ftc.teamcode.util.motors.modern.VelocityMotor;
@@ -142,7 +137,7 @@ public class RobotHardware
                     .setVoltageCompensation(12) // 100% power >= 12 volts
                     .usePower(1)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
-                    .setDistancePerPulse(1, 4.5) // 1.0 = one full revolution; should probably make this in degrees
+                    .setDistancePerPulse(1.0, RobotConstants.Turret.GEAR_RATIO, AngleUnit.DEGREES) // keep in degrees
                     .setControllerType(PositionMotor.PositionController.SquIDF)
                     .setPIDF(RobotConstants.Turret.PIDF)
                     .setPositionTolerance(RobotConstants.Turret.TOLERANCE);
@@ -158,7 +153,7 @@ public class RobotHardware
         try
         {
             transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.NAME, 0, 360);
-            transfer.set(RobotConstants.Transfer.CLOSED_INTAKE_ANGLE);
+            transfer.set(RobotConstants.Transfer.CLOSE_INTAKE_ANGLE);
         }
         catch (Exception e)
         {

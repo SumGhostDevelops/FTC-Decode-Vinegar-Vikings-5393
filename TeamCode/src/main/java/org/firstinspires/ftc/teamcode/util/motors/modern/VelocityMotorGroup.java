@@ -125,6 +125,16 @@ public class VelocityMotorGroup
         return group[0].atSetPoint();
     }
 
+    public double getRPM()
+    {
+        return group[0].getRPM();
+    }
+
+    public double getRPMAcceleration()
+    {
+        return group[0].getRPMAcceleration();
+    }
+
     public void update()
     {
         for (VelocityMotor motor : group)

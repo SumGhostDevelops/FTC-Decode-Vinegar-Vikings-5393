@@ -36,12 +36,24 @@ public class Drive extends SubsystemBase
 
     public void increaseSpeed()
     {
-        speed = Math.min(speed + RobotConstants.Drive.Speed.CHANGE, RobotConstants.Drive.Speed.MAXIMUM);
+        changeSpeed(RobotConstants.Drive.Speed.CHANGE);
     }
 
     public void decreaseSpeed()
     {
-        speed = Math.max(speed - RobotConstants.Drive.Speed.CHANGE, RobotConstants.Drive.Speed.MINIMUM);
+        changeSpeed(-RobotConstants.Drive.Speed.CHANGE);
+    }
+
+    public void changeSpeed(double change)
+    {
+        if (change > 0)
+        {
+            speed = Math.min(speed + change, RobotConstants.Drive.Speed.MAXIMUM);
+        }
+        else
+        {
+            speed = Math.max(speed + change, RobotConstants.Drive.Speed.MINIMUM);
+        }
     }
 
     /**

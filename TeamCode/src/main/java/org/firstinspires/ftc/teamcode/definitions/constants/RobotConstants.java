@@ -90,7 +90,7 @@ public class RobotConstants
         @Sorter(sort = 3)
         public static boolean ON_BY_DEFAULT = false;
         @Sorter(sort = 4)
-        public static boolean AUTO_DISTANCE_ADJUSMENT = true;
+        public static boolean AUTO_DISTANCE_ADJUSMENT = false;
 
         @Sorter(sort = 5)
         public static boolean USE_FUTURE_POSE = false;
@@ -133,14 +133,14 @@ public class RobotConstants
         public static double GEAR_RATIO = 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         public static double TICKS_PER_REV = 17482 / 10.0;
         @Sorter(sort = 3)
-        public static double TOLERANCE = 0.001; // in revolutions
+        public static double TOLERANCE = 2.0; // in degrees
 
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
         @Sorter(sort = 5)
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         @Sorter(sort = 6)
-        public static boolean autoAimToGoal = true;
+        public static boolean autoAimToGoal = false;
 
         @Sorter(sort = 7)
         //public static double[] pidf = new double[]{10, 1, 1, 1};
@@ -159,25 +159,13 @@ public class RobotConstants
         public static String NAME = "transfer";
 
         @Sorter(sort = 1)
-        public static double SERVO_RANGE = 360.0; // Physical servo range in degrees
-        @Sorter(sort = 2)
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
+
+        @Sorter(sort = 2)
+        public static double CLOSE_INTAKE_ANGLE = 210; // An angle where the trapdoor blocks balls from entering
+
         @Sorter(sort = 3)
-        public static double CLOSED_INTAKE_ANGLE = 210; // An angle where the trapdoor blocks balls from entering
-        @Sorter(sort = 4)
-        public static double CLOSED_FULL_TRANSFER_ANGLE = 210;
-
-        public static double CLOSED_SHOOTING_TRANSFER_ANGLE = 210;
-        @Sorter(sort = 5)
-        public static double TRANSFER_ANGLE = 100;
-
-        @Sorter(sort = 6)
-        public static double autoCloseMs = 500; // After the outtake goes from ready -> not ready, the transfer will automatically close for this length.
-
-        @Sorter(sort = 7)
-        public static boolean autoTransferPrevent = false;
-        @Sorter(sort = 8)
-        public static boolean RELEASE_ALL_BALLS_WHEN_READY = false;
+        public static double CLOSE_TRANSFER_ANGLE = 0;
 
         @Configurable
         public static class TimerConstants

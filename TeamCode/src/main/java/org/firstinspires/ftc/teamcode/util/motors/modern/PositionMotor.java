@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.controller.SquIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 
 /**
@@ -132,6 +133,14 @@ public class PositionMotor extends PowerMotor
     public PositionMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio)
     {
         super.setDistancePerPulse(inputGearRatio, outputGearRatio);
+
+        return this;
+    }
+
+    @Override
+    public PositionMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio, AngleUnit angleUnit)
+    {
+        super.setDistancePerPulse(inputGearRatio, outputGearRatio, angleUnit);
 
         return this;
     }

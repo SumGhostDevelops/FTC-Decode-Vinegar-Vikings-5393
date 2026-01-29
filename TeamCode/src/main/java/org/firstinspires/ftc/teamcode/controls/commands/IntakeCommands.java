@@ -25,7 +25,7 @@ public class IntakeCommands
         @Override
         public void execute()
         {
-            intake.in(RPM.getAsDouble());
+            intake.intake(RPM.getAsDouble());
         }
 
         @Override
@@ -50,7 +50,7 @@ public class IntakeCommands
         @Override
         public void execute()
         {
-            intake.out(power.getAsDouble());
+            intake.reverse(power.getAsDouble());
         }
 
         @Override
@@ -82,7 +82,7 @@ public class IntakeCommands
                 timer.start();
             }
 
-            intake.out(power);
+            intake.reverse(power);
         }
 
         @Override

@@ -1,56 +1,42 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.seattlesolvers.solverslib.command.Command;
-import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
-import org.firstinspires.ftc.teamcode.util.MathUtil;
-import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
+import org.firstinspires.ftc.teamcode.util.motors.modern.PositionMotor;
 
 public class Turret extends SubsystemBase
 {
-    public final MotorEx turretMotor;
-    private final double degreePerTick;
-    private Angle initialRelativeAngle;
+    private final PositionMotor motor;
+    private final Angle initialRelativeAngle;
 
-    public int targetPosition;
+    private double targetAngleDegrees;
 
-    /**
-     * If true, the turret will continuously aim to the last {@link Turret#targetPosition} specified when {@link Turret#periodic()} is called.
-     */
-    public boolean lockToPosition = true;
+    /** If true, continuously locks to the target angle in {@link #periodic()}. */
+    public boolean lockToPosition;
 
-    public final Angle tolerance = new Angle(2, AngleUnit.DEGREES);
-
-    public Turret(MotorEx turretMotor, Angle initialRelativeAngle, boolean shouldLock)
+    public Turret(PositionMotor motor, Angle initialRelativeAngle, boolean shouldLock)
     {
-        this(turretMotor, initialRelativeAngle);
-        this.lockToPosition = shouldLock;
-    }
-    public Turret(MotorEx turretMotor, Angle initialRelativeAngle)
-    {
-        this.turretMotor = turretMotor;
+        this.motor = motor;
         this.initialRelativeAngle = initialRelativeAngle;
-        //degreePerTick = 360.0 / (turretMotor.getCPR() * RobotConstants.Turret.GEAR_RATIO);
-        degreePerTick = 360.0 / RobotConstants.Turret.TICKS_PER_REV;
+        this.lockToPosition = shouldLock;
 
-        this.targetPosition = turretMotor.getCurrentPosition();
+        // Initialize target to current position
+        this.targetAngleDegrees = motor.getDistance();
     }
 
     /**
-     * Aim absolutely to the field, around the reported {@code initialRelativeAngle}
-     * @param targetAngle The absolute target angle
-     * @param robotAngle The robot's absolute angle
-     * @see #aimRelative(Angle targetAngle)
+     * Aims the turret absolutely to a field heading.
+     * @param targetAngle The absolute target angle on the field
+     * @param robotAngle The robot's current heading
      */
     public void aimAbsolute(Angle targetAngle, Angle robotAngle)
     {
@@ -58,109 +44,57 @@ public class Turret extends SubsystemBase
     }
 
     /**
-     * Aim relatively to the robot, around the reported {@code initialRelativeAngle}
-     * @param targetAngle The desired turret angle relative to the robot's orientation
-     * @see #aimAbsolute(Angle targetAngle, Angle robotAngle)
+     * Aims the turret relatively to the robot's forward direction.
+     * @param targetAngle The desired turret angle relative to the robot
      */
     public void aimRelative(Angle targetAngle)
     {
-        // Subtract initialRelativeAngle to convert from "relative to robot" coordinates
-        // to "relative to motor zero position" coordinates
+        // Convert from robot-relative to motor-zero-relative coordinates
         Angle adjustedTarget = targetAngle.minus(initialRelativeAngle);
-        int targetTicks = resolveSolution(turretMotor.getCurrentPosition(), adjustedTarget);
+        double targetDegrees = adjustedTarget.getDegrees();
 
-        // Get turn limits
-        UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
+        // Resolve the best rotation to minimize travel while respecting limits
+        targetDegrees = resolveBestRotation(motor.getDistance(), targetDegrees);
 
-        // Final safety clamp (should not be needed if logic above is correct)
-        int minTicks = angleToTicks(turnLimits[0]);
-        int maxTicks = angleToTicks(turnLimits[1]);
-        this.targetPosition = Math.max(minTicks, Math.min(maxTicks, targetTicks));
+        // Clamp to turn limits
+        UnnormalizedAngle[] limits = RobotConstants.Turret.TURN_LIMITS;
+        double minDegrees = limits[0].getDegrees();
+        double maxDegrees = limits[1].getDegrees();
+        this.targetAngleDegrees = Math.max(minDegrees, Math.min(maxDegrees, targetDegrees));
 
-        if (isAtTarget())
-        {
-            return;
-        }
-
-        aim();
+        motor.setTargetDistance(this.targetAngleDegrees);
     }
 
     /**
-     * Aims the turret toward a target field coordinate given the robot's current pose.
-     * Uses the bearing from the robot's position to the target to compute the relative turret angle.
-     * @param target The target {@link FieldCoordinate} to aim at (e.g., a goal position)
-     * @param robotPose The robot's current {@link Pose2d} (position and heading)
+     * Aims the turret toward a target field coordinate.
+     * @param target The target position on the field
+     * @param robotPose The robot's current pose
      */
     public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose)
     {
-        // bearingTo computes the relative angle from the robot's heading to the target
-        Angle relativeBearing = robotPose.bearingTo(target);
-        aimRelative(relativeBearing);
+        aimRelative(robotPose.bearingTo(target));
     }
 
-    /**
-     * Aims to the tick specified in {@link Turret#targetPosition}
-     */
-    private void aim()
-    {
-        // Use SDK's RUN_TO_POSITION for built-in deceleration and position holding
-        turretMotor.motorEx.setTargetPosition(targetPosition);
-        if (!turretMotor.motorEx.getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) turretMotor.motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turretMotor.motorEx.setVelocity(2500);
-    }
-
+    /** Resets the turret to forward position. */
     public void reset()
     {
         aimRelative(RobotConstants.Turret.FORWARD_ANGLE);
     }
 
     /**
-     * Calculates the absolute FieldHeading of the turret.
-     * <p>
-     * Logic: FieldHeading = RobotHeading + (TurretRelative - InitialRelative)
-     * This accounts for the fact that InitialRelative usually defines "Forward" (e.g. 90deg),
-     * so we must subtract it to map "Turret Forward" to "Robot Forward" (0 offset).
-     *
-     * @param robotHeading The robot's current field heading
-     * @return The absolute heading of the turret in the same coordinate system as the robot heading.
+     * Gets the turret's absolute heading on the field.
+     * @param robotHeading The robot's field heading
+     * @return The turret's absolute field heading
      */
     public FieldHeading getFieldHeading(FieldHeading robotHeading)
     {
-        // Calculate the physical offset of the turret from the robot's forward vector.
         Angle turretOffset = getRelativeAngle().minus(initialRelativeAngle);
-
-        // Apply this offset to the robot's heading.
-        // We construct a new FieldHeading using the robot's system.
         return new FieldHeading(robotHeading.angle.plus(turretOffset), robotHeading.system);
     }
 
     /**
-     * @param robotAngle
-     * @return The absolute {@link Angle} of the turret based on the relative {@link Angle} and the robot's {@link Angle}
-     * @see #getAbsoluteUnnormalizedAngle(UnnormalizedAngle)
-     */
-    public Angle getAbsoluteAngle(Angle robotAngle)
-    {
-        return getRelativeAngle().plus(robotAngle).minus(initialRelativeAngle);
-    }
-
-    /**
-     *
-     * @param robotAngle
-     * @return The absolute {@link UnnormalizedAngle} of the turret based on the relative {@link UnnormalizedAngle} and the robot's {@link UnnormalizedAngle}
-     * @see #getAbsoluteAngle(Angle)
-     */
-    public UnnormalizedAngle getAbsoluteUnnormalizedAngle(UnnormalizedAngle robotAngle)
-    {
-        // Converts initialRelativeAngle to unnormalized for the subtraction to be unit-consistent
-        UnnormalizedAngle initialUnnormalized = initialRelativeAngle.toUnit(UnnormalizedAngleUnit.DEGREES);
-
-        return getRelativeUnnormalizedAngle().plus(robotAngle).minus(initialUnnormalized);
-    }
-
-    /**
-     * @return The relative {@link Angle} of the turret
-     * @see #getRelativeUnnormalizedAngle()
+     * Gets the turret's current angle relative to the robot's forward.
+     * @return The relative turret angle (normalized)
      */
     public Angle getRelativeAngle()
     {
@@ -168,107 +102,73 @@ public class Turret extends SubsystemBase
     }
 
     /**
-     * @return The {@link UnnormalizedAngle} of the relative turret heading in the raw {@code UnnormalizedAngleUnit.DEGREES}
-     * @see #getRelativeAngle()
+     * Gets the turret's current unnormalized angle relative to the robot.
+     * @return The relative turret angle (unnormalized)
      */
     public UnnormalizedAngle getRelativeUnnormalizedAngle()
     {
-        double motorPosition = turretMotor.getCurrentPosition(); // in ticks
-        double turretAngle = degreePerTick * motorPosition; // in degrees
-
-        return initialRelativeAngle.toUnit(UnnormalizedAngleUnit.DEGREES) // convert to an unnormalized angle
-                .plus(new UnnormalizedAngle(turretAngle, UnnormalizedAngleUnit.DEGREES)); // add the turret angle to the initial angle
+        double currentDegrees = motor.getDistance();
+        return initialRelativeAngle.toUnit(UnnormalizedAngleUnit.DEGREES)
+                .plus(new UnnormalizedAngle(currentDegrees, UnnormalizedAngleUnit.DEGREES));
     }
 
-    public void setForward()
+    /** @return true if the turret has reached its target angle */
+    public boolean isAtTarget()
     {
-        initialRelativeAngle = RobotConstants.Turret.FORWARD_ANGLE;
-    }
-
-    public Command turnToCommand(Angle angle)
-    {
-        return new InstantCommand(() -> this.aimRelative(angle), this);
+        return motor.atSetPoint();
     }
 
     /**
-     * Resolves the best turret encoder position (in ticks) to reach the requested angle
-     * while respecting the configured turn limits.
-     *
-     * @param currentTicks The current turret position in encoder ticks.
-     * @param targetAngle  The desired turret angle to turn to.
-     * @return The solution, in ticks
+     * Gets the angular difference between the current position and the target.
+     * @return The bearing (error) to the target position as an Angle
      */
-    private int resolveSolution(int currentTicks, Angle targetAngle)
+    public Angle bearingToTarget()
     {
-        double currentDegrees = degreePerTick * currentTicks;
-        double targetDegrees = targetAngle.getAngle(AngleUnit.DEGREES);
+        double errorDegrees = targetAngleDegrees - motor.getDistance();
+        return new Angle(errorDegrees, AngleUnit.DEGREES);
+    }
 
-        // Find the 'n' (number of rotations) that gets us closest to current position
+    /**
+     * Resolves the best rotation (adding/subtracting 360°) to minimize travel within limits.
+     */
+    private double resolveBestRotation(double currentDegrees, double targetDegrees)
+    {
+        UnnormalizedAngle[] limits = RobotConstants.Turret.TURN_LIMITS;
+        double minDegrees = limits[0].getDegrees();
+        double maxDegrees = limits[1].getDegrees();
+
         double closestN = Math.round((currentDegrees - targetDegrees) / 360.0);
-
-        // Get turn limits in degrees
-        UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
-        double minDegrees = turnLimits[0].getAngle(UnnormalizedAngleUnit.DEGREES);
-        double maxDegrees = turnLimits[1].getAngle(UnnormalizedAngleUnit.DEGREES);
-
-        int bestTicks = currentTicks;
+        double bestCandidate = targetDegrees;
         double minDistance = Double.MAX_VALUE;
 
-        // Check the nearest 3 possible rotations (current, one back, one forward)
-        for (double n = closestN - 1; n <= closestN + 1; n++) {
+        for (double n = closestN - 1; n <= closestN + 1; n++)
+        {
             double candidate = targetDegrees + (n * 360.0);
-
-            // Check limits (if applicable)
-            if (candidate >= minDegrees && candidate <= maxDegrees) {
-                int candidateTicks = (int) Math.round(candidate / degreePerTick);
-                double dist = Math.abs(candidateTicks - currentTicks);
-                if (dist < minDistance) {
+            if (candidate >= minDegrees && candidate <= maxDegrees)
+            {
+                double dist = Math.abs(candidate - currentDegrees);
+                if (dist < minDistance)
+                {
                     minDistance = dist;
-                    bestTicks = candidateTicks;
+                    bestCandidate = candidate;
                 }
             }
         }
-        return bestTicks;
-    }
-
-    private int angleToTicks(Angle angle)
-    {
-        return MathUtil.Motor.angleToTicks(angle, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
-    }
-
-    private int angleToTicks(UnnormalizedAngle angle)
-    {
-        return MathUtil.Motor.angleToTicks(angle, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
-    }
-
-    public Angle bearingToTarget()
-    {
-        return MathUtil.Motor.ticksToAngle(turretMotor.motorEx.getCurrentPosition() - targetPosition, turretMotor.getCPR(), RobotConstants.Turret.GEAR_RATIO);
-    }
-
-    public boolean isAtTarget()
-    {
-        return Math.abs(turretMotor.motorEx.getCurrentPosition() - targetPosition) < RobotConstants.Turret.TOLERANCE;
+        return bestCandidate;
     }
 
     @Override
     public void periodic()
     {
-        if (!turretMotor.motorEx.isBusy()) // check if the motor is currently going to a target
+        if (lockToPosition)
         {
-            if (this.lockToPosition) // if not, and we should be "locked" to a position
-            {
-                aim(); // aim to that position
-            }
-            else // if the motor is done and we shouldn't continuously aim
-            {
-                turretMotor.motorEx.setPower(0); // set the turret power to 0
-            }
+            motor.update();
         }
-
-        if (Math.abs(bearingToTarget().toUnit(AngleUnit.DEGREES).measure) < tolerance.toUnit(AngleUnit.DEGREES).measure)
+        else if (motor.atSetPoint())
         {
-            turretMotor.motorEx.setPower(0);
+            motor.stopMotor();
         }
     }
 }
+
+
