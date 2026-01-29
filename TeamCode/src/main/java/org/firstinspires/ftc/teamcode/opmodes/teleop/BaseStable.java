@@ -120,6 +120,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Distance to Goal", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
                 telemetry.addLine("--- Odometry ---");
                 telemetry.addData("Coordinate", robot.subsystems.odometry.getPose().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
+                telemetry.addData("Coordinate", robot.subsystems.odometry.getPose().toCoordinateSystem(CoordinateSystem.DECODE_FTC));
                 telemetry.addData("IMU Yaw", robot.subsystems.odometry.getIMUYaw());
                 telemetry.addData("Driver Heading", robot.subsystems.odometry.getDriverHeading());
                 telemetry.addData("Field Heading", robot.subsystems.odometry.getFieldHeading().toSystem(CoordinateSystem.DECODE_PEDROPATH));
@@ -156,6 +157,7 @@ public abstract class BaseStable extends CommandOpMode
                 robot.team.goal.coord
         );
         FieldDrawing.sendPacket();
+        robot.hw.clearHubCache();
     }
 
     @Override
