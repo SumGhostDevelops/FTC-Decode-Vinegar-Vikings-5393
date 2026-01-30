@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
@@ -11,7 +10,7 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
-import org.firstinspires.ftc.teamcode.util.motors.modern.PositionMotor;
+import org.firstinspires.ftc.teamcode.util.motors.PositionMotor;
 
 public class Turret extends SubsystemBase
 {

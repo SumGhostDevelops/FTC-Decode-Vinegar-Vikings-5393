@@ -13,10 +13,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
-import org.firstinspires.ftc.teamcode.util.motors.modern.PositionMotor;
-import org.firstinspires.ftc.teamcode.util.motors.modern.PowerMotor;
-import org.firstinspires.ftc.teamcode.util.motors.modern.VelocityMotor;
-import org.firstinspires.ftc.teamcode.util.motors.modern.VelocityMotorGroup;
+import org.firstinspires.ftc.teamcode.util.motors.PositionMotor;
+import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
+import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
+import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
 import java.util.List;
 

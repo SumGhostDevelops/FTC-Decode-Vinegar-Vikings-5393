@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
-import org.firstinspires.ftc.teamcode.util.motors.modern.VelocityMotorGroup;
+import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
 public class Outtake extends SubsystemBase {
 

@@ -2,17 +2,11 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
-import org.firstinspires.ftc.teamcode.util.motors.modern.PowerMotor;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
 
 public class Drive extends SubsystemBase
 {

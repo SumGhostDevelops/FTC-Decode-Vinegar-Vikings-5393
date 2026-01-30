@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.motors.modern;
+package org.firstinspires.ftc.teamcode.util.motors;
 
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
