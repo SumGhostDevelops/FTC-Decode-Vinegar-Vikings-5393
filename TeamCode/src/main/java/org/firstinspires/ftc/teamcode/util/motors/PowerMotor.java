@@ -42,6 +42,7 @@ public class PowerMotor
         this.motorEx = motorEx;
 
         motorEx.setRunMode(Motor.RunMode.RawPower);
+        motorEx.resetEncoder();
     }
 
     /**

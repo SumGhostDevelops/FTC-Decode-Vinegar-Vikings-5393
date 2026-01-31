@@ -57,7 +57,7 @@ public class RobotConstants
             public static String BACK_RIGHT = "backRight";
         }
 
-        public static DriveMode DRIVE_MODE = DriveMode.FIELD_CENTRIC;
+        public static DriveMode DRIVE_MODE = DriveMode.RAW_ROBOT_CENTRIC;
 
         @Configurable
         public static class Speed
@@ -133,7 +133,7 @@ public class RobotConstants
         public static double GEAR_RATIO = 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         public static double TICKS_PER_REV = 17482 / 10.0;
         @Sorter(sort = 3)
-        public static double TOLERANCE = 2.0; // in degrees
+        public static double TOLERANCE = 45; // in degrees
 
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
@@ -144,7 +144,7 @@ public class RobotConstants
 
         @Sorter(sort = 7)
         //public static double[] pidf = new double[]{10, 1, 1, 1};
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 1);
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.00, 0.00, 0.00, 0.25);
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;

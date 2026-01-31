@@ -114,7 +114,7 @@ public class Turret extends SubsystemBase
     /** @return true if the turret has reached its target angle */
     public boolean isAtTarget()
     {
-        return motor.atSetPoint();
+        return Math.abs(bearingToTarget().getDegrees()) < RobotConstants.Turret.TOLERANCE;
     }
 
     /**
@@ -156,18 +156,28 @@ public class Turret extends SubsystemBase
         return bestCandidate;
     }
 
+    public double getDistance()
+    {
+        return motor.getDistance();
+    }
+
+    public double getTargetAngleDegrees()
+    {
+        return targetAngleDegrees;
+    }
+
     @Override
     public void periodic()
     {
-        if (lockToPosition)
+        // If we are locked, OR if we haven't reached the target yet, we MUST run the PID loop.
+        if (!isAtTarget())
         {
             motor.update();
         }
-        else if (motor.atSetPoint())
+        else
         {
+            // We are not locked, and we ARE at the target. Safe to relax.
             motor.stopMotor();
         }
     }
 }
-
-

@@ -182,7 +182,7 @@ public class Outtake extends SubsystemBase {
         lastDistance = dist;
 
         // regression is in inches
-        setTargetRPM(MathUtil.Outtake.rpmLUT(dist));
+        setTargetRPM(MathUtil.Outtake.rpmRegression(dist));
     }
 
     public void enableRPMRatio()

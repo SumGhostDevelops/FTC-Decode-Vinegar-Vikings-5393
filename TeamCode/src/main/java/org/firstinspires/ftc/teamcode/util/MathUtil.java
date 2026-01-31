@@ -173,7 +173,7 @@ public class MathUtil
             lut.add(97.81, 5000);
             lut.add(108.49, 5400);
             lut.add(Math.hypot(144, 144), 5400);
-            lut.createLUT();
+            //lut.createLUT();
             lutInitialized = true;
         }
 

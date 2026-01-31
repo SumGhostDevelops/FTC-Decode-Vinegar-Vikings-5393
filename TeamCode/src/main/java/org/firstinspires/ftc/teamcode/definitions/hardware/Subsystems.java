@@ -26,7 +26,7 @@ public class Subsystems
         this.intake = new Intake(hw.intake);
         this.transfer = new Transfer(hw.transfer);
         this.outtake = new Outtake(hw.outtake);
-        this.turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, true);
+        this.turret = new Turret(hw.turret, RobotConstants.Turret.FORWARD_ANGLE, false);
         this.odometry = new Odometry(hw.pinpoint, hw.webcam, new Pose2d(team.base.coord, team.forwardAngle));
     }
 }

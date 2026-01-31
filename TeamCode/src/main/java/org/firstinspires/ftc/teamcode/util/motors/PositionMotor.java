@@ -162,7 +162,6 @@ public class PositionMotor extends PowerMotor
     public void setTargetDistance(double targetDistance)
     {
         stopped = false;
-        if (atSetPoint()) return;
 
         this.targetDistance = targetDistance;
 
@@ -220,6 +219,12 @@ public class PositionMotor extends PowerMotor
     public void update()
     {
         super.update(); // Update sensors
+
+        if (atSetPoint())
+        {
+            setPower(0);
+            return;
+        }
 
         // Always calculate. The controller will return ~0 if at setpoint anyway.
         // If gravity pulls it off, the controller will automatically fight back.

@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
+import org.firstinspires.ftc.teamcode.util.dashboard.TurretGraph;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
@@ -137,6 +138,8 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Is Stable", robot.subsystems.outtake.isStable());
                 telemetry.addLine("--- Turret ---");
                 telemetry.addData("Is At Target", robot.subsystems.turret.isAtTarget());
+                telemetry.addData("Distance", robot.subsystems.turret.getDistance());
+                telemetry.addData("Target Distance/Angle", robot.subsystems.turret.getTargetAngleDegrees());
                 telemetry.addData("Relative Heading", robot.subsystems.turret.getRelativeAngle().toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
                 telemetry.addData("Absolute Heading", robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldHeading()).toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
                 telemetry.addData("Bearing to Target", robot.subsystems.turret.bearingToTarget());
@@ -149,6 +152,7 @@ public abstract class BaseStable extends CommandOpMode
     protected void update()
     {
         displayTelemetry();
+        TurretGraph.update(robot.subsystems.turret);
 
         if (dashboardTimer.milliseconds() > 50)
         {
@@ -165,6 +169,8 @@ public abstract class BaseStable extends CommandOpMode
                 );
                 FieldDrawing.sendPacket();
             }
+
+            //TurretGraph.update(robot.subsystems.turret);
         }
     }
 
