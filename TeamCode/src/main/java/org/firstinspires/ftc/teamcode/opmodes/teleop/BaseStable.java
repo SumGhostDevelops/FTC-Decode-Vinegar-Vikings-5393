@@ -191,7 +191,7 @@ public abstract class BaseStable extends CommandOpMode
         Subsystems s = robot.subsystems;
 
         Trigger opModeIsActive = new Trigger(this::opModeIsActive);
-        Trigger turretReady = new Trigger(() -> Math.abs(s.turret.bearingToTarget().toUnit(AngleUnit.DEGREES).measure) < 8.5);
+        Trigger turretReady = new Trigger(s.turret::isAtTarget);
         Trigger outtakeReady = new Trigger(s.outtake::isStable);
 
         // Define Raw Triggers
@@ -253,25 +253,32 @@ public abstract class BaseStable extends CommandOpMode
 
     private void bindIntakeAndTransferLogic(Trigger active, Trigger dLT, Trigger dRT, Trigger cdLT, Trigger cdRT, Trigger turretReady, Trigger outtakeReady, Subsystems s)
     {
-        boolean twoPerson = RobotConstants.General.TWO_PERSON_OPERATION;
-
         // Abstract the Controls
-        Trigger intakeTrigger = twoPerson ? cdLT : dLT;
-        Trigger shootTrigger  = twoPerson ? cdRT : dRT;
+        Trigger intakeTrigger = dLT;
+        Trigger shootTrigger  = dRT;
 
         // Shared Command Instances
         Command intakeIn = new IntakeCommands.In(s.intake, RobotConstants.Intake.intakePower);
         Command intakeTransfer = new IntakeCommands.In(s.intake, RobotConstants.Intake.transferPower);
-        Command transferOpen = new TransferCommands.OpenOnce(s.transfer);
-        Command transferClose = new TransferCommands.CloseOnce(s.transfer);
+        Command transferOpenOnce = new TransferCommands.OpenOnce(s.transfer);
+        Command transferCloseOnce = new TransferCommands.CloseOnce(s.transfer);
 
         /* --- 1. INTAKE LOGIC --- */
         // Trigger if INTAKE_BY_DEFAULT is on, OR if the manual intake trigger is held.
         // We add .and(shootTrigger.negate()) to ensure intake stops when we try to score.
-        Trigger shouldIntake = (RobotConstants.Intake.INTAKE_BY_DEFAULT ? active : intakeTrigger)
-                .and(shootTrigger.negate());
+        // 1. Create a trigger for the D-Pad (Reverse)
+        Trigger intakeReverse = new Trigger(() -> robot.gamepads.driver.getButton(GamepadKeys.Button.DPAD_LEFT));
 
-        shouldIntake.whileActiveContinuous(intakeIn).whileActiveContinuous(transferClose);
+        // 2. Update the 'shouldIntake' trigger to require that Reverse is NOT active
+        Trigger shouldIntake = (RobotConstants.Intake.INTAKE_BY_DEFAULT ? active : intakeTrigger)
+                .and(shootTrigger.negate())
+                .and(intakeReverse.negate());
+
+        // 3. Bind the Forward logic as normal
+        shouldIntake.whileActiveOnce(intakeIn).whenActive(transferCloseOnce);
+
+        // 4. Bind the Reverse logic (using the trigger we created above for consistency)
+        intakeReverse.whileActiveOnce(new IntakeCommands.Reverse(s.intake, RobotConstants.Intake.outtakePower));
 
         /* --- 2. THE START CONDITION (canScore) --- */
         boolean isSemiAuto = RobotConstants.Intake.INTAKE_BY_DEFAULT || RobotConstants.Outtake.ON_BY_DEFAULT;
@@ -286,8 +293,8 @@ public abstract class BaseStable extends CommandOpMode
                 : intakeTrigger.and(shootTrigger).and(turretReady);
 
         // Bindings for scoring
-        canScore.whenActive(intakeTransfer).whenActive(transferOpen);
-        keepScoring.negate().cancelWhenActive(intakeTransfer).cancelWhenActive(transferOpen);
+        canScore.whenActive(intakeTransfer).whenActive(transferOpenOnce);
+        keepScoring.negate().cancelWhenActive(intakeTransfer).cancelWhenActive(transferOpenOnce);
 
         /* --- 4. FLYWHEEL POWER --- */
         if (RobotConstants.Outtake.ON_BY_DEFAULT)
@@ -298,10 +305,6 @@ public abstract class BaseStable extends CommandOpMode
         {
             shootTrigger.whileActiveContinuous(new OuttakeCommands.On(s.outtake, () -> false));
         }
-
-        /* --- 5. MANUAL OVERRIDES (Driver D-Pad) --- */
-        robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whileHeld(new IntakeCommands.Reverse(s.intake, RobotConstants.Intake.outtakePower));
     }
 
     private void bindCoDriverControls(GamepadEx coDriver, Subsystems s)

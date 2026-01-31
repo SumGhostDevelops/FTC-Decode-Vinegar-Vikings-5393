@@ -25,7 +25,6 @@ public class RobotConstants
         public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = false;
-        public static boolean TWO_PERSON_OPERATION = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.8;
     }
 
