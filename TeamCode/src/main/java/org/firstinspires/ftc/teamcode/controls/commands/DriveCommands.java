@@ -18,7 +18,7 @@ public class DriveCommands
         private final DoubleSupplier x;
         private final DoubleSupplier y;
         private final DoubleSupplier rx;
-        private final Supplier<Angle> botAngle;
+        private final Supplier<Angle> driverHeading;
 
         /**
          *
@@ -34,14 +34,14 @@ public class DriveCommands
             this.x = x;
             this.y = y;
             this.rx = rx;
-            this.botAngle = driverHeading;
+            this.driverHeading = driverHeading;
             addRequirements(drive);
         }
 
         @Override
         public void execute()
         {
-            drive.drive(x.getAsDouble(), y.getAsDouble(), rx.getAsDouble(), botAngle.get());
+            drive.drive(x.getAsDouble(), y.getAsDouble(), rx.getAsDouble(), driverHeading.get());
         }
 
         @Override

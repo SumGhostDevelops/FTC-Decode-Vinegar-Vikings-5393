@@ -70,7 +70,7 @@ public class TurretCommands
      * Command that continuously aims the turret at a target field coordinate (e.g., goal).
      * Uses the robot's current pose from odometry to compute the relative bearing.
      */
-    public static class AimToGoal extends CommandBase
+    public static class AimToCoordinate extends CommandBase
     {
         private final Turret turret;
         private final FieldCoordinate targetCoord;
@@ -81,7 +81,7 @@ public class TurretCommands
          * @param targetCoord The target field coordinate to aim at (e.g., team.goal.coord)
          * @param robotPose Supplier for the robot's current pose from odometry
          */
-        public AimToGoal(Turret turret, FieldCoordinate targetCoord, Supplier<Pose2d> robotPose)
+        public AimToCoordinate(Turret turret, FieldCoordinate targetCoord, Supplier<Pose2d> robotPose)
         {
             this.turret = turret;
             this.targetCoord = targetCoord;

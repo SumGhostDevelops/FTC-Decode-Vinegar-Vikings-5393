@@ -128,11 +128,9 @@ public class RobotConstants
     {
         @Sorter(sort = 0)
         public static String NAME = "turret";
-
-        @Sorter(sort = 2)
+        @Sorter(sort = 1)
         public static double GEAR_RATIO = 4.55; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
-        public static double TICKS_PER_REV = 17482 / 10.0;
-        @Sorter(sort = 3)
+        @Sorter(sort = 2)
         public static double TOLERANCE = 3; // in degrees
 
         @Sorter(sort = 4)
@@ -190,7 +188,7 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
-        public static double transferPassRPM = 1620;
+        public static double transferPower = 1;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
@@ -205,12 +203,6 @@ public class RobotConstants
         public static double FUTURE_POSE_TIME = 1.0;
 
         public static boolean SET_FORWARD_DIRECTION_BASED_ON_TEAM = true;
-
-        @IgnoreConfigurable
-        public static class IMU
-        {
-            public static String NAME = "imu";
-        }
 
         @IgnoreConfigurable
         public static class Pinpoint

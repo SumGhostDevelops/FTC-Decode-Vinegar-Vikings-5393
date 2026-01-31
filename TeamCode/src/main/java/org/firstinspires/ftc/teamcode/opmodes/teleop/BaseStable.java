@@ -61,7 +61,7 @@ public abstract class BaseStable extends CommandOpMode
         register(robot.subsystems.drive, robot.subsystems.intake, robot.subsystems.transfer, robot.subsystems.turret, robot.subsystems.outtake, robot.subsystems.odometry);
 
         // Set the default command for transfer to maintain its initial position
-        robot.subsystems.transfer.setDefaultCommand(new TransferCommands.CloseIntake(robot.subsystems.transfer));
+        robot.subsystems.transfer.setDefaultCommand(new TransferCommands.CloseOnce(robot.subsystems.transfer));
 
         DoubleSupplier x = () -> gamepad1.left_stick_x; // Counteract imperfect strafing
         DoubleSupplier y = () -> -gamepad1.left_stick_y; // Y is inverted
@@ -241,7 +241,7 @@ public abstract class BaseStable extends CommandOpMode
     private void bindTurretControls(Trigger active, GamepadEx driver, Subsystems s)
     {
         Supplier<Pose2d> turretPose = getPoseSupplier(RobotConstants.Turret.USE_FUTURE_POSE, RobotConstants.Turret.FUTURE_POSE_TIME, s);
-        Command aimCmd = new TurretCommands.AimToGoal(s.turret, robot.team.goal.coord, turretPose);
+        Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, robot.team.goal.coord, turretPose);
 
         if (RobotConstants.Turret.autoAimToGoal)
         {
@@ -276,10 +276,10 @@ public abstract class BaseStable extends CommandOpMode
         Trigger shootTrigger  = twoPerson ? cdRT : dRT;
 
         // Shared Command Instances
-        Command intakeIn = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.intakePower);
-        Command intakeTransfer = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.transferPassRPM);
-        Command transferOpen = new TransferCommands.Open(s.transfer);
-        Command transferClose = new TransferCommands.CloseIntake(s.transfer);
+        Command intakeIn = new IntakeCommands.In(s.intake, RobotConstants.Intake.intakePower);
+        Command intakeTransfer = new IntakeCommands.In(s.intake, RobotConstants.Intake.transferPower);
+        Command transferOpen = new TransferCommands.OpenOnce(s.transfer);
+        Command transferClose = new TransferCommands.CloseOnce(s.transfer);
 
         /* --- 1. INTAKE LOGIC --- */
         // Trigger if INTAKE_BY_DEFAULT is on, OR if the manual intake trigger is held.
@@ -317,7 +317,7 @@ public abstract class BaseStable extends CommandOpMode
 
         /* --- 5. MANUAL OVERRIDES (Driver D-Pad) --- */
         robot.gamepads.driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whileHeld(new IntakeCommands.Out(s.intake, () -> RobotConstants.Intake.outtakePower));
+                .whileHeld(new IntakeCommands.Reverse(s.intake, RobotConstants.Intake.outtakePower));
     }
 
     private void bindCoDriverControls(GamepadEx coDriver, Subsystems s)

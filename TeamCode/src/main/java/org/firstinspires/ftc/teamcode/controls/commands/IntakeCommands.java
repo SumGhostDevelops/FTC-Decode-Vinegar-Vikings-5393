@@ -1,21 +1,17 @@
 package org.firstinspires.ftc.teamcode.controls.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
-import com.seattlesolvers.solverslib.util.Timing.Timer;
 
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-
-import java.util.concurrent.TimeUnit;
-import java.util.function.DoubleSupplier;
 
 public class IntakeCommands
 {
     public static class In extends CommandBase
     {
         protected final Intake intake;
-        private final DoubleSupplier power;
+        private final double power;
 
-        public In(org.firstinspires.ftc.teamcode.subsystems.Intake intake, DoubleSupplier power)
+        public In(Intake intake, double power)
         {
             this.intake = intake;
             this.power = power;
@@ -25,7 +21,7 @@ public class IntakeCommands
         @Override
         public void execute()
         {
-            intake.intake(power.getAsDouble());
+            intake.intake(power);
         }
 
         @Override
@@ -35,12 +31,12 @@ public class IntakeCommands
         }
     }
 
-    public static class Out extends CommandBase
+    public static class Reverse extends CommandBase
     {
         private final Intake intake;
-        private final DoubleSupplier power;
+        private final double power;
 
-        public Out(org.firstinspires.ftc.teamcode.subsystems.Intake intake, DoubleSupplier power)
+        public Reverse(Intake intake, double power)
         {
             this.intake = intake;
             this.power = power;
@@ -50,7 +46,7 @@ public class IntakeCommands
         @Override
         public void execute()
         {
-            intake.reverse(power.getAsDouble());
+            intake.reverse(power);
         }
 
         @Override
