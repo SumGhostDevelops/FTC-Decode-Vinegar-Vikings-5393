@@ -130,10 +130,10 @@ public class RobotConstants
         public static String NAME = "turret";
 
         @Sorter(sort = 2)
-        public static double GEAR_RATIO = 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
+        public static double GEAR_RATIO = 4.55; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         public static double TICKS_PER_REV = 17482 / 10.0;
         @Sorter(sort = 3)
-        public static double TOLERANCE = 45; // in degrees
+        public static double TOLERANCE = 3; // in degrees
 
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
@@ -144,7 +144,7 @@ public class RobotConstants
 
         @Sorter(sort = 7)
         //public static double[] pidf = new double[]{10, 1, 1, 1};
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.00, 0.00, 0.00, 0.25);
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.1, 0.00, 0.00075, 0.00);
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;
@@ -186,18 +186,11 @@ public class RobotConstants
         public static String NAME = "intake";
 
         @Sorter(sort = 1)
-        public static double intakeRPM = 1300;
+        public static double intakePower = 1;
         @Sorter(sort = 2)
-        public static double outtakePower = 1300;
+        public static double outtakePower = 0.6;
         @Sorter(sort = 3)
         public static double transferPassRPM = 1620;
-        @Sorter(sort = 4)
-        public static double transferPassPowerSpeed = 0.5;
-        @Sorter(sort = 5)
-        public static double transferPreventPower = 1.0;
-
-        @Sorter(sort = 6)
-        public static double transferPreventDurationMs = 100;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;

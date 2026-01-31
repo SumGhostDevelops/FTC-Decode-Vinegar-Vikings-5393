@@ -116,6 +116,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()).toUnnormalized());
 
                  */
+                break;
             case TESTING:
                 telemetry.addData("Team", team);
                 telemetry.addData("Distance to Goal", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
@@ -275,7 +276,7 @@ public abstract class BaseStable extends CommandOpMode
         Trigger shootTrigger  = twoPerson ? cdRT : dRT;
 
         // Shared Command Instances
-        Command intakeIn = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.intakeRPM);
+        Command intakeIn = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.intakePower);
         Command intakeTransfer = new IntakeCommands.In(s.intake, () -> RobotConstants.Intake.transferPassRPM);
         Command transferOpen = new TransferCommands.Open(s.transfer);
         Command transferClose = new TransferCommands.CloseIntake(s.transfer);

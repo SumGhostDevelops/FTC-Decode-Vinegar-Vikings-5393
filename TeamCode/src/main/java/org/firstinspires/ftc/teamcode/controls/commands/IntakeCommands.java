@@ -13,19 +13,19 @@ public class IntakeCommands
     public static class In extends CommandBase
     {
         protected final Intake intake;
-        private final DoubleSupplier RPM;
+        private final DoubleSupplier power;
 
-        public In(org.firstinspires.ftc.teamcode.subsystems.Intake intake, DoubleSupplier RPM)
+        public In(org.firstinspires.ftc.teamcode.subsystems.Intake intake, DoubleSupplier power)
         {
             this.intake = intake;
-            this.RPM = RPM;
+            this.power = power;
             addRequirements(intake);
         }
 
         @Override
         public void execute()
         {
-            intake.intake(RPM.getAsDouble());
+            intake.intake(power.getAsDouble());
         }
 
         @Override
@@ -57,44 +57,6 @@ public class IntakeCommands
         public void end(boolean interrupted)
         {
             intake.stop();
-        }
-    }
-
-    public static class TransferPreventForDuration extends CommandBase
-    {
-        private final Intake intake;
-        private final double power;
-        private final Timer timer;
-
-        public TransferPreventForDuration(Intake intake, double power, double durationMs)
-        {
-            this.intake = intake;
-            this.power = power;
-            timer = new Timer((long) durationMs, TimeUnit.MILLISECONDS);
-            addRequirements(intake);
-        }
-
-        @Override
-        public void execute()
-        {
-            if (!timer.isTimerOn())
-            {
-                timer.start();
-            }
-
-            intake.reverse(power);
-        }
-
-        @Override
-        public boolean isFinished()
-        {
-            return timer.done();
-        }
-
-        @Override
-        public void end(boolean interrupted)
-        {
-            if (!interrupted) intake.stop();
         }
     }
 }
