@@ -57,7 +57,7 @@ public class RobotConstants
             public static String BACK_RIGHT = "backRight";
         }
 
-        public DriveMode driveMode = org.firstinspires.ftc.teamcode.subsystems.Drive.DriveMode.FIELD_CENTRIC;
+        public static DriveMode DRIVE_MODE = DriveMode.FIELD_CENTRIC;
 
         @Configurable
         public static class Speed

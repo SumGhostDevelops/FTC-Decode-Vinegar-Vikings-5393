@@ -13,7 +13,8 @@ public class Drive extends SubsystemBase
     private final PowerMotor frontLeft, frontRight, backLeft, backRight;
 
     private double speed = RobotConstants.Drive.Speed.DEFAULT;
-    private DriveMode currentMode = DriveMode.FIELD_CENTRIC;
+    private DriveMode currentMode = RobotConstants.Drive.DRIVE_MODE;
+
 
     public Drive(PowerMotor frontLeft, PowerMotor frontRight, PowerMotor backLeft, PowerMotor backRight)
     {
