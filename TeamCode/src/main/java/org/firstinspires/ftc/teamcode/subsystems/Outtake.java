@@ -4,7 +4,8 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
-import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.util.math.BetterInterpLUT;
+import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
@@ -29,13 +30,33 @@ public class Outtake extends SubsystemBase {
     // Tolerance to avoid tiny floating-point updates (adjust as needed)
     private static final double RPM_EPS = 1.0;
 
+    // For reducing the RPM while moving
     private boolean rpmRatioEnabled = false;
     private double rpmRatio = RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
+
+    // If the RPM should be adjusted using Outtake.setTargetRPM(Distance)
+    private boolean adjustWithDistance = RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
+
+    /**
+     * Inches -> RPM
+     */
+    private final BetterInterpLUT rpmLUT;
 
     public Outtake(VelocityMotorGroup motor)
     {
         this.motor = motor;
-        MathUtil.Outtake.initLUT();
+
+        // Inches -> RPM
+        rpmLUT = BetterInterpLUT.builder()
+                .add(0, 4100)
+                .add(50.32, 4100)
+                .add(59.63, 4300)
+                .add(70.25, 4400)
+                .add(86.79, 4800)
+                .add(97.81, 5000)
+                .add(108.49, 5400)
+                .add(Math.hypot(144, 144), 5400)
+                .build();
     }
 
     public void on()
@@ -167,9 +188,9 @@ public class Outtake extends SubsystemBase {
         }
     }
 
-    public void setTargetRPMFromDistance(Distance dist)
+    public void setTargetRPM(Distance dist)
     {
-        if (!RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT)
+        if (!adjustWithDistance)
         {
             return;
         }
@@ -181,23 +202,7 @@ public class Outtake extends SubsystemBase {
 
         lastDistance = dist;
 
-        // regression is in inches
-        setTargetRPM(MathUtil.Outtake.rpmRegression(dist));
-    }
-
-    public void enableRPMRatio()
-    {
-        rpmRatioEnabled = true;
-    }
-
-    public void disableRPMRatio()
-    {
-        rpmRatioEnabled = false;
-    }
-
-    public boolean getRPMRatio()
-    {
-        return rpmRatioEnabled;
+        setTargetRPM(rpmLUT.get(lastDistance.getInch()));
     }
 
     public double getTargetRPM()
@@ -233,4 +238,6 @@ public class Outtake extends SubsystemBase {
     {
         motor.update();
     }
+
+
 }

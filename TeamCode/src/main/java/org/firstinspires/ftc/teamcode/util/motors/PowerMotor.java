@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
-import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 
 /**
  * The PowerMotor class provides an abstraction for controlling a motor with additional

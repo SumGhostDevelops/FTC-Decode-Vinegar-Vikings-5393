@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.controller.BangBangController;
 import org.firstinspires.ftc.teamcode.util.controller.TakeBackHalfController;
 
