@@ -99,23 +99,6 @@ public abstract class BaseStable extends CommandOpMode
         {
             case DEFAULT:
             case COMPETITION:
-                /*
-                telemetry.addData("Team", team);
-                telemetry.addData("Remaining Time", timer.remainingTime() + "/120");
-                telemetry.addData("Distance to Goal (inches)", robot.subsystems.odometry.getFieldCoord().distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
-                telemetry.addLine("--- Odometry ---");
-                telemetry.addData("Absolute Heading (deg)", robot.subsystems.odometry.getFieldAngle().toSystem(CoordinateSystem.DECODE_PEDROPATH).angle.getUnsignedAngle(AngleUnit.DEGREES));
-                telemetry.addLine("--- Drive ---");
-                telemetry.addData("Speed (power)", robot.subsystems.drive.getSpeed());
-                telemetry.addLine("--- Outtake ---");
-                telemetry.addData("Target RPM", robot.subsystems.outtake.getTargetRPM());
-                telemetry.addData("True RPM", robot.subsystems.outtake.getRPM());
-                telemetry.addData("Is Stable", robot.subsystems.outtake.isReady());
-                telemetry.addLine("--- Turret ---");
-                telemetry.addData("Relative Heading (deg)", robot.subsystems.turret.getRelativeAngle().getUnsignedAngle(AngleUnit.DEGREES));
-                telemetry.addData("Absolute Heading (deg)", robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldAngle()).toUnnormalized());
-
-                 */
                 break;
             case TESTING:
                 telemetry.addData("Team", team);
@@ -139,6 +122,7 @@ public abstract class BaseStable extends CommandOpMode
                 telemetry.addData("Is Stable", robot.subsystems.outtake.isStable());
                 telemetry.addLine("--- Turret ---");
                 telemetry.addData("Is At Target", robot.subsystems.turret.isAtTarget());
+                telemetry.addData("Tolerance", robot.subsystems.turret.getTolerance());
                 telemetry.addData("Distance", robot.subsystems.turret.getDistance());
                 telemetry.addData("Target Distance/Angle", robot.subsystems.turret.getTargetAngleDegrees());
                 telemetry.addData("Relative Heading", robot.subsystems.turret.getRelativeAngle().toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));

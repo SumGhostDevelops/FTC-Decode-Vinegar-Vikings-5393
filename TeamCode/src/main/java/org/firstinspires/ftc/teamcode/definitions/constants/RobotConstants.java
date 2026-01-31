@@ -131,8 +131,10 @@ public class RobotConstants
         @Sorter(sort = 1)
         public static double GEAR_RATIO = 4.55; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         @Sorter(sort = 2)
-        public static double TOLERANCE = 3; // in degrees
-
+        public static Angle TOLERANCE = new Angle(2, AngleUnit.DEGREES); // in degrees
+        public static Distance LINEAR_TOLERANCE = new Distance(3, DistanceUnit.INCH);
+        @Sorter(sort = 3)
+        public static boolean USE_DYNAMIC_TOLERANCE = true;
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
         @Sorter(sort = 5)

@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.PositionMotor;
 
 public class Turret extends SubsystemBase
@@ -19,14 +20,13 @@ public class Turret extends SubsystemBase
 
     private double targetAngleDegrees;
 
-    /** If true, continuously locks to the target angle in {@link #periodic()}. */
-    public boolean lockToPosition;
+    // Add a variable to track the active tolerance, defaulting to the constant
+    private double currentToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
 
-    public Turret(PositionMotor motor, Angle initialRelativeAngle, boolean shouldLock)
+    public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {
         this.motor = motor;
         this.initialRelativeAngle = initialRelativeAngle;
-        this.lockToPosition = shouldLock;
 
         // Initialize target to current position
         this.targetAngleDegrees = motor.getDistance();
@@ -34,8 +34,7 @@ public class Turret extends SubsystemBase
 
     /**
      * Aims the turret absolutely to a field heading.
-     * @param targetAngle The absolute target angle on the field
-     * @param robotAngle The robot's current heading
+     * Resets tolerance to the default fixed value.
      */
     public void aimAbsolute(Angle targetAngle, Angle robotAngle)
     {
@@ -44,9 +43,20 @@ public class Turret extends SubsystemBase
 
     /**
      * Aims the turret relatively to the robot's forward direction.
-     * @param targetAngle The desired turret angle relative to the robot
+     * Resets tolerance to the default fixed value.
      */
     public void aimRelative(Angle targetAngle)
+    {
+        // Reset to default tolerance when using standard aiming
+        this.currentToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
+        setTargetRelative(targetAngle);
+    }
+
+    /**
+     * Internal helper to handle the motor math.
+     * Extracted from aimRelative so we can call it without resetting tolerance.
+     */
+    private void setTargetRelative(Angle targetAngle)
     {
         // Convert from robot-relative to motor-zero-relative coordinates
         Angle adjustedTarget = targetAngle.minus(initialRelativeAngle);
@@ -64,72 +74,6 @@ public class Turret extends SubsystemBase
         motor.setTargetDistance(this.targetAngleDegrees);
     }
 
-    /**
-     * Aims the turret toward a target field coordinate.
-     * @param target The target position on the field
-     * @param robotPose The robot's current pose
-     */
-    public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose)
-    {
-        aimRelative(robotPose.bearingTo(target));
-    }
-
-    /** Resets the turret to forward position. */
-    public void reset()
-    {
-        aimRelative(RobotConstants.Turret.FORWARD_ANGLE);
-    }
-
-    /**
-     * Gets the turret's absolute heading on the field.
-     * @param robotHeading The robot's field heading
-     * @return The turret's absolute field heading
-     */
-    public FieldHeading getFieldHeading(FieldHeading robotHeading)
-    {
-        Angle turretOffset = getRelativeAngle().minus(initialRelativeAngle);
-        return new FieldHeading(robotHeading.angle.plus(turretOffset), robotHeading.system);
-    }
-
-    /**
-     * Gets the turret's current angle relative to the robot's forward.
-     * @return The relative turret angle (normalized)
-     */
-    public Angle getRelativeAngle()
-    {
-        return getRelativeUnnormalizedAngle().toNormalized();
-    }
-
-    /**
-     * Gets the turret's current unnormalized angle relative to the robot.
-     * @return The relative turret angle (unnormalized)
-     */
-    public UnnormalizedAngle getRelativeUnnormalizedAngle()
-    {
-        double currentDegrees = motor.getDistance();
-        return initialRelativeAngle.toUnit(UnnormalizedAngleUnit.DEGREES)
-                .plus(new UnnormalizedAngle(currentDegrees, UnnormalizedAngleUnit.DEGREES));
-    }
-
-    /** @return true if the turret has reached its target angle */
-    public boolean isAtTarget()
-    {
-        return Math.abs(bearingToTarget().getDegrees()) < RobotConstants.Turret.TOLERANCE;
-    }
-
-    /**
-     * Gets the angular difference between the current position and the target.
-     * @return The bearing (error) to the target position as an Angle
-     */
-    public Angle bearingToTarget()
-    {
-        double errorDegrees = targetAngleDegrees - motor.getDistance();
-        return new Angle(errorDegrees, AngleUnit.DEGREES);
-    }
-
-    /**
-     * Resolves the best rotation (adding/subtracting 360°) to minimize travel within limits.
-     */
     private double resolveBestRotation(double currentDegrees, double targetDegrees)
     {
         UnnormalizedAngle[] limits = RobotConstants.Turret.TURN_LIMITS;
@@ -156,6 +100,74 @@ public class Turret extends SubsystemBase
         return bestCandidate;
     }
 
+    /**
+     * Aims the turret toward a target coordinate with dynamic tolerance.
+     * Tolerance tightens as the robot gets farther away, maintaining a virtual "hit box" size.
+     * * @param target The target position on the field
+     *
+     * @param robotPose             The robot's current pose
+     * @param linearToleranceRadius The allowable error radius at the target (e.g., 3 inches)
+     * @param minAngularTolerance   The minimum angle (degrees) the tolerance can shrink to
+     */
+    public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose, Distance linearToleranceRadius, Angle minAngularTolerance)
+    {
+        if (!RobotConstants.Turret.USE_DYNAMIC_TOLERANCE)
+        {
+            aimToCoordinate(target, robotPose);
+            return;
+        }
+
+        // Calculate distance to target
+        double distance = robotPose.coord.distanceTo(target).getInch();
+
+        // Calculate dynamic tolerance (Inverse Tangent of radius / distance)
+        if (distance > 1e-6)
+        { // Avoid division by zero
+            double dynamicTolerance = Math.toDegrees(Math.atan2(linearToleranceRadius.getInch(), distance));
+            // Ensure we don't demand impossible precision
+            this.currentToleranceDegrees = Math.max(dynamicTolerance, minAngularTolerance.getDegrees());
+        }
+        else
+        {
+            // If we are ON the target, tolerance is effectively infinite
+            this.currentToleranceDegrees = 180.0;
+        }
+
+        // Aim using the calculated bearing without resetting the tolerance we just set
+        setTargetRelative(robotPose.bearingTo(target));
+    }
+
+    /**
+     * Overload for aimToCoordinate that defaults to standard behavior if no MOA params are provided.
+     */
+    public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose)
+    {
+        aimRelative(robotPose.bearingTo(target));
+    }
+
+    public void reset()
+    {
+        aimRelative(RobotConstants.Turret.FORWARD_ANGLE);
+    }
+
+    public FieldHeading getFieldHeading(FieldHeading robotHeading)
+    {
+        Angle turretOffset = getRelativeAngle().minus(initialRelativeAngle);
+        return new FieldHeading(robotHeading.angle.plus(turretOffset), robotHeading.system);
+    }
+
+    public Angle getRelativeAngle()
+    {
+        return getRelativeUnnormalizedAngle().toNormalized();
+    }
+
+    public UnnormalizedAngle getRelativeUnnormalizedAngle()
+    {
+        double currentDegrees = motor.getDistance();
+        return initialRelativeAngle.toUnit(UnnormalizedAngleUnit.DEGREES)
+                .plus(new UnnormalizedAngle(currentDegrees, UnnormalizedAngleUnit.DEGREES));
+    }
+
     public double getDistance()
     {
         return motor.getDistance();
@@ -166,17 +178,35 @@ public class Turret extends SubsystemBase
         return targetAngleDegrees;
     }
 
+    /**
+     * @return true if the turret has reached its target angle within the current tolerance
+     */
+    public boolean isAtTarget()
+    {
+        // Use the active dynamic tolerance instead of the static constant
+        return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees;
+    }
+
+    public Angle bearingToTarget()
+    {
+        double errorDegrees = targetAngleDegrees - motor.getDistance();
+        return new Angle(errorDegrees, AngleUnit.DEGREES);
+    }
+
+    public Angle getTolerance()
+    {
+        return new Angle(currentToleranceDegrees, AngleUnit.DEGREES);
+    }
+
     @Override
     public void periodic()
     {
-        // If we are locked, OR if we haven't reached the target yet, we MUST run the PID loop.
         if (!isAtTarget())
         {
             motor.update();
         }
         else
         {
-            // We are not locked, and we ARE at the target. Safe to relax.
             motor.stopMotor();
         }
     }
