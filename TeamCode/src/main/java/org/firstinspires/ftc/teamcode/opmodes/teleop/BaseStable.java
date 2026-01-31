@@ -41,7 +41,7 @@ public abstract class BaseStable extends CommandOpMode
     protected RobotContext robot;
     private final Timer timer = new Timer(120, TimeUnit.SECONDS);
     private final ElapsedTime logTimer = new ElapsedTime();
-    private double lastCleared = logTimer.seconds();
+    private final ElapsedTime dashboardTimer = new ElapsedTime();
     private Timing.Stopwatch stopwatch;
 
     @Override
@@ -88,10 +88,10 @@ public abstract class BaseStable extends CommandOpMode
         telemetry.addData("Loop Time", stopwatch.deltaTime() + "ms");
 
         if (RobotConstants.Telemetry.SET_AUTOCLEAR) telemetry.clear();
-        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS && Math.abs(logTimer.seconds() - lastCleared) > RobotConstants.Telemetry.LOG_AUTOCLEAR_DELAY)
+        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS && logTimer.seconds() > RobotConstants.Telemetry.LOG_AUTOCLEAR_DELAY)
         {
             telemetry.log().clear();
-            lastCleared = logTimer.seconds();
+            logTimer.reset();
         }
 
         switch (RobotConstants.General.PRESET_OPTION)
@@ -149,21 +149,30 @@ public abstract class BaseStable extends CommandOpMode
     protected void update()
     {
         displayTelemetry();
-        telemetry.update();
-        // Draw robot position on Panels Dashboard Field panel
-        FieldDrawing.draw(
-                robot.subsystems.odometry.getPose(),
-                null,
-                robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldHeading()),
-                robot.team.goal.coord
-        );
-        FieldDrawing.sendPacket();
-        robot.hw.clearHubCache();
+
+        if (dashboardTimer.milliseconds() > 50)
+        {
+            telemetry.update();
+
+            if (RobotConstants.Telemetry.ENABLE_FIELD_DRAWING)
+            {
+                // Draw robot position on Panels Dashboard Field panel
+                FieldDrawing.draw(
+                        robot.subsystems.odometry.getPose(),
+                        null,
+                        robot.subsystems.turret.getFieldHeading(robot.subsystems.odometry.getFieldHeading()),
+                        robot.team.goal.coord
+                );
+                FieldDrawing.sendPacket();
+            }
+        }
     }
 
     @Override
     public void run()
     {
+        robot.hw.clearHubCache();
+
         if (!timer.isTimerOn())
         {
             timer.start();
@@ -172,6 +181,7 @@ public abstract class BaseStable extends CommandOpMode
         {
             timer.pause();
         }
+
         update();
         super.run();
     }

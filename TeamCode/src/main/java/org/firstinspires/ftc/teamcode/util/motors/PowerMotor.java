@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 
 /**
@@ -20,10 +21,15 @@ public class PowerMotor
     protected VoltageSensor battery;
 
     // Voltage compensation value
-    private double voltageCompensation = 13.0;
+    private double voltageCompensation = 12.0;
 
     // Flag to indicate if the motor is stopped
     protected boolean stopped = false;
+
+    // Filter factor: 0.0 = infinite smoothing (no change), 1.0 = no smoothing (raw data)
+    // Start with 0.8. If still noisy, lower it. If too laggy, raise it.
+    private static final double accelFilterFactor = RobotConstants.General.MOTOR_ACCELERATION_FILTER_FACTOR;
+    private double lastFilteredAccel = 0.0;
 
     /**
      * Constructor to initialize the PowerMotor with a MotorEx instance.
@@ -151,7 +157,7 @@ public class PowerMotor
      */
     public double getRPM()
     {
-        return tpsToRpm(motorEx.getCorrectedVelocity());
+        return tpsToRpm(motorEx.getCorrectedVelocity()); // consider changing this to motorEx.motorEx.getVelocity()
     }
 
     /**
@@ -161,7 +167,13 @@ public class PowerMotor
      */
     public double getRPMAcceleration()
     {
-        return tps2ToRpm2(motorEx.getAcceleration());
+        double rawAccel = tps2ToRpm2(motorEx.getAcceleration());
+
+        // Low-Pass Filter Implementation (EMA)
+        lastFilteredAccel = (accelFilterFactor * rawAccel)
+                + ((1.0 - accelFilterFactor) * lastFilteredAccel);
+
+        return lastFilteredAccel;
     }
 
     /**

@@ -26,6 +26,7 @@ public class RobotConstants
         public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static boolean TWO_PERSON_OPERATION = false;
+        public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.8;
     }
 
     @Configurable
@@ -34,6 +35,7 @@ public class RobotConstants
         public static boolean SET_AUTOCLEAR = true;
         public static boolean SET_AUTOCLEAR_LOGS = true;
         public static double LOG_AUTOCLEAR_DELAY = 10;
+        public static boolean ENABLE_FIELD_DRAWING = true;
     }
 
     public static class AprilTags
@@ -127,8 +129,6 @@ public class RobotConstants
         @Sorter(sort = 0)
         public static String NAME = "turret";
 
-        @Sorter(sort = 1)
-        public static double PPR = 537.7;
         @Sorter(sort = 2)
         public static double GEAR_RATIO = 4.5; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         public static double TICKS_PER_REV = 17482 / 10.0;
