@@ -32,7 +32,8 @@ public class Vector2d
 
     public Angle getDirection()
     {
-        return new Angle(Math.atan2(y.magnitude, x.magnitude), angUnit);
+        // Math.atan2 returns radians, so we must use AngleUnit.RADIANS here
+        return new Angle(Math.atan2(y.magnitude, x.magnitude), AngleUnit.RADIANS);
     }
 
     public Vector2d toDistanceUnit(DistanceUnit distanceUnit)

@@ -140,7 +140,7 @@ public class RobotHardware
                     .setDistancePerPulse(1.0, RobotConstants.Turret.GEAR_RATIO, AngleUnit.DEGREES) // keep in degrees
                     .setControllerType(PositionMotor.PositionController.SquIDF)
                     .setPIDF(RobotConstants.Turret.PIDF)
-                    .setPositionTolerance(RobotConstants.Turret.TOLERANCE);
+                    .setPositionTolerance(RobotConstants.Turret.TOLERANCE.getDegrees());
 
             turret.setTargetDistance(0);
         }

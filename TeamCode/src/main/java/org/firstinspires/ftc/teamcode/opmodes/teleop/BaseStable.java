@@ -223,7 +223,7 @@ public abstract class BaseStable extends CommandOpMode
         Supplier<Pose2d> turretPose = s.odometry::getPose;
         Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, robot.team.goal.coord, turretPose);
 
-        if (RobotConstants.Turret.autoAimToGoal)
+        if (RobotConstants.Turret.AUTO_AIM_TO_GOAL)
         {
             opModeActive.whileActiveContinuous(aimCmd);
         }
@@ -273,8 +273,10 @@ public abstract class BaseStable extends CommandOpMode
                 .and(shootBtn.negate())
                 .and(reverseBtn.negate());
 
-        shouldIntake.whileActiveOnce(intakeIn).whenActive(closeTransfer);
-        reverseBtn.whileActiveOnce(reverseIntake);
+        // Use whileActiveContinuous instead of whileActiveOnce to fix the command scheduling bug
+        // whileActiveContinuous ensures the command is properly re-scheduled each time the trigger becomes active
+        shouldIntake.whileActiveContinuous(intakeIn).whenActive(closeTransfer);
+        reverseBtn.whileActiveContinuous(reverseIntake);
 
         // 2. Scoring Logic
         boolean semiAuto = RobotConstants.Intake.INTAKE_BY_DEFAULT || RobotConstants.Outtake.ON_BY_DEFAULT;

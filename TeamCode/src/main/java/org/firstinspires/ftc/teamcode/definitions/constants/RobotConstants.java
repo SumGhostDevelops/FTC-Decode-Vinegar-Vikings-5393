@@ -141,7 +141,7 @@ public class RobotConstants
         @Sorter(sort = 5)
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
         @Sorter(sort = 6)
-        public static boolean autoAimToGoal = false;
+        public static boolean AUTO_AIM_TO_GOAL = false;
 
         @Sorter(sort = 7)
         //public static double[] pidf = new double[]{10, 1, 1, 1};
@@ -243,14 +243,18 @@ public class RobotConstants
                 @Sorter(sort = 2)
                 public static Distance Z = new Distance(9, DistanceUnit.INCH);
 
-                // Camera orientation (YawPitchRoll)
+                // Camera orientation (YawPitchRoll) - FTC SDK Convention:
                 // Yaw: 0 = pointing forward, +90 = pointing left, -90 = pointing right
-                // Pitch: -90 = horizontal (pointing forward), 0 = pointing straight up
+                // Pitch: 0 = horizontal (forward), -90 = pointing down, +90 = pointing up
                 // Roll: 0 = level, +/-90 = vertical, 180 = upside-down
+                //
+                // NOTE: If camera localization became inaccurate after hardware changes,
+                // verify these values match the physical camera mounting orientation.
+                // A slight tilt or rotation of the camera requires updating these values.
                 @Sorter(sort = 0)
                 public static Angle YAW = new Angle(0, AngleUnit.DEGREES);
                 @Sorter(sort = 1)
-                public static Angle PITCH = new Angle(-90, AngleUnit.DEGREES); // horizontal camera
+                public static Angle PITCH = new Angle(0, AngleUnit.DEGREES); // horizontal camera looking forward
                 @Sorter(sort = 2)
                 public static Angle ROLL = new Angle(0, AngleUnit.DEGREES);
             }

@@ -36,9 +36,8 @@ public class ConstantsPresets
                 RobotConstants.Outtake.ON_BY_DEFAULT = true;
                 RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
                 RobotConstants.General.REGRESSION_TESTING_MODE = false;
-                RobotConstants.Turret.autoAimToGoal = true;
+                RobotConstants.Turret.AUTO_AIM_TO_GOAL = true;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = true;
-                RobotConstants.General.TWO_PERSON_OPERATION = true;
                 break;
         }
     }
