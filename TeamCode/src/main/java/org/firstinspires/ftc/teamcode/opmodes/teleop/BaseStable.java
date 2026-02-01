@@ -60,7 +60,7 @@ public abstract class BaseStable extends CommandOpMode
         register(s.drive, s.intake, s.transfer, s.turret, s.outtake, s.odometry);
 
         // 3. Set Defaults & Init Commands
-        s.transfer.setDefaultCommand(new TransferCommands.CloseOnce(s.transfer));
+        //s.transfer.setDefaultCommand(new TransferCommands.CloseOnce(s.transfer));
 
         // Drive Control Suppliers
         DoubleSupplier x = () -> gamepad1.left_stick_x;
