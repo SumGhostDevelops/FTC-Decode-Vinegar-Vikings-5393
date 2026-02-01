@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.dashboard.Graph;
+import org.firstinspires.ftc.teamcode.util.AutoStateStorage;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
@@ -28,10 +29,8 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 /**
- * Refactored BaseStable:
- * - Optimized telemetry for object allocation
- * - Simplified binding logic
- * - Cleaned up subsystem access
+ * Refactored BaseStable: - Optimized telemetry for object allocation -
+ * Simplified binding logic - Cleaned up subsystem access
  */
 public abstract class BaseStable extends CommandOpMode
 {
@@ -55,12 +54,15 @@ public abstract class BaseStable extends CommandOpMode
         // 1. Initialize Hardware
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
 
+        // 1b. Try to load saved state from autonomous
+        loadAutoState();
+
         // 2. Register Subsystems
         Subsystems s = robot.subsystems;
         register(s.drive, s.intake, s.transfer, s.turret, s.outtake, s.odometry);
 
         // 3. Set Defaults & Init Commands
-        //s.transfer.setDefaultCommand(new TransferCommands.CloseOnce(s.transfer));
+        // s.transfer.setDefaultCommand(new TransferCommands.CloseOnce(s.transfer));
 
         // Drive Control Suppliers
         DoubleSupplier x = () -> gamepad1.left_stick_x;
@@ -96,8 +98,34 @@ public abstract class BaseStable extends CommandOpMode
 
     private void manageMatchTimer()
     {
-        if (!matchTimer.isTimerOn()) matchTimer.start();
-        if (matchTimer.done()) matchTimer.pause();
+        if (!matchTimer.isTimerOn())
+            matchTimer.start();
+        if (matchTimer.done())
+            matchTimer.pause();
+    }
+
+    /**
+     * Attempts to load the saved autonomous state (pose + turret position). Only
+     * loads if the state was saved within the last 60 seconds.
+     */
+    private void loadAutoState()
+    {
+        AutoStateStorage.AutoState state = AutoStateStorage.loadRecentState(60000);
+
+        if (state != null)
+        {
+            // Convert Pedro Pathing coordinates to Pose2d
+            // Pedro uses inches and radians, our Pose2d uses similar units
+            Pose2d loadedPose = Pose2d.fromPedro(state.x, state.y, state.headingRadians);
+
+            robot.subsystems.odometry.updateReferencePose(loadedPose);
+
+            telemetry.log().add("Loaded pose from autonomous: (%.1f, %.1f) @ %.1f°", state.x, state.y, Math.toDegrees(state.headingRadians));
+        }
+        else
+        {
+            telemetry.log().add("No recent autonomous state found, using default pose");
+        }
     }
 
     protected void update()
@@ -105,12 +133,14 @@ public abstract class BaseStable extends CommandOpMode
         // Cache the subsystem reference for this loop iteration
         Subsystems s = robot.subsystems;
 
-        // Pre-fetch pose once per loop to avoid re-calculating it for every telemetry line
+        // Pre-fetch pose once per loop to avoid re-calculating it for every telemetry
+        // line
         Pose2d loopPose = s.odometry.getPose();
 
         displayTelemetry(s, loopPose);
 
-        // Throttle dashboard updates to save bandwidth (~20Hz is plenty for visualization)
+        // Throttle dashboard updates to save bandwidth (~20Hz is plenty for
+        // visualization)
         if (dashboardTimer.milliseconds() > 50)
         {
             updateDashboard(s, loopPose);
@@ -162,7 +192,8 @@ public abstract class BaseStable extends CommandOpMode
         telemetry.addLine("--- Turret ---");
         telemetry.addData("At Target", s.turret.isAtTarget());
         telemetry.addData("Err/Tol", String.format("%.2f / %.2f", s.turret.bearingToTarget().getDegrees(), s.turret.getTolerance().getDegrees()));
-        telemetry.addData("Heading (Abs)", s.turret.getFieldHeading(s.odometry.getFieldHeading()).toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
+        telemetry.addData("Heading (Abs)",
+                s.turret.getFieldHeading(s.odometry.getFieldHeading()).toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
 
         telemetry.update();
     }
@@ -171,12 +202,7 @@ public abstract class BaseStable extends CommandOpMode
     {
         if (RobotConstants.Telemetry.ENABLE_FIELD_DRAWING)
         {
-            FieldDrawing.draw(
-                    pose,
-                    null,
-                    s.turret.getFieldHeading(s.odometry.getFieldHeading()),
-                    robot.team.goal.coord
-            );
+            FieldDrawing.draw(pose, null, s.turret.getFieldHeading(s.odometry.getFieldHeading()), robot.team.goal.coord);
             FieldDrawing.update();
         }
 
@@ -214,14 +240,10 @@ public abstract class BaseStable extends CommandOpMode
 
     private void bindDriveControls(GamepadEx driver, Subsystems s)
     {
-        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new DriveCommands.DecreaseSpeed(s.drive));
-        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new DriveCommands.IncreaseSpeed(s.drive));
-        driver.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(s.odometry));
-        driver.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new OdometryCommands.LocalizeWithRumble(s.odometry, telemetry, driver.gamepad));
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(new DriveCommands.DecreaseSpeed(s.drive));
+        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(new DriveCommands.IncreaseSpeed(s.drive));
+        driver.getGamepadButton(GamepadKeys.Button.B).whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(s.odometry));
+        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(new OdometryCommands.LocalizeWithRumble(s.odometry, telemetry, driver.gamepad));
     }
 
     private void bindTurretControls(Trigger opModeActive, GamepadEx driver, Subsystems s)
@@ -249,10 +271,8 @@ public abstract class BaseStable extends CommandOpMode
         if (RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT)
         {
             // Update RPM dynamically based on distance to goal
-            active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
-                    s.outtake,
-                    () -> s.odometry.getPose().distanceTo(team.goal.coord)
-            ));
+            active.whileActiveContinuous(
+                    new OuttakeCommands.UpdateRPMBasedOnDistance(s.outtake, () -> s.odometry.getPose().distanceTo(team.goal.coord)));
         }
     }
 
@@ -260,7 +280,7 @@ public abstract class BaseStable extends CommandOpMode
     {
         // --- Triggers ---
         Trigger intakeBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
-        Trigger shootBtn  = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
+        Trigger shootBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
         Trigger reverseBtn = new Trigger(() -> driver.getButton(GamepadKeys.Button.DPAD_LEFT));
 
         Trigger systemsReady = new Trigger(s.turret::isAtTarget).and(new Trigger(s.outtake::isStable));
@@ -275,27 +295,26 @@ public abstract class BaseStable extends CommandOpMode
         // --- Logic ---
 
         // 1. Intake Logic: (Auto OR Manual) AND Not Shooting AND Not Reversing
-        Trigger shouldIntake = (RobotConstants.Intake.INTAKE_BY_DEFAULT ? active : intakeBtn)
-                .and(shootBtn.negate())
-                .and(reverseBtn.negate());
+        Trigger shouldIntake = (RobotConstants.Intake.INTAKE_BY_DEFAULT ? active : intakeBtn).and(shootBtn.negate()).and(reverseBtn.negate());
 
-        // Use whileActiveContinuous instead of whileActiveOnce to fix the command scheduling bug
-        // whileActiveContinuous ensures the command is properly re-scheduled each time the trigger becomes active
+        // Use whileActiveContinuous instead of whileActiveOnce to fix the command
+        // scheduling bug
+        // whileActiveContinuous ensures the command is properly re-scheduled each time
+        // the trigger becomes active
         shouldIntake.whileActiveContinuous(intakeIn).whenActive(closeTransfer);
         reverseBtn.whileActiveContinuous(reverseIntake);
 
         // 2. Scoring Logic
         boolean semiAuto = RobotConstants.Intake.INTAKE_BY_DEFAULT || RobotConstants.Outtake.ON_BY_DEFAULT;
 
-        // "Can Score" = User wants to shoot + Systems are ready ( + Manual intake hold if not semi-auto)
-        Trigger canScore = semiAuto
-                ? shootBtn.and(systemsReady)
-                : intakeBtn.and(shootBtn).and(systemsReady);
+        // "Can Score" = User wants to shoot + Systems are ready ( + Manual intake hold
+        // if not semi-auto)
+        Trigger canScore = semiAuto ? shootBtn.and(systemsReady) : intakeBtn.and(shootBtn).and(systemsReady);
 
-        // "Keep Scoring" = Hysteresis to ensure we finish the shot even if turret jitters slightly
-        Trigger keepScoring = semiAuto
-                ? shootBtn
-                : intakeBtn.and(shootBtn); // Ideally this might need systemsReady too, but kept close to original logic
+        // "Keep Scoring" = Hysteresis to ensure we finish the shot even if turret
+        // jitters slightly
+        Trigger keepScoring = semiAuto ? shootBtn : intakeBtn.and(shootBtn); // Ideally this might need systemsReady too, but kept close to original
+                                                                             // logic
 
         // Action: When ready, run intake (feeder) and open transfer
         canScore.whenActive(intakeScore).whenActive(openTransfer);

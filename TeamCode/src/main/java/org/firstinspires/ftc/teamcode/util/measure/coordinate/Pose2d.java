@@ -33,13 +33,28 @@ public class Pose2d
 
     public static Pose2d fromPose2D(Pose2D pose, CoordinateSystem coordSys)
     {
-        FieldCoordinate coord = new FieldCoordinate(
-                new Distance(pose.getX(DistanceUnit.INCH), DistanceUnit.INCH),
-                new Distance(pose.getY(DistanceUnit.INCH), DistanceUnit.INCH),
-                coordSys
-        );
+        FieldCoordinate coord = new FieldCoordinate(new Distance(pose.getX(DistanceUnit.INCH), DistanceUnit.INCH),
+                new Distance(pose.getY(DistanceUnit.INCH), DistanceUnit.INCH), coordSys);
 
         FieldHeading heading = new FieldHeading(pose.getHeading(AngleUnit.DEGREES), AngleUnit.DEGREES, coordSys);
+
+        return new Pose2d(coord, heading);
+    }
+
+    /**
+     * Creates a Pose2d from Pedro Pathing coordinates. Pedro Pathing uses inches
+     * and radians.
+     *
+     * @param x              X position in inches
+     * @param y              Y position in inches
+     * @param headingRadians Heading in radians
+     * @return A new Pose2d in the FTC coordinate system
+     */
+    public static Pose2d fromPedro(double x, double y, double headingRadians)
+    {
+        FieldCoordinate coord = new FieldCoordinate(new Distance(x, DistanceUnit.INCH), new Distance(y, DistanceUnit.INCH), CoordinateSystem.FTC);
+
+        FieldHeading heading = new FieldHeading(headingRadians, AngleUnit.RADIANS, CoordinateSystem.FTC);
 
         return new Pose2d(coord, heading);
     }
@@ -49,10 +64,8 @@ public class Pose2d
      */
     public static Pose2d fromPose3D(Pose3D pose, CoordinateSystem coordSys)
     {
-        FieldCoordinate coord = new FieldCoordinate(
-                new Distance(pose.getPosition().x, pose.getPosition().unit),
-                new Distance(pose.getPosition().y, pose.getPosition().unit),
-                coordSys);
+        FieldCoordinate coord = new FieldCoordinate(new Distance(pose.getPosition().x, pose.getPosition().unit),
+                new Distance(pose.getPosition().y, pose.getPosition().unit), coordSys);
 
         return new Pose2d(coord, new FieldHeading((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS, coordSys));
     }
@@ -75,10 +88,7 @@ public class Pose2d
         }
 
         // Fix: Explicitly convert the heading to the target system as well
-        return new Pose2d(
-                coord.toCoordinateSystem(coordSys),
-                heading.toSystem(coordSys)
-        );
+        return new Pose2d(coord.toCoordinateSystem(coordSys), heading.toSystem(coordSys));
     }
 
     public Pose2d toAngleUnit(AngleUnit angleUnit)
@@ -93,7 +103,8 @@ public class Pose2d
 
     /**
      * @param otherPose
-     * @return The straight line {@link Distance} to another {@link Pose2d}'s {@link Pose2d#coord}
+     * @return The straight line {@link Distance} to another {@link Pose2d}'s
+     *         {@link Pose2d#coord}
      */
     public Distance distanceTo(Pose2d otherPose)
     {
@@ -111,7 +122,9 @@ public class Pose2d
 
     /**
      * @param otherPose
-     * @return The {@link Angle} to another {@link Pose2d}'s {@link Pose2d#coord}, taking into account this {@link Pose2d}'s {@link Pose2d#heading}; the relative {@link Angle}
+     * @return The {@link Angle} to another {@link Pose2d}'s {@link Pose2d#coord},
+     *         taking into account this {@link Pose2d}'s {@link Pose2d#heading}; the
+     *         relative {@link Angle}
      */
     public Angle bearingTo(Pose2d otherPose)
     {
@@ -119,8 +132,11 @@ public class Pose2d
     }
 
     /**
-     * @param otherCoord The target {@link FieldCoordinate} to calculate the relative bearing to
-     * @return The {@link Angle} to another {@link FieldCoordinate}, taking into account this {@link Pose2d}'s {@link Pose2d#heading}; the relative {@link Angle}
+     * @param otherCoord The target {@link FieldCoordinate} to calculate the
+     *                   relative bearing to
+     * @return The {@link Angle} to another {@link FieldCoordinate}, taking into
+     *         account this {@link Pose2d}'s {@link Pose2d#heading}; the relative
+     *         {@link Angle}
      */
     public Angle bearingTo(FieldCoordinate otherCoord)
     {
@@ -128,8 +144,11 @@ public class Pose2d
     }
 
     /**
-     * @param otherPose The target {@link Pose2d} whose {@link Pose2d#coord} is used to compute the absolute {@link Angle}
-     * @return The {@link Angle} to another {@link Pose2d}'s {@link Pose2d#coord} from this {@link Pose2d}'s {@link Pose2d#coord}; the absolute {@link Angle}
+     * @param otherPose The target {@link Pose2d} whose {@link Pose2d#coord} is used
+     *                  to compute the absolute {@link Angle}
+     * @return The {@link Angle} to another {@link Pose2d}'s {@link Pose2d#coord}
+     *         from this {@link Pose2d}'s {@link Pose2d#coord}; the absolute
+     *         {@link Angle}
      */
     public Angle angleTo(Pose2d otherPose)
     {
@@ -138,7 +157,8 @@ public class Pose2d
 
     /**
      * @param otherCoord
-     * @return The {@link Angle} to another {@link FieldCoordinate} from this {@link Pose2d}'s {@link Pose2d#coord}; the absolute {@link Angle}
+     * @return The {@link Angle} to another {@link FieldCoordinate} from this
+     *         {@link Pose2d}'s {@link Pose2d#coord}; the absolute {@link Angle}
      */
     public Angle angleTo(FieldCoordinate otherCoord)
     {
