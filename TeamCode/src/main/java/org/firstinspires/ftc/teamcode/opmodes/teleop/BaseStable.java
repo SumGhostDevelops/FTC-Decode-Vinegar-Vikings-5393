@@ -259,8 +259,8 @@ public abstract class BaseStable extends CommandOpMode
     private void bindIntakeAndTransferLogic(Trigger active, GamepadEx driver, GamepadEx coDriver, Subsystems s)
     {
         // --- Triggers ---
-        Trigger intakeBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.25);
-        Trigger shootBtn  = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.25);
+        Trigger intakeBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1);
+        Trigger shootBtn  = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1);
         Trigger reverseBtn = new Trigger(() -> driver.getButton(GamepadKeys.Button.DPAD_LEFT));
 
         Trigger systemsReady = new Trigger(s.turret::isAtTarget).and(new Trigger(s.outtake::isStable));
