@@ -36,7 +36,8 @@ public class Odometry extends SubsystemBase
      * The field-absolute heading that the driver considers "forward" for field-centric driving.
      */
     private FieldHeading driverForward;
-    
+    private Pose2d cachedPose;
+
     private boolean referencePoseWasSet = false;
     private Pose2D referencePose;
 
@@ -50,18 +51,6 @@ public class Odometry extends SubsystemBase
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
 
-        /*
-        long startTime = System.currentTimeMillis();
-        while (this.pinpoint.getDeviceStatus() != Pinpoint.DeviceStatus.READY
-                && (System.currentTimeMillis() - startTime) < 1000)
-        {
-            this.pinpoint.update();
-        }
-
-        this.pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
-        this.pinpoint.update();
-
-         */
         this.referencePose = referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D();
 
         if (!referencePoseWasSet && this.pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY)
@@ -71,6 +60,7 @@ public class Odometry extends SubsystemBase
             referencePoseWasSet = true;
         }
 
+        this.cachedPose = referencePose;
         this.driverForward = referencePose.heading;
     }
 
@@ -79,7 +69,7 @@ public class Odometry extends SubsystemBase
      */
     public Angle getIMUYaw()
     {
-        return getPose().heading.toSystem(CoordinateSystem.DECODE_FTC).angle;
+        return cachedPose.heading.toSystem(CoordinateSystem.DECODE_FTC).angle;
     }
 
     /**
@@ -87,7 +77,7 @@ public class Odometry extends SubsystemBase
      */
     public FieldHeading getFieldHeading()
     {
-        return getPose().heading;
+        return cachedPose.heading;
     }
 
     /**
@@ -106,11 +96,7 @@ public class Odometry extends SubsystemBase
      */
     public FieldCoordinate getFieldCoord()
     {
-        return new FieldCoordinate(
-                new Distance(pinpoint.getPosX(dUnit), dUnit),
-                new Distance(pinpoint.getPosY(dUnit), dUnit),
-                CoordinateSystem.DECODE_FTC
-        );
+        return cachedPose.coord;
     }
 
     /**
@@ -118,7 +104,7 @@ public class Odometry extends SubsystemBase
      */
     public Pose2d getPose()
     {
-        return Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
+        return cachedPose;
     }
 
     /**
@@ -215,6 +201,7 @@ public class Odometry extends SubsystemBase
         }
 
         pinpoint.update();
+        cachedPose = Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
     }
 
     public void close()

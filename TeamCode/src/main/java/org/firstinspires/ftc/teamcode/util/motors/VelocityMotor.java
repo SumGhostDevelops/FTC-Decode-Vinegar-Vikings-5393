@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.motors.modern;
+package org.firstinspires.ftc.teamcode.util.motors;
 
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.controller.BangBangController;
 import org.firstinspires.ftc.teamcode.util.controller.TakeBackHalfController;
 
@@ -121,6 +121,18 @@ public class VelocityMotor extends PowerMotor
      */
     public VelocityMotor setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior)
     {
+        return this;
+    }
+
+    /**
+     * @param volts The desired voltage compensation value.
+     * @return
+     */
+    @Override
+    public VelocityMotor setVoltageCompensation(double volts)
+    {
+        super.setVoltageCompensation(volts);
+
         return this;
     }
 

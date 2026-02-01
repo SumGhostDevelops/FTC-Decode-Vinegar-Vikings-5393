@@ -110,7 +110,7 @@ public class OuttakeCommands
         @Override
         public void execute()
         {
-            outtake.setTargetRPMFromDistance(distance.get());
+            outtake.setTargetRPM(distance.get());
         }
     }
 }

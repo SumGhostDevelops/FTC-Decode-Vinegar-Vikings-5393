@@ -4,7 +4,6 @@ import com.bylazar.field.FieldManager;
 import com.bylazar.field.PanelsField;
 import com.bylazar.field.Style;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
@@ -190,7 +189,7 @@ public class FieldDrawing
      * Sends the current packet to Panels Dashboard.
      * Call this after drawing all elements for the current frame.
      */
-    public static void sendPacket()
+    public static void update()
     {
         panelsField.update();
     }

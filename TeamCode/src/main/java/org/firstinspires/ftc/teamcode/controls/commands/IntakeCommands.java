@@ -1,46 +1,17 @@
 package org.firstinspires.ftc.teamcode.controls.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
-import com.seattlesolvers.solverslib.util.Timing.Timer;
 
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-
-import java.util.concurrent.TimeUnit;
-import java.util.function.DoubleSupplier;
 
 public class IntakeCommands
 {
     public static class In extends CommandBase
     {
         protected final Intake intake;
-        private final DoubleSupplier RPM;
+        private final double power;
 
-        public In(org.firstinspires.ftc.teamcode.subsystems.Intake intake, DoubleSupplier RPM)
-        {
-            this.intake = intake;
-            this.RPM = RPM;
-            addRequirements(intake);
-        }
-
-        @Override
-        public void execute()
-        {
-            intake.in(RPM.getAsDouble());
-        }
-
-        @Override
-        public void end(boolean interrupted)
-        {
-            intake.stop();
-        }
-    }
-
-    public static class Out extends CommandBase
-    {
-        private final Intake intake;
-        private final DoubleSupplier power;
-
-        public Out(org.firstinspires.ftc.teamcode.subsystems.Intake intake, DoubleSupplier power)
+        public In(Intake intake, double power)
         {
             this.intake = intake;
             this.power = power;
@@ -50,7 +21,7 @@ public class IntakeCommands
         @Override
         public void execute()
         {
-            intake.out(power.getAsDouble());
+            intake.intake(power);
         }
 
         @Override
@@ -60,41 +31,28 @@ public class IntakeCommands
         }
     }
 
-    public static class TransferPreventForDuration extends CommandBase
+    public static class Reverse extends CommandBase
     {
         private final Intake intake;
         private final double power;
-        private final Timer timer;
 
-        public TransferPreventForDuration(Intake intake, double power, double durationMs)
+        public Reverse(Intake intake, double power)
         {
             this.intake = intake;
             this.power = power;
-            timer = new Timer((long) durationMs, TimeUnit.MILLISECONDS);
             addRequirements(intake);
         }
 
         @Override
         public void execute()
         {
-            if (!timer.isTimerOn())
-            {
-                timer.start();
-            }
-
-            intake.out(power);
-        }
-
-        @Override
-        public boolean isFinished()
-        {
-            return timer.done();
+            intake.reverse(power);
         }
 
         @Override
         public void end(boolean interrupted)
         {
-            if (!interrupted) intake.stop();
+            intake.stop();
         }
     }
 }

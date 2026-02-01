@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
-import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.util.math.BetterInterpLUT;
+import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
-import org.firstinspires.ftc.teamcode.util.motors.MotorXP;
+import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
 public class Outtake extends SubsystemBase {
 
@@ -18,23 +18,45 @@ public class Outtake extends SubsystemBase {
         OFF,
     }
 
-    private final MotorXP motor;
+    private final VelocityMotorGroup motor;
     private State state = State.OFF;
 
     private double targetRPM = RobotConstants.Outtake.BASE_RPM;
     private double setRPM = 0;
 
-    private Distance lastDistance = new Distance(0, DistanceUnit.INCH);
+    private final static Distance epsilon = new Distance(1, DistanceUnit.INCH);
+    private Distance lastDistance = Distance.ZERO;
 
     // Tolerance to avoid tiny floating-point updates (adjust as needed)
     private static final double RPM_EPS = 1.0;
 
+    // For reducing the RPM while moving
     private boolean rpmRatioEnabled = false;
     private double rpmRatio = RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
 
-    public Outtake(MotorXP motor)
+    // If the RPM should be adjusted using Outtake.setTargetRPM(Distance)
+    private boolean adjustWithDistance = RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
+
+    /**
+     * Inches -> RPM
+     */
+    private final BetterInterpLUT rpmLUT;
+
+    public Outtake(VelocityMotorGroup motor)
     {
         this.motor = motor;
+
+        // Inches -> RPM
+        rpmLUT = BetterInterpLUT.builder()
+                .add(0, 4100)
+                .add(50.32, 4100)
+                .add(59.63, 4300)
+                .add(70.25, 4400)
+                .add(86.79, 4800)
+                .add(97.81, 5000)
+                .add(108.49, 5400)
+                .add(Math.hypot(144, 144), 5400)
+                .build();
     }
 
     public void on()
@@ -55,8 +77,7 @@ public class Outtake extends SubsystemBase {
         double desired = targetRPM;
         if (Math.abs(desired - setRPM) > RPM_EPS || force)
         {
-            motor.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setRPM(desired);
+            motor.setTargetRPM(desired);
             setRPM = desired;
         }
     }
@@ -81,15 +102,19 @@ public class Outtake extends SubsystemBase {
         double desired = targetRPM / 2.0;
         if (Math.abs(desired - setRPM) > RPM_EPS || force)
         {
-            motor.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setRPM(desired);
+            motor.setTargetRPM(desired);
             setRPM = desired;
         }
     }
 
     public void off()
     {
-        if (state == State.OFF)
+        off(false);
+    }
+
+    public void off(boolean force)
+    {
+        if (state == State.OFF & !force)
         {
             return;
         }
@@ -98,6 +123,32 @@ public class Outtake extends SubsystemBase {
         motor.stopMotor();
 
         setRPM = 0;
+    }
+
+    public void setState(State state)
+    {
+        setState(state, false);
+    }
+
+    /**
+     *
+     * @param state
+     * @param force If this state change should be forcibly applied, even if it is the same as the current state
+     */
+    public void setState(State state, boolean force)
+    {
+        switch (state)
+        {
+            case ON:
+                on(force);
+                break;
+            case IDLE:
+                idle(force);
+                break;
+            case OFF:
+                off();
+                break;
+        }
     }
 
     public void setTargetRPM(double rpm)
@@ -132,20 +183,17 @@ public class Outtake extends SubsystemBase {
 
         if (Math.abs(desired - setRPM) > RPM_EPS)
         {
-            motor.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setRPM(desired);
+            motor.setTargetRPM(desired);
             setRPM = desired;
         }
     }
 
-    public void setTargetRPMFromDistance(Distance dist)
+    public void setTargetRPM(Distance dist)
     {
-        if (!RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT)
+        if (!adjustWithDistance)
         {
             return;
         }
-
-        Distance epsilon = new Distance(1, DistanceUnit.INCH);
 
         if (Math.abs(lastDistance.minus(dist).toUnit(epsilon.unit).magnitude) < epsilon.magnitude)
         {
@@ -154,23 +202,7 @@ public class Outtake extends SubsystemBase {
 
         lastDistance = dist;
 
-        // regression is in inches
-        setTargetRPM(MathUtil.Outtake.rpmLUT(dist));
-    }
-
-    public void enableRPMRatio()
-    {
-        rpmRatioEnabled = true;
-    }
-
-    public void disableRPMRatio()
-    {
-        rpmRatioEnabled = false;
-    }
-
-    public boolean getRPMRatio()
-    {
-        return rpmRatioEnabled;
+        setTargetRPM(rpmLUT.get(lastDistance.getInch()));
     }
 
     public double getTargetRPM()
@@ -191,9 +223,9 @@ public class Outtake extends SubsystemBase {
     /**
      * @return If the outtake is ready for balls to be transferred and shot out
      */
-    public boolean isReady()
+    public boolean isStable()
     {
-        return motor.isStable() && state.equals(State.ON);
+        return state == State.ON && motor.atSetPoint();
     }
 
     public State getState()
@@ -204,6 +236,8 @@ public class Outtake extends SubsystemBase {
     @Override
     public void periodic()
     {
-        motor.updateAcceleration();
+        motor.update();
     }
+
+
 }
