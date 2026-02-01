@@ -9,10 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
-
+import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
 
 @Autonomous(name = "FarRedAuto", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
-public class Red extends Base {
+public class Red extends AutoBase
+{
 
     private Paths paths;
     private Timer timer, opModeTimer;
@@ -23,18 +24,18 @@ public class Red extends Base {
     private AutoStrat autoStrat = AutoStrat.REGULAR;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() throws InterruptedException
+    {
 
         team = Team.RED;
-        super.runOpMode();
 
-
-        if (opModeIsActive() && !isStopRequested()) {
+        if (opModeIsActive() && !isStopRequested())
+        {
             opModeTimer.resetTimer();
-            //  follower.followPath(paths.ToShoot);
+            // follower.followPath(paths.ToShoot);
 
-
-            while (opModeIsActive() && !isStopRequested()) {
+            while (opModeIsActive() && !isStopRequested())
+            {
                 handlePathing();
                 follower.update();
 
@@ -47,36 +48,38 @@ public class Red extends Base {
 
     }
 
-
-    public void initAuto() {
+    public void initAuto()
+    {
         follower = PedroConstants.createFollower(hardwareMap);
         paths = new Paths(follower);
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-        //  setPathState(Paths.PathState.ToShoot);
+        // setPathState(Paths.PathState.ToShoot);
 
     }
 
-    public void setPathState(Paths.PathState pathState) {
+    public void setPathState(Paths.PathState pathState)
+    {
         currentPathState = pathState;
         timer.resetTimer();
     }
 
-    private void handlePathing() {
+    private void handlePathing()
+    {
 
     }
 
-    public static class Paths {
+    public static class Paths
+    {
 
-
-        public enum PathState {
-
+        public enum PathState
+        {
 
         }
 
-        public Paths(Follower follower) {
-
+        public Paths(Follower follower)
+        {
 
         }
 
