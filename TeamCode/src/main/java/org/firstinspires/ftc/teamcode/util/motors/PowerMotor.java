@@ -241,7 +241,7 @@ public class PowerMotor
     {
         if (stopped) return;
 
-        motorEx.stopMotor();
+        motorEx.set(0);
         stopped = true;
     }
 
