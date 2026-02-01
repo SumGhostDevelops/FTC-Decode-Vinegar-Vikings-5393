@@ -163,7 +163,7 @@ public class RobotConstants
         public static double ROTATION_COMPENSATION_FF = 0.00072; // Feedforward gain: power per deg/s of robot rotation
 
         @Sorter(sort = 12)
-        public static double SAFETY_MARGIN_DEGREES = 10.0;
+        public static Angle SAFETY_MARGIN = new Angle(10, AngleUnit.DEGREES);
     }
 
     @Configurable

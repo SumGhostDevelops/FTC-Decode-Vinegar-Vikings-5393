@@ -247,7 +247,7 @@ public class Turret extends SubsystemBase
         UnnormalizedAngle[] limits = RobotConstants.Turret.TURN_LIMITS;
         double minDegrees = limits[0].getDegrees();
         double maxDegrees = limits[1].getDegrees();
-        double safetyMargin = RobotConstants.Turret.SAFETY_MARGIN_DEGREES;
+        double safetyMargin = RobotConstants.Turret.SAFETY_MARGIN.getDegrees();
 
         // If we are significantly outside the limits, stop the motor immediately to
         // prevent damage
