@@ -9,7 +9,6 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.util.Timing;
 import com.seattlesolvers.solverslib.util.Timing.Timer;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.controls.commands.DriveCommands;
@@ -24,11 +23,12 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
-import org.firstinspires.ftc.teamcode.util.dashboard.TurretGraph;
+import org.firstinspires.ftc.teamcode.util.dashboard.Graph;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -137,7 +137,16 @@ public abstract class BaseStable extends CommandOpMode
     protected void update()
     {
         displayTelemetry();
-        TurretGraph.update(robot.subsystems.turret);
+
+        if (RobotConstants.Telemetry.ENABLE_GRAPH_OUTPUT)
+        {
+            Graph.put("Turret (Pos)", robot.subsystems.turret.getRelativeUnnormalizedAngle().getDegrees());
+            Graph.put("Turret (Target Pos)", robot.subsystems.turret.getTargetAngleDegrees());
+            Graph.put("Outtake (RPM)", robot.subsystems.outtake.getRPM());
+            Graph.put("Outtake (RPM Acceleration)", robot.subsystems.outtake.getRPMAcceleration());
+            Graph.put("Outtake (Target RPM)", robot.subsystems.outtake.getTargetRPM());
+            Graph.update();
+        }
 
         if (dashboardTimer.milliseconds() > 50)
         {
@@ -154,8 +163,6 @@ public abstract class BaseStable extends CommandOpMode
                 );
                 FieldDrawing.sendPacket();
             }
-
-            //TurretGraph.update(robot.subsystems.turret);
         }
     }
 
