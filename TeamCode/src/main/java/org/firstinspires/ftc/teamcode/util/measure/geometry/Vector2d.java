@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.util.measure.geometry;
 
 import static org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem.calculateBasis;
 
+import android.view.MotionEvent;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
@@ -14,17 +16,22 @@ public class Vector2d
     public final Distance y;
     public final CoordinateSystem coordSys;
     public final DistanceUnit distUnit;
-    public final AngleUnit angUnit = AngleUnit.DEGREES;
+    public final AngleUnit angUnit;
 
-    public Vector2d(Distance x, Distance y, CoordinateSystem coordSys)
+    public Vector2d(Distance x, Distance y, CoordinateSystem coordSys, AngleUnit angUnit)
     {
         this.coordSys = coordSys;
         this.x = x;
         this.y = y.toUnit(x.unit);
         this.distUnit = x.unit;
+        this.angUnit = angUnit;
     }
 
-    // ... (Keep standard Getters: getLength, getDirection) ...
+    public Vector2d(Distance x, Distance y, CoordinateSystem coordSys)
+    {
+        this(x, y, coordSys, AngleUnit.DEGREES);
+    }
+
     public Distance getLength()
     {
         return new Distance(Math.hypot(x.magnitude, y.magnitude), x.unit);
@@ -32,8 +39,7 @@ public class Vector2d
 
     public Angle getDirection()
     {
-        // Math.atan2 returns radians, so we must use AngleUnit.RADIANS here
-        return new Angle(Math.atan2(y.magnitude, x.magnitude), AngleUnit.RADIANS);
+        return new Angle(Math.atan2(y.magnitude, x.magnitude), AngleUnit.RADIANS).toUnit(angUnit);
     }
 
     public Vector2d toDistanceUnit(DistanceUnit distanceUnit)
@@ -75,6 +81,16 @@ public class Vector2d
                 new Distance(newYMag, x.unit), // Use x.unit to preserve original unit
                 targetSys
         );
+    }
+
+    public Vector2d toAngleUnit(AngleUnit targetUnit)
+    {
+        if (this.angUnit == targetUnit)
+        {
+            return this;
+        }
+
+        return new Vector2d(x.toUnit(distUnit), y.toUnit(distUnit), coordSys, targetUnit);
     }
 
     // Small optimization: check for empty addition
