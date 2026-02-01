@@ -144,7 +144,7 @@ public class RobotConstants {
         @Sorter(sort = 10)
         public static boolean ROTATION_COMPENSATION_ENABLED = true;
         @Sorter(sort = 11)
-        public static double ROTATION_COMPENSATION_FF = 0.005; // Feedforward gain: power per deg/s of robot rotation
+        public static double ROTATION_COMPENSATION_FF = 0.00072; // Feedforward gain: power per deg/s of robot rotation
     }
 
     @Configurable
