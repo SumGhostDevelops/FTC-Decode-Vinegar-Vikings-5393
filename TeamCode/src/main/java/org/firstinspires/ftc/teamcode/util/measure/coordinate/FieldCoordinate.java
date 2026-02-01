@@ -13,7 +13,9 @@ public class FieldCoordinate extends Coordinate
     public final CoordinateSystem coordSys;
 
     /**
-     * RIGHT_HAND sets the red alliance loading zone to (0, 0). FTC_STD (STANDARD) sets the center of the field to (0, 0). Both coordinate systems are audience down/goals up.
+     * RIGHT_HAND sets the red alliance loading zone to (0, 0). FTC_STD (STANDARD)
+     * sets the center of the field to (0, 0). Both coordinate systems are audience
+     * down/goals up.
      */
 
     public FieldCoordinate(Distance x, Distance y)
@@ -39,22 +41,26 @@ public class FieldCoordinate extends Coordinate
 
     /**
      * @param unit
-     * @return The transformed {@link FieldCoordinate} to the specified {@link DistanceUnit}
+     * @return The transformed {@link FieldCoordinate} to the specified
+     *         {@link DistanceUnit}
      */
     public FieldCoordinate toDistanceUnit(DistanceUnit unit)
     {
-        if (this.isDistanceUnit(unit)) return this;
+        if (this.isDistanceUnit(unit))
+            return this;
 
         return new FieldCoordinate(x.toUnit(unit), y.toUnit(unit), coordSys);
     }
 
     /**
      * @param targetSys
-     * @return The transformed {@link FieldCoordinate} to the specified {@link CoordinateSystem}
+     * @return The transformed {@link FieldCoordinate} to the specified
+     *         {@link CoordinateSystem}
      */
     public FieldCoordinate toCoordinateSystem(CoordinateSystem targetSys)
     {
-        if (this.coordSys == targetSys) return this;
+        if (this.coordSys == targetSys)
+            return this;
 
         // 1. Convert THIS -> Universal
         Coordinate universalPoint = this.coordSys.toUniversal(this.x, this.y);
@@ -78,7 +84,9 @@ public class FieldCoordinate extends Coordinate
     }
 
     /**
-     * Calculates the {@link Distance} to the other {@link FieldCoordinate}, with consideration to {@link DistanceUnit} and/or {@link CoordinateSystem} mismatches.
+     * Calculates the {@link Distance} to the other {@link FieldCoordinate}, with
+     * consideration to {@link DistanceUnit} and/or {@link CoordinateSystem}
+     * mismatches.
      *
      * @param otherCoord
      * @return The {@link Distance} to the other {@link FieldCoordinate}
@@ -90,7 +98,9 @@ public class FieldCoordinate extends Coordinate
     }
 
     /**
-     * Calculates the {@link Angle} to the other {@link FieldCoordinate}, with consideration to {@link DistanceUnit} and/or {@link CoordinateSystem} mismatches.
+     * Calculates the {@link Angle} to the other {@link FieldCoordinate}, with
+     * consideration to {@link DistanceUnit} and/or {@link CoordinateSystem}
+     * mismatches.
      *
      * @param otherCoord
      * @return The {@link Angle} to the other {@link FieldCoordinate}
@@ -109,8 +119,10 @@ public class FieldCoordinate extends Coordinate
     @Override
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (!(obj instanceof FieldCoordinate)) return false;
+        if (this == obj)
+            return true;
+        if (!(obj instanceof FieldCoordinate))
+            return false;
         FieldCoordinate other = (FieldCoordinate) obj;
         // Convert both to universal (FTC standard)
         FieldCoordinate thisUniv = this.toCoordinateSystem(CoordinateSystem.DECODE_FTC);

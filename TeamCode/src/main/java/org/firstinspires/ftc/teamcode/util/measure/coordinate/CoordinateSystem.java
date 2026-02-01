@@ -24,6 +24,7 @@ public enum CoordinateSystem
     // Cache basis vectors to avoid switch statements at runtime
     private final double[] xBasis;
     private final double[] yBasis;
+
     CoordinateSystem(Direction positiveX, Direction positiveY, Direction positiveZ, Coordinate center)
     {
         this.positiveX = positiveX;
@@ -41,23 +42,30 @@ public enum CoordinateSystem
         switch (dir)
         {
             case AUDIENCE:
-                return new double[]{1.0, 0.0};
+                return new double[]
+                { 1.0, 0.0 };
             case BACKSTAGE:
-                return new double[]{-1.0, 0.0};
+                return new double[]
+                { -1.0, 0.0 };
             case BLUE:
-                return new double[]{0.0, 1.0};
+                return new double[]
+                { 0.0, 1.0 };
             case RED:
-                return new double[]{0.0, -1.0};
+                return new double[]
+                { 0.0, -1.0 };
             default:
-                return new double[]{0.0, 0.0}; // Default identity
+                return new double[]
+                { 0.0, 0.0 }; // Default identity
         }
     }
 
     public Coordinate toUniversal(Distance localX, Distance localY)
     {
-        if (this == GENERIC) return new Coordinate(localX, localY);
+        if (this == GENERIC)
+            return new Coordinate(localX, localY);
 
-        // Optimization: Use raw double math to avoid creating 3-4 intermediate Distance objects
+        // Optimization: Use raw double math to avoid creating 3-4 intermediate Distance
+        // objects
         // We normalize to INCHES for the math, then wrap at the end.
         double xInch = localX.getDistance(DistanceUnit.INCH);
         double yInch = localY.getDistance(DistanceUnit.INCH);
@@ -74,13 +82,13 @@ public enum CoordinateSystem
 
         return new Coordinate(
                 new Distance(globalXVal, DistanceUnit.INCH),
-                new Distance(globalYVal, DistanceUnit.INCH)
-        );
+                new Distance(globalYVal, DistanceUnit.INCH));
     }
 
     public Coordinate fromUniversal(Distance globalX, Distance globalY)
     {
-        if (this == GENERIC) return new Coordinate(globalX, globalY);
+        if (this == GENERIC)
+            return new Coordinate(globalX, globalY);
 
         double gX = globalX.getDistance(DistanceUnit.INCH);
         double gY = globalY.getDistance(DistanceUnit.INCH);
@@ -94,8 +102,7 @@ public enum CoordinateSystem
         // Add Center
         return new Coordinate(
                 new Distance(localOffX + centerX, DistanceUnit.INCH),
-                new Distance(localOffY + centerY, DistanceUnit.INCH)
-        );
+                new Distance(localOffY + centerY, DistanceUnit.INCH));
     }
 
     public Coordinate fromUniversal(Coordinate globalCoordinate)
@@ -106,9 +113,13 @@ public enum CoordinateSystem
     public double getRotationOffsetRadians()
     {
         // atan2(y component of X-basis, x component of X-basis)
-        // This tells us the angle of this system's X-axis relative to the Universal X-axis
+        // This tells us the angle of this system's X-axis relative to the Universal
+        // X-axis
         return Math.atan2(xBasis[1], xBasis[0]);
     }
 
-    public enum Direction {RED, BLUE, AUDIENCE, BACKSTAGE, UP, DOWN}
+    public enum Direction
+    {
+        RED, BLUE, AUDIENCE, BACKSTAGE, UP, DOWN
+    }
 }

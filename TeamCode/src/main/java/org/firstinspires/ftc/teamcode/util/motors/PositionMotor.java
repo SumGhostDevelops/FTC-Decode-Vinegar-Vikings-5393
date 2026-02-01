@@ -26,7 +26,8 @@ import java.util.function.DoubleSupplier;
  * @see #setTargetDistance(double)
  * @see #setZeroPowerBehavior(Motor.ZeroPowerBehavior)
  */
-public class PositionMotor extends PowerMotor {
+public class PositionMotor extends PowerMotor
+{
     // The type of position controller being used (e.g., PIDF, SquIDF)
     private PositionController controllerType = PositionController.PIDF;
 
@@ -50,10 +51,13 @@ public class PositionMotor extends PowerMotor {
      * VoltageSensor.
      * Sets the default controller type to PIDF and the motor run mode to RawPower.
      *
-     * @param motorEx The MotorEx instance to be controlled.
-     * @param battery The VoltageSensor for monitoring battery voltage.
+     * @param motorEx
+     *            The MotorEx instance to be controlled.
+     * @param battery
+     *            The VoltageSensor for monitoring battery voltage.
      */
-    public PositionMotor(MotorEx motorEx, VoltageSensor battery) {
+    public PositionMotor(MotorEx motorEx, VoltageSensor battery)
+    {
         super(motorEx, battery);
 
         setControllerType(PositionController.PIDF);
@@ -63,10 +67,12 @@ public class PositionMotor extends PowerMotor {
     /**
      * Sets the power used when turning (only for SquIDF controller).
      *
-     * @param power The desired power level (0 to 1).
+     * @param power
+     *            The desired power level (0 to 1).
      * @return The current PositionMotor instance for method chaining.
      */
-    public PositionMotor usePower(double power) {
+    public PositionMotor usePower(double power)
+    {
         this.power = MathUtil.clamp(power, 0, 1);
 
         return this;
@@ -75,10 +81,12 @@ public class PositionMotor extends PowerMotor {
     /**
      * Sets the proportional coefficient (Kp) for the position controller.
      *
-     * @param kp The proportional gain.
+     * @param kp
+     *            The proportional gain.
      * @return The current PositionMotor instance for method chaining.
      */
-    public PositionMotor setPositionCoefficient(double kp) {
+    public PositionMotor setPositionCoefficient(double kp)
+    {
         coefficients.p = kp;
         return setPIDF(coefficients);
     }
@@ -86,10 +94,12 @@ public class PositionMotor extends PowerMotor {
     /**
      * Sets the PIDF coefficients for the position controller.
      *
-     * @param coefficients The PIDFCoefficients object containing the PIDF values.
+     * @param coefficients
+     *            The PIDFCoefficients object containing the PIDF values.
      * @return The current PositionMotor instance for method chaining.
      */
-    public PositionMotor setPIDF(PIDFCoefficients coefficients) {
+    public PositionMotor setPIDF(PIDFCoefficients coefficients)
+    {
         this.coefficients = coefficients;
         controller.setCoefficients(coefficients);
 
@@ -100,51 +110,62 @@ public class PositionMotor extends PowerMotor {
      * Sets the PIDF coefficients for the position controller.
      * Note: The F term is not used in the SquIDF controller.
      *
-     * @param kp Proportional gain.
-     * @param ki Integral gain.
-     * @param kd Derivative gain.
-     * @param kf Feedforward gain.
+     * @param kp
+     *            Proportional gain.
+     * @param ki
+     *            Integral gain.
+     * @param kd
+     *            Derivative gain.
+     * @param kf
+     *            Feedforward gain.
      * @return The current PositionMotor instance for method chaining.
      */
-    public PositionMotor setPIDF(double kp, double ki, double kd, double kf) {
+    public PositionMotor setPIDF(double kp, double ki, double kd, double kf)
+    {
         return setPIDF(new PIDFCoefficients(kp, ki, kd, kf));
     }
 
     /**
      * Sets the position tolerance for the position controller.
      *
-     * @param tolerance The tolerance for position control.
+     * @param tolerance
+     *            The tolerance for position control.
      * @return The current PositionMotor instance for method chaining.
      */
-    public PositionMotor setPositionTolerance(double tolerance) {
+    public PositionMotor setPositionTolerance(double tolerance)
+    {
         controller.setTolerance(tolerance);
 
         return this;
     }
 
     @Override
-    public PositionMotor setVoltageCompensation(double volts) {
+    public PositionMotor setVoltageCompensation(double volts)
+    {
         super.setVoltageCompensation(volts);
 
         return this;
     }
 
     @Override
-    public PositionMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio) {
+    public PositionMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio)
+    {
         super.setDistancePerPulse(inputGearRatio, outputGearRatio);
 
         return this;
     }
 
     @Override
-    public PositionMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio, AngleUnit angleUnit) {
+    public PositionMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio, AngleUnit angleUnit)
+    {
         super.setDistancePerPulse(inputGearRatio, outputGearRatio, angleUnit);
 
         return this;
     }
 
     @Override
-    public PositionMotor setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior) {
+    public PositionMotor setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior)
+    {
         super.setZeroPowerBehavior(behavior);
 
         return this;
@@ -155,9 +176,11 @@ public class PositionMotor extends PowerMotor {
      * Calculates the output power required to reach the target distance and applies
      * it to the motor.
      *
-     * @param targetDistance The desired target distance.
+     * @param targetDistance
+     *            The desired target distance.
      */
-    public void setTargetDistance(double targetDistance) {
+    public void setTargetDistance(double targetDistance)
+    {
         stopped = false;
 
         this.targetDistance = targetDistance;
@@ -171,10 +194,12 @@ public class PositionMotor extends PowerMotor {
      * This is useful for velocity compensation (e.g., turret countering robot
      * rotation).
      *
-     * @param supplier A supplier that returns the feedforward power to add
+     * @param supplier
+     *            A supplier that returns the feedforward power to add
      * @return The current PositionMotor instance for method chaining.
      */
-    public PositionMotor setFeedforwardSupplier(DoubleSupplier supplier) {
+    public PositionMotor setFeedforwardSupplier(DoubleSupplier supplier)
+    {
         this.feedforwardSupplier = supplier != null ? supplier : () -> 0.0;
         return this;
     }
@@ -184,7 +209,8 @@ public class PositionMotor extends PowerMotor {
      *
      * @return True if the motor is at the set point, false otherwise.
      */
-    public boolean atSetPoint() {
+    public boolean atSetPoint()
+    {
         return controller.atSetPoint();
     }
 
@@ -193,20 +219,24 @@ public class PositionMotor extends PowerMotor {
      *
      * @return The current PositionController type.
      */
-    public PositionController getControllerType() {
+    public PositionController getControllerType()
+    {
         return controllerType;
     }
 
     /**
      * Sets the type of position controller to be used (e.g., PIDF, SquIDF).
      *
-     * @param positionController The desired position controller type.
+     * @param positionController
+     *            The desired position controller type.
      * @return The current PositionMotor instance for method chaining.
      */
-    public PositionMotor setControllerType(PositionController positionController) {
+    public PositionMotor setControllerType(PositionController positionController)
+    {
         this.controllerType = positionController;
 
-        switch (positionController) {
+        switch (positionController)
+        {
             case PIDF:
                 controller = new PIDFController(coefficients);
                 break;
@@ -223,10 +253,12 @@ public class PositionMotor extends PowerMotor {
      * position.
      */
     @Override
-    public void update() {
+    public void update()
+    {
         super.update(); // Update sensors
 
-        if (atSetPoint()) {
+        if (atSetPoint())
+        {
             setPower(0);
             return;
         }
@@ -246,7 +278,8 @@ public class PositionMotor extends PowerMotor {
     /**
      * Enum representing the types of position controllers available.
      */
-    public enum PositionController {
+    public enum PositionController
+    {
         PIDF, SquIDF
     }
 }

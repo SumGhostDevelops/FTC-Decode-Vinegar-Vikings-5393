@@ -15,7 +15,6 @@ public class Drive extends SubsystemBase
     private double speed = RobotConstants.Drive.Speed.DEFAULT;
     private DriveMode currentMode = RobotConstants.Drive.DRIVE_MODE;
 
-
     public Drive(PowerMotor frontLeft, PowerMotor frontRight, PowerMotor backLeft, PowerMotor backRight)
     {
         this.frontLeft = frontLeft;
@@ -44,8 +43,7 @@ public class Drive extends SubsystemBase
         if (change > 0)
         {
             speed = Math.min(speed + change, RobotConstants.Drive.Speed.MAXIMUM);
-        }
-        else
+        } else
         {
             speed = Math.max(speed + change, RobotConstants.Drive.Speed.MINIMUM);
         }
@@ -53,10 +51,16 @@ public class Drive extends SubsystemBase
 
     /**
      * Main drive method.
-     * @param lateral Left/Right strafe (Left stick X)
-     * @param axial Forward/Back (Left stick Y) - Note: Up should be positive in your command
-     * @param yaw Turn (Right stick X)
-     * @param driverHeading The robot's heading relative to the driver's forward
+     * 
+     * @param lateral
+     *            Left/Right strafe (Left stick X)
+     * @param axial
+     *            Forward/Back (Left stick Y) - Note: Up should be positive in your
+     *            command
+     * @param yaw
+     *            Turn (Right stick X)
+     * @param driverHeading
+     *            The robot's heading relative to the driver's forward
      */
     public void drive(double lateral, double axial, double yaw, Angle driverHeading)
     {
@@ -95,8 +99,7 @@ public class Drive extends SubsystemBase
                     // Drive forward in the new direction
                     rotY = magnitude;
                     rotX = 0;
-                }
-                else
+                } else
                 {
                     rotX = 0;
                     rotY = 0;
@@ -133,8 +136,6 @@ public class Drive extends SubsystemBase
 
     public enum DriveMode
     {
-        FIELD_CENTRIC,
-        ROBOT_CENTRIC_HYBRID,
-        RAW_ROBOT_CENTRIC
+        FIELD_CENTRIC, ROBOT_CENTRIC_HYBRID, RAW_ROBOT_CENTRIC
     }
 }

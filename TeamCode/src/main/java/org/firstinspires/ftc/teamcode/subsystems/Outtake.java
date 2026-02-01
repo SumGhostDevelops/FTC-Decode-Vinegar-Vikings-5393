@@ -9,13 +9,12 @@ import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
-public class Outtake extends SubsystemBase {
+public class Outtake extends SubsystemBase
+{
 
     public enum State
     {
-        ON,
-        IDLE,
-        OFF,
+        ON, IDLE, OFF,
     }
 
     private final VelocityMotorGroup motor;
@@ -133,7 +132,9 @@ public class Outtake extends SubsystemBase {
     /**
      *
      * @param state
-     * @param force If this state change should be forcibly applied, even if it is the same as the current state
+     * @param force
+     *            If this state change should be forcibly applied, even if it is the
+     *            same as the current state
      */
     public void setState(State state, boolean force)
     {
@@ -162,10 +163,13 @@ public class Outtake extends SubsystemBase {
             return;
         }
 
-        if (rpmRatioEnabled) targetRPM = newRPM * rpmRatio;
-        else targetRPM = newRPM;
+        if (rpmRatioEnabled)
+            targetRPM = newRPM * rpmRatio;
+        else
+            targetRPM = newRPM;
 
-        // If motor is active, compute desired rpm for current state and update only if needed
+        // If motor is active, compute desired rpm for current state and update only if
+        // needed
         double desired;
         switch (state)
         {
@@ -238,6 +242,5 @@ public class Outtake extends SubsystemBase {
     {
         motor.update();
     }
-
 
 }
