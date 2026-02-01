@@ -277,7 +277,7 @@ public class RobotConstants
                 // Distance from the center to the FORWARD wheel along the Y-axis (LATERAL)
                 // Positive if LEFT of center, Negative if RIGHT of center
                 //not great but good enough
-                public static Distance OFFSET = new Distance(-10, DistanceUnit.MM);
+                public static Distance OFFSET = new Distance(-38, DistanceUnit.MM);
             }
 
             @Configurable
@@ -286,7 +286,7 @@ public class RobotConstants
                 // Distance from the center to the STRAFE wheel along the X-axis (LONGITUDINAL)
                 // Positive if FORWARD of center, Negative if BACKWARD of center
                 //not great but good enough
-                public static Distance OFFSET = new Distance(-4.8, DistanceUnit.INCH);
+                public static Distance OFFSET = new Distance(-5.93, DistanceUnit.INCH);
             }
         }
     }
