@@ -29,11 +29,14 @@ public class Odometry extends SubsystemBase
     private final Pinpoint pinpoint;
     private final Webcam webcam;
 
+    private final boolean setForwardBasedOnTeam = RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM;
+
     private static final AngleUnit aUnit = AngleUnit.DEGREES;
     private static final DistanceUnit dUnit = DistanceUnit.INCH;
 
     /**
-     * The field-absolute heading that the driver considers "forward" for field-centric driving.
+     * The field-absolute heading that the driver considers "forward" for
+     * field-centric driving.
      */
     private FieldHeading driverForward;
     private Pose2d cachedPose;
@@ -81,7 +84,8 @@ public class Odometry extends SubsystemBase
     }
 
     /**
-     * @return A heading where 0 is conceptually "Forward" (aligned with Pedro X-Axis/Blue Alliance)
+     * @return A heading where 0 is conceptually "Forward" (aligned with Pedro
+     *         X-Axis/Blue Alliance)
      */
     public Angle getDriverHeading()
     {
@@ -115,8 +119,7 @@ public class Odometry extends SubsystemBase
         return new Vector2d(
                 new Distance(pinpoint.getVelX(dUnit), dUnit),
                 new Distance(pinpoint.getVelY(dUnit), dUnit),
-                CoordinateSystem.DECODE_FTC
-        );
+                CoordinateSystem.DECODE_FTC);
     }
 
     /**
@@ -129,8 +132,10 @@ public class Odometry extends SubsystemBase
 
     /**
      * Sets the current field-absolute heading as the driver's "forward" direction.
-     * Call this AFTER localization to set which direction the driver considers forward
-     * for field-centric driving, without affecting the absolute heading calibration.
+     * Call this AFTER localization to set which direction the driver considers
+     * forward
+     * for field-centric driving, without affecting the absolute heading
+     * calibration.
      */
     public void setDriverForwardFromCurrent()
     {
@@ -146,6 +151,7 @@ public class Odometry extends SubsystemBase
 
     /**
      * Localizes using an AprilTag
+     * 
      * @return If the localization was successful or not
      */
     public boolean localizeWithAprilTag()
@@ -154,7 +160,8 @@ public class Odometry extends SubsystemBase
         webcam.updateDetections();
 
         Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
-        if (possibleTag.isEmpty()) return false;
+        if (possibleTag.isEmpty())
+            return false;
 
         AprilTagDetection tag = possibleTag.get();
         Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
@@ -172,7 +179,9 @@ public class Odometry extends SubsystemBase
     }
 
     /**
-     * Localizes using an AprilTag, and automatically sets the driver forward direction (if enabled)
+     * Localizes using an AprilTag, and automatically sets the driver forward
+     * direction (if enabled)
+     * 
      * @param team
      * @return If localization was successful or not
      */
@@ -183,7 +192,7 @@ public class Odometry extends SubsystemBase
             return false;
         }
 
-        if (RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM)
+        if (setForwardBasedOnTeam)
         {
             driverForward = team.forwardAngle;
         }

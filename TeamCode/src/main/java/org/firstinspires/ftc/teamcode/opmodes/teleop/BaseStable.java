@@ -38,6 +38,21 @@ public abstract class BaseStable extends CommandOpMode
     protected Team team;
     protected RobotContext robot;
 
+    private final boolean setAutoclear = RobotConstants.Telemetry.SET_AUTOCLEAR;
+    private final boolean setAutoclearLogs = RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS;
+    private final double logAutoclearDelay = RobotConstants.Telemetry.LOG_AUTOCLEAR_DELAY;
+    private final ConstantsPresets.Preset presetOption = RobotConstants.General.PRESET_OPTION;
+    private final boolean enableFieldDrawing = RobotConstants.Telemetry.ENABLE_FIELD_DRAWING;
+    private final boolean enableGraphOutput = RobotConstants.Telemetry.ENABLE_GRAPH_OUTPUT;
+    private final boolean autoAimToGoal = RobotConstants.Turret.AUTO_AIM_TO_GOAL;
+    private final boolean regressionTestingMode = RobotConstants.General.REGRESSION_TESTING_MODE;
+    private final boolean autoDistanceAdjustment = RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
+    private final double intakePower = RobotConstants.Intake.intakePower;
+    private final double transferPower = RobotConstants.Intake.transferPower;
+    private final double outtakePower = RobotConstants.Intake.outtakePower;
+    private final boolean intakeByDefault = RobotConstants.Intake.INTAKE_BY_DEFAULT;
+    private final boolean outtakeOnByDefault = RobotConstants.Outtake.ON_BY_DEFAULT;
+
     // Timers
     private final Timer matchTimer = new Timer(120, TimeUnit.SECONDS);
     private final ElapsedTime logTimer = new ElapsedTime();
@@ -60,7 +75,7 @@ public abstract class BaseStable extends CommandOpMode
         register(s.drive, s.intake, s.transfer, s.turret, s.outtake, s.odometry);
 
         // 3. Set Defaults & Init Commands
-        //s.transfer.setDefaultCommand(new TransferCommands.CloseOnce(s.transfer));
+        // s.transfer.setDefaultCommand(new TransferCommands.CloseOnce(s.transfer));
 
         // Drive Control Suppliers
         DoubleSupplier x = () -> gamepad1.left_stick_x;
@@ -75,7 +90,7 @@ public abstract class BaseStable extends CommandOpMode
 
         // 5. Finalize Telemetry
         telemetry.log().add("Initialized in " + loopStopwatch.deltaTime() + "ms");
-        telemetry.setAutoClear(RobotConstants.Telemetry.SET_AUTOCLEAR);
+        telemetry.setAutoClear(setAutoclear);
         telemetry.addData("Status", "Initialized for " + team);
 
         // Initialize Dashboard tools
@@ -96,8 +111,10 @@ public abstract class BaseStable extends CommandOpMode
 
     private void manageMatchTimer()
     {
-        if (!matchTimer.isTimerOn()) matchTimer.start();
-        if (matchTimer.done()) matchTimer.pause();
+        if (!matchTimer.isTimerOn())
+            matchTimer.start();
+        if (matchTimer.done())
+            matchTimer.pause();
     }
 
     protected void update()
@@ -105,12 +122,14 @@ public abstract class BaseStable extends CommandOpMode
         // Cache the subsystem reference for this loop iteration
         Subsystems s = robot.subsystems;
 
-        // Pre-fetch pose once per loop to avoid re-calculating it for every telemetry line
+        // Pre-fetch pose once per loop to avoid re-calculating it for every telemetry
+        // line
         Pose2d loopPose = s.odometry.getPose();
 
         displayTelemetry(s, loopPose);
 
-        // Throttle dashboard updates to save bandwidth (~20Hz is plenty for visualization)
+        // Throttle dashboard updates to save bandwidth (~20Hz is plenty for
+        // visualization)
         if (dashboardTimer.milliseconds() > 50)
         {
             updateDashboard(s, loopPose);
@@ -128,13 +147,13 @@ public abstract class BaseStable extends CommandOpMode
         telemetry.addData("Loop Time", loopTime + "ms");
         Graph.put("Loop Time (ms)", loopTime);
 
-        if (RobotConstants.Telemetry.SET_AUTOCLEAR_LOGS && logTimer.seconds() > RobotConstants.Telemetry.LOG_AUTOCLEAR_DELAY)
+        if (setAutoclearLogs && logTimer.seconds() > logAutoclearDelay)
         {
             telemetry.log().clear();
             logTimer.reset();
         }
 
-        if (RobotConstants.General.PRESET_OPTION != ConstantsPresets.Preset.TESTING)
+        if (presetOption != ConstantsPresets.Preset.TESTING)
         {
             telemetry.update();
             return;
@@ -169,18 +188,17 @@ public abstract class BaseStable extends CommandOpMode
 
     private void updateDashboard(Subsystems s, Pose2d pose)
     {
-        if (RobotConstants.Telemetry.ENABLE_FIELD_DRAWING)
+        if (enableFieldDrawing)
         {
             FieldDrawing.draw(
                     pose,
                     null,
                     s.turret.getFieldHeading(s.odometry.getFieldHeading()),
-                    robot.team.goal.coord
-            );
+                    robot.team.goal.coord);
             FieldDrawing.update();
         }
 
-        if (RobotConstants.Telemetry.ENABLE_GRAPH_OUTPUT)
+        if (enableGraphOutput)
         {
             Graph.put("Turret Pos", s.turret.getRelativeUnnormalizedAngle().getDegrees());
             Graph.put("Turret Target", s.turret.getTargetAngleDegrees());
@@ -229,11 +247,10 @@ public abstract class BaseStable extends CommandOpMode
         Supplier<Pose2d> turretPose = s.odometry::getPose;
         Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, robot.team.goal.coord, turretPose);
 
-        if (RobotConstants.Turret.AUTO_AIM_TO_GOAL)
+        if (autoAimToGoal)
         {
             opModeActive.whileActiveContinuous(aimCmd);
-        }
-        else
+        } else
         {
             driver.getGamepadButton(GamepadKeys.Button.Y).toggleWhenPressed(aimCmd);
         }
@@ -241,18 +258,17 @@ public abstract class BaseStable extends CommandOpMode
 
     private void bindOuttakeControls(Trigger active, GamepadEx driver, Subsystems s)
     {
-        if (RobotConstants.General.REGRESSION_TESTING_MODE)
+        if (regressionTestingMode)
         {
             driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 25));
             driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -25));
         }
-        if (RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT)
+        if (autoDistanceAdjustment)
         {
             // Update RPM dynamically based on distance to goal
             active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
                     s.outtake,
-                    () -> s.odometry.getPose().distanceTo(team.goal.coord)
-            ));
+                    () -> s.odometry.getPose().distanceTo(team.goal.coord)));
         }
     }
 
@@ -260,39 +276,43 @@ public abstract class BaseStable extends CommandOpMode
     {
         // --- Triggers ---
         Trigger intakeBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1);
-        Trigger shootBtn  = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1);
+        Trigger shootBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1);
         Trigger reverseBtn = new Trigger(() -> driver.getButton(GamepadKeys.Button.DPAD_LEFT));
 
         Trigger systemsReady = new Trigger(s.turret::isAtTarget).and(new Trigger(s.outtake::isStable));
 
         // --- Commands ---
-        Command intakeIn = new IntakeCommands.In(s.intake, RobotConstants.Intake.intakePower);
-        Command intakeScore = new IntakeCommands.In(s.intake, RobotConstants.Intake.transferPower);
-        Command reverseIntake = new IntakeCommands.Reverse(s.intake, RobotConstants.Intake.outtakePower);
+        Command intakeIn = new IntakeCommands.In(s.intake, intakePower);
+        Command intakeScore = new IntakeCommands.In(s.intake, transferPower);
+        Command reverseIntake = new IntakeCommands.Reverse(s.intake, outtakePower);
         Command closeTransfer = new TransferCommands.CloseOnce(s.transfer);
         Command openTransfer = new TransferCommands.OpenOnce(s.transfer);
 
         // --- Logic ---
 
         // 1. Intake Logic: (Auto OR Manual) AND Not Shooting AND Not Reversing
-        Trigger shouldIntake = (RobotConstants.Intake.INTAKE_BY_DEFAULT ? active : intakeBtn)
+        Trigger shouldIntake = (intakeByDefault ? active : intakeBtn)
                 .and(shootBtn.negate())
                 .and(reverseBtn.negate());
 
-        // Use whileActiveContinuous instead of whileActiveOnce to fix the command scheduling bug
-        // whileActiveContinuous ensures the command is properly re-scheduled each time the trigger becomes active
+        // Use whileActiveContinuous instead of whileActiveOnce to fix the command
+        // scheduling bug
+        // whileActiveContinuous ensures the command is properly re-scheduled each time
+        // the trigger becomes active
         shouldIntake.whileActiveContinuous(intakeIn).whenActive(closeTransfer);
         reverseBtn.whileActiveContinuous(reverseIntake);
 
         // 2. Scoring Logic
-        boolean semiAuto = RobotConstants.Intake.INTAKE_BY_DEFAULT || RobotConstants.Outtake.ON_BY_DEFAULT;
+        boolean semiAuto = intakeByDefault || outtakeOnByDefault;
 
-        // "Can Score" = User wants to shoot + Systems are ready ( + Manual intake hold if not semi-auto)
+        // "Can Score" = User wants to shoot + Systems are ready ( + Manual intake hold
+        // if not semi-auto)
         Trigger canScore = semiAuto
                 ? shootBtn.and(systemsReady)
                 : intakeBtn.and(shootBtn).and(systemsReady);
 
-        // "Keep Scoring" = Hysteresis to ensure we finish the shot even if turret jitters slightly
+        // "Keep Scoring" = Hysteresis to ensure we finish the shot even if turret
+        // jitters slightly
         Trigger keepScoring = semiAuto
                 ? shootBtn
                 : intakeBtn.and(shootBtn); // Ideally this might need systemsReady too, but kept close to original logic
@@ -304,7 +324,7 @@ public abstract class BaseStable extends CommandOpMode
         keepScoring.negate().cancelWhenActive(intakeScore).cancelWhenActive(openTransfer);
 
         // 3. Flywheel Logic
-        Trigger flywheelActive = RobotConstants.Outtake.ON_BY_DEFAULT ? active : shootBtn;
+        Trigger flywheelActive = outtakeOnByDefault ? active : shootBtn;
         flywheelActive.whileActiveContinuous(new OuttakeCommands.On(s.outtake, () -> false));
     }
 

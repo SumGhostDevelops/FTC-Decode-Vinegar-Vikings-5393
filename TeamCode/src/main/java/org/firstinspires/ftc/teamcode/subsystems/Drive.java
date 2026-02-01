@@ -12,7 +12,14 @@ public class Drive extends SubsystemBase
 {
     private final PowerMotor frontLeft, frontRight, backLeft, backRight;
 
-    private double speed = RobotConstants.Drive.Speed.DEFAULT;
+    private final double speedDefault = RobotConstants.Drive.Speed.DEFAULT;
+    private final double speedChange = RobotConstants.Drive.Speed.CHANGE;
+    private final double speedMax = RobotConstants.Drive.Speed.MAXIMUM;
+    private final double speedMin = RobotConstants.Drive.Speed.MINIMUM;
+    private final double hybridDeadband = RobotConstants.Drive.HybridMode.DEADBAND;
+    private final double hybridTurnP = RobotConstants.Drive.HybridMode.TURN_P;
+
+    private double speed = speedDefault;
     private DriveMode currentMode = RobotConstants.Drive.DRIVE_MODE;
 
     public Drive(PowerMotor frontLeft, PowerMotor frontRight, PowerMotor backLeft, PowerMotor backRight)
@@ -30,22 +37,22 @@ public class Drive extends SubsystemBase
 
     public void increaseSpeed()
     {
-        changeSpeed(RobotConstants.Drive.Speed.CHANGE);
+        changeSpeed(speedChange);
     }
 
     public void decreaseSpeed()
     {
-        changeSpeed(-RobotConstants.Drive.Speed.CHANGE);
+        changeSpeed(-speedChange);
     }
 
     public void changeSpeed(double change)
     {
         if (change > 0)
         {
-            speed = Math.min(speed + change, RobotConstants.Drive.Speed.MAXIMUM);
+            speed = Math.min(speed + change, speedMax);
         } else
         {
-            speed = Math.max(speed + change, RobotConstants.Drive.Speed.MINIMUM);
+            speed = Math.max(speed + change, speedMin);
         }
     }
 
@@ -84,7 +91,7 @@ public class Drive extends SubsystemBase
 
             case ROBOT_CENTRIC_HYBRID:
                 double magnitude = Math.hypot(axial, lateral);
-                if (magnitude > RobotConstants.Drive.HybridMode.DEADBAND)
+                if (magnitude > hybridDeadband)
                 {
                     // Calculate target heading from joystick
                     double targetHeading = Math.atan2(lateral, axial);
@@ -93,7 +100,7 @@ public class Drive extends SubsystemBase
                     // Auto-turn to face target if not manually turning
                     if (Math.abs(yaw) < 0.05)
                     {
-                        rx = Range.clip(error * RobotConstants.Drive.HybridMode.TURN_P, -1.0, 1.0);
+                        rx = Range.clip(error * hybridTurnP, -1.0, 1.0);
                     }
 
                     // Drive forward in the new direction

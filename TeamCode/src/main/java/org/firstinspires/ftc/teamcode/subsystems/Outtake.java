@@ -20,7 +20,10 @@ public class Outtake extends SubsystemBase
     private final VelocityMotorGroup motor;
     private State state = State.OFF;
 
-    private double targetRPM = RobotConstants.Outtake.BASE_RPM;
+    private final double baseRPM = RobotConstants.Outtake.BASE_RPM;
+    private final double movingRPMRatio = RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
+
+    private double targetRPM = baseRPM;
     private double setRPM = 0;
 
     private final static Distance epsilon = new Distance(1, DistanceUnit.INCH);
@@ -31,7 +34,7 @@ public class Outtake extends SubsystemBase
 
     // For reducing the RPM while moving
     private boolean rpmRatioEnabled = false;
-    private double rpmRatio = RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
+    private double rpmRatio = movingRPMRatio;
 
     // If the RPM should be adjusted using Outtake.setTargetRPM(Distance)
     private boolean adjustWithDistance = RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;

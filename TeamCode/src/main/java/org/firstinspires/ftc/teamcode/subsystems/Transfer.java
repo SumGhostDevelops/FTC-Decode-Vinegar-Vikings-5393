@@ -9,6 +9,9 @@ public class Transfer extends SubsystemBase
 {
     private final ServoEx transfer;
 
+    private final double openAngle = RobotConstants.Transfer.OPEN_ANGLE;
+    private final double closeIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
+
     public Transfer(ServoEx transfer)
     {
         this.transfer = transfer;
@@ -19,7 +22,7 @@ public class Transfer extends SubsystemBase
      */
     public void open()
     {
-        setAngle(RobotConstants.Transfer.OPEN_ANGLE);
+        setAngle(openAngle);
     }
 
     /**
@@ -27,7 +30,7 @@ public class Transfer extends SubsystemBase
      */
     public void close()
     {
-        setAngle(RobotConstants.Transfer.CLOSE_INTAKE_ANGLE);
+        setAngle(closeIntakeAngle);
     }
 
     public void setAngle(double angle)

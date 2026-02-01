@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.definitions.hardware;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.PositionMotor;
 import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
@@ -34,6 +36,31 @@ public class RobotHardware
     public PositionMotor turret;
     public ServoEx transfer;
 
+    private final String pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
+    private final Distance forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
+    private final Distance strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
+    private final String webcamName = RobotConstants.Odometry.Webcam.NAME;
+
+    private final String frontLeftName = RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT;
+    private final String frontRightName = RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT;
+    private final String backLeftName = RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT;
+    private final String backRightName = RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT;
+
+    private final String outtakeLauncherLeftName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
+    private final PIDFCoefficients outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
+    private final int outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
+    private final int outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;
+
+    private final String turretName = RobotConstants.Turret.NAME;
+    private final double turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
+    private final PIDFCoefficients turretPIDF = RobotConstants.Turret.PIDF;
+    private final double turretToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
+
+    private final String transferName = RobotConstants.Transfer.NAME;
+    private final double transferCloseIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
+
+    private final String intakeName = RobotConstants.Intake.NAME;
+
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry)
     {
         try
@@ -41,8 +68,7 @@ public class RobotHardware
             hubs = hardwareMap.getAll(LynxModule.class);
 
             hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: Hubs not found");
         }
@@ -50,8 +76,7 @@ public class RobotHardware
         try
         {
             battery = hardwareMap.voltageSensor.iterator().next();
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: Voltage sensor not found");
         }
@@ -59,33 +84,31 @@ public class RobotHardware
         // Odometry
         try
         {
-            pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.NAME);
+            pinpoint = hardwareMap.get(Pinpoint.class, pinpointName);
 
             // Pinpoint convention: X offset (left=positive), Y offset (forward=positive)
-            // Our RobotConstants convention matches Pinpoint: left=positive, forward=positive
-            DistanceUnit dUnit = RobotConstants.Odometry.Deadwheels.Forward.OFFSET.unit;
+            // Our RobotConstants convention matches Pinpoint: left=positive,
+            // forward=positive
+            DistanceUnit dUnit = forwardWheelOffset.unit;
 
             pinpoint.setOffsets(
-                    RobotConstants.Odometry.Deadwheels.Forward.OFFSET.magnitude,   // Left is positive in both conventions
-                    RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(dUnit).magnitude,    // Forward is positive in both conventions
-                    dUnit
-            );
+                    forwardWheelOffset.magnitude, // Left is positive in both conventions
+                    strafeWheelOffset.toUnit(dUnit).magnitude, // Forward is positive in both conventions
+                    dUnit);
 
             pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
             pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.REVERSED);
 
             pinpoint.recalibrateIMU();
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: goBilda Pinpoint not found");
         }
 
         try
         {
-            webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.Webcam.NAME);
-        }
-        catch (Exception e)
+            webcam = hardwareMap.get(WebcamName.class, webcamName);
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: Webcam not found");
         }
@@ -93,23 +116,22 @@ public class RobotHardware
         // Drive
         try
         {
-            frontLeft = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT, Motor.GoBILDA.RPM_312))
+            frontLeft = new PowerMotor(new MotorEx(hardwareMap, frontLeftName, Motor.GoBILDA.RPM_312))
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            frontRight = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT, Motor.GoBILDA.RPM_312))
+            frontRight = new PowerMotor(new MotorEx(hardwareMap, frontRightName, Motor.GoBILDA.RPM_312))
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            backLeft = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT, Motor.GoBILDA.RPM_312))
+            backLeft = new PowerMotor(new MotorEx(hardwareMap, backLeftName, Motor.GoBILDA.RPM_312))
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            backRight = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT, Motor.GoBILDA.RPM_312))
+            backRight = new PowerMotor(new MotorEx(hardwareMap, backRightName, Motor.GoBILDA.RPM_312))
                     .setMotorDirection(Motor.Direction.FORWARD)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: One or more drive motors not found");
         }
@@ -117,15 +139,14 @@ public class RobotHardware
         // Outtake
         try
         {
-            VelocityMotor outtakeLeft = new VelocityMotor(new MotorEx(hardwareMap, RobotConstants.Outtake.Name.LAUNCHER_LEFT, Motor.GoBILDA.BARE), battery);
+            VelocityMotor outtakeLeft = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), battery);
             // VelocityMotor outtakeRight = new MotorEx
             outtake = new VelocityMotorGroup(outtakeLeft)
                     .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf)
-                    .setPIDF(RobotConstants.Outtake.Coefficients.PIDF)
-                    .setTolerance(RobotConstants.Outtake.Tolerance.RPM, RobotConstants.Outtake.Tolerance.RPM_ACCELERATION);
-        }
-        catch (Exception e)
+                    .setPIDF(outtakePIDF)
+                    .setTolerance(outtakeToleranceRPM, outtakeToleranceRPMAccel);
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: One or more outtake motors not found");
             telemetry.log().add(e.getMessage());
@@ -133,18 +154,17 @@ public class RobotHardware
 
         try
         {
-            turret = new PositionMotor(new MotorEx(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_435), battery)
+            turret = new PositionMotor(new MotorEx(hardwareMap, turretName, Motor.GoBILDA.RPM_435), battery)
                     .setVoltageCompensation(12) // 100% power >= 12 volts
                     .usePower(1)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
-                    .setDistancePerPulse(1.0, RobotConstants.Turret.GEAR_RATIO, AngleUnit.DEGREES) // keep in degrees
+                    .setDistancePerPulse(1.0, turretGearRatio, AngleUnit.DEGREES) // keep in degrees
                     .setControllerType(PositionMotor.PositionController.SquIDF)
-                    .setPIDF(RobotConstants.Turret.PIDF)
-                    .setPositionTolerance(RobotConstants.Turret.TOLERANCE.getDegrees());
+                    .setPIDF(turretPIDF)
+                    .setPositionTolerance(turretToleranceDegrees);
 
             turret.setTargetDistance(0);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: Turret motor not found");
             telemetry.log().add(e.getMessage());
@@ -152,10 +172,9 @@ public class RobotHardware
 
         try
         {
-            transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.NAME, 0, 360);
-            transfer.set(RobotConstants.Transfer.CLOSE_INTAKE_ANGLE);
-        }
-        catch (Exception e)
+            transfer = new ServoEx(hardwareMap, transferName, 0, 360);
+            transfer.set(transferCloseIntakeAngle);
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: Transfer servo not found");
             telemetry.log().add(e.getMessage());
@@ -163,12 +182,11 @@ public class RobotHardware
 
         try
         {
-            intake = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620))
+            intake = new PowerMotor(new MotorEx(hardwareMap, intakeName, Motor.GoBILDA.RPM_1620))
                     .setVoltageCompensation(12)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             telemetry.log().add("Warning: Intake motor not found");
         }
