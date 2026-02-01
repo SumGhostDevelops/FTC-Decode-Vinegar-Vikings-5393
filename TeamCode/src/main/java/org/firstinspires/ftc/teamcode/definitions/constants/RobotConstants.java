@@ -17,11 +17,9 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 
-public class RobotConstants
-{
+public class RobotConstants {
     @Configurable
-    public static class General
-    {
+    public static class General {
         public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = false;
@@ -29,8 +27,7 @@ public class RobotConstants
     }
 
     @Configurable
-    public static class Telemetry
-    {
+    public static class Telemetry {
         public static boolean SET_AUTOCLEAR = true;
         public static boolean SET_AUTOCLEAR_LOGS = true;
         public static double LOG_AUTOCLEAR_DELAY = 10;
@@ -39,19 +36,16 @@ public class RobotConstants
         public static boolean ENABLE_GRAPH_OUTPUT = true;
     }
 
-    public static class AprilTags
-    {
-        public static int[] GOAL_IDS = new int[]{20, 24};
-        public static int[] OBELISK_IDS = new int[]{21, 22, 23};
+    public static class AprilTags {
+        public static int[] GOAL_IDS = new int[] { 20, 24 };
+        public static int[] OBELISK_IDS = new int[] { 21, 22, 23 };
     }
 
     @Configurable
     // Hardware Names
-    public static class Drive
-    {
+    public static class Drive {
         @IgnoreConfigurable
-        public static class WHEEL_NAMES
-        {
+        public static class WHEEL_NAMES {
             public static String FRONT_LEFT = "frontLeft";
             public static String FRONT_RIGHT = "frontRight";
             public static String BACK_LEFT = "backLeft";
@@ -61,8 +55,7 @@ public class RobotConstants
         public static DriveMode DRIVE_MODE = DriveMode.RAW_ROBOT_CENTRIC;
 
         @Configurable
-        public static class Speed
-        {
+        public static class Speed {
             public static double DEFAULT = 1.0;
             public static double MAXIMUM = 1.0;
             public static double MINIMUM = 0.25;
@@ -70,8 +63,7 @@ public class RobotConstants
         }
 
         @IgnoreConfigurable
-        public static class HybridMode
-        {
+        public static class HybridMode {
             public static double TURN_P = 0.02;
             public static double TURN_D = 0.001;
             public static double DEADBAND = 0.05;
@@ -79,8 +71,7 @@ public class RobotConstants
     }
 
     @Configurable
-    public static class Outtake
-    {
+    public static class Outtake {
         public static final double RPM_WHILE_MOVING_RATIO = 0.8;
         @Sorter(sort = 0)
         public static int PPR = 28;
@@ -101,22 +92,19 @@ public class RobotConstants
         public static double FUTURE_POSE_TIME = 1.0;
 
         @IgnoreConfigurable
-        public static class Name
-        {
+        public static class Name {
             public static String LAUNCHER_LEFT = "leftOuttake";
             public static String LAUNCHER_RIGHT = "rightOuttake";
         }
 
         @Configurable
-        public static class Coefficients
-        {
-            //public static double[] veloCoeffs = new double[]{10, 3, 2, 0};
+        public static class Coefficients {
+            // public static double[] veloCoeffs = new double[]{10, 3, 2, 0};
             public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 1);
         }
 
         @Configurable
-        public static class Tolerance
-        {
+        public static class Tolerance {
             @Sorter(sort = 0)
             public static int RPM = 75;
             @Sorter(sort = 1)
@@ -125,8 +113,7 @@ public class RobotConstants
     }
 
     @Configurable
-    public static class Turret
-    {
+    public static class Turret {
         @Sorter(sort = 0)
         public static String NAME = "turret";
         @Sorter(sort = 1)
@@ -139,23 +126,29 @@ public class RobotConstants
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
         @Sorter(sort = 5)
-        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES), new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
+        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[] {
+                new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES),
+                new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
         @Sorter(sort = 6)
         public static boolean AUTO_AIM_TO_GOAL = false;
 
         @Sorter(sort = 7)
-        //public static double[] pidf = new double[]{10, 1, 1, 1};
+        // public static double[] pidf = new double[]{10, 1, 1, 1};
         public static PIDFCoefficients PIDF = new PIDFCoefficients(0.1, 0.00, 0.00075, 0.00);
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;
         @Sorter(sort = 9)
         public static double FUTURE_POSE_TIME = 1.0;
+
+        @Sorter(sort = 10)
+        public static boolean ROTATION_COMPENSATION_ENABLED = true;
+        @Sorter(sort = 11)
+        public static double ROTATION_COMPENSATION_FF = 0.005; // Feedforward gain: power per deg/s of robot rotation
     }
 
     @Configurable
-    public static class Transfer
-    {
+    public static class Transfer {
         @Sorter(sort = 0)
         public static String NAME = "transfer";
 
@@ -163,14 +156,13 @@ public class RobotConstants
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
 
         @Sorter(sort = 2)
-        public static double CLOSE_INTAKE_ANGLE = 0; //210; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSE_INTAKE_ANGLE = 0; // 210; // An angle where the trapdoor blocks balls from entering
 
         @Sorter(sort = 3)
         public static double CLOSE_TRANSFER_ANGLE = 0;
 
         @Configurable
-        public static class TimerConstants
-        {
+        public static class TimerConstants {
             @Sorter(sort = 0)
             public static int totalTime = 600;
             @Sorter(sort = 1)
@@ -181,8 +173,7 @@ public class RobotConstants
     }
 
     @Configurable
-    public static class Intake
-    {
+    public static class Intake {
         @Sorter(sort = 0)
         public static String NAME = "intake";
 
@@ -198,29 +189,28 @@ public class RobotConstants
     }
 
     @Configurable
-    public static class Odometry
-    {
+    public static class Odometry {
         @Sorter(sort = 0)
-        public static Pose2d DEFAULT_POSE = new Pose2d(new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), CoordinateSystem.DECODE_PEDROPATH), new FieldHeading(new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
+        public static Pose2d DEFAULT_POSE = new Pose2d(
+                new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH),
+                        CoordinateSystem.DECODE_PEDROPATH),
+                new FieldHeading(new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
         @Sorter(sort = 1)
         public static double FUTURE_POSE_TIME = 1.0;
 
         public static boolean SET_FORWARD_DIRECTION_BASED_ON_TEAM = true;
 
         @IgnoreConfigurable
-        public static class Pinpoint
-        {
+        public static class Pinpoint {
             public static String NAME = "pinpoint";
         }
 
         @IgnoreConfigurable
-        public static class Webcam
-        {
+        public static class Webcam {
             public static String NAME = "webcam";
 
             @Configurable
-            public static class Lens
-            {
+            public static class Lens {
 
                 public static double LENS_FX = 958.876;
                 public static double LENS_FY = 958.876;
@@ -229,8 +219,7 @@ public class RobotConstants
             }
 
             @Configurable
-            public static class Offset
-            {
+            public static class Offset {
                 // Position of camera relative to robot center
                 // Uses FTC SDK conventions for setCameraPose():
                 // X: Left/right (positive = RIGHT of center)
@@ -276,7 +265,7 @@ public class RobotConstants
             {
                 // Distance from the center to the FORWARD wheel along the Y-axis (LATERAL)
                 // Positive if LEFT of center, Negative if RIGHT of center
-                //not great but good enough
+                // not great but good enough
                 public static Distance OFFSET = new Distance(-10, DistanceUnit.MM);
             }
 
@@ -285,7 +274,7 @@ public class RobotConstants
             {
                 // Distance from the center to the STRAFE wheel along the X-axis (LONGITUDINAL)
                 // Positive if FORWARD of center, Negative if BACKWARD of center
-                //not great but good enough
+                // not great but good enough
                 public static Distance OFFSET = new Distance(-4.8, DistanceUnit.INCH);
             }
         }
