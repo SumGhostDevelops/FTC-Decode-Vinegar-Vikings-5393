@@ -9,6 +9,10 @@ import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.util.measure.Ballistics;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.FuturePose.FuturePoseResult;
+
 public class Outtake extends SubsystemBase
 {
 
@@ -38,6 +42,7 @@ public class Outtake extends SubsystemBase
 
     // If the RPM should be adjusted using Outtake.setTargetRPM(Distance)
     private boolean adjustWithDistance = RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
+    private final boolean useFuturePose = RobotConstants.Outtake.USE_FUTURE_POSE;
 
     /**
      * Inches -> RPM
@@ -210,6 +215,23 @@ public class Outtake extends SubsystemBase
         lastDistance = dist;
 
         setTargetRPM(rpmLUT.get(lastDistance.getInch()));
+    }
+
+    /**
+     * Sets the target RPM based on the distance to a field target, optionally using
+     * FuturePose based on RobotConstants.
+     */
+    public void setTargetRPM(FieldCoordinate target, Odometry odometry)
+    {
+        if (useFuturePose)
+        {
+            FuturePoseResult result = Ballistics.calculate(target, odometry);
+            setTargetRPM(result.distance);
+        }
+        else
+        {
+            setTargetRPM(odometry.getPose().distanceTo(target));
+        }
     }
 
     public double getTargetRPM()

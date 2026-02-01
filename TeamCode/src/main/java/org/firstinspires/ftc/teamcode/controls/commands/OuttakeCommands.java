@@ -6,6 +6,9 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -98,19 +101,22 @@ public class OuttakeCommands
     public static class UpdateRPMBasedOnDistance extends CommandBase
     {
         private final Outtake outtake;
-        private final Supplier<Distance> distance;
+        private final FieldCoordinate target;
+        private final Odometry odometry;
 
-        public UpdateRPMBasedOnDistance(Outtake outtake, Supplier<Distance> distance)
+        public UpdateRPMBasedOnDistance(Outtake outtake, FieldCoordinate target, Odometry odometry)
         {
             this.outtake = outtake;
-            this.distance = distance;
-            // Note: Do not add requirements - this command should run alongside other outtake commands
+            this.target = target;
+            this.odometry = odometry;
+            // Note: Do not add requirements - this command should run alongside other
+            // outtake commands
         }
 
         @Override
         public void execute()
         {
-            outtake.setTargetRPM(distance.get());
+            outtake.setTargetRPM(target, odometry);
         }
     }
 }

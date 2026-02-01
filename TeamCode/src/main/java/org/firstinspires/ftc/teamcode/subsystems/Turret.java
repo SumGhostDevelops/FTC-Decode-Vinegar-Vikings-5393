@@ -13,6 +13,10 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.PositionMotor;
 
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.util.measure.Ballistics;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.FuturePose.FuturePoseResult;
+
 import java.util.function.DoubleSupplier;
 
 public class Turret extends SubsystemBase
@@ -29,6 +33,7 @@ public class Turret extends SubsystemBase
     private final double rotationCompensationFF = RobotConstants.Turret.ROTATION_COMPENSATION_FF;
     private final UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
     private final Angle safetyMargin = RobotConstants.Turret.SAFETY_MARGIN;
+    private final boolean useFuturePose = RobotConstants.Turret.USE_FUTURE_POSE;
 
     private double targetAngleDegrees;
 
@@ -174,7 +179,8 @@ public class Turret extends SubsystemBase
             double dynamicTolerance = Math.toDegrees(Math.atan2(linearToleranceRadius.getInch(), distance));
             // Ensure we don't demand impossible precision
             this.currentToleranceDegrees = Math.max(dynamicTolerance, minAngularTolerance.getDegrees());
-        } else
+        }
+        else
         {
             // If we are ON the target, tolerance is effectively infinite
             this.currentToleranceDegrees = 180.0;
@@ -191,6 +197,45 @@ public class Turret extends SubsystemBase
     public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose)
     {
         aimRelative(robotPose.bearingTo(target));
+    }
+
+    /**
+     * Aims the turret at a target coordinate, optionally using FuturePose for
+     * predictive aiming based on RobotConstants.
+     * 
+     * @param target
+     *            The FieldCoordinate to aim at
+     * @param odometry
+     *            The odometry subsystem for robot pose and velocity
+     */
+    public void aimToTarget(FieldCoordinate target, Odometry odometry)
+    {
+        if (useFuturePose)
+        {
+            FuturePoseResult result = Ballistics.calculate(target, odometry);
+
+            // Use predicted pose for aiming
+            if (useDynamicTolerance)
+            {
+                aimToCoordinate(target, result.pose, linearTolerance, new Angle(1, AngleUnit.DEGREES)); // Min 1 deg
+            }
+            else
+            {
+                aimToCoordinate(target, result.pose);
+            }
+        }
+        else
+        {
+            // Standard aiming
+            if (useDynamicTolerance)
+            {
+                aimToCoordinate(target, odometry.getPose(), linearTolerance, new Angle(1, AngleUnit.DEGREES));
+            }
+            else
+            {
+                aimToCoordinate(target, odometry.getPose());
+            }
+        }
     }
 
     public void reset()

@@ -244,8 +244,8 @@ public abstract class BaseStable extends CommandOpMode
 
     private void bindTurretControls(Trigger opModeActive, GamepadEx driver, Subsystems s)
     {
-        Supplier<Pose2d> turretPose = s.odometry::getPose;
-        Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, robot.team.goal.coord, turretPose);
+        // turretPose supplier no longer needed, we pass odometry directly
+        Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, robot.team.goal.coord, s.odometry);
 
         if (autoAimToGoal)
         {
@@ -265,10 +265,11 @@ public abstract class BaseStable extends CommandOpMode
         }
         if (autoDistanceAdjustment)
         {
-            // Update RPM dynamically based on distance to goal
+            // Update RPM dynamically based on distance to goal, optionally using FuturePose
             active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
                     s.outtake,
-                    () -> s.odometry.getPose().distanceTo(team.goal.coord)));
+                    team.goal.coord,
+                    s.odometry));
         }
     }
 

@@ -306,4 +306,18 @@ public class RobotConstants
             }
         }
     }
+
+    @Configurable
+    public static class Ballistics
+    {
+        @Sorter(sort = 0)
+        public static double SYSTEM_LATENCY = 0.0; // Seconds
+
+        // Boilerplate data for Flight Time LUT (Distance -> Time)
+        // Add your empirical data here
+        public static final double[] DISTANCES = new double[]
+        { 0, 24, 48, 72, 96, 120, 144 }; // Inches
+        public static final double[] FLIGHT_TIMES = new double[]
+        { 0, 0.5, 0.8, 1.1, 1.4, 1.7, 2.0 }; // Seconds (Example data)
+    }
 }
