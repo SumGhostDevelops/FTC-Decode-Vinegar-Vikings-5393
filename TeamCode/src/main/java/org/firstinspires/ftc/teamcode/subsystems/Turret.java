@@ -243,6 +243,20 @@ public class Turret extends SubsystemBase
     @Override
     public void periodic()
     {
+        double currentDegrees = motor.getDistance();
+        UnnormalizedAngle[] limits = RobotConstants.Turret.TURN_LIMITS;
+        double minDegrees = limits[0].getDegrees();
+        double maxDegrees = limits[1].getDegrees();
+        double safetyMargin = RobotConstants.Turret.SAFETY_MARGIN_DEGREES;
+
+        // If we are significantly outside the limits, stop the motor immediately to
+        // prevent damage
+        if (currentDegrees < minDegrees - safetyMargin || currentDegrees > maxDegrees + safetyMargin)
+        {
+            motor.stopMotor();
+            return;
+        }
+
         // Always update motor to apply feedforward compensation for robot rotation
         // even when at target position (to maintain position during rotation)
         motor.update();
