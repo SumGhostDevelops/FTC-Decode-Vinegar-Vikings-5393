@@ -10,7 +10,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
-public class Subsystems {
+public class Subsystems
+{
     public final Drive drive;
     public final Intake intake;
     public final Transfer transfer;
@@ -19,7 +20,8 @@ public class Subsystems {
 
     public Odometry odometry;
 
-    public Subsystems(RobotHardware hw, Team team) {
+    public Subsystems(RobotHardware hw, Team team)
+    {
         this.drive = new Drive(hw.frontLeft, hw.frontRight, hw.backLeft, hw.backRight);
         this.intake = new Intake(hw.intake);
         this.transfer = new Transfer(hw.transfer);

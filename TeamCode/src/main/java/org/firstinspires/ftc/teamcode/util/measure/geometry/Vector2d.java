@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.util.measure.geometry;
 
 import static org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem.calculateBasis;
 
-import android.view.MotionEvent;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
@@ -18,6 +16,11 @@ public class Vector2d
     public final DistanceUnit distUnit;
     public final AngleUnit angUnit;
 
+    public Vector2d(Distance x, Distance y, CoordinateSystem coordSys)
+    {
+        this(x, y, coordSys, AngleUnit.DEGREES);
+    }
+
     public Vector2d(Distance x, Distance y, CoordinateSystem coordSys, AngleUnit angUnit)
     {
         this.coordSys = coordSys;
@@ -27,25 +30,33 @@ public class Vector2d
         this.angUnit = angUnit;
     }
 
-    public Vector2d(Distance x, Distance y, CoordinateSystem coordSys)
+    public Vector2d toAngleUnit(AngleUnit targetUnit)
     {
-        this(x, y, coordSys, AngleUnit.DEGREES);
+        if (this.angUnit == targetUnit)
+        {
+            return this;
+        }
+
+        return new Vector2d(x.toUnit(distUnit), y.toUnit(distUnit), coordSys, targetUnit);
     }
 
-    public Distance getLength()
+    public Vector2d minus(Vector2d b)
     {
-        return new Distance(Math.hypot(x.magnitude, y.magnitude), x.unit);
+        return plus(b.inverse());
     }
 
-    public Angle getDirection()
+    // Small optimization: check for empty addition
+    public Vector2d plus(Vector2d b)
     {
-        return new Angle(Math.atan2(y.magnitude, x.magnitude), AngleUnit.RADIANS).toUnit(angUnit);
+        if (b.x.magnitude == 0 && b.y.magnitude == 0) return this;
+
+        Vector2d convertedB = b.toCoordinateSystem(this.coordSys);
+        return new Vector2d(this.x.plus(convertedB.x), this.y.plus(convertedB.y), this.coordSys);
     }
 
-    public Vector2d toDistanceUnit(DistanceUnit distanceUnit)
+    public Vector2d inverse()
     {
-        if (isDistanceUnit(distanceUnit)) return this;
-        return new Vector2d(x.toUnit(distanceUnit), y.toUnit(distanceUnit), coordSys);
+        return new Vector2d(x.multiply(-1), y.multiply(-1), coordSys);
     }
 
     public Vector2d toCoordinateSystem(CoordinateSystem targetSys)
@@ -83,43 +94,9 @@ public class Vector2d
         );
     }
 
-    public Vector2d toAngleUnit(AngleUnit targetUnit)
-    {
-        if (this.angUnit == targetUnit)
-        {
-            return this;
-        }
-
-        return new Vector2d(x.toUnit(distUnit), y.toUnit(distUnit), coordSys, targetUnit);
-    }
-
-    // Small optimization: check for empty addition
-    public Vector2d plus(Vector2d b)
-    {
-        if (b.x.magnitude == 0 && b.y.magnitude == 0) return this;
-
-        Vector2d convertedB = b.toCoordinateSystem(this.coordSys);
-        return new Vector2d(this.x.plus(convertedB.x), this.y.plus(convertedB.y), this.coordSys);
-    }
-
-    public Vector2d inverse()
-    {
-        return new Vector2d(x.multiply(-1), y.multiply(-1), coordSys);
-    }
-
-    public Vector2d minus(Vector2d b)
-    {
-        return plus(b.inverse());
-    }
-
     public DistanceUnit getDistanceUnit()
     {
         return distUnit;
-    }
-
-    public boolean isDistanceUnit(DistanceUnit unit)
-    {
-        return distUnit.equals(unit);
     }
 
     @Override
@@ -144,9 +121,30 @@ public class Vector2d
         return this.x.equals(convertedOther.x) && this.y.equals(convertedOther.y);
     }
 
+    public Vector2d toDistanceUnit(DistanceUnit distanceUnit)
+    {
+        if (isDistanceUnit(distanceUnit)) return this;
+        return new Vector2d(x.toUnit(distanceUnit), y.toUnit(distanceUnit), coordSys);
+    }
+
+    public boolean isDistanceUnit(DistanceUnit unit)
+    {
+        return distUnit.equals(unit);
+    }
+
     @Override
     public String toString()
     {
         return String.format("%s; %s (%s)", getLength(), getDirection(), coordSys.name());
+    }
+
+    public Distance getLength()
+    {
+        return new Distance(Math.hypot(x.magnitude, y.magnitude), x.unit);
+    }
+
+    public Angle getDirection()
+    {
+        return new Angle(Math.atan2(y.magnitude, x.magnitude), AngleUnit.RADIANS).toUnit(angUnit);
     }
 }
