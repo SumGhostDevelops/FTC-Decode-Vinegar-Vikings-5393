@@ -28,6 +28,7 @@ public class Odometry extends SubsystemBase
 {
     private final Pinpoint pinpoint;
     private final Webcam webcam;
+    private final PoseVelocityTracker velocityTracker;
 
     private final boolean setForwardBasedOnTeam = RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM;
 
@@ -53,6 +54,7 @@ public class Odometry extends SubsystemBase
     {
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
+        this.velocityTracker = new PoseVelocityTracker(() -> System.nanoTime() / 1e9);
 
         this.referencePose = referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D();
 
@@ -128,6 +130,11 @@ public class Odometry extends SubsystemBase
     public UnnormalizedAngle getHeadingVelocity()
     {
         return new UnnormalizedAngle(pinpoint.getHeadingVelocity(aUnit.getUnnormalized()), aUnit.getUnnormalized());
+    }
+
+    public PoseVelocityTracker getVelocityTracker()
+    {
+        return velocityTracker;
     }
 
     /**
@@ -211,6 +218,9 @@ public class Odometry extends SubsystemBase
 
         pinpoint.update();
         cachedPose = Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
+
+        // Update kinematic tracker
+        velocityTracker.update(cachedPose, getVelocity(), pinpoint.getHeadingVelocity());
     }
 
     public void close()
