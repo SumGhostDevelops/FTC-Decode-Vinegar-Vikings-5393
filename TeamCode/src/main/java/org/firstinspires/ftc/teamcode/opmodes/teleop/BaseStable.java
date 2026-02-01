@@ -134,7 +134,11 @@ public abstract class BaseStable extends CommandOpMode
             logTimer.reset();
         }
 
-        if (RobotConstants.General.PRESET_OPTION != ConstantsPresets.Preset.TESTING) return;
+        if (RobotConstants.General.PRESET_OPTION != ConstantsPresets.Preset.TESTING)
+        {
+            telemetry.update();
+            return;
+        }
 
         // --- Testing Telemetry ---
         telemetry.addData("Team", team);
@@ -159,6 +163,8 @@ public abstract class BaseStable extends CommandOpMode
         telemetry.addData("At Target", s.turret.isAtTarget());
         telemetry.addData("Err/Tol", String.format("%.2f / %.2f", s.turret.bearingToTarget().getDegrees(), s.turret.getTolerance().getDegrees()));
         telemetry.addData("Heading (Abs)", s.turret.getFieldHeading(s.odometry.getFieldHeading()).toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
+
+        telemetry.update();
     }
 
     private void updateDashboard(Subsystems s, Pose2d pose)
