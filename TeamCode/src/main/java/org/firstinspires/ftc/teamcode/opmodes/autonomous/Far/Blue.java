@@ -348,7 +348,7 @@ public class Blue extends AutoBase
         public static class Paths
         {
 
-                public Pose startPose = new Pose(21.000, 125.000);
+                public Pose startPose = new Pose(21.000, 125.000, Math.toRadians(145));
 
                 public PathChain ToShoot,
                                 ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
@@ -384,7 +384,7 @@ public class Blue extends AutoBase
 
                 private void buildPathsBasic(Follower follower)
                 {
-                        startPose = new Pose(21.000, 125.000);
+                        startPose = new Pose(21.000, 125.000,  Math.toRadians(145));
                         final Pose shootPose = new Pose(43.000, 108.000);
                         final Pose leavePose = new Pose(19.000, 106.000);
 
@@ -525,7 +525,7 @@ public class Blue extends AutoBase
                 private void buildPathsGate(Follower follower)
                 {
 
-                        startPose = new Pose(17.000, 127.000);
+                        startPose = new Pose(17.000, 127.000,  Math.toRadians(145));
                         final Pose shootPose = new Pose(71.000, 71.000);
                         final Pose ballOneLinePose = new Pose(56.000, 60.000);
                         final Pose ballOneFullPose = new Pose(56.000, 60.000);
