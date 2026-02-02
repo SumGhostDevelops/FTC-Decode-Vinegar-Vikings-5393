@@ -76,10 +76,8 @@ public class Blue extends Base {
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-
         follower.setStartingPose(paths.startPose);
         follower.update();
-
         setPathState(Paths.PathState.ToShoot);
 
 

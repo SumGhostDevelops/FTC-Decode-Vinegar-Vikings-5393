@@ -67,6 +67,7 @@ Blue extends Base {
                 telemetry.addData("Current State", currentPathState);
                 telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
                 telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
+                telemetry.addData("Heading", follower.getHeading());
                 telemetry.update();
             }
         }
@@ -324,7 +325,7 @@ Blue extends Base {
 
     public static class Paths {
 
-        public Pose startPose =  new Pose(21.000, 125.000);
+        public Pose startPose =  new Pose(21.000, 125.000, Math.toRadians(145));
 
         public PathChain ToShoot,
                 ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
@@ -362,7 +363,7 @@ Blue extends Base {
         }
 
         private void buildPathsBasic(Follower follower) {
-            startPose = new Pose(21.000, 125.000);
+            startPose = new Pose(21.000, 125.000,  Math.toRadians(145));
            final Pose shootPose =  new Pose(43.000, 108.000);
            final Pose leavePose = new Pose(19.000, 106.000);
 
@@ -390,7 +391,7 @@ finalPose = follower.pathBuilder().addPath(
 
         private void buildPathsReg(Follower follower) {
 
-            startPose         =  new Pose(20.000, 123.000);
+            startPose         =  new Pose(20.000, 123.000,  Math.toRadians(145));
             final Pose ballOneLinePose   = new Pose(54.000, 84.000);
             final Pose ballOneFullPose   =  new Pose(18.000, 84.000);
             final Pose shootPose         =  new Pose(54.000, 97.200);
@@ -517,7 +518,7 @@ finalPose = follower.pathBuilder().addPath(
 
         private void buildPathsGate(Follower follower) {
 
-                        startPose =  new Pose(17.000, 127.000);
+                        startPose =  new Pose(17.000, 127.000,  Math.toRadians(145));
             final Pose shootPose =  new Pose(71.000, 71.000);
             final Pose ballOneLinePose =  new Pose(56.000, 60.000);
             final Pose ballOneFullPose = new Pose(56.000, 60.000);
