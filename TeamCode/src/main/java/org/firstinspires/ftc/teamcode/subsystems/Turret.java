@@ -236,6 +236,18 @@ public class Turret extends SubsystemBase
         return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees;
     }
 
+    public boolean exceedingTurnLimits()
+    {
+        double currentDegrees = motor.getDistance();
+        double minDegrees = turnLimits[0].getDegrees();
+        double maxDegrees = turnLimits[1].getDegrees();
+        double safetyMarginDegrees = safetyMargin.getDegrees();
+
+        // If we are significantly outside the limits, stop the motor immediately to
+        // prevent damage
+        return (currentDegrees < minDegrees - safetyMarginDegrees) || (currentDegrees > maxDegrees + safetyMarginDegrees);
+    }
+
     public Angle bearingToTarget()
     {
         double errorDegrees = targetAngleDegrees - motor.getDistance();
@@ -250,14 +262,9 @@ public class Turret extends SubsystemBase
     @Override
     public void periodic()
     {
-        double currentDegrees = motor.getDistance();
-        double minDegrees = turnLimits[0].getDegrees();
-        double maxDegrees = turnLimits[1].getDegrees();
-        double safetyMarginDegrees = safetyMargin.getDegrees();
-
         // If we are significantly outside the limits, stop the motor immediately to
         // prevent damage
-        if (currentDegrees < minDegrees - safetyMarginDegrees || currentDegrees > maxDegrees + safetyMarginDegrees)
+        if (exceedingTurnLimits())
         {
             motor.stopMotor();
             return;
