@@ -173,9 +173,7 @@ public abstract class BaseStable extends CommandOpMode
         telemetry.addLine("--- Hardware ---");
         telemetry.addData("Drive Speed", s.drive.getSpeed());
         telemetry.addData("Intake RPM", s.intake.getRPM());
-        telemetry.addData("Outtake State", s.outtake.getState());
-        telemetry.addData("Outtake RPM", s.outtake.getRPM());
-        telemetry.addData("Outtake Target", s.outtake.getTargetRPM());
+        telemetry.addData("Outtake", s.outtake.toString());
         telemetry.addData("Outtake Stable", s.outtake.isStable());
 
         telemetry.addLine("--- Turret ---");

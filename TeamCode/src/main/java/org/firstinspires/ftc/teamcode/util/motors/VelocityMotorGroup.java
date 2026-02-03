@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public class VelocityMotorGroup
 {
-    private final VelocityMotor[] group;
+    public final VelocityMotor[] group;
 
     public VelocityMotorGroup(VelocityMotor leader)
     {
@@ -128,6 +128,18 @@ public class VelocityMotorGroup
     public double getRPM()
     {
         return group[0].getRPM();
+    }
+
+    public double[] getRPMs()
+    {
+        double[] rpms = new double[group.length];
+
+        for (int i = 0; i < group.length; i++)
+        {
+            rpms[i] = group[i].getRPM();
+        }
+
+        return rpms;
     }
 
     public double getRPMAcceleration()

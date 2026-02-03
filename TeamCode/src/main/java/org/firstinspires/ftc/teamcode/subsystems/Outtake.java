@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.math.BetterInterpLUT;
 import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
 public class Outtake extends SubsystemBase
@@ -246,4 +247,16 @@ public class Outtake extends SubsystemBase
         motor.update();
     }
 
+    @Override
+    public String toString()
+    {
+        String str = "State: " + state + " | Target RPM: " + targetRPM + " | ";
+
+        for (int i = 0; i < motor.group.length; i++)
+        {
+            str += "Motor " + i+1 + ": " + motor.group[i].getRPM() + " RPM | ";
+        }
+
+        return str;
+    }
 }
