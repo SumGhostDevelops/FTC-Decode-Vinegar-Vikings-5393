@@ -24,8 +24,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
 
-public class Odometry extends SubsystemBase
-{
+public class Odometry extends SubsystemBase {
     private final Pinpoint pinpoint;
     private final Webcam webcam;
 
@@ -44,20 +43,18 @@ public class Odometry extends SubsystemBase
     private boolean referencePoseWasSet = false;
     private Pose2D referencePose;
 
-    public Odometry(Pinpoint pinpoint, WebcamName webcam)
-    {
-        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
+    public Odometry(Pinpoint pinpoint, WebcamName webcam) {
+        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH),
+                new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
     }
 
-    public Odometry(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
-    {
+    public Odometry(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose) {
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
 
         this.referencePose = referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D();
 
-        if (!referencePoseWasSet && this.pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY)
-        {
+        if (!referencePoseWasSet && this.pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY) {
             this.pinpoint.setPosition(this.referencePose);
             this.pinpoint.update();
             referencePoseWasSet = true;
@@ -70,16 +67,14 @@ public class Odometry extends SubsystemBase
     /**
      * @return The yaw, as reported directly by the Pinpoint
      */
-    public Angle getIMUYaw()
-    {
+    public Angle getIMUYaw() {
         return cachedPose.heading.toSystem(CoordinateSystem.DECODE_FTC).angle;
     }
 
     /**
      * @return The absolute heading of the robot
      */
-    public FieldHeading getFieldHeading()
-    {
+    public FieldHeading getFieldHeading() {
         return cachedPose.heading;
     }
 
@@ -87,8 +82,7 @@ public class Odometry extends SubsystemBase
      * @return A heading where 0 is conceptually "Forward" (aligned with Pedro
      *         X-Axis/Blue Alliance)
      */
-    public Angle getDriverHeading()
-    {
+    public Angle getDriverHeading() {
         FieldHeading currentPedro = getFieldHeading().toSystem(CoordinateSystem.DECODE_PEDROPATH);
         FieldHeading startPedro = driverForward.toSystem(CoordinateSystem.DECODE_PEDROPATH);
 
@@ -98,24 +92,21 @@ public class Odometry extends SubsystemBase
     /**
      * @return The field coordinate of the robot
      */
-    public FieldCoordinate getFieldCoord()
-    {
+    public FieldCoordinate getFieldCoord() {
         return cachedPose.coord;
     }
 
     /**
      * @return The pose of the robot
      */
-    public Pose2d getPose()
-    {
+    public Pose2d getPose() {
         return cachedPose;
     }
 
     /**
      * @return A vector of the velocity
      */
-    public Vector2d getVelocity()
-    {
+    public Vector2d getVelocity() {
         return new Vector2d(
                 new Distance(pinpoint.getVelX(dUnit), dUnit),
                 new Distance(pinpoint.getVelY(dUnit), dUnit),
@@ -125,8 +116,7 @@ public class Odometry extends SubsystemBase
     /**
      * @return The velocity of the robot
      */
-    public UnnormalizedAngle getHeadingVelocity()
-    {
+    public UnnormalizedAngle getHeadingVelocity() {
         return new UnnormalizedAngle(pinpoint.getHeadingVelocity(aUnit.getUnnormalized()), aUnit.getUnnormalized());
     }
 
@@ -137,13 +127,11 @@ public class Odometry extends SubsystemBase
      * for field-centric driving, without affecting the absolute heading
      * calibration.
      */
-    public void setDriverForwardFromCurrent()
-    {
+    public void setDriverForwardFromCurrent() {
         driverForward = getFieldHeading();
     }
 
-    public void updateReferencePose(Pose2d referencePose)
-    {
+    public void updateReferencePose(Pose2d referencePose) {
         driverForward = referencePose.heading;
 
         pinpoint.setPosition(referencePose.toPose2D());
@@ -154,8 +142,7 @@ public class Odometry extends SubsystemBase
      * 
      * @return If the localization was successful or not
      */
-    public boolean localizeWithAprilTag()
-    {
+    public boolean localizeWithAprilTag() {
         // verify the apriltag exists
         webcam.updateDetections();
 
@@ -164,7 +151,7 @@ public class Odometry extends SubsystemBase
             return false;
 
         AprilTagDetection tag = possibleTag.get();
-        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
+        Pose2d estimatedPose = Pose2d.fromAprilTagRobotPose(tag.robotPose);
 
         // Preserve driver's relative heading before resetting hardware
         FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
@@ -185,15 +172,12 @@ public class Odometry extends SubsystemBase
      * @param team
      * @return If localization was successful or not
      */
-    public boolean localizeWithAprilTag(Team team)
-    {
-        if (!localizeWithAprilTag())
-        {
+    public boolean localizeWithAprilTag(Team team) {
+        if (!localizeWithAprilTag()) {
             return false;
         }
 
-        if (setForwardBasedOnTeam)
-        {
+        if (setForwardBasedOnTeam) {
             driverForward = team.forwardAngle;
         }
 
@@ -205,17 +189,15 @@ public class Odometry extends SubsystemBase
      * debugging.
      * 
      * @param telemetry
-     *            Telemetry object to log debug values
+     *                  Telemetry object to log debug values
      * @return If the localization was successful or not
      */
-    public boolean localizeWithDebugTelemetry(org.firstinspires.ftc.robotcore.external.Telemetry telemetry)
-    {
+    public boolean localizeWithDebugTelemetry(org.firstinspires.ftc.robotcore.external.Telemetry telemetry) {
         // verify the apriltag exists
         webcam.updateDetections();
 
         Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
-        if (possibleTag.isEmpty())
-        {
+        if (possibleTag.isEmpty()) {
             telemetry.log().add("Localization: No AprilTag detected");
             return false;
         }
@@ -230,7 +212,7 @@ public class Odometry extends SubsystemBase
 
         telemetry.log().add(String.format("Raw robotPose: x=%.2f, y=%.2f (%s), yaw=%.1f°", rawX, rawY, unit, rawYaw));
 
-        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
+        Pose2d estimatedPose = Pose2d.fromAprilTagRobotPose(tag.robotPose);
 
         // Preserve driver's relative heading before resetting hardware
         FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
@@ -248,10 +230,8 @@ public class Odometry extends SubsystemBase
     }
 
     @Override
-    public void periodic()
-    {
-        if (!this.referencePoseWasSet && pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY)
-        {
+    public void periodic() {
+        if (!this.referencePoseWasSet && pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY) {
             this.pinpoint.setPosition(this.referencePose);
             this.referencePoseWasSet = true;
         }
@@ -260,8 +240,7 @@ public class Odometry extends SubsystemBase
         cachedPose = Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
     }
 
-    public void close()
-    {
+    public void close() {
         webcam.close();
     }
 }
