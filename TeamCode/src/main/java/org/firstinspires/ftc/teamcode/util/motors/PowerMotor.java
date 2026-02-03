@@ -179,7 +179,7 @@ public class PowerMotor
      */
     public double getRPM()
     {
-        return tpsToRpm(motorEx.getCorrectedVelocity()); // consider changing this to motorEx.motorEx.getVelocity()
+        return tpsToRpm(motorEx.getVelocity());
     }
 
     /**

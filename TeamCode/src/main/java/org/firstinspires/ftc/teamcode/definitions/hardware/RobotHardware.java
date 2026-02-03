@@ -47,6 +47,7 @@ public class RobotHardware
     private final String backRightName = RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT;
 
     private final String outtakeLauncherLeftName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
+    private final String outtakeLauncherRightName = RobotConstants.Outtake.Name.LAUNCHER_RIGHT;
     private final PIDFCoefficients outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
     private final int outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
     private final int outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;
@@ -140,8 +141,9 @@ public class RobotHardware
         try
         {
             VelocityMotor outtakeLeft = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), battery);
-            // VelocityMotor outtakeRight = new MotorEx
-            outtake = new VelocityMotorGroup(outtakeLeft)
+            VelocityMotor outtakeRight = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE), battery);
+
+            outtake = new VelocityMotorGroup(outtakeLeft, outtakeRight)
                     .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf)
                     .setPIDF(outtakePIDF)
@@ -186,6 +188,7 @@ public class RobotHardware
                     .setVoltageCompensation(12)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         } catch (Exception e)
         {
             telemetry.log().add("Warning: Intake motor not found");
