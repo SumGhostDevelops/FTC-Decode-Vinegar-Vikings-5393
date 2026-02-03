@@ -116,7 +116,7 @@ public class Outtake extends SubsystemBase
 
     public void off(boolean force)
     {
-        if (state == State.OFF & !force)
+        if (state == State.OFF && !force)
         {
             return;
         }
