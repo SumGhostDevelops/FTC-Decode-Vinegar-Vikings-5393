@@ -38,31 +38,33 @@ public class RobotHardware
     public PositionMotor turret;
     public ServoEx transfer;
 
-    private final String pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
-    private final Distance forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
-    private final Distance strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
-    private final String webcamName = RobotConstants.Odometry.Webcam.NAME;
+    private String pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
+    private Distance forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
+    private Distance strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
+    private String webcamName = RobotConstants.Odometry.Webcam.NAME;
 
-    private final String frontLeftName = RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT;
-    private final String frontRightName = RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT;
-    private final String backLeftName = RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT;
-    private final String backRightName = RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT;
+    private String frontLeftName = RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT;
+    private String frontRightName = RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT;
+    private String backLeftName = RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT;
+    private String backRightName = RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT;
 
-    private final String outtakeLauncherLeftName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
-    private final String outtakeLauncherRightName = RobotConstants.Outtake.Name.LAUNCHER_RIGHT;
-    private final PIDFCoefficients outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
-    private final int outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
-    private final int outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;
+    private String outtakeLauncherLeftName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
+    private String outtakeLauncherRightName = RobotConstants.Outtake.Name.LAUNCHER_RIGHT;
+    private PIDFCoefficients outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
+    private int outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
+    private int outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;
 
-    private final String turretName = RobotConstants.Turret.NAME;
-    private final double turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
-    private final PIDFCoefficients turretPIDF = RobotConstants.Turret.PIDF;
-    private final double turretToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
+    private String turretName = RobotConstants.Turret.NAME;
+    private double turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
+    private PIDFCoefficients turretPIDF = RobotConstants.Turret.PIDF;
+    private double turretToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
 
-    private final String transferName = RobotConstants.Transfer.NAME;
-    private final double transferCloseIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
+    private String transferName = RobotConstants.Transfer.NAME;
+    private double transferCloseIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
 
-    private final String intakeName = RobotConstants.Intake.NAME;
+    private String intakeName = RobotConstants.Intake.NAME;
+    private PIDFCoefficients intakePIDF = RobotConstants.Intake.PIDF;
+
 
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry)
     {
@@ -189,6 +191,8 @@ public class RobotHardware
         {
             intake = new VelocityMotor(new MotorEx(hardwareMap, intakeName, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
                     .setVoltageCompensation(12)
+                    .setPIDF(intakePIDF)
+                    .setControllerType(VelocityMotor.VelocityController.PIDF)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
