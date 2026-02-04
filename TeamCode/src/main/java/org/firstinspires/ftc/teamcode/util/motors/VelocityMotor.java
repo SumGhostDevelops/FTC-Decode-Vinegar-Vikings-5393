@@ -136,6 +136,14 @@ public class VelocityMotor extends PowerMotor
         return this;
     }
 
+    @Override
+    public VelocityMotor setMotorDirection(Motor.Direction direction)
+    {
+        super.setMotorDirection(direction);
+
+        return this;
+    }
+
     /**
      * Sets the target RPM as a scale of the motor's maximum RPM.
      *
