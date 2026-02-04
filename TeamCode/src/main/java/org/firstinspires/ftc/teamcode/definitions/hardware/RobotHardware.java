@@ -145,10 +145,11 @@ public class RobotHardware
         // Outtake
         try
         {
-            VelocityMotor outtakeLeft = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), () -> cachedVoltage);
-            VelocityMotor outtakeRight = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE), () -> cachedVoltage);
+            VelocityMotor outtakeTop = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), () -> cachedVoltage);
+            VelocityMotor outtakeBottom = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE), () -> cachedVoltage)
+                    .setMotorDirection(Motor.Direction.REVERSE);
 
-            outtake = new VelocityMotorGroup(outtakeLeft, outtakeRight)
+            outtake = new VelocityMotorGroup(outtakeTop, outtakeBottom)
                     .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf)
                     .setPIDF(outtakePIDF)

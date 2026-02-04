@@ -247,7 +247,7 @@ public class PIDFTuner extends OpMode
 
         if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
-            double rpmTarget = gamepad1.right_trigger * 6000;
+            double rpmTarget = gamepad1.right_trigger * 3000;
             if (rpmTarget > 100)
             {
                 outtake.setTargetRPM(rpmTarget);

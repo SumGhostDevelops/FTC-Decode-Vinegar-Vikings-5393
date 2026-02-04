@@ -142,7 +142,7 @@ public class RobotConstants
         @Sorter(sort = 5)
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]
         {
-                new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES),
+                new UnnormalizedAngle(-260, UnnormalizedAngleUnit.DEGREES),
                 new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
         @Sorter(sort = 6)
         public static boolean AUTO_AIM_TO_GOAL = false;
