@@ -43,7 +43,7 @@ public class Webcam
 
     public Webcam(WebcamName webcam)
     {
-        this(webcam, DistanceUnit.METER, true);
+        this(webcam, DistanceUnit.INCH, true);
     }
 
     protected Webcam(WebcamName webcam, DistanceUnit unit)
