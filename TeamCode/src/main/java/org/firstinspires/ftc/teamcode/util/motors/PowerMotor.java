@@ -8,6 +8,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 
+import java.util.function.DoubleSupplier;
+
 /**
  * The PowerMotor class provides an abstraction for controlling a motor with
  * additional
@@ -19,8 +21,8 @@ public class PowerMotor
     // The motor object that this class wraps around
     protected final MotorEx motorEx;
 
-    // Voltage sensor for battery monitoring
-    protected VoltageSensor battery;
+    // Voltage supplier for battery monitoring
+    protected DoubleSupplier voltageSupplier;
 
     // Voltage compensation value
     private double voltageCompensation = 12.0;
@@ -61,7 +63,31 @@ public class PowerMotor
     public PowerMotor(MotorEx motorEx, VoltageSensor battery)
     {
         this(motorEx);
-        this.battery = battery;
+        this.voltageSupplier = () ->
+        {
+            try
+            {
+                return battery.getVoltage();
+            } catch (Exception e)
+            {
+                return 12.0;
+            }
+        };
+    }
+
+    /**
+     * Constructor to initialize the PowerMotor with a MotorEx instance and a
+     * DoubleSupplier for voltage.
+     *
+     * @param motorEx
+     *            The MotorEx instance to be controlled.
+     * @param voltageSupplier
+     *            The Supplier for monitoring battery voltage.
+     */
+    public PowerMotor(MotorEx motorEx, DoubleSupplier voltageSupplier)
+    {
+        this(motorEx);
+        this.voltageSupplier = voltageSupplier;
     }
 
     /**
@@ -227,12 +253,12 @@ public class PowerMotor
      */
     public double getVoltageScale()
     {
-        if (battery == null)
+        if (voltageSupplier == null)
             return 1.0;
 
         // Get voltage, but don't let it drop below 10.0V in the math
         // This prevents massive multipliers if the sensor glitches
-        double effectiveVoltage = Math.max(battery.getVoltage(), 10.0);
+        double effectiveVoltage = Math.max(voltageSupplier.getAsDouble(), 10.0);
 
         return voltageCompensation / effectiveVoltage;
     }

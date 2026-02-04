@@ -65,6 +65,24 @@ public class PositionMotor extends PowerMotor
     }
 
     /**
+     * Constructor to initialize the PositionMotor with a MotorEx instance and a
+     * DoubleSupplier.
+     * Sets the default controller type to PIDF and the motor run mode to RawPower.
+     *
+     * @param motorEx
+     *            The MotorEx instance to be controlled.
+     * @param voltageSupplier
+     *            The Supplier for monitoring battery voltage.
+     */
+    public PositionMotor(MotorEx motorEx, DoubleSupplier voltageSupplier)
+    {
+        super(motorEx, voltageSupplier);
+
+        setControllerType(PositionController.PIDF);
+        motorEx.setRunMode(Motor.RunMode.RawPower);
+    }
+
+    /**
      * Sets the power used when turning (only for SquIDF controller).
      *
      * @param power

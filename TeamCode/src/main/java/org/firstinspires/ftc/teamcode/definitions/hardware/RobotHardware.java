@@ -25,6 +25,8 @@ import java.util.List;
 public class RobotHardware
 {
     public VoltageSensor battery;
+    private double cachedVoltage = 12.0;
+
     public List<LynxModule> hubs;
 
     public Pinpoint pinpoint;
@@ -77,6 +79,7 @@ public class RobotHardware
         try
         {
             battery = hardwareMap.voltageSensor.iterator().next();
+            cachedVoltage = battery.getVoltage();
         } catch (Exception e)
         {
             telemetry.log().add("Warning: Voltage sensor not found");
@@ -117,19 +120,19 @@ public class RobotHardware
         // Drive
         try
         {
-            frontLeft = new PowerMotor(new MotorEx(hardwareMap, frontLeftName, Motor.GoBILDA.RPM_312))
+            frontLeft = new PowerMotor(new MotorEx(hardwareMap, frontLeftName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            frontRight = new PowerMotor(new MotorEx(hardwareMap, frontRightName, Motor.GoBILDA.RPM_312))
+            frontRight = new PowerMotor(new MotorEx(hardwareMap, frontRightName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            backLeft = new PowerMotor(new MotorEx(hardwareMap, backLeftName, Motor.GoBILDA.RPM_312))
+            backLeft = new PowerMotor(new MotorEx(hardwareMap, backLeftName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            backRight = new PowerMotor(new MotorEx(hardwareMap, backRightName, Motor.GoBILDA.RPM_312))
+            backRight = new PowerMotor(new MotorEx(hardwareMap, backRightName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
                     .setMotorDirection(Motor.Direction.FORWARD)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         } catch (Exception e)
@@ -140,8 +143,8 @@ public class RobotHardware
         // Outtake
         try
         {
-            VelocityMotor outtakeLeft = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), battery);
-            VelocityMotor outtakeRight = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE), battery);
+            VelocityMotor outtakeLeft = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), () -> cachedVoltage);
+            VelocityMotor outtakeRight = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE), () -> cachedVoltage);
 
             outtake = new VelocityMotorGroup(outtakeLeft, outtakeRight)
                     .setVoltageCompensation(12)
@@ -156,7 +159,7 @@ public class RobotHardware
 
         try
         {
-            turret = new PositionMotor(new MotorEx(hardwareMap, turretName, Motor.GoBILDA.RPM_435), battery)
+            turret = new PositionMotor(new MotorEx(hardwareMap, turretName, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
                     .setVoltageCompensation(12) // 100% power >= 12 volts
                     .usePower(1)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
@@ -184,7 +187,7 @@ public class RobotHardware
 
         try
         {
-            intake = new PowerMotor(new MotorEx(hardwareMap, intakeName, Motor.GoBILDA.RPM_1620))
+            intake = new PowerMotor(new MotorEx(hardwareMap, intakeName, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
                     .setVoltageCompensation(12)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -193,10 +196,19 @@ public class RobotHardware
         {
             telemetry.log().add("Warning: Intake motor not found");
         }
+
     }
 
     public void clearHubCache()
     {
         hubs.forEach(LynxModule::clearBulkCache);
+    }
+
+    public void readBattery()
+    {
+        if (battery != null)
+        {
+            cachedVoltage = battery.getVoltage();
+        }
     }
 }

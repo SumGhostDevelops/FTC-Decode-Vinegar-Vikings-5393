@@ -6,17 +6,21 @@ import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
+import java.util.function.DoubleSupplier;
+
 import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.controller.BangBangController;
 import org.firstinspires.ftc.teamcode.util.controller.TakeBackHalfController;
 
 /**
  * The VelocityMotor class extends the PowerMotor class to provide additional
- * functionality for controlling motor velocity using various control algorithms.
+ * functionality for controlling motor velocity using various control
+ * algorithms.
  */
 public class VelocityMotor extends PowerMotor
 {
-    // The type of velocity controller being used (e.g., PIDF, BangBang, TakeBackHalf)
+    // The type of velocity controller being used (e.g., PIDF, BangBang,
+    // TakeBackHalf)
     private VelocityController controllerType;
 
     // The controller instance used for velocity control
@@ -32,11 +36,15 @@ public class VelocityMotor extends PowerMotor
     private double rpmCachingTolerance = 25;
 
     /**
-     * Constructor to initialize the VelocityMotor with a MotorEx instance and a VoltageSensor.
-     * Sets the default controller type to PIDF and the zero power behavior to FLOAT.
+     * Constructor to initialize the VelocityMotor with a MotorEx instance and a
+     * VoltageSensor.
+     * Sets the default controller type to PIDF and the zero power behavior to
+     * FLOAT.
      *
-     * @param motorEx The MotorEx instance to be controlled.
-     * @param battery The VoltageSensor for monitoring battery voltage.
+     * @param motorEx
+     *            The MotorEx instance to be controlled.
+     * @param battery
+     *            The VoltageSensor for monitoring battery voltage.
      */
     public VelocityMotor(MotorEx motorEx, VoltageSensor battery)
     {
@@ -47,9 +55,30 @@ public class VelocityMotor extends PowerMotor
     }
 
     /**
-     * Sets the type of velocity controller to be used (e.g., PIDF, BangBang, TakeBackHalf).
+     * Constructor to initialize the VelocityMotor with a MotorEx instance and a
+     * DoubleSupplier.
+     * Sets the default controller type to PIDF and the zero power behavior to
+     * FLOAT.
      *
-     * @param velocityController The desired velocity controller type.
+     * @param motorEx
+     *            The MotorEx instance to be controlled.
+     * @param voltageSupplier
+     *            The Supplier for monitoring battery voltage.
+     */
+    public VelocityMotor(MotorEx motorEx, DoubleSupplier voltageSupplier)
+    {
+        super(motorEx, voltageSupplier);
+
+        motorEx.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        setControllerType(VelocityController.PIDF);
+    }
+
+    /**
+     * Sets the type of velocity controller to be used (e.g., PIDF, BangBang,
+     * TakeBackHalf).
+     *
+     * @param velocityController
+     *            The desired velocity controller type.
      * @return The current VelocityMotor instance for method chaining.
      */
     public VelocityMotor setControllerType(VelocityController velocityController)
@@ -74,10 +103,14 @@ public class VelocityMotor extends PowerMotor
     /**
      * Sets the PIDF coefficients for the velocity controller.
      *
-     * @param kp Proportional gain.
-     * @param ki Integral gain.
-     * @param kd Derivative gain.
-     * @param kf Feedforward gain.
+     * @param kp
+     *            Proportional gain.
+     * @param ki
+     *            Integral gain.
+     * @param kd
+     *            Derivative gain.
+     * @param kf
+     *            Feedforward gain.
      * @return The current VelocityMotor instance for method chaining.
      */
     public VelocityMotor setPIDF(double kp, double ki, double kd, double kf)
@@ -88,7 +121,8 @@ public class VelocityMotor extends PowerMotor
     /**
      * Sets the PIDF coefficients for the velocity controller.
      *
-     * @param coefficients The PIDFCoefficients object containing the PIDF values.
+     * @param coefficients
+     *            The PIDFCoefficients object containing the PIDF values.
      * @return The current VelocityMotor instance for method chaining.
      */
     public VelocityMotor setPIDF(PIDFCoefficients coefficients)
@@ -102,8 +136,10 @@ public class VelocityMotor extends PowerMotor
     /**
      * Sets the tolerance for the velocity controller.
      *
-     * @param rpmTolerance   The tolerance for RPM.
-     * @param accelTolerance The tolerance for acceleration.
+     * @param rpmTolerance
+     *            The tolerance for RPM.
+     * @param accelTolerance
+     *            The tolerance for acceleration.
      * @return The current VelocityMotor instance for method chaining.
      */
     public VelocityMotor setTolerance(double rpmTolerance, double accelTolerance)
@@ -116,7 +152,8 @@ public class VelocityMotor extends PowerMotor
     /**
      * Overriding the zero power behavior is not allowed for VelocityMotor.
      *
-     * @param behavior The zero power behavior (ignored).
+     * @param behavior
+     *            The zero power behavior (ignored).
      * @return The current VelocityMotor instance for method chaining.
      */
     public VelocityMotor setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior)
@@ -125,7 +162,8 @@ public class VelocityMotor extends PowerMotor
     }
 
     /**
-     * @param volts The desired voltage compensation value.
+     * @param volts
+     *            The desired voltage compensation value.
      * @return
      */
     @Override
@@ -139,7 +177,8 @@ public class VelocityMotor extends PowerMotor
     /**
      * Sets the target RPM as a scale of the motor's maximum RPM.
      *
-     * @param scale The scale (0 to 1) of the motor's maximum RPM.
+     * @param scale
+     *            The scale (0 to 1) of the motor's maximum RPM.
      */
     public void setScale(double scale)
     {
@@ -161,7 +200,8 @@ public class VelocityMotor extends PowerMotor
     /**
      * Sets the target RPM for the motor.
      *
-     * @param rpm The desired target RPM.
+     * @param rpm
+     *            The desired target RPM.
      */
     public void setTargetRPM(double rpm)
     {
@@ -181,7 +221,8 @@ public class VelocityMotor extends PowerMotor
     /**
      * Sets the RPM caching tolerance.
      *
-     * @param rpm The desired RPM caching tolerance.
+     * @param rpm
+     *            The desired RPM caching tolerance.
      * @return The current VelocityMotor instance for method chaining.
      */
     public VelocityMotor setRpmCachingTolerance(double rpm)
@@ -204,7 +245,8 @@ public class VelocityMotor extends PowerMotor
     /**
      * Updates the motor's velocity control loop.
      * If the target RPM is zero or less, the motor is stopped.
-     * Otherwise, the controller calculates the output power to achieve the target RPM.
+     * Otherwise, the controller calculates the output power to achieve the target
+     * RPM.
      */
     @Override
     public void update()
@@ -250,5 +292,7 @@ public class VelocityMotor extends PowerMotor
      * Enum representing the types of velocity controllers available.
      */
     public enum VelocityController
-    {PIDF, BangBang, TakeBackHalf}
+    {
+        PIDF, BangBang, TakeBackHalf
+    }
 }

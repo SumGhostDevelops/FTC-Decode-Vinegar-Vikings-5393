@@ -104,6 +104,7 @@ public abstract class BaseStable extends CommandOpMode
     public void run()
     {
         robot.hw.clearHubCache();
+        robot.hw.readBattery();
         manageMatchTimer();
         update();
         super.run();
@@ -248,7 +249,8 @@ public abstract class BaseStable extends CommandOpMode
         if (autoAimToGoal)
         {
             opModeActive.whileActiveContinuous(aimCmd);
-        } else
+        }
+        else
         {
             driver.getGamepadButton(GamepadKeys.Button.Y).toggleWhenPressed(aimCmd);
         }
