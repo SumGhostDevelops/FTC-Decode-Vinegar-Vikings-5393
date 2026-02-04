@@ -49,7 +49,7 @@ public class Pose2d {
                 coordSys);
 
         return new Pose2d(coord,
-                new FieldHeading((pose.getOrientation().getYaw(AngleUnit.RADIANS)), AngleUnit.RADIANS, coordSys));
+                new FieldHeading((pose.getOrientation().getYaw(AngleUnit.DEGREES)), AngleUnit.DEGREES, coordSys));
     }
 
     /**
@@ -64,17 +64,17 @@ public class Pose2d {
         // Transform SDK coordinates: (y, -x) rotates from (Audience/Blue) to
         // (Blue/Backstage)
         FieldCoordinate coord = new FieldCoordinate(
+                new Distance(robotPose.getPosition().x, robotPose.getPosition().unit),
                 new Distance(robotPose.getPosition().y, robotPose.getPosition().unit),
-                new Distance(-robotPose.getPosition().x, robotPose.getPosition().unit),
-                CoordinateSystem.APRILTAG_SDK);
+                CoordinateSystem.DECODE_FTC);
 
         FieldHeading heading = new FieldHeading(
-                robotPose.getOrientation().getYaw(AngleUnit.RADIANS),
-                AngleUnit.RADIANS,
-                CoordinateSystem.APRILTAG_SDK);
+                robotPose.getOrientation().getYaw(AngleUnit.DEGREES),
+                AngleUnit.DEGREES,
+                CoordinateSystem.DECODE_FTC);
 
         // Convert from APRILTAG_SDK to DECODE_FTC
-        return new Pose2d(coord, heading).toCoordinateSystem(CoordinateSystem.DECODE_FTC);
+        return new Pose2d(coord, heading);
     }
 
     public Pose2d toDistanceUnit(DistanceUnit distanceUnit) {

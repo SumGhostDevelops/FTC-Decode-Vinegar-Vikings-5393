@@ -12,12 +12,6 @@ public enum CoordinateSystem {
     DECODE_PEDROPATH(Direction.BLUE, Direction.BACKSTAGE, Direction.UP,
             new Coordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH))),
 
-    // AprilTag SDK output after (y, -x) transform: +X = Blue, +Y = Backstage,
-    // center at (0,0)
-    // Same axes as PedroPath, used as intermediate for AprilTag data conversion
-    APRILTAG_SDK(Direction.BLUE, Direction.BACKSTAGE, Direction.UP,
-            new Coordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH))),
-
     // Safe default for center to avoid NPEs if used accidentally
     GENERIC(Direction.UP, Direction.UP, Direction.UP,
             new Coordinate(new Distance(0, DistanceUnit.INCH), new Distance(0, DistanceUnit.INCH)));

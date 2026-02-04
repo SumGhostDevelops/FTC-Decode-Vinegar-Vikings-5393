@@ -228,7 +228,7 @@ public class Odometry extends SubsystemBase
 
         telemetry.log().add(String.format("Raw robotPose: x=%.2f, y=%.2f (%s), yaw=%.1f°", rawX, rawY, unit, rawYaw));
 
-        Pose2d estimatedPose = Pose2d.fromAprilTagRobotPose(tag.robotPose);
+        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
 
         // Preserve driver's relative heading before resetting hardware
         FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
