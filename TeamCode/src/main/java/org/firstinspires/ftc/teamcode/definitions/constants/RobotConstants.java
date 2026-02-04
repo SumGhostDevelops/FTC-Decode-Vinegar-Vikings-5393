@@ -179,17 +179,6 @@ public class RobotConstants
 
         @Sorter(sort = 3)
         public static double CLOSE_TRANSFER_ANGLE = 0;
-
-        @Configurable
-        public static class TimerConstants
-        {
-            @Sorter(sort = 0)
-            public static int totalTime = 600;
-            @Sorter(sort = 1)
-            public static int upTime = 300;
-            @Sorter(sort = 2)
-            public static int downTime = 300;
-        }
     }
 
     @Configurable
