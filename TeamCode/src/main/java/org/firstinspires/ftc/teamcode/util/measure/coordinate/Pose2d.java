@@ -54,23 +54,27 @@ public class Pose2d {
 
     /**
      * Converts AprilTag SDK's robotPose to our Pose2d.
-     * The AprilTag SDK uses a different coordinate frame than FTC Standard:
-     * SDK Y → FTC X, SDK X (negated) → FTC Y.
-     * This is effectively a 90° clockwise rotation.
+     * SDK outputs in (+X=Audience, +Y=Blue). We transform with (y, -x) to get
+     * (+X=Blue, +Y=Backstage) in APRILTAG_SDK, then convert to DECODE_FTC.
      *
      * @param robotPose The robotPose from AprilTagDetection
      * @return A Pose2d in DECODE_FTC coordinate system
      */
     public static Pose2d fromAprilTagRobotPose(Pose3D robotPose) {
+        // Transform SDK coordinates: (y, -x) rotates from (Audience/Blue) to
+        // (Blue/Backstage)
         FieldCoordinate coord = new FieldCoordinate(
                 new Distance(robotPose.getPosition().y, robotPose.getPosition().unit),
                 new Distance(-robotPose.getPosition().x, robotPose.getPosition().unit),
-                CoordinateSystem.DECODE_FTC);
+                CoordinateSystem.APRILTAG_SDK);
 
-        return new Pose2d(coord, new FieldHeading(
+        FieldHeading heading = new FieldHeading(
                 robotPose.getOrientation().getYaw(AngleUnit.RADIANS),
                 AngleUnit.RADIANS,
-                CoordinateSystem.DECODE_FTC));
+                CoordinateSystem.APRILTAG_SDK);
+
+        // Convert from APRILTAG_SDK to DECODE_FTC
+        return new Pose2d(coord, heading).toCoordinateSystem(CoordinateSystem.DECODE_FTC);
     }
 
     public Pose2d toDistanceUnit(DistanceUnit distanceUnit) {
