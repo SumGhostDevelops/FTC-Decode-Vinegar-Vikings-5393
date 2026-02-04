@@ -30,7 +30,7 @@ public class Subsystems
         this.transfer = new Transfer(hw.transfer);
         this.outtake = new Outtake(hw.outtake);
         this.turret = new Turret(hw.turret, turretForwardAngle);
-        this.odometry = new Odometry(hw.pinpoint, hw.webcam, new Pose2d(team.base.coord, team.forwardAngle));
+        this.odometry = new Odometry(hw.pinpoint, hw.webcam, new Pose2d(team.base.coord, team.initialPose.heading));
 
         // Wire turret rotation compensation from odometry angular velocity
         this.turret.setAngularVelocitySupplier(() -> this.odometry.getHeadingVelocity().getDegrees());
