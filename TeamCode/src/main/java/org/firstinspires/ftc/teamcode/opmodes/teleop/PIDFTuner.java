@@ -59,6 +59,7 @@ public class PIDFTuner extends OpMode
     private PositionMotor turret;
     private VelocityMotorGroup outtake;
     private VoltageSensor battery;
+    private double cachedVoltage = 12.0;
 
     // Current PIDF values
     private PIDFCoefficients turretPIDF;
@@ -99,6 +100,7 @@ public class PIDFTuner extends OpMode
         try
         {
             battery = hardwareMap.voltageSensor.iterator().next();
+            cachedVoltage = battery.getVoltage();
         } catch (Exception e)
         {
             telemetry.log().add("Warning: Voltage sensor not found");
@@ -107,7 +109,7 @@ public class PIDFTuner extends OpMode
         // Initialize Turret
         try
         {
-            turret = new PositionMotor(new MotorEx(hardwareMap, turretName, Motor.GoBILDA.RPM_435), battery)
+            turret = new PositionMotor(new MotorEx(hardwareMap, turretName, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
                     .setVoltageCompensation(12)
                     .usePower(1)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
@@ -131,7 +133,7 @@ public class PIDFTuner extends OpMode
         try
         {
             VelocityMotor outtakeMotor = new VelocityMotor(
-                    new MotorEx(hardwareMap, outtakeName, Motor.GoBILDA.BARE), battery);
+                    new MotorEx(hardwareMap, outtakeName, Motor.GoBILDA.BARE), () -> cachedVoltage);
             outtake = new VelocityMotorGroup(outtakeMotor)
                     .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf);
@@ -158,6 +160,8 @@ public class PIDFTuner extends OpMode
     @Override
     public void loop()
     {
+        if (battery != null)
+            cachedVoltage = battery.getVoltage();
         handleInput();
         updateHardware();
         collectTuningData();
