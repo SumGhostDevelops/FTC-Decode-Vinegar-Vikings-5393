@@ -112,8 +112,7 @@ public class RobotConstants
         @Configurable
         public static class Coefficients
         {
-            // public static double[] veloCoeffs = new double[]{10, 3, 2, 0};
-            public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 1);
+            public static PIDFCoefficients PIDF = new PIDFCoefficients(0, 0.00001, 0, 0); // only change I
         }
 
         @Configurable
@@ -149,7 +148,7 @@ public class RobotConstants
         public static boolean AUTO_AIM_TO_GOAL = false;
 
         @Sorter(sort = 7)
-        // public static double[] pidf = new double[]{10, 1, 1, 1};
+        // only change p and d
         public static PIDFCoefficients PIDF = new PIDFCoefficients(0.1, 0.00, 0.00075, 0.00);
 
         @Sorter(sort = 8)
