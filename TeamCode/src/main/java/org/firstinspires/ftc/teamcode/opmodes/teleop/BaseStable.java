@@ -266,8 +266,8 @@ public abstract class BaseStable extends CommandOpMode
     {
         if (regressionTestingMode)
         {
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 25));
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -25));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 50));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -50));
         }
         if (autoDistanceAdjustment)
         {
