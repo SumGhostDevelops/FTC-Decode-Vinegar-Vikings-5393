@@ -199,12 +199,14 @@ public abstract class BaseStable extends CommandOpMode
 
         if (enableGraphOutput)
         {
-            Graph.put("Turret (Position)", s.turret.getRelativeUnnormalizedAngle().getDegrees());
-            Graph.put("Turret (Position Target)", s.turret.getTargetAngleDegrees());
+            Graph.put("Turret (Degrees)", s.turret.getRelativeUnnormalizedAngle().getDegrees());
+            Graph.put("Turret (Target Degrees)", s.turret.getTargetAngleDegrees());
             Graph.put("Outtake (RPM)", s.outtake.getRPM());
             Graph.put("Outtake (RPM^2)", s.outtake.getRPMAcceleration());
             Graph.put("Outtake (RPM Target)", s.outtake.getTargetRPM());
+            Graph.put("Outtake (Power)", robot.hw.outtake.getPower());
             Graph.put("Intake (RPM)", s.intake.getRPM());
+            Graph.put("Intake (Power)", robot.hw.intake.getPower());
             Graph.update();
         }
     }

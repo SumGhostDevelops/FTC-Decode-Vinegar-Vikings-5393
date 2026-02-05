@@ -65,7 +65,6 @@ public class RobotHardware
     private String intakeName = RobotConstants.Intake.NAME;
     private PIDFCoefficients intakePIDF = RobotConstants.Intake.PIDF;
 
-
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry)
     {
         try

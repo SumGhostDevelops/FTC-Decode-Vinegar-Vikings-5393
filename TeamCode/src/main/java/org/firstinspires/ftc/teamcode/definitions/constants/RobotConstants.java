@@ -112,7 +112,7 @@ public class RobotConstants
         @Configurable
         public static class Coefficients
         {
-            public static PIDFCoefficients PIDF = new PIDFCoefficients(0, 0.00001, 0, 0); // only change I
+            public static PIDFCoefficients PIDF = new PIDFCoefficients(0, 0.0002, 0, 0.00016); // only change I
         }
 
         @Configurable

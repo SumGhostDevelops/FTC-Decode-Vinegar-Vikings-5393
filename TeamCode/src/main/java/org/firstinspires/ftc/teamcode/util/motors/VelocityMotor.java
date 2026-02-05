@@ -94,7 +94,7 @@ public class VelocityMotor extends PowerMotor
                 controller = new BangBangController(coefficients.p, coefficients.f);
                 break;
             case TakeBackHalf:
-                controller = new TakeBackHalfController(coefficients.i);
+                controller = new TakeBackHalfController(coefficients.i, coefficients.f);
         }
 
         return this;
@@ -294,6 +294,10 @@ public class VelocityMotor extends PowerMotor
     {
         super.stopMotor();
         targetRPM = 0.0;
+        if (controller != null)
+        {
+            controller.reset();
+        }
     }
 
     /**

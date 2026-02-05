@@ -30,6 +30,9 @@ public class PowerMotor
     // Flag to indicate if the motor is stopped
     protected boolean stopped = false;
 
+    // The last set power command
+    private double lastSetPower = 0.0;
+
     // Filter factor: 0.0 = infinite smoothing (no change), 1.0 = no smoothing (raw
     // data)
     // Start with 0.8. If still noisy, lower it. If too laggy, raise it.
@@ -280,7 +283,18 @@ public class PowerMotor
     public void setPower(double power)
     {
         stopped = false;
+        lastSetPower = power;
         motorEx.set(MathUtil.clamp(power * getVoltageScale(), -1, 1));
+    }
+
+    /**
+     * Gets the last set power of the motor.
+     *
+     * @return The last set power level.
+     */
+    public double getPower()
+    {
+        return lastSetPower;
     }
 
     /**
@@ -292,6 +306,7 @@ public class PowerMotor
         if (stopped)
             return;
 
+        lastSetPower = 0.0;
         motorEx.set(0);
         stopped = true;
     }

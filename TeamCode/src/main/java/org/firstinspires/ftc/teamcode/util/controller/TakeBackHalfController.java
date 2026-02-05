@@ -15,12 +15,14 @@ public class TakeBackHalfController extends PIDFController
     private double tbhVal = 0;
 
     /**
-     * // kP = 0, kI = gain, kD = 0, kF = 0
      * @param gain
+     *            The integral gain (kI)
+     * @param kF
+     *            The feedforward term
      */
-    public TakeBackHalfController(double gain)
+    public TakeBackHalfController(double gain, double kF)
     {
-        super(0, gain, 0, 0);
+        super(0, gain, 0, kF);
     }
 
     @Override
@@ -36,7 +38,8 @@ public class TakeBackHalfController extends PIDFController
         prevErrorVal = errorVal_p;
 
         double currentTimeStamp = (double) System.nanoTime() / 1E9;
-        if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
+        if (lastTimeStamp == 0)
+            lastTimeStamp = currentTimeStamp;
         period = currentTimeStamp - lastTimeStamp;
         lastTimeStamp = currentTimeStamp;
 
@@ -52,6 +55,7 @@ public class TakeBackHalfController extends PIDFController
         totalError += kI * errorVal_p * period;
 
         // Clamp totalError to motor limits [-1, 1]
+        // Note: We clamp the *integral* part, but the final output will include FF
         totalError = MathUtils.clamp(totalError, -1.0, 1.0);
 
         // Zero Crossing Detection
@@ -61,6 +65,7 @@ public class TakeBackHalfController extends PIDFController
             tbhVal = totalError;
         }
 
-        return totalError;
+        // Return Total Error (Integral) + Feedforward
+        return totalError + (kF * setPoint);
     }
 }
