@@ -201,8 +201,10 @@ public abstract class BaseStable extends CommandOpMode
         {
             Graph.put("Turret (Degrees)", s.turret.getRelativeUnnormalizedAngle().getDegrees());
             Graph.put("Turret (Target Degrees)", s.turret.getTargetAngleDegrees());
-            Graph.put("Outtake (RPM)", s.outtake.getRPM());
-            Graph.put("Outtake (RPM^2)", s.outtake.getRPMAcceleration());
+            Graph.put("Outtake (Motor RPM)", s.outtake.getMotorRPM());
+            Graph.put("Outtake (Motor RPM^2)", s.outtake.getMotorRPMAcceleration());
+            Graph.put("Outtake (Flywheel RPM)", s.outtake.getFlywheelRPM());
+            Graph.put("Outtake (Flywheel RPM^2)", s.outtake.getFlywheelRPMAcceleration());
             Graph.put("Outtake (RPM Target)", s.outtake.getTargetRPM());
             Graph.put("Outtake (Power)", robot.hw.outtake.getPower());
             Graph.put("Intake (RPM)", s.intake.getRPM());
@@ -264,8 +266,8 @@ public abstract class BaseStable extends CommandOpMode
     {
         if (regressionTestingMode)
         {
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 25));
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -25));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 50));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -50));
         }
         if (autoDistanceAdjustment)
         {

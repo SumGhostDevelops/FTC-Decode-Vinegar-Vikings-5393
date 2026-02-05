@@ -39,6 +39,9 @@ public class PowerMotor
     private final double accelFilterFactor = RobotConstants.General.MOTOR_ACCELERATION_FILTER_FACTOR;
     private double lastFilteredAccel = 0.0;
 
+    // Stored distance per pulse value for calculating output RPM from gear ratios
+    protected double distancePerPulse = 1.0;
+
     /**
      * Constructor to initialize the PowerMotor with a MotorEx instance.
      * Sets the motor to run in raw power mode.
@@ -147,6 +150,7 @@ public class PowerMotor
      */
     public PowerMotor setDistancePerPulse(double distancePerPulse)
     {
+        this.distancePerPulse = distancePerPulse;
         motorEx.setDistancePerPulse(distancePerPulse);
 
         return this;
@@ -202,21 +206,31 @@ public class PowerMotor
     }
 
     /**
-     * Gets the current RPM (Revolutions Per Minute) of the motor.
+     * Gets the current RPM (Revolutions Per Minute) of the motor shaft.
      *
      * @return The current RPM of the motor.
      */
-    public double getRPM()
+    public double getMotorRPM()
     {
         return tpsToRpm(motorEx.getVelocity());
     }
 
     /**
-     * Gets the current acceleration in RPM^2 of the motor.
+     * Gets the current RPM at the output, adjusted by the set gear ratios (distance per pulse).
+     *
+     * @return The current output RPM based on the gear ratio.
+     */
+    public double getOutputRPM()
+    {
+        return getMotorRPM() * distancePerPulse * motorEx.getCPR();
+    }
+
+    /**
+     * Gets the current acceleration in RPM^2 of the motor shaft.
      *
      * @return The current acceleration in RPM^2.
      */
-    public double getRPMAcceleration()
+    public double getMotorRPMAcceleration()
     {
         double rawAccel = tps2ToRpm2(motorEx.getAcceleration());
 
@@ -225,6 +239,16 @@ public class PowerMotor
                 + ((1.0 - accelFilterFactor) * lastFilteredAccel);
 
         return lastFilteredAccel;
+    }
+
+    /**
+     * Gets the current acceleration in RPM^2 at the output, adjusted by the set gear ratios (distance per pulse).
+     *
+     * @return The current output acceleration in RPM^2 based on the gear ratio.
+     */
+    public double getOutputRPMAcceleration()
+    {
+        return getMotorRPMAcceleration() * distancePerPulse * motorEx.getCPR();
     }
 
     /**

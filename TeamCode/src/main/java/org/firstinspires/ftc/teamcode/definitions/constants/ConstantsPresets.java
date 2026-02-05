@@ -7,6 +7,7 @@ public class ConstantsPresets
         DEFAULT,
         TESTING,
         COMPETITION,
+        COMPETITION_TESTING
     }
 
     /**
@@ -35,10 +36,16 @@ public class ConstantsPresets
             case COMPETITION:
                 RobotConstants.Outtake.ON_BY_DEFAULT = true;
                 RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
-                RobotConstants.General.REGRESSION_TESTING_MODE = false;
+                RobotConstants.General.REGRESSION_TESTING_MODE = true;
                 RobotConstants.Turret.AUTO_AIM_TO_GOAL = true;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = true;
                 break;
+            case COMPETITION_TESTING:
+                RobotConstants.Outtake.ON_BY_DEFAULT = true;
+                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
+                RobotConstants.General.REGRESSION_TESTING_MODE = false;
+                RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
+                RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
         }
     }
 }

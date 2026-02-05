@@ -53,6 +53,8 @@ public class RobotHardware
     private PIDFCoefficients outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
     private int outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
     private int outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;
+    private double outtakeInputGearRatio = RobotConstants.Outtake.INPUT_GEAR_RATIO;
+    private double outtakeOutputGearRatio = RobotConstants.Outtake.OUTPUT_GEAR_RATIO;
 
     private String turretName = RobotConstants.Turret.NAME;
     private double turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
@@ -144,8 +146,10 @@ public class RobotHardware
         // Outtake
         try
         {
-            VelocityMotor outtakeTop = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), () -> cachedVoltage);
+            VelocityMotor outtakeTop = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), () -> cachedVoltage)
+                    .setDistancePerPulse(outtakeInputGearRatio, outtakeOutputGearRatio);
             VelocityMotor outtakeBottom = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE), () -> cachedVoltage)
+                    .setDistancePerPulse(outtakeInputGearRatio, outtakeOutputGearRatio)
                     .setMotorDirection(Motor.Direction.REVERSE);
 
             outtake = new VelocityMotorGroup(outtakeTop, outtakeBottom)

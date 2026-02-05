@@ -32,11 +32,11 @@ public class Intake extends SubsystemBase
 
     public double getRPM()
     {
-        return intake.getRPM();
+        return intake.getMotorRPM();
     }
 
     public double getAcceleration()
     {
-        return intake.getRPMAcceleration();
+        return intake.getMotorRPMAcceleration();
     }
 }

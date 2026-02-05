@@ -133,7 +133,8 @@ public class PIDFTuner extends OpMode
         try
         {
             VelocityMotor outtakeMotor = new VelocityMotor(
-                    new MotorEx(hardwareMap, outtakeName, Motor.GoBILDA.BARE), () -> cachedVoltage);
+                    new MotorEx(hardwareMap, outtakeName, Motor.GoBILDA.BARE), () -> cachedVoltage)
+                    .setDistancePerPulse(RobotConstants.Outtake.INPUT_GEAR_RATIO, RobotConstants.Outtake.OUTPUT_GEAR_RATIO);
             outtake = new VelocityMotorGroup(outtakeMotor)
                     .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf);
@@ -250,7 +251,7 @@ public class PIDFTuner extends OpMode
             double rpmTarget = gamepad1.right_trigger * 3000;
             if (rpmTarget > 100)
             {
-                outtake.setTargetRPM(rpmTarget);
+                outtake.setOutputTargetRPM(rpmTarget);
             }
         }
 
@@ -318,9 +319,9 @@ public class PIDFTuner extends OpMode
         }
         else if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
-            testStartValue = outtake.getRPM();
+            testStartValue = outtake.getOutputRPM();
             testTargetValue = RobotConstants.Outtake.BASE_RPM; // Use base RPM as target
-            outtake.setTargetRPM(testTargetValue);
+            outtake.setOutputTargetRPM(testTargetValue);
         }
     }
 
@@ -396,7 +397,7 @@ public class PIDFTuner extends OpMode
         }
         else if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
-            currentValue = outtake.getRPM();
+            currentValue = outtake.getOutputRPM();
             error = testTargetValue - currentValue;
         }
         else
@@ -583,7 +584,7 @@ public class PIDFTuner extends OpMode
         }
         else if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
-            telemetry.addData("RPM", String.format("%.0f / %.0f", outtake.getRPM(), outtake.getTargetRPM()));
+            telemetry.addData("RPM", String.format("%.0f / %.0f", outtake.getOutputRPM(), outtake.getOutputTargetRPM()));
             telemetry.addData("At Target", outtake.atSetPoint());
         }
 
