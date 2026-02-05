@@ -80,7 +80,7 @@ public class Webcam
         visionPortal = new VisionPortal.Builder()
                 .addProcessor(tagProcessor)
                 .setCamera(webcam)
-                .setCameraResolution(new Size(1920, 1080))
+                .setCameraResolution(new Size(1280, 720))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .enableLiveView(showLiveView)
                 .build();
