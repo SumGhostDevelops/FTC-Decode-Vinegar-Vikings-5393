@@ -199,52 +199,6 @@ public class Odometry extends SubsystemBase
         return true;
     }
 
-    /**
-     * Localizes using an AprilTag and prints raw robotPose values to telemetry for
-     * debugging.
-     *
-     * @param telemetry Telemetry object to log debug values
-     * @return If the localization was successful or not
-     */
-    public boolean localizeWithDebugTelemetry(org.firstinspires.ftc.robotcore.external.Telemetry telemetry)
-    {
-        // verify the apriltag exists
-        webcam.updateDetections();
-
-        Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
-        if (possibleTag.isEmpty())
-        {
-            telemetry.log().add("Localization: No AprilTag detected");
-            return false;
-        }
-
-        AprilTagDetection tag = possibleTag.get();
-
-        // Log raw robotPose values for debugging
-        double rawX = tag.robotPose.getPosition().x;
-        double rawY = tag.robotPose.getPosition().y;
-        double rawYaw = tag.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
-        String unit = tag.robotPose.getPosition().unit.toString();
-
-        telemetry.log().add(String.format("Raw robotPose: x=%.2f, y=%.2f (%s), yaw=%.1f°", rawX, rawY, unit, rawYaw));
-
-        Pose2d estimatedPose = Pose2d.fromAprilTagRobotPose(tag.robotPose);
-
-        // Preserve driver's relative heading before resetting hardware
-        FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
-
-        // Update driverForward based on the new absolute estimate
-        driverForward = estimatedPose.heading.minus(currentDriverHeading);
-
-        // Set hardware to the new estimated pose (translation and rotation)
-        pinpoint.setPosition(estimatedPose.toPose2D());
-
-        // Log converted pose values
-        telemetry.log().add(String.format("Converted Pose2d: %s", estimatedPose.toString()));
-
-        return true;
-    }
-
     @Override
     public void periodic()
     {

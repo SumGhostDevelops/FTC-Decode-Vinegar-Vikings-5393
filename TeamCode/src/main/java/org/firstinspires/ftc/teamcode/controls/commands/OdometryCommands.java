@@ -79,14 +79,14 @@ public class OdometryCommands
         {
             super(() ->
             {
-                boolean success = odometry.localizeWithDebugTelemetry(telemetry);
+                boolean success = odometry.localizeWithAprilTag();
                 if (success)
                 {
-                    telemetry.log().add("Localization with debug: SUCCESS");
+                    telemetry.log().add("Localization: SUCCESS");
                 }
                 else
                 {
-                    telemetry.log().add("Localization with debug: FAILED - no AprilTag");
+                    telemetry.log().add("Localization: FAILED - no AprilTag");
                 }
             });
         }
