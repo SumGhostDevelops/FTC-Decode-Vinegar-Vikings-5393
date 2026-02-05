@@ -147,6 +147,11 @@ public class VelocityMotorGroup
         return group[0].getRPMAcceleration();
     }
 
+    public double getPower()
+    {
+        return group[0].getPower();
+    }
+
     public void update()
     {
         for (VelocityMotor motor : group)
