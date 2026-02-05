@@ -182,6 +182,14 @@ public class VelocityMotor extends PowerMotor
         return this;
     }
 
+    @Override
+    public VelocityMotor setDistancePerPulse(double inputGearRatio, double outputGearRatio)
+    {
+        super.setDistancePerPulse(inputGearRatio, outputGearRatio);
+
+        return this;
+    }
+
     /**
      * Sets the target RPM as a scale of the motor's maximum RPM.
      *
@@ -192,7 +200,7 @@ public class VelocityMotor extends PowerMotor
     {
         scale = MathUtil.clamp(scale, 0, 1);
 
-        setTargetRPM(scale * motorEx.getMaxRPM());
+        setMotorTargetRPM(scale * motorEx.getMaxRPM());
     }
 
     /**
@@ -206,14 +214,28 @@ public class VelocityMotor extends PowerMotor
     }
 
     /**
-     * Sets the target RPM for the motor.
+     * Sets the target RPM for the motor shaft.
      *
      * @param rpm
-     *            The desired target RPM.
+     *            The desired target RPM for the motor shaft.
      */
-    public void setTargetRPM(double rpm)
+    public void setMotorTargetRPM(double rpm)
     {
         this.targetRPM = MathUtil.clamp(rpm, 0, motorEx.getMaxRPM());
+    }
+
+    /**
+     * Sets the target RPM at the output, which will be converted to motor RPM
+     * using the gear ratios (distance per pulse).
+     *
+     * @param rpm
+     *            The desired target RPM at the output.
+     */
+    public void setOutputTargetRPM(double rpm)
+    {
+        // Convert output RPM to motor RPM using inverse of gear ratio
+        double motorRPM = rpm / (distancePerPulse * motorEx.getCPR());
+        setMotorTargetRPM(motorRPM);
     }
 
     /**
@@ -267,7 +289,7 @@ public class VelocityMotor extends PowerMotor
             return;
         }
 
-        double currentRPM = getRPM();
+        double currentRPM = getMotorRPM();
         double output = 0;
 
         // Calculate base output

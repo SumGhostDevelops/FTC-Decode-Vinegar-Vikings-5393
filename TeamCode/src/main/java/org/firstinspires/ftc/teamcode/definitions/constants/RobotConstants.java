@@ -24,7 +24,7 @@ public class RobotConstants
     {
         public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean ENERGY_SAVER_MODE = false;
-        public static boolean REGRESSION_TESTING_MODE = false;
+        public static boolean REGRESSION_TESTING_MODE = true;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.8;
     }
 
@@ -87,7 +87,8 @@ public class RobotConstants
         @Sorter(sort = 0)
         public static int PPR = 28;
         @Sorter(sort = 1)
-        public static double GEAR_RATIO = 1.5; // driver::driving 3::2
+        public static double INPUT_GEAR_RATIO = 3;
+        public static double OUTPUT_GEAR_RATIO = 2;
 
         @Sorter(sort = 2)
         public static int BASE_RPM = 3700;

@@ -5,9 +5,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.math.BetterInterpLUT;
-import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
-import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
 public class Outtake extends SubsystemBase
@@ -80,7 +78,7 @@ public class Outtake extends SubsystemBase
         double desired = targetRPM;
         if (Math.abs(desired - setRPM) > RPM_EPS || force)
         {
-            motor.setTargetRPM(desired);
+            motor.setOutputTargetRPM(desired);
             setRPM = desired;
         }
     }
@@ -105,7 +103,7 @@ public class Outtake extends SubsystemBase
         double desired = targetRPM / 2.0;
         if (Math.abs(desired - setRPM) > RPM_EPS || force)
         {
-            motor.setTargetRPM(desired);
+            motor.setOutputTargetRPM(desired);
             setRPM = desired;
         }
     }
@@ -191,7 +189,7 @@ public class Outtake extends SubsystemBase
 
         if (Math.abs(desired - setRPM) > RPM_EPS)
         {
-            motor.setTargetRPM(desired);
+            motor.setOutputTargetRPM(desired);
             setRPM = desired;
         }
     }
@@ -218,14 +216,24 @@ public class Outtake extends SubsystemBase
         return targetRPM;
     }
 
-    public double getRPM()
+    public double getMotorRPM()
     {
-        return motor.getRPM();
+        return motor.getMotorRPM();
     }
 
-    public double getRPMAcceleration()
+    public double getMotorRPMAcceleration()
     {
-        return motor.getRPMAcceleration();
+        return motor.getMotorRPMAcceleration();
+    }
+
+    public double getFlywheelRPM()
+    {
+        return motor.getOutputRPM();
+    }
+
+    public double getFlywheelRPMAcceleration()
+    {
+        return motor.getOutputRPMAcceleration();
     }
 
     /**
@@ -254,7 +262,7 @@ public class Outtake extends SubsystemBase
 
         for (int i = 0; i < motor.group.length; i++)
         {
-            str += "Motor " + i+1 + ": " + motor.group[i].getRPM() + " RPM | ";
+            str += "Motor " + i+1 + ": " + motor.group[i].getMotorRPM() + " RPM | ";
         }
 
         return str;

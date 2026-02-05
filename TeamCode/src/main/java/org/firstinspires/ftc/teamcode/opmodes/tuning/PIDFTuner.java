@@ -250,7 +250,7 @@ public class PIDFTuner extends OpMode
             double rpmTarget = gamepad1.right_trigger * 3000;
             if (rpmTarget > 100)
             {
-                outtake.setTargetRPM(rpmTarget);
+                outtake.setOutputTargetRPM(rpmTarget);
             }
         }
 
@@ -318,9 +318,9 @@ public class PIDFTuner extends OpMode
         }
         else if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
-            testStartValue = outtake.getRPM();
+            testStartValue = outtake.getOutputRPM();
             testTargetValue = RobotConstants.Outtake.BASE_RPM; // Use base RPM as target
-            outtake.setTargetRPM(testTargetValue);
+            outtake.setOutputTargetRPM(testTargetValue);
         }
     }
 
@@ -396,7 +396,7 @@ public class PIDFTuner extends OpMode
         }
         else if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
-            currentValue = outtake.getRPM();
+            currentValue = outtake.getOutputRPM();
             error = testTargetValue - currentValue;
         }
         else
@@ -583,7 +583,7 @@ public class PIDFTuner extends OpMode
         }
         else if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
-            telemetry.addData("RPM", String.format("%.0f / %.0f", outtake.getRPM(), outtake.getTargetRPM()));
+            telemetry.addData("RPM", String.format("%.0f / %.0f", outtake.getOutputRPM(), outtake.getTargetRPM()));
             telemetry.addData("At Target", outtake.atSetPoint());
         }
 

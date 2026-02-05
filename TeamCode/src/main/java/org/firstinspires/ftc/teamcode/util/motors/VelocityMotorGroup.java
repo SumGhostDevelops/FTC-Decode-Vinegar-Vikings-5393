@@ -85,11 +85,19 @@ public class VelocityMotorGroup
         return group[0].getTargetRPM();
     }
 
-    public void setTargetRPM(double rpm)
+    public void setMotorTargetRPM(double rpm)
     {
         for (VelocityMotor motor : group)
         {
-            motor.setTargetRPM(rpm);
+            motor.setMotorTargetRPM(rpm);
+        }
+    }
+
+    public void setOutputTargetRPM(double rpm)
+    {
+        for (VelocityMotor motor : group)
+        {
+            motor.setOutputTargetRPM(rpm);
         }
     }
 
@@ -125,26 +133,36 @@ public class VelocityMotorGroup
         return group[0].atSetPoint();
     }
 
-    public double getRPM()
+    public double getMotorRPM()
     {
-        return group[0].getRPM();
+        return group[0].getMotorRPM();
     }
 
-    public double[] getRPMs()
+    public double[] getMotorRPMs()
     {
         double[] rpms = new double[group.length];
 
         for (int i = 0; i < group.length; i++)
         {
-            rpms[i] = group[i].getRPM();
+            rpms[i] = group[i].getMotorRPM();
         }
 
         return rpms;
     }
 
-    public double getRPMAcceleration()
+    public double getMotorRPMAcceleration()
     {
-        return group[0].getRPMAcceleration();
+        return group[0].getMotorRPMAcceleration();
+    }
+
+    public double getOutputRPM()
+    {
+        return group[0].getOutputRPM();
+    }
+
+    public double getOutputRPMAcceleration()
+    {
+        return group[0].getOutputRPMAcceleration();
     }
 
     public double getPower()
