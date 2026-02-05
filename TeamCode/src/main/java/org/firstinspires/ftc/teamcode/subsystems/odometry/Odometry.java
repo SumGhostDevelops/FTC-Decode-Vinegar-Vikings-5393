@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
-import static java.lang.Thread.sleep;
-
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -12,14 +10,14 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
-import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
-import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
@@ -46,7 +44,8 @@ public class Odometry extends SubsystemBase
 
     public Odometry(Pinpoint pinpoint, WebcamName webcam)
     {
-        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
+        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH),
+                new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
     }
 
     public Odometry(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
@@ -85,7 +84,7 @@ public class Odometry extends SubsystemBase
 
     /**
      * @return A heading where 0 is conceptually "Forward" (aligned with Pedro
-     *         X-Axis/Blue Alliance)
+     * X-Axis/Blue Alliance)
      */
     public Angle getDriverHeading()
     {
@@ -151,7 +150,7 @@ public class Odometry extends SubsystemBase
 
     /**
      * Localizes using an AprilTag
-     * 
+     *
      * @return If the localization was successful or not
      */
     public boolean localizeWithAprilTag()
@@ -164,7 +163,7 @@ public class Odometry extends SubsystemBase
             return false;
 
         AprilTagDetection tag = possibleTag.get();
-        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
+        Pose2d estimatedPose = Pose2d.fromAprilTagRobotPose(tag.robotPose);
 
         // Preserve driver's relative heading before resetting hardware
         FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
@@ -181,7 +180,7 @@ public class Odometry extends SubsystemBase
     /**
      * Localizes using an AprilTag, and automatically sets the driver forward
      * direction (if enabled)
-     * 
+     *
      * @param team
      * @return If localization was successful or not
      */

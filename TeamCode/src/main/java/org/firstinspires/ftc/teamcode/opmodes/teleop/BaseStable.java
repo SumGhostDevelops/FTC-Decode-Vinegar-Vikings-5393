@@ -242,7 +242,7 @@ public abstract class BaseStable extends CommandOpMode
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(s.odometry));
         driver.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new OdometryCommands.LocalizeWithRumble(s.odometry, telemetry, driver.gamepad));
+                .whenPressed(new OdometryCommands.LocalizeWithDebugTelemetry(s.odometry, telemetry));
     }
 
     private void bindTurretControls(Trigger opModeActive, GamepadEx driver, Subsystems s)

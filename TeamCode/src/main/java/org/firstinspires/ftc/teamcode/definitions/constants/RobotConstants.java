@@ -227,7 +227,6 @@ public class RobotConstants
             @Configurable
             public static class Lens
             {
-
                 public static double LENS_FX = 958.876;
                 public static double LENS_FY = 958.876;
                 public static double LENS_CX = 654.11;
@@ -251,7 +250,8 @@ public class RobotConstants
 
                 // Camera orientation (YawPitchRoll) - FTC SDK Convention:
                 // Yaw: 0 = pointing forward, +90 = pointing left, -90 = pointing right
-                // Pitch: 0 = horizontal (forward), -90 = pointing down, +90 = pointing up
+                // Pitch: 0 = pointing straight up, -90 = horizontal (forward), +90 = pointing
+                // straight down
                 // Roll: 0 = level, +/-90 = vertical, 180 = upside-down
                 //
                 // NOTE: If camera localization became inaccurate after hardware changes,
@@ -260,7 +260,7 @@ public class RobotConstants
                 @Sorter(sort = 0)
                 public static Angle YAW = new Angle(0, AngleUnit.DEGREES);
                 @Sorter(sort = 1)
-                public static Angle PITCH = new Angle(0, AngleUnit.DEGREES); // horizontal camera looking forward
+                public static Angle PITCH = new Angle(0, AngleUnit.DEGREES); // horizontal camera pointing forward
                 @Sorter(sort = 2)
                 public static Angle ROLL = new Angle(0, AngleUnit.DEGREES);
             }
