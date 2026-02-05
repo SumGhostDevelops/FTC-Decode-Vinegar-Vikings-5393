@@ -80,9 +80,14 @@ public class VelocityMotorGroup
         return this;
     }
 
-    public double getTargetRPM()
+    public double getMotorTargetRPM()
     {
-        return group[0].getTargetRPM();
+        return group[0].getMotorTargetRPM();
+    }
+
+    public double getOutputTargetRPM()
+    {
+        return group[0].getOutputTargetRPM();
     }
 
     public void setMotorTargetRPM(double rpm)

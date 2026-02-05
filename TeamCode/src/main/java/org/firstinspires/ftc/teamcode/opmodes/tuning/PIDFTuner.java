@@ -133,7 +133,8 @@ public class PIDFTuner extends OpMode
         try
         {
             VelocityMotor outtakeMotor = new VelocityMotor(
-                    new MotorEx(hardwareMap, outtakeName, Motor.GoBILDA.BARE), () -> cachedVoltage);
+                    new MotorEx(hardwareMap, outtakeName, Motor.GoBILDA.BARE), () -> cachedVoltage)
+                    .setDistancePerPulse(RobotConstants.Outtake.INPUT_GEAR_RATIO, RobotConstants.Outtake.OUTPUT_GEAR_RATIO);
             outtake = new VelocityMotorGroup(outtakeMotor)
                     .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf);
@@ -583,7 +584,7 @@ public class PIDFTuner extends OpMode
         }
         else if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
-            telemetry.addData("RPM", String.format("%.0f / %.0f", outtake.getOutputRPM(), outtake.getTargetRPM()));
+            telemetry.addData("RPM", String.format("%.0f / %.0f", outtake.getOutputRPM(), outtake.getOutputTargetRPM()));
             telemetry.addData("At Target", outtake.atSetPoint());
         }
 

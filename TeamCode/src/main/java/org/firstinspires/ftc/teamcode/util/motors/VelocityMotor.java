@@ -204,13 +204,24 @@ public class VelocityMotor extends PowerMotor
     }
 
     /**
-     * Gets the current target RPM of the motor.
+     * Gets the current target RPM of the motor shaft.
      *
-     * @return The target RPM.
+     * @return The motor shaft target RPM.
      */
-    public double getTargetRPM()
+    public double getMotorTargetRPM()
     {
         return targetRPM;
+    }
+
+    /**
+     * Gets the current target RPM at the output, converted from motor RPM
+     * using the gear ratios (distance per pulse).
+     *
+     * @return The output target RPM.
+     */
+    public double getOutputTargetRPM()
+    {
+        return targetRPM * distancePerPulse * motorEx.getCPR();
     }
 
     /**
