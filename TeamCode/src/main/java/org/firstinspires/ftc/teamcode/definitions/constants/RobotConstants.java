@@ -22,7 +22,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION_TESTING;
         public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = true;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.8;
@@ -91,7 +91,7 @@ public class RobotConstants
         public static double OUTPUT_GEAR_RATIO = 2;
 
         @Sorter(sort = 2)
-        public static int BASE_RPM = 3700;
+        public static int BASE_RPM = 3000;
 
         @Sorter(sort = 3)
         public static boolean ON_BY_DEFAULT = false;
