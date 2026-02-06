@@ -4,10 +4,7 @@ public class ConstantsPresets
 {
     public enum Preset
     {
-        DEFAULT,
-        TESTING,
-        COMPETITION,
-        COMPETITION_TESTING
+        DEFAULT, TESTING, COMPETITION, COMPETITION_TESTING
     }
 
     /**
@@ -15,11 +12,12 @@ public class ConstantsPresets
      */
     public static void applyPreset()
     {
-        applyPreset(RobotConstants.General.PRESET_OPTION);
+        applyPreset(RobotConstants.General.PRESET_OPTION.get());
     }
 
     /**
      * Applies the provided {@link Preset}
+     * 
      * @param preset
      */
     public static void applyPreset(Preset preset)
@@ -29,25 +27,25 @@ public class ConstantsPresets
             case DEFAULT:
                 break;
             case TESTING:
-                RobotConstants.Outtake.ON_BY_DEFAULT = false;
-                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = false;
-                RobotConstants.General.REGRESSION_TESTING_MODE = true;
-                RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
-                RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
+                RobotConstants.Outtake.ON_BY_DEFAULT = () -> false;
+                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = () -> false;
+                RobotConstants.General.REGRESSION_TESTING_MODE = () -> true;
+                RobotConstants.Turret.AUTO_AIM_TO_GOAL = () -> false;
+                RobotConstants.Intake.INTAKE_BY_DEFAULT = () -> false;
                 break;
             case COMPETITION:
-                RobotConstants.Outtake.ON_BY_DEFAULT = true;
-                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
-                RobotConstants.General.REGRESSION_TESTING_MODE = true;
-                RobotConstants.Turret.AUTO_AIM_TO_GOAL = true;
-                RobotConstants.Intake.INTAKE_BY_DEFAULT = true;
+                RobotConstants.Outtake.ON_BY_DEFAULT = () -> true;
+                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = () -> true;
+                RobotConstants.General.REGRESSION_TESTING_MODE = () -> true;
+                RobotConstants.Turret.AUTO_AIM_TO_GOAL = () -> true;
+                RobotConstants.Intake.INTAKE_BY_DEFAULT = () -> true;
                 break;
             case COMPETITION_TESTING:
-                RobotConstants.Outtake.ON_BY_DEFAULT = true;
-                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = false;
-                RobotConstants.General.REGRESSION_TESTING_MODE = true;
-                RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
-                RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
+                RobotConstants.Outtake.ON_BY_DEFAULT = () -> true;
+                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = () -> false;
+                RobotConstants.General.REGRESSION_TESTING_MODE = () -> true;
+                RobotConstants.Turret.AUTO_AIM_TO_GOAL = () -> false;
+                RobotConstants.Intake.INTAKE_BY_DEFAULT = () -> false;
         }
     }
 }

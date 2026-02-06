@@ -21,13 +21,15 @@ import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class Odometry extends SubsystemBase
 {
     private final Pinpoint pinpoint;
     private final Webcam webcam;
 
-    private final boolean setForwardBasedOnTeam = RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM;
+    private final BooleanSupplier setForwardBasedOnTeam = RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM;
 
     private static final AngleUnit aUnit = AngleUnit.DEGREES;
     private static final DistanceUnit dUnit = DistanceUnit.INCH;
@@ -84,7 +86,7 @@ public class Odometry extends SubsystemBase
 
     /**
      * @return A heading where 0 is conceptually "Forward" (aligned with Pedro
-     * X-Axis/Blue Alliance)
+     *         X-Axis/Blue Alliance)
      */
     public Angle getDriverHeading()
     {
@@ -191,7 +193,7 @@ public class Odometry extends SubsystemBase
             return false;
         }
 
-        if (setForwardBasedOnTeam)
+        if (setForwardBasedOnTeam.getAsBoolean())
         {
             driverForward = team.forwardAngle;
         }

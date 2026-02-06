@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.PositionMotor;
 import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
@@ -21,6 +22,10 @@ import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 public class RobotHardware
 {
@@ -38,34 +43,34 @@ public class RobotHardware
     public PositionMotor turret;
     public ServoEx transfer;
 
-    private String pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
-    private Distance forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
-    private Distance strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
-    private String webcamName = RobotConstants.Odometry.Webcam.NAME;
+    private Supplier<String> pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
+    private Supplier<Distance> forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
+    private Supplier<Distance> strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
+    private Supplier<String> webcamName = RobotConstants.Odometry.Webcam.NAME;
 
-    private String frontLeftName = RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT;
-    private String frontRightName = RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT;
-    private String backLeftName = RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT;
-    private String backRightName = RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT;
+    private Supplier<String> frontLeftName = RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT;
+    private Supplier<String> frontRightName = RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT;
+    private Supplier<String> backLeftName = RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT;
+    private Supplier<String> backRightName = RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT;
 
-    private String outtakeLauncherLeftName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
-    private String outtakeLauncherRightName = RobotConstants.Outtake.Name.LAUNCHER_RIGHT;
-    private PIDFCoefficients outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
-    private int outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
-    private int outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;
-    private double outtakeInputGearRatio = RobotConstants.Outtake.INPUT_GEAR_RATIO;
-    private double outtakeOutputGearRatio = RobotConstants.Outtake.OUTPUT_GEAR_RATIO;
+    private Supplier<String> outtakeLauncherLeftName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
+    private Supplier<String> outtakeLauncherRightName = RobotConstants.Outtake.Name.LAUNCHER_RIGHT;
+    private Supplier<PIDFCoefficients> outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
+    private IntSupplier outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
+    private IntSupplier outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;
+    private DoubleSupplier outtakeInputGearRatio = RobotConstants.Outtake.INPUT_GEAR_RATIO;
+    private DoubleSupplier outtakeOutputGearRatio = RobotConstants.Outtake.OUTPUT_GEAR_RATIO;
 
-    private String turretName = RobotConstants.Turret.NAME;
-    private double turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
-    private PIDFCoefficients turretPIDF = RobotConstants.Turret.PIDF;
-    private double turretToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
+    private Supplier<String> turretName = RobotConstants.Turret.NAME;
+    private DoubleSupplier turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
+    private Supplier<PIDFCoefficients> turretPIDF = RobotConstants.Turret.PIDF;
+    private Supplier<Angle> turretToleranceDegrees = RobotConstants.Turret.TOLERANCE;
 
-    private String transferName = RobotConstants.Transfer.NAME;
-    private double transferCloseIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
+    private Supplier<String> transferName = RobotConstants.Transfer.NAME;
+    private DoubleSupplier transferCloseIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
 
-    private String intakeName = RobotConstants.Intake.NAME;
-    private PIDFCoefficients intakePIDF = RobotConstants.Intake.PIDF;
+    private Supplier<String> intakeName = RobotConstants.Intake.NAME;
+    private Supplier<PIDFCoefficients> intakePIDF = RobotConstants.Intake.PIDF;
 
     public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry)
     {
@@ -91,16 +96,16 @@ public class RobotHardware
         // Odometry
         try
         {
-            pinpoint = hardwareMap.get(Pinpoint.class, pinpointName);
+            pinpoint = hardwareMap.get(Pinpoint.class, pinpointName.get());
 
             // Pinpoint convention: X offset (left=positive), Y offset (forward=positive)
             // Our RobotConstants convention matches Pinpoint: left=positive,
             // forward=positive
-            DistanceUnit dUnit = forwardWheelOffset.unit;
+            DistanceUnit dUnit = forwardWheelOffset.get().unit;
 
             pinpoint.setOffsets(
-                    forwardWheelOffset.magnitude, // Left is positive in both conventions
-                    strafeWheelOffset.toUnit(dUnit).magnitude, // Forward is positive in both conventions
+                    forwardWheelOffset.get().magnitude, // Left is positive in both conventions
+                    strafeWheelOffset.get().toUnit(dUnit).magnitude, // Forward is positive in both conventions
                     dUnit);
 
             pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -114,7 +119,7 @@ public class RobotHardware
 
         try
         {
-            webcam = hardwareMap.get(WebcamName.class, webcamName);
+            webcam = hardwareMap.get(WebcamName.class, webcamName.get());
         } catch (Exception e)
         {
             telemetry.log().add("Warning: Webcam not found");
@@ -123,19 +128,19 @@ public class RobotHardware
         // Drive
         try
         {
-            frontLeft = new PowerMotor(new MotorEx(hardwareMap, frontLeftName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+            frontLeft = new PowerMotor(new MotorEx(hardwareMap, frontLeftName.get(), Motor.GoBILDA.RPM_312), () -> cachedVoltage)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            frontRight = new PowerMotor(new MotorEx(hardwareMap, frontRightName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+            frontRight = new PowerMotor(new MotorEx(hardwareMap, frontRightName.get(), Motor.GoBILDA.RPM_312), () -> cachedVoltage)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            backLeft = new PowerMotor(new MotorEx(hardwareMap, backLeftName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+            backLeft = new PowerMotor(new MotorEx(hardwareMap, backLeftName.get(), Motor.GoBILDA.RPM_312), () -> cachedVoltage)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-            backRight = new PowerMotor(new MotorEx(hardwareMap, backRightName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+            backRight = new PowerMotor(new MotorEx(hardwareMap, backRightName.get(), Motor.GoBILDA.RPM_312), () -> cachedVoltage)
                     .setMotorDirection(Motor.Direction.FORWARD)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         } catch (Exception e)
@@ -146,22 +151,22 @@ public class RobotHardware
         // Outtake
         try
         {
-            MotorEx outtakeTopEx = new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE);
-            MotorEx outtakeBottomEx = new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE);
+            MotorEx outtakeTopEx = new MotorEx(hardwareMap, outtakeLauncherLeftName.get(), Motor.GoBILDA.BARE);
+            MotorEx outtakeBottomEx = new MotorEx(hardwareMap, outtakeLauncherRightName.get(), Motor.GoBILDA.BARE);
 
             outtakeBottomEx.encoder = outtakeTopEx.encoder;
 
             VelocityMotor outtakeTop = new VelocityMotor(outtakeTopEx, () -> cachedVoltage)
-                    .setDistancePerPulse(outtakeInputGearRatio, outtakeOutputGearRatio);
+                    .setDistancePerPulse(outtakeInputGearRatio.getAsDouble(), outtakeOutputGearRatio.getAsDouble());
             VelocityMotor outtakeBottom = new VelocityMotor(outtakeBottomEx, () -> cachedVoltage)
-                    .setDistancePerPulse(outtakeInputGearRatio, outtakeOutputGearRatio)
+                    .setDistancePerPulse(outtakeInputGearRatio.getAsDouble(), outtakeOutputGearRatio.getAsDouble())
                     .setMotorDirection(Motor.Direction.REVERSE);
 
             outtake = new VelocityMotorGroup(outtakeTop, outtakeBottom)
                     .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf)
-                    .setPIDF(outtakePIDF)
-                    .setTolerance(outtakeToleranceRPM, outtakeToleranceRPMAccel);
+                    .setPIDF(outtakePIDF.get())
+                    .setTolerance(outtakeToleranceRPM.getAsInt(), outtakeToleranceRPMAccel.getAsInt());
         } catch (Exception e)
         {
             telemetry.log().add("Warning: One or more outtake motors not found");
@@ -170,14 +175,14 @@ public class RobotHardware
 
         try
         {
-            turret = new PositionMotor(new MotorEx(hardwareMap, turretName, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
+            turret = new PositionMotor(new MotorEx(hardwareMap, turretName.get(), Motor.GoBILDA.RPM_435), () -> cachedVoltage)
                     .setVoltageCompensation(12) // 100% power >= 12 volts
                     .usePower(1)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
-                    .setDistancePerPulse(1.0, turretGearRatio, AngleUnit.DEGREES) // keep in degrees
+                    .setDistancePerPulse(1.0, turretGearRatio.getAsDouble(), AngleUnit.DEGREES) // keep in degrees
                     .setControllerType(PositionMotor.PositionController.SquIDF)
-                    .setPIDF(turretPIDF)
-                    .setPositionTolerance(turretToleranceDegrees);
+                    .setPIDF(turretPIDF.get())
+                    .setPositionTolerance(turretToleranceDegrees.get().getDegrees());
 
             turret.setTargetDistance(0);
         } catch (Exception e)
@@ -188,8 +193,8 @@ public class RobotHardware
 
         try
         {
-            transfer = new ServoEx(hardwareMap, transferName, 0, 360);
-            transfer.set(transferCloseIntakeAngle);
+            transfer = new ServoEx(hardwareMap, transferName.get(), 0, 360);
+            transfer.set(transferCloseIntakeAngle.getAsDouble());
         } catch (Exception e)
         {
             telemetry.log().add("Warning: Transfer servo not found");
@@ -198,7 +203,7 @@ public class RobotHardware
 
         try
         {
-            intake = new PowerMotor(new MotorEx(hardwareMap, intakeName, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
+            intake = new PowerMotor(new MotorEx(hardwareMap, intakeName.get(), Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
                     .setVoltageCompensation(12)
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

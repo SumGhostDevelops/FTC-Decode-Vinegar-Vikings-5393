@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 /**
  * The PowerMotor class provides an abstraction for controlling a motor with
@@ -36,7 +37,7 @@ public class PowerMotor
     // Filter factor: 0.0 = infinite smoothing (no change), 1.0 = no smoothing (raw
     // data)
     // Start with 0.8. If still noisy, lower it. If too laggy, raise it.
-    private final double accelFilterFactor = RobotConstants.General.MOTOR_ACCELERATION_FILTER_FACTOR;
+    private final DoubleSupplier accelFilterFactor = RobotConstants.General.MOTOR_ACCELERATION_FILTER_FACTOR;
     private double lastFilteredAccel = 0.0;
 
     // Stored distance per pulse value for calculating output RPM from gear ratios
@@ -216,7 +217,8 @@ public class PowerMotor
     }
 
     /**
-     * Gets the current RPM at the output, adjusted by the set gear ratios (distance per pulse).
+     * Gets the current RPM at the output, adjusted by the set gear ratios (distance
+     * per pulse).
      *
      * @return The current output RPM based on the gear ratio.
      */
@@ -235,14 +237,15 @@ public class PowerMotor
         double rawAccel = tps2ToRpm2(motorEx.getAcceleration());
 
         // Low-Pass Filter Implementation (EMA)
-        lastFilteredAccel = (accelFilterFactor * rawAccel)
-                + ((1.0 - accelFilterFactor) * lastFilteredAccel);
+        lastFilteredAccel = (accelFilterFactor.getAsDouble() * rawAccel)
+                + ((1.0 - accelFilterFactor.getAsDouble()) * lastFilteredAccel);
 
         return lastFilteredAccel;
     }
 
     /**
-     * Gets the current acceleration in RPM^2 at the output, adjusted by the set gear ratios (distance per pulse).
+     * Gets the current acceleration in RPM^2 at the output, adjusted by the set
+     * gear ratios (distance per pulse).
      *
      * @return The current output acceleration in RPM^2 based on the gear ratio.
      */
