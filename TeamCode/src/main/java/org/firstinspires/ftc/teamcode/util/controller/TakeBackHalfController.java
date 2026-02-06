@@ -70,33 +70,47 @@ public class TakeBackHalfController extends PIDFController
         // Store previous error for zero-crossing detection
         prevErrorVal = errorVal_p;
 
-        // Update timing (kept for parent class potential usage, e.g. logging or future
-        // expansion)
+        // Update timing
         double currentTimeStamp = (double) System.nanoTime() / 1E9;
         if (lastTimeStamp == 0)
             lastTimeStamp = currentTimeStamp;
         period = currentTimeStamp - lastTimeStamp;
         lastTimeStamp = currentTimeStamp;
 
-        // Current error (errorVal_p) is already calculated in super.calculate()
-        // so we don't need to re-calculate it here.
         measuredValue = pv;
 
-        // 1. Accumulate output directly (traditional TBH - loop dependent)
+        // --- STEP 1: Calculate Feedforward First ---
+        // We need this value to know how much room is left for the integral
+        double ffTerm = kF * setPoint;
+
+        // --- STEP 2: Accumulate Output ---
         output += kI * errorVal_p;
 
-        // 2. Take Back Half on zero-crossing
-        // When error changes sign, average current output with saved TBH value
-        // Skip on first iteration to avoid false zero-crossing detection
+        // --- STEP 3: DYNAMIC ANTI-WINDUP (The Critical Fix) ---
+        // Calculate how much "headroom" is left after Feedforward.
+        // e.g. If FF is 0.9, maxIntegral is 0.1.
+        double maxIntegral = 1.0 - ffTerm;
+
+        // Clamp the internal 'output' variable immediately.
+        // We allow the low end to go to -1.0 to permit "braking" logic internally,
+        // even if your final return limits it to 0.
+        output = MathUtils.clamp(output, -1.0, maxIntegral);
+
+        // --- STEP 4: Take Back Half ---
+        // Now TBH operates on a value that is essentially "Real Power," not "Virtual Math."
         if (!firstIteration && (errorVal_p * prevErrorVal < 0))
         {
             output = 0.5 * (output + tbhVal);
             tbhVal = output;
+
+            // Re-clamp in case the TBH math pushed it slightly out of bounds (rare but safer)
+            output = MathUtils.clamp(output, -1.0, maxIntegral);
         }
 
         firstIteration = false;
 
-        // 3. Return output with Feedforward, clamped to valid motor power range
-        return MathUtils.clamp(output + (kF * setPoint), 0.0, 1.0);
+        // --- STEP 5: Return ---
+        // Final check to ensure we only send positive voltage (0.0 to 1.0)
+        return MathUtils.clamp(output + ffTerm, 0.0, 1.0);
     }
 }
