@@ -79,6 +79,18 @@ public class TakeBackHalfController extends PIDFController
 
         measuredValue = pv;
 
+        double error = setPoint - pv;
+
+        // 1. THE SPEED-UP BOOST
+        // If we are more than 20% away from the target, just send high power.
+        // This ignores the TBH logic entirely until we are close.
+        if (error > (setPoint * 0.20)) {
+            tbhVal = 0;      // Keep TBH clean
+            output = 0.5;    // Start the integral at a healthy midpoint
+            firstIteration = true; // Reset TBH trigger
+            return 0.9;      // Send 90% power to rocket up to speed
+        }
+
         // --- STEP 1: Calculate Feedforward First ---
         // We need this value to know how much room is left for the integral
         double ffTerm = kF * setPoint;
