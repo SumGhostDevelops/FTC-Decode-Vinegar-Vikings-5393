@@ -258,12 +258,7 @@ public class Outtake extends SubsystemBase
     @Override
     public String toString()
     {
-        String str = "State: " + state + " | Target RPM: " + targetRPM + " | ";
-
-        for (int i = 0; i < motor.group.length; i++)
-        {
-            str += "Motor " + i+1 + ": " + motor.group[i].getMotorRPM() + " RPM | ";
-        }
+        String str = "State: " + state + " | Flywheel Target: " + targetRPM + " | Flywheel RPM: " + motor.getOutputRPM();
 
         return str;
     }

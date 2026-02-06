@@ -150,7 +150,7 @@ public class RobotConstants
 
         @Sorter(sort = 7)
         // only change p and d
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.11, 0.00, 0.001, 0.00);
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.10, 0.00, 0.0075, 0.00);
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;
@@ -173,10 +173,10 @@ public class RobotConstants
         public static String NAME = "transfer";
 
         @Sorter(sort = 1)
-        public static double OPEN_ANGLE = 80; // Open means the transfer is allowing balls to pass through
+        public static double OPEN_ANGLE = 90; // Open means the transfer is allowing balls to pass through
 
         @Sorter(sort = 2)
-        public static double CLOSE_INTAKE_ANGLE = 10; // 210; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSE_INTAKE_ANGLE = 210; // 210; // An angle where the trapdoor blocks balls from entering
 
         @Sorter(sort = 3)
         public static double CLOSE_TRANSFER_ANGLE = 0;
@@ -189,11 +189,11 @@ public class RobotConstants
         public static String NAME = "intake";
 
         @Sorter(sort = 1)
-        public static double intakePower = 0.6;
+        public static double intakePower = 0.85;
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
-        public static double transferPower = 0.8;
+        public static double transferPower = 1.0;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
