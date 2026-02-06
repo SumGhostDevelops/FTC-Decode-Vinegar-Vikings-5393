@@ -146,9 +146,14 @@ public class RobotHardware
         // Outtake
         try
         {
-            VelocityMotor outtakeTop = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE), () -> cachedVoltage)
+            MotorEx outtakeTopEx = new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE);
+            MotorEx outtakeBottomEx = new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE);
+
+            outtakeBottomEx.encoder = outtakeTopEx.encoder;
+
+            VelocityMotor outtakeTop = new VelocityMotor(outtakeTopEx, () -> cachedVoltage)
                     .setDistancePerPulse(outtakeInputGearRatio, outtakeOutputGearRatio);
-            VelocityMotor outtakeBottom = new VelocityMotor(new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE), () -> cachedVoltage)
+            VelocityMotor outtakeBottom = new VelocityMotor(outtakeBottomEx, () -> cachedVoltage)
                     .setDistancePerPulse(outtakeInputGearRatio, outtakeOutputGearRatio)
                     .setMotorDirection(Motor.Direction.REVERSE);
 

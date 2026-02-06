@@ -177,9 +177,20 @@ public class VelocityMotorGroup
 
     public void update()
     {
-        for (VelocityMotor motor : group)
+        // Leader-Follower Control:
+        // Update the leader (index 0) which runs the TBH/PID algorithm
+        VelocityMotor leader = group[0];
+        leader.update();
+
+        // Get the calculated power from the leader
+        double leaderPower = leader.getPower();
+
+        // Apply the same power to all followers
+        // We do NOT call update() on followers to avoid independent controller
+        // divergence
+        for (int i = 1; i < group.length; i++)
         {
-            motor.update();
+            group[i].setPower(leaderPower);
         }
     }
 
