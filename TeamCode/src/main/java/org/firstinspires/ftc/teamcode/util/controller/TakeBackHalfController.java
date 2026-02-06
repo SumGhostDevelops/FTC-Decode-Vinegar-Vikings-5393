@@ -12,7 +12,8 @@ import com.seattlesolvers.solverslib.util.MathUtils;
  * - Naturally converges to the correct output without overshoot
  *
  * Usage:
- * - gain: Controls how quickly output accumulates (typical range: 0.0001 - 0.001)
+ * - gain: Controls how quickly output accumulates (typical range: 0.0001 -
+ * 0.001)
  *
  * The algorithm works by continuously accumulating (gain * error) until the
  * error crosses zero, then averaging the current output with the previous
@@ -38,7 +39,20 @@ public class TakeBackHalfController extends PIDFController
      */
     public TakeBackHalfController(double gain)
     {
-        super(0, gain, 0, 0);
+        this(gain, 0);
+    }
+
+    /**
+     * Creates a TakeBackHalfController with Feedforward.
+     *
+     * @param gain
+     *            The TBH gain - controls accumulation rate (stored in kI).
+     * @param f
+     *            The Feedforward gain (stored in kF).
+     */
+    public TakeBackHalfController(double gain, double f)
+    {
+        super(0, gain, 0, f);
     }
 
     @Override
@@ -56,24 +70,22 @@ public class TakeBackHalfController extends PIDFController
         // Store previous error for zero-crossing detection
         prevErrorVal = errorVal_p;
 
-        // Update timing
+        // Update timing (kept for parent class potential usage, e.g. logging or future
+        // expansion)
         double currentTimeStamp = (double) System.nanoTime() / 1E9;
-        if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
+        if (lastTimeStamp == 0)
+            lastTimeStamp = currentTimeStamp;
         period = currentTimeStamp - lastTimeStamp;
         lastTimeStamp = currentTimeStamp;
 
-        // Calculate current error
-        errorVal_p = setPoint - pv;
+        // Current error (errorVal_p) is already calculated in super.calculate()
+        // so we don't need to re-calculate it here.
         measuredValue = pv;
 
-        // 1. Accumulate output directly (classic TBH - NOT time-integrated)
-        // This provides much faster response than period-based integration
+        // 1. Accumulate output directly (traditional TBH - loop dependent)
         output += kI * errorVal_p;
 
-        // 2. Clamp output to valid motor power range
-        output = MathUtils.clamp(output, 0.0, 1.0);
-
-        // 3. Take Back Half on zero-crossing
+        // 2. Take Back Half on zero-crossing
         // When error changes sign, average current output with saved TBH value
         // Skip on first iteration to avoid false zero-crossing detection
         if (!firstIteration && (errorVal_p * prevErrorVal < 0))
@@ -84,6 +96,7 @@ public class TakeBackHalfController extends PIDFController
 
         firstIteration = false;
 
-        return output;
+        // 3. Return output with Feedforward, clamped to valid motor power range
+        return MathUtils.clamp(output + (kF * setPoint), 0.0, 1.0);
     }
 }

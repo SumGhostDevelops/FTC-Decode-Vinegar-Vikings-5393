@@ -94,7 +94,8 @@ public class VelocityMotor extends PowerMotor
                 controller = new BangBangController(coefficients.p, coefficients.f);
                 break;
             case TakeBackHalf:
-                controller = new TakeBackHalfController(coefficients.i);
+                controller = new TakeBackHalfController(coefficients.i, coefficients.f);
+                break;
         }
 
         return this;
