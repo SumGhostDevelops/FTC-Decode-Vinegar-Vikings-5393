@@ -8,22 +8,19 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 public class Drive extends SubsystemBase
 {
     private final PowerMotor frontLeft, frontRight, backLeft, backRight;
 
-    private final DoubleSupplier speedDefault = RobotConstants.Drive.Speed.DEFAULT;
-    private final DoubleSupplier speedChange = RobotConstants.Drive.Speed.CHANGE;
-    private final DoubleSupplier speedMax = RobotConstants.Drive.Speed.MAXIMUM;
-    private final DoubleSupplier speedMin = RobotConstants.Drive.Speed.MINIMUM;
-    private final DoubleSupplier hybridDeadband = RobotConstants.Drive.HybridMode.DEADBAND;
-    private final DoubleSupplier hybridTurnP = RobotConstants.Drive.HybridMode.TURN_P;
+    private final double speedDefault = RobotConstants.Drive.Speed.DEFAULT;
+    private final double speedChange = RobotConstants.Drive.Speed.CHANGE;
+    private final double speedMax = RobotConstants.Drive.Speed.MAXIMUM;
+    private final double speedMin = RobotConstants.Drive.Speed.MINIMUM;
+    private final double hybridDeadband = RobotConstants.Drive.HybridMode.DEADBAND;
+    private final double hybridTurnP = RobotConstants.Drive.HybridMode.TURN_P;
 
-    private double speed = speedDefault.getAsDouble();
-    private Supplier<DriveMode> currentMode = RobotConstants.Drive.DRIVE_MODE;
+    private double speed = speedDefault;
+    private DriveMode currentMode = RobotConstants.Drive.DRIVE_MODE;
 
     public Drive(PowerMotor frontLeft, PowerMotor frontRight, PowerMotor backLeft, PowerMotor backRight)
     {
@@ -40,23 +37,22 @@ public class Drive extends SubsystemBase
 
     public void increaseSpeed()
     {
-        changeSpeed(speedChange.getAsDouble());
+        changeSpeed(speedChange);
     }
 
     public void decreaseSpeed()
     {
-        changeSpeed(-speedChange.getAsDouble());
+        changeSpeed(-speedChange);
     }
 
     public void changeSpeed(double change)
     {
         if (change > 0)
         {
-            speed = Math.min(speed + change, speedMax.getAsDouble());
-        }
-        else
+            speed = Math.min(speed + change, speedMax);
+        } else
         {
-            speed = Math.max(speed + change, speedMin.getAsDouble());
+            speed = Math.max(speed + change, speedMin);
         }
     }
 
@@ -82,7 +78,7 @@ public class Drive extends SubsystemBase
         // Ensure angle is always in radians for Math functions
         double botHeading = driverHeading.getRadians();
 
-        switch (currentMode.get())
+        switch (currentMode)
         {
             case FIELD_CENTRIC:
                 // Standard Field Centric Math
@@ -95,7 +91,7 @@ public class Drive extends SubsystemBase
 
             case ROBOT_CENTRIC_HYBRID:
                 double magnitude = Math.hypot(axial, lateral);
-                if (magnitude > hybridDeadband.getAsDouble())
+                if (magnitude > hybridDeadband)
                 {
                     // Calculate target heading from joystick
                     double targetHeading = Math.atan2(lateral, axial);
@@ -104,14 +100,13 @@ public class Drive extends SubsystemBase
                     // Auto-turn to face target if not manually turning
                     if (Math.abs(yaw) < 0.05)
                     {
-                        rx = Range.clip(error * hybridTurnP.getAsDouble(), -1.0, 1.0);
+                        rx = Range.clip(error * hybridTurnP, -1.0, 1.0);
                     }
 
                     // Drive forward in the new direction
                     rotY = magnitude;
                     rotX = 0;
-                }
-                else
+                } else
                 {
                     rotX = 0;
                     rotY = 0;

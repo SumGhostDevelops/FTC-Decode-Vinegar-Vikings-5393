@@ -16,8 +16,6 @@ import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 /**
  * PIDF Tuning TeleOp Mode.
@@ -89,9 +87,9 @@ public class PIDFTuner extends OpMode
     private boolean prevLB, prevRB, prevStart, prevBack;
 
     // Constants from RobotConstants
-    private final Supplier<String> turretName = RobotConstants.Turret.NAME;
-    private final DoubleSupplier turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
-    private final Supplier<String> outtakeName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
+    private final String turretName = RobotConstants.Turret.NAME;
+    private final double turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
+    private final String outtakeName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
 
     @Override
     public void init()
@@ -111,20 +109,20 @@ public class PIDFTuner extends OpMode
         // Initialize Turret
         try
         {
-            turret = new PositionMotor(new MotorEx(hardwareMap, turretName.get(), Motor.GoBILDA.RPM_435), () -> cachedVoltage)
+            turret = new PositionMotor(new MotorEx(hardwareMap, turretName, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
                     .setVoltageCompensation(12)
                     .usePower(1)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
-                    .setDistancePerPulse(1.0, turretGearRatio.getAsDouble(), AngleUnit.DEGREES)
+                    .setDistancePerPulse(1.0, turretGearRatio, AngleUnit.DEGREES)
                     .setControllerType(PositionMotor.PositionController.SquIDF);
 
             turretPIDF = new PIDFCoefficients(
-                    RobotConstants.Turret.PIDF.get().p,
-                    RobotConstants.Turret.PIDF.get().i,
-                    RobotConstants.Turret.PIDF.get().d,
-                    RobotConstants.Turret.PIDF.get().f);
+                    RobotConstants.Turret.PIDF.p,
+                    RobotConstants.Turret.PIDF.i,
+                    RobotConstants.Turret.PIDF.d,
+                    RobotConstants.Turret.PIDF.f);
             turret.setPIDF(turretPIDF);
-            turret.setPositionTolerance(RobotConstants.Turret.TOLERANCE.get().getDegrees());
+            turret.setPositionTolerance(RobotConstants.Turret.TOLERANCE.getDegrees());
             turret.setTargetDistance(0);
         } catch (Exception e)
         {
@@ -135,21 +133,21 @@ public class PIDFTuner extends OpMode
         try
         {
             VelocityMotor outtakeMotor = new VelocityMotor(
-                    new MotorEx(hardwareMap, outtakeName.get(), Motor.GoBILDA.BARE), () -> cachedVoltage)
-                            .setDistancePerPulse(RobotConstants.Outtake.INPUT_GEAR_RATIO.getAsDouble(), RobotConstants.Outtake.OUTPUT_GEAR_RATIO.getAsDouble());
+                    new MotorEx(hardwareMap, outtakeName, Motor.GoBILDA.BARE), () -> cachedVoltage)
+                    .setDistancePerPulse(RobotConstants.Outtake.INPUT_GEAR_RATIO, RobotConstants.Outtake.OUTPUT_GEAR_RATIO);
             outtake = new VelocityMotorGroup(outtakeMotor)
                     .setVoltageCompensation(12)
                     .setControllerType(VelocityMotor.VelocityController.TakeBackHalf);
 
             outtakePIDF = new PIDFCoefficients(
-                    RobotConstants.Outtake.Coefficients.PIDF.get().p,
-                    RobotConstants.Outtake.Coefficients.PIDF.get().i,
-                    RobotConstants.Outtake.Coefficients.PIDF.get().d,
-                    RobotConstants.Outtake.Coefficients.PIDF.get().f);
+                    RobotConstants.Outtake.Coefficients.PIDF.p,
+                    RobotConstants.Outtake.Coefficients.PIDF.i,
+                    RobotConstants.Outtake.Coefficients.PIDF.d,
+                    RobotConstants.Outtake.Coefficients.PIDF.f);
             outtake.setPIDF(outtakePIDF);
             outtake.setTolerance(
-                    RobotConstants.Outtake.Tolerance.RPM.getAsInt(),
-                    RobotConstants.Outtake.Tolerance.RPM_ACCELERATION.getAsInt());
+                    RobotConstants.Outtake.Tolerance.RPM,
+                    RobotConstants.Outtake.Tolerance.RPM_ACCELERATION);
         } catch (Exception e)
         {
             telemetry.log().add("Warning: Outtake motor not found - " + e.getMessage());
@@ -322,7 +320,7 @@ public class PIDFTuner extends OpMode
         else if (currentMode == TuningMode.OUTTAKE && outtake != null)
         {
             testStartValue = outtake.getOutputRPM();
-            testTargetValue = RobotConstants.Outtake.BASE_RPM.getAsInt(); // Use base RPM as target
+            testTargetValue = RobotConstants.Outtake.BASE_RPM; // Use base RPM as target
             outtake.setOutputTargetRPM(testTargetValue);
         }
     }
@@ -356,18 +354,18 @@ public class PIDFTuner extends OpMode
         if (currentMode == TuningMode.TURRET)
         {
             turretPIDF = new PIDFCoefficients(
-                    RobotConstants.Turret.PIDF.get().p,
-                    RobotConstants.Turret.PIDF.get().i,
-                    RobotConstants.Turret.PIDF.get().d,
-                    RobotConstants.Turret.PIDF.get().f);
+                    RobotConstants.Turret.PIDF.p,
+                    RobotConstants.Turret.PIDF.i,
+                    RobotConstants.Turret.PIDF.d,
+                    RobotConstants.Turret.PIDF.f);
         }
         else
         {
             outtakePIDF = new PIDFCoefficients(
-                    RobotConstants.Outtake.Coefficients.PIDF.get().p,
-                    RobotConstants.Outtake.Coefficients.PIDF.get().i,
-                    RobotConstants.Outtake.Coefficients.PIDF.get().d,
-                    RobotConstants.Outtake.Coefficients.PIDF.get().f);
+                    RobotConstants.Outtake.Coefficients.PIDF.p,
+                    RobotConstants.Outtake.Coefficients.PIDF.i,
+                    RobotConstants.Outtake.Coefficients.PIDF.d,
+                    RobotConstants.Outtake.Coefficients.PIDF.f);
         }
         applyPIDF();
         telemetry.log().add("PIDF reset to defaults");
@@ -419,8 +417,8 @@ public class PIDFTuner extends OpMode
 
         // Calculate settling time (time to stay within tolerance)
         double tolerance = (currentMode == TuningMode.TURRET)
-                ? RobotConstants.Turret.TOLERANCE.get().getDegrees()
-                : RobotConstants.Outtake.Tolerance.RPM.getAsInt();
+                ? RobotConstants.Turret.TOLERANCE.getDegrees()
+                : RobotConstants.Outtake.Tolerance.RPM;
 
         if (Math.abs(error) < tolerance && settlingTime == 0)
         {
@@ -464,7 +462,7 @@ public class PIDFTuner extends OpMode
         if (currentMode == TuningMode.TURRET)
         {
             // Position control analysis
-            double tolerance = RobotConstants.Turret.TOLERANCE.get().getDegrees();
+            double tolerance = RobotConstants.Turret.TOLERANCE.getDegrees();
 
             if (steadyStateError > tolerance * 2)
             {
@@ -512,7 +510,7 @@ public class PIDFTuner extends OpMode
         else
         {
             // Velocity control analysis (TakeBackHalf uses I primarily)
-            double tolerance = RobotConstants.Outtake.Tolerance.RPM.getAsInt();
+            double tolerance = RobotConstants.Outtake.Tolerance.RPM;
 
             if (steadyStateError > tolerance)
             {

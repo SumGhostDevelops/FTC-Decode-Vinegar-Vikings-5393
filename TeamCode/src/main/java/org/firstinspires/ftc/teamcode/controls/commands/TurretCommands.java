@@ -21,6 +21,7 @@ public class TurretCommands
         private final Supplier<Angle> targetAngle;
         private final Supplier<Angle> robotAngle;
 
+
         public AimAbsolute(Turret turret, Supplier<Angle> targetAngle, Supplier<Angle> robotAngle)
         {
             this.turret = turret;
@@ -69,8 +70,7 @@ public class TurretCommands
     }
 
     /**
-     * Command that continuously aims the turret at a target field coordinate (e.g.,
-     * goal).
+     * Command that continuously aims the turret at a target field coordinate (e.g., goal).
      * Uses the robot's current pose from odometry to compute the relative bearing.
      */
     public static class AimToCoordinate extends CommandBase
@@ -79,16 +79,13 @@ public class TurretCommands
         private final FieldCoordinate targetCoord;
         private final Supplier<Pose2d> robotPose;
 
-        private final Supplier<Distance> LINEAR_TOLERANCE = RobotConstants.Turret.LINEAR_TOLERANCE;
-        private final Supplier<Angle> ANGLE_TOLERANCE = RobotConstants.Turret.TOLERANCE;
+        private final Distance LINEAR_TOLERANCE = RobotConstants.Turret.LINEAR_TOLERANCE;
+        private final Angle ANGLE_TOLERANCE = RobotConstants.Turret.TOLERANCE;
 
         /**
-         * @param turret
-         *            The turret subsystem
-         * @param targetCoord
-         *            The target field coordinate to aim at (e.g., team.goal.coord)
-         * @param robotPose
-         *            Supplier for the robot's current pose from odometry
+         * @param turret The turret subsystem
+         * @param targetCoord The target field coordinate to aim at (e.g., team.goal.coord)
+         * @param robotPose Supplier for the robot's current pose from odometry
          */
         public AimToCoordinate(Turret turret, FieldCoordinate targetCoord, Supplier<Pose2d> robotPose)
         {
@@ -101,7 +98,7 @@ public class TurretCommands
         @Override
         public void execute()
         {
-            turret.aimToCoordinate(targetCoord, robotPose.get(), LINEAR_TOLERANCE.get(), ANGLE_TOLERANCE.get());
+            turret.aimToCoordinate(targetCoord, robotPose.get(), LINEAR_TOLERANCE, ANGLE_TOLERANCE);
         }
 
         @Override

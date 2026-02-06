@@ -15,29 +15,26 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 
 public class Webcam
 {
     private final AprilTagProcessor tagProcessor;
     private final VisionPortal visionPortal;
 
-    private final DoubleSupplier xOffset = () -> RobotConstants.Odometry.Webcam.Offset.X.get().getDistance(DistanceUnit.INCH);
-    private final DoubleSupplier yOffset = () -> RobotConstants.Odometry.Webcam.Offset.Y.get().getDistance(DistanceUnit.INCH);
-    private final DoubleSupplier zOffset = () -> RobotConstants.Odometry.Webcam.Offset.Z.get().getDistance(DistanceUnit.INCH);
-    private final DoubleSupplier yawOffset = () -> RobotConstants.Odometry.Webcam.Offset.YAW.get().getAngle(AngleUnit.DEGREES);
-    private final DoubleSupplier pitchOffset = () -> RobotConstants.Odometry.Webcam.Offset.PITCH.get().getAngle(AngleUnit.DEGREES);
-    private final DoubleSupplier rollOffset = () -> RobotConstants.Odometry.Webcam.Offset.ROLL.get().getAngle(AngleUnit.DEGREES);
+    private final double xOffset = RobotConstants.Odometry.Webcam.Offset.X.getDistance(DistanceUnit.INCH);
+    private final double yOffset = RobotConstants.Odometry.Webcam.Offset.Y.getDistance(DistanceUnit.INCH);
+    private final double zOffset = RobotConstants.Odometry.Webcam.Offset.Z.getDistance(DistanceUnit.INCH);
+    private final double yawOffset = RobotConstants.Odometry.Webcam.Offset.YAW.getAngle(AngleUnit.DEGREES);
+    private final double pitchOffset = RobotConstants.Odometry.Webcam.Offset.PITCH.getAngle(AngleUnit.DEGREES);
+    private final double rollOffset = RobotConstants.Odometry.Webcam.Offset.ROLL.getAngle(AngleUnit.DEGREES);
 
-    private final DoubleSupplier lensFX = RobotConstants.Odometry.Webcam.Lens.LENS_FX;
-    private final DoubleSupplier lensFY = RobotConstants.Odometry.Webcam.Lens.LENS_FY;
-    private final DoubleSupplier lensCX = RobotConstants.Odometry.Webcam.Lens.LENS_CX;
-    private final DoubleSupplier lensCY = RobotConstants.Odometry.Webcam.Lens.LENS_CY;
+    private final double lensFX = RobotConstants.Odometry.Webcam.Lens.LENS_FX;
+    private final double lensFY = RobotConstants.Odometry.Webcam.Lens.LENS_FY;
+    private final double lensCX = RobotConstants.Odometry.Webcam.Lens.LENS_CX;
+    private final double lensCY = RobotConstants.Odometry.Webcam.Lens.LENS_CY;
 
-    private final Supplier<int[]> goalIds = RobotConstants.AprilTags.GOAL_IDS;
-    private final Supplier<int[]> obeliskIds = RobotConstants.AprilTags.OBELISK_IDS;
+    private final int[] goalIds = RobotConstants.AprilTags.GOAL_IDS;
+    private final int[] obeliskIds = RobotConstants.AprilTags.OBELISK_IDS;
 
     private List<AprilTagDetection> cachedTagDetections = new ArrayList<>();
 
@@ -58,16 +55,16 @@ public class Webcam
     {
         // Camera position relative to robot center
         Position cameraPosition = new Position(DistanceUnit.INCH,
-                xOffset.getAsDouble(),
-                yOffset.getAsDouble(),
-                zOffset.getAsDouble(),
+                xOffset,
+                yOffset,
+                zOffset,
                 0);
 
         // Camera orientation (yaw, pitch, roll)
         YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
-                yawOffset.getAsDouble(),
-                pitchOffset.getAsDouble(),
-                rollOffset.getAsDouble(),
+                yawOffset,
+                pitchOffset,
+                rollOffset,
                 0);
 
         tagProcessor = new AprilTagProcessor.Builder()
@@ -75,7 +72,7 @@ public class Webcam
                 .setDrawCubeProjection(showLiveView)
                 .setDrawTagID(showLiveView)
                 .setDrawTagOutline(showLiveView)
-                .setLensIntrinsics(lensFX.getAsDouble(), lensFY.getAsDouble(), lensCX.getAsDouble(), lensCY.getAsDouble())
+                .setLensIntrinsics(lensFX, lensFY, lensCX, lensCY)
                 .setCameraPose(cameraPosition, cameraOrientation)
                 .setOutputUnits(unit, AngleUnit.DEGREES)
                 .build();
@@ -187,14 +184,14 @@ public class Webcam
 
         public Optional<AprilTagDetection> getAny()
         {
-            return getDetection(goalIds.get());
+            return getDetection(goalIds);
         }
 
         public Optional<AprilTagDetection> getSpecific(int id)
         {
             boolean idIsCorrect = false;
 
-            for (int possibleId : goalIds.get())
+            for (int possibleId : goalIds)
             {
                 if (possibleId == id)
                 {
@@ -226,7 +223,7 @@ public class Webcam
 
         public Optional<Integer> getId()
         {
-            Optional<AprilTagDetection> tag = getDetection(obeliskIds.get());
+            Optional<AprilTagDetection> tag = getDetection(obeliskIds);
 
             return tag.map(aprilTagDetection -> aprilTagDetection.id);
         }

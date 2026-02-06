@@ -13,9 +13,7 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.PositionMotor;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class Turret extends SubsystemBase
 {
@@ -23,29 +21,26 @@ public class Turret extends SubsystemBase
     private final Angle initialRelativeAngle;
     private State state = State.ACTIVE;
 
-    private final DoubleSupplier gearRatio = RobotConstants.Turret.GEAR_RATIO;
-    private final Supplier<Angle> forwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
-    private final Supplier<Angle> tolerance = RobotConstants.Turret.TOLERANCE;
-    private final Supplier<Distance> linearTolerance = RobotConstants.Turret.LINEAR_TOLERANCE;
-    private final BooleanSupplier useDynamicTolerance = RobotConstants.Turret.USE_DYNAMIC_TOLERANCE;
-    private final BooleanSupplier rotationCompensationEnabled = RobotConstants.Turret.ROTATION_COMPENSATION_ENABLED;
-    private final DoubleSupplier rotationCompensationFF = RobotConstants.Turret.ROTATION_COMPENSATION_FF;
-    private final Supplier<UnnormalizedAngle[]> turnLimits = RobotConstants.Turret.TURN_LIMITS;
-    private final Supplier<Angle> safetyMargin = RobotConstants.Turret.SAFETY_MARGIN;
+    private final double gearRatio = RobotConstants.Turret.GEAR_RATIO;
+    private final Angle forwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
+    private final Angle tolerance = RobotConstants.Turret.TOLERANCE;
+    private final Distance linearTolerance = RobotConstants.Turret.LINEAR_TOLERANCE;
+    private final boolean useDynamicTolerance = RobotConstants.Turret.USE_DYNAMIC_TOLERANCE;
+    private final boolean rotationCompensationEnabled = RobotConstants.Turret.ROTATION_COMPENSATION_ENABLED;
+    private final double rotationCompensationFF = RobotConstants.Turret.ROTATION_COMPENSATION_FF;
+    private final UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
+    private final Angle safetyMargin = RobotConstants.Turret.SAFETY_MARGIN;
 
     private double targetAngleDegrees;
 
     // Add a variable to track the active tolerance, defaulting to the local
     // tolerance
-    private double currentToleranceDegrees = tolerance.get().getDegrees();
+    private double currentToleranceDegrees = tolerance.getDegrees();
 
     // Supplier for robot angular velocity (deg/s) for feedforward compensation
     private DoubleSupplier angularVelocitySupplier = () -> 0.0;
 
-    public enum State
-    {
-        ACTIVE, FREEZE
-    }
+    public enum State { ACTIVE, FREEZE }
 
     public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {
@@ -82,14 +77,14 @@ public class Turret extends SubsystemBase
         // power
         motor.setFeedforwardSupplier(() ->
         {
-            if (!rotationCompensationEnabled.getAsBoolean())
+            if (!rotationCompensationEnabled)
             {
                 return 0.0;
             }
             double robotAngularVelocity = angularVelocitySupplier.getAsDouble();
 
             // Negative because turret must counter-rotate against robot rotation
-            return -robotAngularVelocity * gearRatio.getAsDouble() * rotationCompensationFF.getAsDouble();
+            return -robotAngularVelocity * gearRatio * rotationCompensationFF;
         });
     }
 
@@ -109,7 +104,7 @@ public class Turret extends SubsystemBase
     public void aimRelative(Angle targetAngle)
     {
         // Reset to default tolerance when using standard aiming
-        this.currentToleranceDegrees = tolerance.get().getDegrees();
+        this.currentToleranceDegrees = tolerance.getDegrees();
         setTargetRelative(targetAngle);
     }
 
@@ -127,8 +122,8 @@ public class Turret extends SubsystemBase
         targetDegrees = resolveBestRotation(motor.getDistance(), targetDegrees);
 
         // Clamp to turn limits
-        double minDegrees = turnLimits.get()[0].getDegrees();
-        double maxDegrees = turnLimits.get()[1].getDegrees();
+        double minDegrees = turnLimits[0].getDegrees();
+        double maxDegrees = turnLimits[1].getDegrees();
         this.targetAngleDegrees = Math.max(minDegrees, Math.min(maxDegrees, targetDegrees));
 
         motor.setTargetDistance(this.targetAngleDegrees);
@@ -136,8 +131,8 @@ public class Turret extends SubsystemBase
 
     private double resolveBestRotation(double currentDegrees, double targetDegrees)
     {
-        double minDegrees = turnLimits.get()[0].getDegrees();
-        double maxDegrees = turnLimits.get()[1].getDegrees();
+        double minDegrees = turnLimits[0].getDegrees();
+        double maxDegrees = turnLimits[1].getDegrees();
 
         double closestN = Math.round((currentDegrees - targetDegrees) / 360.0);
         double bestCandidate = targetDegrees;
@@ -177,7 +172,7 @@ public class Turret extends SubsystemBase
     public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose, Distance linearToleranceRadius,
             Angle minAngularTolerance)
     {
-        if (!useDynamicTolerance.getAsBoolean())
+        if (!useDynamicTolerance)
         {
             aimToCoordinate(target, robotPose);
             return;
@@ -192,8 +187,7 @@ public class Turret extends SubsystemBase
             double dynamicTolerance = Math.toDegrees(Math.atan2(linearToleranceRadius.getInch(), distance));
             // Ensure we don't demand impossible precision
             this.currentToleranceDegrees = Math.max(dynamicTolerance, minAngularTolerance.getDegrees());
-        }
-        else
+        } else
         {
             // If we are ON the target, tolerance is effectively infinite
             this.currentToleranceDegrees = 180.0;
@@ -214,7 +208,7 @@ public class Turret extends SubsystemBase
 
     public void reset()
     {
-        aimRelative(forwardAngle.get());
+        aimRelative(forwardAngle);
     }
 
     public FieldHeading getFieldHeading(FieldHeading robotHeading)
@@ -258,9 +252,9 @@ public class Turret extends SubsystemBase
     public boolean exceedingTurnLimits()
     {
         double currentDegrees = motor.getDistance();
-        double minDegrees = turnLimits.get()[0].getDegrees();
-        double maxDegrees = turnLimits.get()[1].getDegrees();
-        double safetyMarginDegrees = safetyMargin.get().getDegrees();
+        double minDegrees = turnLimits[0].getDegrees();
+        double maxDegrees = turnLimits[1].getDegrees();
+        double safetyMarginDegrees = safetyMargin.getDegrees();
 
         // If we are significantly outside the limits, stop the motor immediately to
         // prevent damage

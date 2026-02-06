@@ -5,15 +5,12 @@ import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 public class Transfer extends SubsystemBase
 {
     private final ServoEx transfer;
 
-    private final DoubleSupplier openAngle = RobotConstants.Transfer.OPEN_ANGLE;
-    private final DoubleSupplier closeIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
+    private final double openAngle = RobotConstants.Transfer.OPEN_ANGLE;
+    private final double closeIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
 
     public Transfer(ServoEx transfer)
     {
@@ -25,7 +22,7 @@ public class Transfer extends SubsystemBase
      */
     public void open()
     {
-        setAngle(openAngle.getAsDouble());
+        setAngle(openAngle);
     }
 
     /**
@@ -33,7 +30,7 @@ public class Transfer extends SubsystemBase
      */
     public void close()
     {
-        setAngle(closeIntakeAngle.getAsDouble());
+        setAngle(closeIntakeAngle);
     }
 
     public void setAngle(double angle)

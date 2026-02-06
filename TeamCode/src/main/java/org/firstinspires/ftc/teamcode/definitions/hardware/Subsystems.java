@@ -11,8 +11,6 @@ import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
-import java.util.function.Supplier;
-
 public class Subsystems
 {
     public final Drive drive;
@@ -23,7 +21,7 @@ public class Subsystems
 
     public Odometry odometry;
 
-    private final Supplier<Angle> turretForwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
+    private final Angle turretForwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
 
     public Subsystems(RobotHardware hw, Team team)
     {
@@ -31,7 +29,7 @@ public class Subsystems
         this.intake = new Intake(hw.intake);
         this.transfer = new Transfer(hw.transfer);
         this.outtake = new Outtake(hw.outtake);
-        this.turret = new Turret(hw.turret, turretForwardAngle.get());
+        this.turret = new Turret(hw.turret, turretForwardAngle);
         this.odometry = new Odometry(hw.pinpoint, hw.webcam, new Pose2d(team.base.coord, team.initialPose.heading));
 
         // Wire turret rotation compensation from odometry angular velocity
