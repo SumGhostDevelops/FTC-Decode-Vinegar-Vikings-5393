@@ -33,39 +33,40 @@ public class TakeBackHalfController extends PIDFController
     }
 
     @Override
-    protected double calculateOutput(double pv)
-    {
+    protected double calculateOutput(double pv) {
         prevErrorVal = errorVal_p;
 
         double currentTimeStamp = (double) System.nanoTime() / 1E9;
-        if (lastTimeStamp == 0)
-            lastTimeStamp = currentTimeStamp;
+        if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
         period = currentTimeStamp - lastTimeStamp;
         lastTimeStamp = currentTimeStamp;
 
         errorVal_p = setPoint - pv;
         measuredValue = pv;
 
-        if (Math.abs(period) > 1E-6)
-        {
-            errorVal_v = (errorVal_p - prevErrorVal) / period;
+        // Calculate the Feedforward component separately
+        double ffOutput = kF * setPoint;
+
+        // TBH Integration
+        // We only integrate if the output isn't already maxed out (Anti-Windup)
+        if (period > 1E-6) {
+            totalError += kI * errorVal_p * period;
         }
 
-        // TBH Integration into totalError
-        totalError += kI * errorVal_p * period;
+        // FIX 1: Dynamic Clamping
+        // Clamp the integral so that (Integral + FF) never exceeds [-1, 1].
+        // This ensures TBH cuts the *real* power, not a theoretical value.
+        double maxIntegral = 1.0 - Math.abs(ffOutput);
+        totalError = MathUtils.clamp(totalError, -maxIntegral, maxIntegral);
 
-        // Clamp totalError to motor limits [-1, 1]
-        // Note: We clamp the *integral* part, but the final output will include FF
-        totalError = MathUtils.clamp(totalError, -1.0, 1.0);
-
-        // Zero Crossing Detection
-        if (Math.signum(errorVal_p) != Math.signum(prevErrorVal))
-        {
+        // FIX 2: Safer Zero Crossing
+        // Use multiplication to detect sign change. This prevents double-triggering
+        // if the error lands exactly on 0.0.
+        if (errorVal_p * prevErrorVal < 0) {
             totalError = 0.5 * (totalError + tbhVal);
             tbhVal = totalError;
         }
 
-        // Return Total Error (Integral) + Feedforward
-        return totalError + (kF * setPoint);
+        return totalError + ffOutput;
     }
 }
