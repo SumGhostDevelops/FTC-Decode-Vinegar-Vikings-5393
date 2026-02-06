@@ -321,6 +321,11 @@ public class PowerMotor
         return lastSetPower;
     }
 
+    public double getTruePower()
+    {
+        return motorEx.getRawPower();
+    }
+
     /**
      * Stops the motor by setting its power to zero.
      * Ensures the motor is not stopped multiple times unnecessarily.

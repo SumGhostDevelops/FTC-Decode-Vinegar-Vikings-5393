@@ -223,9 +223,11 @@ public abstract class BaseStable extends CommandOpMode
             Graph.put("Top Outtake (Motor RPM)", topOuttake.getMotorRPM());
             Graph.put("Top Outtake (Motor Target RPM)", topOuttake.getMotorTargetRPM());
             Graph.put("Top Outtake (Power)", topOuttake.getPower());
+            Graph.put("Top Outtake (True Power)", topOuttake.getTruePower());
             Graph.put("Bottom Outtake (Motor RPM)", bottomOuttake.getMotorRPM());
             Graph.put("Bottom Outtake (Motor Target RPM)", bottomOuttake.getMotorTargetRPM());
             Graph.put("Bottom Outtake (Power)", bottomOuttake.getPower());
+            Graph.put("Bottom Outtake (True Power)", bottomOuttake.getTruePower());
 
             Graph.update();
         }
