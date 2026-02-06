@@ -53,11 +53,14 @@ public class TakeBackHalfController extends PIDFController
             totalError += kI * errorVal_p * period;
         }
 
-        // FIX 1: Dynamic Clamping
-        // Clamp the integral so that (Integral + FF) never exceeds [-1, 1].
-        // This ensures TBH cuts the *real* power, not a theoretical value.
-        double maxIntegral = 1.0 - Math.abs(ffOutput);
-        totalError = MathUtils.clamp(totalError, -maxIntegral, maxIntegral);
+        // FIX: Asymmetric Clamping
+        // We limit the TOP to avoid exceeding 1.0 (anti-windup).
+        // We limit the BOTTOM to -1.0 so the controller can reduce power fully if needed.
+        double maxIntegral = 1.0 - ffOutput;
+
+        // Note: range is [-1.0, maxIntegral]
+        // This allows the I term to go negative enough to cancel out the F term if necessary.
+        totalError = MathUtils.clamp(totalError, -1.0, maxIntegral);
 
         // FIX 2: Safer Zero Crossing
         // Use multiplication to detect sign change. This prevents double-triggering
