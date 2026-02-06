@@ -200,34 +200,18 @@ public abstract class BaseStable extends CommandOpMode
 
         if (enableGraphOutput)
         {
-            /*
+            Graph.put("Outtake (Motor RPM)", s.outtake.getMotorRPM());
+            Graph.put("Outtake (Flywheel RPM)", s.outtake.getFlywheelRPM());
+            Graph.put("Outtake (Target RPM)", s.outtake.getTargetRPM());
+            Graph.put("Outtake (Power)", robot.hw.outtake.getPower());
+            Graph.put("Outtake Ready", s.outtake.isStable() ? 1 : 0);
+
             Graph.put("Turret (Degrees)", s.turret.getRelativeUnnormalizedAngle().getDegrees());
             Graph.put("Turret (Target Degrees)", s.turret.getTargetAngleDegrees());
             Graph.put("Turret (Bearing Degrees)", s.turret.bearingToTarget().getDegrees());
-            Graph.put("Outtake (Motor RPM)", s.outtake.getMotorRPM());
-            Graph.put("Outtake (Motor RPM^2)", s.outtake.getMotorRPMAcceleration());
-            Graph.put("Outtake (Flywheel RPM)", s.outtake.getFlywheelRPM());
-            Graph.put("Outtake (Flywheel RPM^2)", s.outtake.getFlywheelRPMAcceleration());
-            Graph.put("Outtake (RPM Target)", s.outtake.getTargetRPM());
-            Graph.put("Outtake (Power)", robot.hw.outtake.getPower());
+
             Graph.put("Intake (RPM)", s.intake.getRPM());
             Graph.put("Intake (Power)", robot.hw.intake.getPower());
-            Graph.put("Outtake (Raw Motor Target)", robot.hw.outtake.getMotorTargetRPM());
-            Graph.put("Outtake (Raw Flywheel Target)", robot.hw.outtake.getOutputTargetRPM());
-
-             */
-
-            VelocityMotor topOuttake = robot.hw.outtake.group[0];
-            VelocityMotor bottomOuttake = robot.hw.outtake.group[1];
-
-            Graph.put("Top Outtake (Motor RPM)", topOuttake.getMotorRPM());
-            Graph.put("Top Outtake (Motor Target RPM)", topOuttake.getMotorTargetRPM());
-            Graph.put("Top Outtake (Power)", topOuttake.getPower());
-            Graph.put("Top Outtake (True Power)", topOuttake.getTruePower());
-            Graph.put("Bottom Outtake (Motor RPM)", bottomOuttake.getMotorRPM());
-            Graph.put("Bottom Outtake (Motor Target RPM)", bottomOuttake.getMotorTargetRPM());
-            Graph.put("Bottom Outtake (Power)", bottomOuttake.getPower());
-            Graph.put("Bottom Outtake (True Power)", bottomOuttake.getTruePower());
 
             Graph.update();
         }
