@@ -120,9 +120,9 @@ public class RobotConstants
         public static class Tolerance
         {
             @Sorter(sort = 0)
-            public static int RPM = 75;
+            public static int RPM = 150;
             @Sorter(sort = 1)
-            public static int RPM_ACCELERATION = 100;
+            public static int RPM_ACCELERATION = 500;
         }
     }
 
@@ -173,10 +173,10 @@ public class RobotConstants
         public static String NAME = "transfer";
 
         @Sorter(sort = 1)
-        public static double OPEN_ANGLE = 65; // Open means the transfer is allowing balls to pass through
+        public static double OPEN_ANGLE = 80; // Open means the transfer is allowing balls to pass through
 
         @Sorter(sort = 2)
-        public static double CLOSE_INTAKE_ANGLE = 0; // 210; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSE_INTAKE_ANGLE = 10; // 210; // An angle where the trapdoor blocks balls from entering
 
         @Sorter(sort = 3)
         public static double CLOSE_TRANSFER_ANGLE = 0;
@@ -189,7 +189,7 @@ public class RobotConstants
         public static String NAME = "intake";
 
         @Sorter(sort = 1)
-        public static double intakePower = 0.85;
+        public static double intakePower = 0.6;
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
@@ -245,7 +245,7 @@ public class RobotConstants
                 @Sorter(sort = 0)
                 public static Distance X = new Distance(0, DistanceUnit.INCH); // camera centered left/right
                 @Sorter(sort = 1)
-                public static Distance Y = new Distance(4.75, DistanceUnit.INCH); // camera forward of center
+                public static Distance Y = new Distance(-4, DistanceUnit.INCH); // camera forward of center, was 4.75
                 @Sorter(sort = 2)
                 public static Distance Z = new Distance(9, DistanceUnit.INCH);
 

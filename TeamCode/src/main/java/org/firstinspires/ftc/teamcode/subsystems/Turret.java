@@ -283,6 +283,8 @@ public class Turret extends SubsystemBase
             return;
         }
 
+        motor.setPositionTolerance(currentToleranceDegrees);
+
         // Always update motor to apply feedforward compensation for robot rotation
         // even when at target position (to maintain position during rotation)
         motor.update();

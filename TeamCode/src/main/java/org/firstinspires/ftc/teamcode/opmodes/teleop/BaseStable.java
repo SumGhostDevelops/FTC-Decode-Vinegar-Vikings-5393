@@ -214,6 +214,8 @@ public abstract class BaseStable extends CommandOpMode
             Graph.put("Intake (RPM)", s.intake.getRPM());
             Graph.put("Intake (Power)", robot.hw.intake.getPower());
 
+            Graph.put("Battery (Voltage)", robot.hw.battery.getVoltage());
+
             Graph.update();
         }
     }
