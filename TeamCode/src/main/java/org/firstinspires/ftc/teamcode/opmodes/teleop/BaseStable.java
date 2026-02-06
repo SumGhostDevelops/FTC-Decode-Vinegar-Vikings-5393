@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.util.dashboard.Graph;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
+import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
@@ -199,6 +200,7 @@ public abstract class BaseStable extends CommandOpMode
 
         if (enableGraphOutput)
         {
+            /*
             Graph.put("Turret (Degrees)", s.turret.getRelativeUnnormalizedAngle().getDegrees());
             Graph.put("Turret (Target Degrees)", s.turret.getTargetAngleDegrees());
             Graph.put("Turret (Bearing Degrees)", s.turret.bearingToTarget().getDegrees());
@@ -212,6 +214,19 @@ public abstract class BaseStable extends CommandOpMode
             Graph.put("Intake (Power)", robot.hw.intake.getPower());
             Graph.put("Outtake (Raw Motor Target)", robot.hw.outtake.getMotorTargetRPM());
             Graph.put("Outtake (Raw Flywheel Target)", robot.hw.outtake.getOutputTargetRPM());
+
+             */
+
+            VelocityMotor topOuttake = robot.hw.outtake.group[0];
+            VelocityMotor bottomOuttake = robot.hw.outtake.group[1];
+
+            Graph.put("Top Outtake (Motor RPM)", topOuttake.getMotorRPM());
+            Graph.put("Top Outtake (Motor Target RPM)", topOuttake.getMotorTargetRPM());
+            Graph.put("Top Outtake (Power)", topOuttake.getPower());
+            Graph.put("Bottom Outtake (Motor RPM)", bottomOuttake.getMotorRPM());
+            Graph.put("Bottom Outtake (Motor Target RPM)", bottomOuttake.getMotorTargetRPM());
+            Graph.put("Bottom Outtake (Power)", bottomOuttake.getPower());
+
             Graph.update();
         }
     }
