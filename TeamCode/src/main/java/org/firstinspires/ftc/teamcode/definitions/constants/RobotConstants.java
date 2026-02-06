@@ -22,7 +22,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION_TESTING;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = true;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.8;
@@ -113,7 +113,7 @@ public class RobotConstants
         @Configurable
         public static class Coefficients
         {
-            public static PIDFCoefficients PIDF = new PIDFCoefficients(0, 0.0002, 0, 0.00016); // only change I
+            public static PIDFCoefficients PIDF = new PIDFCoefficients(0, 0.00001, 0, 0.000045); // only change I
         }
 
         @Configurable

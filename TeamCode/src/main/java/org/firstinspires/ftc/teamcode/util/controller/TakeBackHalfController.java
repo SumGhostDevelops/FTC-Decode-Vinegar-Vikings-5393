@@ -67,62 +67,50 @@ public class TakeBackHalfController extends PIDFController
     @Override
     protected double calculateOutput(double pv)
     {
-        // Store previous error for zero-crossing detection
+        // 1. Update timing and error state
         prevErrorVal = errorVal_p;
 
-        // Update timing
         double currentTimeStamp = (double) System.nanoTime() / 1E9;
-        if (lastTimeStamp == 0)
-            lastTimeStamp = currentTimeStamp;
+        if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
         period = currentTimeStamp - lastTimeStamp;
         lastTimeStamp = currentTimeStamp;
 
+        errorVal_p = setPoint - pv;
         measuredValue = pv;
 
-        double error = setPoint - pv;
-
-        // 1. THE SPEED-UP BOOST
-        // If we are more than 20% away from the target, just send high power.
-        // This ignores the TBH logic entirely until we are close.
-        if (error > (setPoint * 0.20)) {
-            tbhVal = 0;      // Keep TBH clean
-            output = 0.5;    // Start the integral at a healthy midpoint
-            firstIteration = true; // Reset TBH trigger
-            return 0.9;      // Send 90% power to rocket up to speed
-        }
-
-        // --- STEP 1: Calculate Feedforward First ---
-        // We need this value to know how much room is left for the integral
+        // 2. Feedforward (The "Floor")
+        // Tune this to reach ~80% of your target RPM.
         double ffTerm = kF * setPoint;
 
-        // --- STEP 2: Accumulate Output ---
+        // 3. Proportional (The "Snap")
+        // This provides the immediate correction when speed drops.
+        // Use a small kP so it doesn't oscillate.
+        double pTerm = kP * errorVal_p;
+
+        // 4. Integral Accumulation (TBH Internal)
+        // This adds the I-gain per loop cycle.
         output += kI * errorVal_p;
 
-        // --- STEP 3: DYNAMIC ANTI-WINDUP (The Critical Fix) ---
-        // Calculate how much "headroom" is left after Feedforward.
-        // e.g. If FF is 0.9, maxIntegral is 0.1.
+        // 5. Dynamic Asymmetric Clamp (Anti-Windup)
+        // Limits the 'output' so (output + ffTerm) never exceeds 1.0.
+        // This allows the motor to actually drop power the moment TBH triggers.
         double maxIntegral = 1.0 - ffTerm;
-
-        // Clamp the internal 'output' variable immediately.
-        // We allow the low end to go to -1.0 to permit "braking" logic internally,
-        // even if your final return limits it to 0.
         output = MathUtils.clamp(output, -1.0, maxIntegral);
 
-        // --- STEP 4: Take Back Half ---
-        // Now TBH operates on a value that is essentially "Real Power," not "Virtual Math."
+        // 6. Zero-Crossing Detection (Take Back Half)
         if (!firstIteration && (errorVal_p * prevErrorVal < 0))
         {
             output = 0.5 * (output + tbhVal);
             tbhVal = output;
 
-            // Re-clamp in case the TBH math pushed it slightly out of bounds (rare but safer)
+            // Safety re-clamp
             output = MathUtils.clamp(output, -1.0, maxIntegral);
         }
 
         firstIteration = false;
 
-        // --- STEP 5: Return ---
-        // Final check to ensure we only send positive voltage (0.0 to 1.0)
-        return MathUtils.clamp(output + ffTerm, 0.0, 1.0);
+        // 7. Final Return
+        // Clamp the final sum to valid motor ranges [0.0, 1.0].
+        return MathUtils.clamp(output + ffTerm + pTerm, 0.0, 1.0);
     }
 }
