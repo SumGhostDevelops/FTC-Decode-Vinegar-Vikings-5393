@@ -33,7 +33,8 @@ public class TakeBackHalfController extends PIDFController
     }
 
     @Override
-    protected double calculateOutput(double pv) {
+    protected double calculateOutput(double pv)
+    {
         prevErrorVal = errorVal_p;
 
         double currentTimeStamp = (double) System.nanoTime() / 1E9;
@@ -44,28 +45,25 @@ public class TakeBackHalfController extends PIDFController
         errorVal_p = setPoint - pv;
         measuredValue = pv;
 
-        // Calculate the Feedforward component separately
+        // 1. Calculate Feedforward separately
         double ffOutput = kF * setPoint;
 
-        // TBH Integration
-        // We only integrate if the output isn't already maxed out (Anti-Windup)
-        if (period > 1E-6) {
+        // 2. Integrate only if running
+        if (Math.abs(period) > 1E-6)
+        {
             totalError += kI * errorVal_p * period;
         }
 
-        // FIX: Asymmetric Clamping
-        // We limit the TOP to avoid exceeding 1.0 (anti-windup).
-        // We limit the BOTTOM to -1.0 so the controller can reduce power fully if needed.
+        // 3. ASYMMETRIC CLAMP (The Fix)
+        // Prevent the sum (FF + I) from exceeding 1.0 (anti-windup).
+        // But allow I to go fully negative (-1.0) so it can brake if needed.
         double maxIntegral = 1.0 - ffOutput;
-
-        // Note: range is [-1.0, maxIntegral]
-        // This allows the I term to go negative enough to cancel out the F term if necessary.
         totalError = MathUtils.clamp(totalError, -1.0, maxIntegral);
 
-        // FIX 2: Safer Zero Crossing
-        // Use multiplication to detect sign change. This prevents double-triggering
-        // if the error lands exactly on 0.0.
-        if (errorVal_p * prevErrorVal < 0) {
+        // 4. Zero Crossing (TBH)
+        // Use multiplication for safer sign check
+        if (errorVal_p * prevErrorVal < 0)
+        {
             totalError = 0.5 * (totalError + tbhVal);
             tbhVal = totalError;
         }
