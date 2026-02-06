@@ -150,7 +150,7 @@ public class RobotConstants
 
         @Sorter(sort = 7)
         // only change p and d
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.1, 0.00, 0.00075, 0.00);
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.11, 0.00, 0.001, 0.00);
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;
