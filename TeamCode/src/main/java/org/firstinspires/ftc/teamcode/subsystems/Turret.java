@@ -23,9 +23,9 @@ public class Turret extends SubsystemBase
 
     private final double gearRatio = RobotConstants.Turret.GEAR_RATIO;
     private final Angle forwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
+    private final Angle aimCalibrationOffset = RobotConstants.Turret.AIM_CALIBRATION_OFFSET;
     private final Angle tolerance = RobotConstants.Turret.TOLERANCE;
-    private final Distance linearTolerance = RobotConstants.Turret.LINEAR_TOLERANCE;
-    private final boolean useDynamicTolerance = RobotConstants.Turret.USE_DYNAMIC_TOLERANCE;
+    private final boolean useLinearToleranceRadius = RobotConstants.Turret.USE_LINEAR_TOLERANCE_RADIUS;
     private final boolean rotationCompensationEnabled = RobotConstants.Turret.ROTATION_COMPENSATION_ENABLED;
     private final double rotationCompensationFF = RobotConstants.Turret.ROTATION_COMPENSATION_FF;
     private final UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
@@ -114,8 +114,12 @@ public class Turret extends SubsystemBase
      */
     private void setTargetRelative(Angle targetAngle)
     {
+        // Apply calibration offset to compensate for systematic aiming errors
+        // (e.g., from localization, camera alignment, or mechanical offsets)
+        Angle calibratedTarget = targetAngle.plus(aimCalibrationOffset);
+
         // Convert from robot-relative to motor-zero-relative coordinates
-        Angle adjustedTarget = targetAngle.minus(initialRelativeAngle);
+        Angle adjustedTarget = calibratedTarget.minus(initialRelativeAngle);
         double targetDegrees = adjustedTarget.getDegrees();
 
         // Resolve the best rotation to minimize travel while respecting limits
@@ -172,7 +176,7 @@ public class Turret extends SubsystemBase
     public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose, Distance linearToleranceRadius,
             Angle minAngularTolerance)
     {
-        if (!useDynamicTolerance)
+        if (!useLinearToleranceRadius)
         {
             aimToCoordinate(target, robotPose);
             return;

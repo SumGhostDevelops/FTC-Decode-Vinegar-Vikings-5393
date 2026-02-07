@@ -129,27 +129,38 @@ public class RobotConstants
         public static Angle TOLERANCE = new Angle(2, AngleUnit.DEGREES); // in degrees
         public static Distance LINEAR_TOLERANCE = new Distance(3, DistanceUnit.INCH);
         @Sorter(sort = 3)
-        public static boolean USE_DYNAMIC_TOLERANCE = true;
+        public static boolean USE_LINEAR_TOLERANCE_RADIUS = true;
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
+
+        /**
+         * Calibration offset to compensate for systematic aiming error.
+         * Positive = turret aims more to the LEFT (CCW when viewed from above)
+         * Negative = turret aims more to the RIGHT (CW when viewed from above)
+         *
+         * If balls consistently miss to the LEFT of the goal, use a NEGATIVE value.
+         * If balls consistently miss to the RIGHT of the goal, use a POSITIVE value.
+         */
         @Sorter(sort = 5)
+        public static Angle AIM_CALIBRATION_OFFSET = new Angle(0, AngleUnit.DEGREES);
+        @Sorter(sort = 6)
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]
         {
                 new UnnormalizedAngle(-260, UnnormalizedAngleUnit.DEGREES),
                 new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
-        @Sorter(sort = 6)
+        @Sorter(sort = 7)
         public static boolean AUTO_AIM_TO_GOAL = false;
 
-        @Sorter(sort = 7)
+        @Sorter(sort = 8)
         // only change p and d
         public static PIDFCoefficients PIDF = new PIDFCoefficients(0.08, 0.00, 0.0007, 0.00);
 
-        @Sorter(sort = 10)
-        public static boolean ROTATION_COMPENSATION_ENABLED = true;
         @Sorter(sort = 11)
+        public static boolean ROTATION_COMPENSATION_ENABLED = true;
+        @Sorter(sort = 12)
         public static double ROTATION_COMPENSATION_FF = 0.0006; // Feedforward gain: power per deg/s of robot rotation
 
-        @Sorter(sort = 12)
+        @Sorter(sort = 13)
         public static Angle SAFETY_MARGIN = new Angle(10, AngleUnit.DEGREES);
     }
 
