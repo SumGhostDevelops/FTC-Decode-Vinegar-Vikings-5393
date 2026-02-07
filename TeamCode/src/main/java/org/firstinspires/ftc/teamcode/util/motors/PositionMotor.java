@@ -275,14 +275,9 @@ public class PositionMotor extends PowerMotor
     {
         super.update(); // Update sensors
 
-        if (atSetPoint())
-        {
-            setPower(0);
-            return;
-        }
-
-        // Always calculate. The controller will return ~0 if at setpoint anyway.
-        // If gravity pulls it off, the controller will automatically fight back.
+        // Always calculate the controller output, even at setpoint
+        // This allows the motor to hold position (respecting BRAKE mode)
+        // and automatically fight back against external forces
         double output = controller.calculate(motorEx.getDistance(), targetDistance);
 
         output *= this.power; // The max power limit
