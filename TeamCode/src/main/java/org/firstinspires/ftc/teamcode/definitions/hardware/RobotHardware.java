@@ -48,8 +48,8 @@ public class RobotHardware
     private String backLeftName = RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT;
     private String backRightName = RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT;
 
-    private String outtakeLauncherLeftName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
-    private String outtakeLauncherRightName = RobotConstants.Outtake.Name.LAUNCHER_RIGHT;
+    private String outtakeLauncherLeftName = RobotConstants.Outtake.Name.TOP;
+    private String outtakeLauncherRightName = RobotConstants.Outtake.Name.BOTTOM;
     private PIDFCoefficients outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
     private int outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
     private int outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;

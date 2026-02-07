@@ -98,8 +98,8 @@ public class RobotConstants
         @IgnoreConfigurable
         public static class Name
         {
-            public static String LAUNCHER_LEFT = "leftOuttake";
-            public static String LAUNCHER_RIGHT = "rightOuttake";
+            public static String TOP = "topOuttake";
+            public static String BOTTOM = "bottomOuttake";
         }
 
         @Configurable

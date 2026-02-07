@@ -89,7 +89,7 @@ public class PIDFTuner extends OpMode
     // Constants from RobotConstants
     private final String turretName = RobotConstants.Turret.NAME;
     private final double turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
-    private final String outtakeName = RobotConstants.Outtake.Name.LAUNCHER_LEFT;
+    private final String outtakeName = RobotConstants.Outtake.Name.TOP;
 
     @Override
     public void init()
