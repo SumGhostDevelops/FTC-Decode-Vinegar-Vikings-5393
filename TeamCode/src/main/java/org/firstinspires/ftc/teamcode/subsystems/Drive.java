@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class Drive extends SubsystemBase
 {
@@ -20,9 +21,9 @@ public class Drive extends SubsystemBase
     private final DoubleSupplier speedMin = () -> RobotConstants.Drive.Speed.MINIMUM;
     private final DoubleSupplier hybridDeadband = () -> RobotConstants.Drive.HybridMode.DEADBAND;
     private final DoubleSupplier hybridTurnP = () -> RobotConstants.Drive.HybridMode.TURN_P;
+    private final Supplier<DriveMode> currentMode = () -> RobotConstants.Drive.DRIVE_MODE;
 
     private double speed = speedDefault.getAsDouble();
-    private DriveMode currentMode = RobotConstants.Drive.DRIVE_MODE;
 
     public Drive(PowerMotor frontLeft, PowerMotor frontRight, PowerMotor backLeft, PowerMotor backRight)
     {
@@ -81,7 +82,7 @@ public class Drive extends SubsystemBase
         // Ensure angle is always in radians for Math functions
         double botHeading = driverHeading.getRadians();
 
-        switch (currentMode)
+        switch (currentMode.get())
         {
             case FIELD_CENTRIC:
                 // Standard Field Centric Math

@@ -24,6 +24,7 @@ public class Outtake extends SubsystemBase
 
     private final DoubleSupplier baseRPM = () -> RobotConstants.Outtake.BASE_RPM;
     private final DoubleSupplier movingRPMRatio = () -> RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
+    private final BooleanSupplier adjustWithDistance = () -> RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
 
     private double targetRPM = baseRPM.getAsDouble();
     private double setRPM = 0;
@@ -36,10 +37,6 @@ public class Outtake extends SubsystemBase
 
     // For reducing the RPM while moving
     private boolean rpmRatioEnabled = false;
-    private double rpmRatio = movingRPMRatio.getAsDouble();
-
-    // If the RPM should be adjusted using Outtake.setTargetRPM(Distance)
-    private final BooleanSupplier adjustWithDistance = () -> RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
 
     /**
      * Inches -> RPM
@@ -169,7 +166,7 @@ public class Outtake extends SubsystemBase
         }
 
         if (rpmRatioEnabled)
-            targetRPM = newRPM * rpmRatio;
+            targetRPM = newRPM * movingRPMRatio.getAsDouble();
         else
             targetRPM = newRPM;
 
