@@ -23,8 +23,8 @@ public class PedroConstants {
     static double mass = 11.3398; // kg, this is the mass of the robot without any game elements
 
     public static FollowerConstants followerConstants = new FollowerConstants().mass(mass)
-            .forwardZeroPowerAcceleration(-70.6038)
-            .lateralZeroPowerAcceleration(-130.811)
+            .forwardZeroPowerAcceleration(-37.525867483633505)
+            .lateralZeroPowerAcceleration(-61.67424035159679)
             .translationalPIDFCoefficients(new PIDFCoefficients(.13,0,.0001,.019))
             .headingPIDFCoefficients(new PIDFCoefficients(1,0,.01,.001))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(.025,0,.00001,.6,.01));
@@ -41,8 +41,8 @@ public class PedroConstants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(-31.40130638956564)
-            .yVelocity(-61.18830882220879);
+            .xVelocity(67.04197536678765)
+            .yVelocity(51.896766962967526);
     //drive
     public static PathConstraints pathConstraints = new PathConstraints(
             0.99,
@@ -58,7 +58,7 @@ public class PedroConstants {
             .strafePodX(RobotConstants.Odometry.Deadwheels.Strafe.OFFSET.toUnit(DistanceUnit.INCH).magnitude)
             .distanceUnit(DistanceUnit.INCH)
             // Applying your original directions (Forward and Reverse)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 

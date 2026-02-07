@@ -426,7 +426,6 @@ public class Blue extends AutoBase
                                                         shootPose
 
                                         )).setTangentHeadingInterpolation()
-                                        .setReversed()
                                         .build();
 
                         ToBallOne = follower.pathBuilder().addPath(

@@ -432,49 +432,49 @@ public class Red extends AutoBase
                                         .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                                         .build();
 
-                        ToBallTwo = follower.pathBuilder().addPath(
+                        ToBallOne = follower.pathBuilder().addPath(
                                         new BezierLine(
                                                         shootPose,
                                                         ballTwoFullPose // Using ballTwoFullPose directly as per your new path logic
                                         )).setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(0))
                                         .build();
 
-                        ToBallTwoFull = follower.pathBuilder().addPath(
+                        ToBallOneFull = follower.pathBuilder().addPath(
                                         new BezierLine(
                                                         ballTwoFullPose,
                                                         ballThreeLinePose // Using ballThreeLinePose as per your new path logic
                                         )).setTangentHeadingInterpolation()
                                         .build();
 
-                        ToShoot_2 = follower.pathBuilder().addPath(
+                        ToShoot_1 = follower.pathBuilder().addPath(
                                         new BezierLine(
                                                         ballThreeLinePose,
                                                         shootPose))
                                         .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                                         .build();
 
-                        ToThree = follower.pathBuilder().addPath(
+                        ToBallTwo = follower.pathBuilder().addPath(
                                         new BezierLine(
                                                         shootPose,
                                                         gateLinePose // Using gateLinePose as per your new path logic
                                         )).setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(0))
                                         .build();
 
-                        ToThreeFull = follower.pathBuilder().addPath(
+                        ToBallTwoFull = follower.pathBuilder().addPath(
                                         new BezierLine(
                                                         gateLinePose,
                                                         gatePushPose))
                                         .setTangentHeadingInterpolation()
                                         .build();
 
-                        ToShoot_3 = follower.pathBuilder().addPath(
+                        ToShoot_2 = follower.pathBuilder().addPath(
                                         new BezierLine(
                                                         gatePushPose,
                                                         shootPose))
                                         .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                                         .build();
 
-                        FinalPose = follower.pathBuilder().addPath(
+                        ToThree = follower.pathBuilder().addPath(
                                         new BezierLine(
                                                         shootPose,
                                                         finalPose))

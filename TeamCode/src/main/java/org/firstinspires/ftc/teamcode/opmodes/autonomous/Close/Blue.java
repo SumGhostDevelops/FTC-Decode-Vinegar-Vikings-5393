@@ -178,22 +178,22 @@ public class Blue extends AutoBase
                                 case ToShoot_2:
                                         Shoot();
                                         follower.followPath(paths.ToThree);
-                                        setPathState(Paths.PathState.Gate1);
+                                        setPathState(Paths.PathState.ToThree);
                                         break;
                                 case ToThree:
                                         Intake();
                                         follower.followPath(paths.ToThreeFull);
-                                        setPathState(Paths.PathState.Gate2);
+                                        setPathState(Paths.PathState.ToThreeFull);
                                         break;
                                 case ToThreeFull:
                                         // has ball
                                         follower.followPath(paths.bottomBalls);
-                                        setPathState(Paths.PathState.ToEatGate);
+                                        setPathState(Paths.PathState.bottomBalls);
                                         break;
                                 case bottomBalls:
                                         Intake();
                                         follower.followPath(paths.bottomBallsEat);
-                                        setPathState(Paths.PathState.ToShoot_3);
+                                        setPathState(Paths.PathState.bottomBallsEat);
                                         break;
                                 case bottomBallsEat:
                                         Shoot();
