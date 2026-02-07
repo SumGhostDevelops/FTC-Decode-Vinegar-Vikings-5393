@@ -112,9 +112,9 @@ public class RobotConstants
         public static class Tolerance
         {
             @Sorter(sort = 0)
-            public static int RPM = 150;
+            public static int RPM = 75;
             @Sorter(sort = 1)
-            public static int RPM_ACCELERATION = 500;
+            public static int RPM_ACCELERATION = 250;
         }
     }
 
