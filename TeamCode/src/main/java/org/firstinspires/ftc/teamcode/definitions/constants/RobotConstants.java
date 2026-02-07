@@ -23,7 +23,6 @@ public class RobotConstants
     public static class General
     {
         public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
-        public static boolean ENERGY_SAVER_MODE = false;
         public static boolean REGRESSION_TESTING_MODE = true;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.8;
     }
@@ -84,8 +83,6 @@ public class RobotConstants
     public static class Outtake
     {
         public static final double RPM_WHILE_MOVING_RATIO = 0.8;
-        @Sorter(sort = 0)
-        public static int PPR = 28;
         @Sorter(sort = 1)
         public static double INPUT_GEAR_RATIO = 3;
         public static double OUTPUT_GEAR_RATIO = 2;
@@ -97,11 +94,6 @@ public class RobotConstants
         public static boolean ON_BY_DEFAULT = false;
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = false;
-
-        @Sorter(sort = 5)
-        public static boolean USE_FUTURE_POSE = false;
-        @Sorter(sort = 6)
-        public static double FUTURE_POSE_TIME = 1.0;
 
         @IgnoreConfigurable
         public static class Name
@@ -152,11 +144,6 @@ public class RobotConstants
         // only change p and d
         public static PIDFCoefficients PIDF = new PIDFCoefficients(0.08, 0.00, 0.0007, 0.00);
 
-        @Sorter(sort = 8)
-        public static boolean USE_FUTURE_POSE = false;
-        @Sorter(sort = 9)
-        public static double FUTURE_POSE_TIME = 1.0;
-
         @Sorter(sort = 10)
         public static boolean ROTATION_COMPENSATION_ENABLED = true;
         @Sorter(sort = 11)
@@ -177,9 +164,6 @@ public class RobotConstants
 
         @Sorter(sort = 2)
         public static double CLOSE_INTAKE_ANGLE = 210; // 210; // An angle where the trapdoor blocks balls from entering
-
-        @Sorter(sort = 3)
-        public static double CLOSE_TRANSFER_ANGLE = 0;
     }
 
     @Configurable
@@ -209,8 +193,6 @@ public class RobotConstants
                 new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH),
                         CoordinateSystem.DECODE_PEDROPATH),
                 new FieldHeading(new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
-        @Sorter(sort = 1)
-        public static double FUTURE_POSE_TIME = 1.0;
 
         public static boolean SET_FORWARD_DIRECTION_BASED_ON_TEAM = true;
 
@@ -270,13 +252,9 @@ public class RobotConstants
         @Configurable
         public static class Deadwheels // These are plugged in directly to the Pinpoint
         {
-            @Sorter(sort = 0)
-            public static int COUNTS_PER_REVOLUTION = 8192;
 
             @Sorter(sort = 1)
             public static Distance WHEEL_DIAMETER = new Distance(35, DistanceUnit.MM);
-            @Sorter(sort = 2)
-            public static Distance WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER.multiply(Math.PI); // π × diameter
 
             @Configurable
             public static class Forward // also parallel
