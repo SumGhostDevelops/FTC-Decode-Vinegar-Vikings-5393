@@ -150,7 +150,7 @@ public class RobotConstants
 
         @Sorter(sort = 7)
         // only change p and d
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.10, 0.00, 0.0075, 0.00);
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.08, 0.00, 0.0007, 0.00);
 
         @Sorter(sort = 8)
         public static boolean USE_FUTURE_POSE = false;
@@ -160,7 +160,7 @@ public class RobotConstants
         @Sorter(sort = 10)
         public static boolean ROTATION_COMPENSATION_ENABLED = true;
         @Sorter(sort = 11)
-        public static double ROTATION_COMPENSATION_FF = 0.00072; // Feedforward gain: power per deg/s of robot rotation
+        public static double ROTATION_COMPENSATION_FF = 0.0006; // Feedforward gain: power per deg/s of robot rotation
 
         @Sorter(sort = 12)
         public static Angle SAFETY_MARGIN = new Angle(10, AngleUnit.DEGREES);

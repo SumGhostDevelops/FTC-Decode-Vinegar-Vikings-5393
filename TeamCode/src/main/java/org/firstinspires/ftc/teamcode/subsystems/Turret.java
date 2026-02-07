@@ -19,7 +19,7 @@ public class Turret extends SubsystemBase
 {
     private final PositionMotor motor;
     private final Angle initialRelativeAngle;
-    private State state = State.ACTIVE;
+    private State state = State.ON;
 
     private final double gearRatio = RobotConstants.Turret.GEAR_RATIO;
     private final Angle forwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
@@ -40,7 +40,7 @@ public class Turret extends SubsystemBase
     // Supplier for robot angular velocity (deg/s) for feedforward compensation
     private DoubleSupplier angularVelocitySupplier = () -> 0.0;
 
-    public enum State { ACTIVE, FREEZE }
+    public enum State { ON, OFF }
 
     public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {
@@ -277,7 +277,7 @@ public class Turret extends SubsystemBase
     {
         // If we are significantly outside the limits, stop the motor immediately to
         // prevent damage
-        if (exceedingTurnLimits() || state == State.FREEZE)
+        if (exceedingTurnLimits() || state == State.OFF)
         {
             motor.stopMotor();
             return;

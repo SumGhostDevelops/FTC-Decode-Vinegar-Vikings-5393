@@ -98,6 +98,7 @@ public class TurretCommands
         @Override
         public void execute()
         {
+            turret.setState(Turret.State.ON);
             turret.aimToCoordinate(targetCoord, robotPose.get(), LINEAR_TOLERANCE, ANGLE_TOLERANCE);
         }
 
