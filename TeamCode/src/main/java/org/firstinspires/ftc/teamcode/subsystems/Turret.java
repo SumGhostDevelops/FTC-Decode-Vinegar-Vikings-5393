@@ -250,7 +250,7 @@ public class Turret extends SubsystemBase
     public boolean isAtTarget()
     {
         // Use the active dynamic tolerance instead of the static constant
-        return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees;
+        return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees || state == State.OFF; // always return true if state is OFF
     }
 
     public boolean exceedingTurnLimits()
