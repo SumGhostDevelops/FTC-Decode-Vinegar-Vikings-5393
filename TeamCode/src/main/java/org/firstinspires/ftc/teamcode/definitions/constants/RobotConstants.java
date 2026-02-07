@@ -84,8 +84,8 @@ public class RobotConstants
     {
         public static final double RPM_WHILE_MOVING_RATIO = 0.8;
         @Sorter(sort = 1)
-        public static double INPUT_GEAR_RATIO = 3;
-        public static double OUTPUT_GEAR_RATIO = 2;
+        public static double INPUT_GEAR_RATIO = 1;
+        public static double OUTPUT_GEAR_RATIO = 1;
 
         @Sorter(sort = 2)
         public static int BASE_RPM = 3000;
@@ -158,7 +158,7 @@ public class RobotConstants
         @Sorter(sort = 11)
         public static boolean ROTATION_COMPENSATION_ENABLED = true;
         @Sorter(sort = 12)
-        public static double ROTATION_COMPENSATION_FF = 0.0006; // Feedforward gain: power per deg/s of robot rotation
+        public static double ROTATION_COMPENSATION_FF = 0.0008; // Feedforward gain: power per deg/s of robot rotation
 
         @Sorter(sort = 13)
         public static Angle SAFETY_MARGIN = new Angle(10, AngleUnit.DEGREES);
@@ -238,7 +238,7 @@ public class RobotConstants
                 @Sorter(sort = 0)
                 public static Distance X = new Distance(0, DistanceUnit.INCH); // camera centered left/right
                 @Sorter(sort = 1)
-                public static Distance Y = new Distance(-4, DistanceUnit.INCH); // camera forward of center, was 4.75
+                public static Distance Y = new Distance(8, DistanceUnit.INCH); // camera forward of center, was 4.75
                 @Sorter(sort = 2)
                 public static Distance Z = new Distance(9, DistanceUnit.INCH);
 

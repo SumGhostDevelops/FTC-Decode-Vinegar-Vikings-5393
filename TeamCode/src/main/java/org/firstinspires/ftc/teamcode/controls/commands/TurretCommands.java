@@ -76,11 +76,24 @@ public class TurretCommands
     public static class AimToCoordinate extends CommandBase
     {
         private final Turret turret;
-        private final FieldCoordinate targetCoord;
+        private final Supplier<FieldCoordinate> targetCoordSupplier;
         private final Supplier<Pose2d> robotPose;
 
         private final Distance LINEAR_TOLERANCE = RobotConstants.Turret.LINEAR_TOLERANCE;
         private final Angle ANGLE_TOLERANCE = RobotConstants.Turret.TOLERANCE;
+
+        /**
+         * @param turret The turret subsystem
+         * @param targetCoordSupplier Supplier for the target field coordinate to aim at (e.g., team.goal.coord)
+         * @param robotPose Supplier for the robot's current pose from odometry
+         */
+        public AimToCoordinate(Turret turret, Supplier<FieldCoordinate> targetCoordSupplier, Supplier<Pose2d> robotPose)
+        {
+            this.turret = turret;
+            this.targetCoordSupplier = targetCoordSupplier;
+            this.robotPose = robotPose;
+            addRequirements(turret);
+        }
 
         /**
          * @param turret The turret subsystem
@@ -89,17 +102,14 @@ public class TurretCommands
          */
         public AimToCoordinate(Turret turret, FieldCoordinate targetCoord, Supplier<Pose2d> robotPose)
         {
-            this.turret = turret;
-            this.targetCoord = targetCoord;
-            this.robotPose = robotPose;
-            addRequirements(turret);
+            this(turret, () -> targetCoord, robotPose);
         }
 
         @Override
         public void execute()
         {
             turret.setState(Turret.State.ON);
-            turret.aimToCoordinate(targetCoord, robotPose.get(), LINEAR_TOLERANCE, ANGLE_TOLERANCE);
+            turret.aimToCoordinate(targetCoordSupplier.get(), robotPose.get(), LINEAR_TOLERANCE, ANGLE_TOLERANCE);
         }
 
         @Override

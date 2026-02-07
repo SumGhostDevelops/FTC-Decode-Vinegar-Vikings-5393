@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
+import java.util.function.Supplier;
+
 /**
  * Utility class for drawing the robot and field elements on Panels Dashboard's Field panel.
  * Designed for use with the Panels (bylazar) plugin.
@@ -46,6 +48,11 @@ public class FieldDrawing
     public static void init()
     {
         panelsField.setOffsets(PanelsField.INSTANCE.getPresets().getPEDRO_PATHING());
+    }
+
+    public static void draw(Supplier<Pose2d> pose, Supplier<Pose2d> futurePose, Supplier<FieldHeading> turretHeading, Supplier<FieldCoordinate> targetCoord)
+    {
+        draw(pose.get(), futurePose.get(), turretHeading.get(), targetCoord.get());
     }
 
     /**

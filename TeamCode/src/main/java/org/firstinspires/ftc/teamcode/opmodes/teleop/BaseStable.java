@@ -19,12 +19,13 @@ import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.dashboard.Graph;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
-import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
@@ -166,7 +167,7 @@ public abstract class BaseStable extends CommandOpMode
 
         // --- Testing Telemetry ---
         telemetry.addData("Team", team);
-        telemetry.addData("Dist. to Goal", pose.coord.distanceTo(team.goal.coord).toUnit(DistanceUnit.INCH));
+        telemetry.addData("Dist. to Goal", pose.coord.distanceTo(team.goalFromClose.coord).toUnit(DistanceUnit.INCH));
 
         telemetry.addLine("--- Odometry ---");
         telemetry.addData("Coord (Pedro)", pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
@@ -194,10 +195,10 @@ public abstract class BaseStable extends CommandOpMode
         if (enableFieldDrawing.getAsBoolean())
         {
             FieldDrawing.draw(
-                    pose,
-                    null,
-                    s.turret.getFieldHeading(s.odometry.getFieldHeading()),
-                    robot.team.goal.coord);
+                    () -> pose,
+                    () -> null,
+                    () -> s.turret.getFieldHeading(s.odometry.getFieldHeading()),
+                    this::getGoal);
             FieldDrawing.update();
         }
 
@@ -263,7 +264,7 @@ public abstract class BaseStable extends CommandOpMode
     private void bindTurretControls(Trigger opModeActive, GamepadEx driver, Subsystems s)
     {
         Supplier<Pose2d> turretPose = s.odometry::getPose;
-        Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, robot.team.goal.coord, turretPose);
+        Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, this::getGoal, turretPose);
         Command off = new InstantCommand(() -> s.turret.setState(Turret.State.OFF));
 
         if (autoAimToGoal.getAsBoolean())
@@ -288,7 +289,7 @@ public abstract class BaseStable extends CommandOpMode
             // Update RPM dynamically based on distance to goal
             active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
                     s.outtake,
-                    () -> s.odometry.getPose().distanceTo(team.goal.coord)));
+                    () -> s.odometry.getPose().distanceTo(getGoal())));
         }
     }
 
@@ -305,8 +306,8 @@ public abstract class BaseStable extends CommandOpMode
         Command intakeIn = new IntakeCommands.In(s.intake, intakePower.getAsDouble());
         Command intakeScore = new IntakeCommands.In(s.intake, transferPower.getAsDouble());
         Command reverseIntake = new IntakeCommands.Reverse(s.intake, outtakePower.getAsDouble());
-        Command closeTransfer = new TransferCommands.CloseOnce(s.transfer);
-        Command openTransfer = new TransferCommands.OpenOnce(s.transfer);
+        //Command closeTransfer = new TransferCommands.CloseOnce(s.transfer);
+        Command openTransfer = new TransferCommands.Open(s.transfer);
 
         // --- Logic ---
 
@@ -319,7 +320,7 @@ public abstract class BaseStable extends CommandOpMode
         // scheduling bug
         // whileActiveContinuous ensures the command is properly re-scheduled each time
         // the trigger becomes active
-        shouldIntake.whileActiveContinuous(intakeIn).whenActive(closeTransfer);
+        shouldIntake.whileActiveContinuous(intakeIn).cancelWhenActive(openTransfer);
         reverseBtn.whileActiveContinuous(reverseIntake);
 
         // 2. Scoring Logic
@@ -351,5 +352,19 @@ public abstract class BaseStable extends CommandOpMode
     private void bindCoDriverControls(GamepadEx coDriver, Subsystems s)
     {
         // Add Co-Driver controls here
+    }
+
+    private FieldCoordinate getGoal()
+    {
+        Odometry odometry = robot.subsystems.odometry;
+
+        if (odometry.getFieldCoord().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).y.getInch() > 48)
+        {
+            return robot.team.goalFromClose.coord;
+        }
+        else
+        {
+            return robot.team.goalFromFar.coord;
+        }
     }
 }
