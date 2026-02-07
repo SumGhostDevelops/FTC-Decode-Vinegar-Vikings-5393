@@ -8,9 +8,6 @@ import org.firstinspires.ftc.teamcode.util.math.BetterInterpLUT;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
 public class Outtake extends SubsystemBase
 {
 
@@ -22,11 +19,10 @@ public class Outtake extends SubsystemBase
     private final VelocityMotorGroup motor;
     private State state = State.OFF;
 
-    private final DoubleSupplier baseRPM = () -> RobotConstants.Outtake.BASE_RPM;
-    private final DoubleSupplier movingRPMRatio = () -> RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
-    private final BooleanSupplier adjustWithDistance = () -> RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
+    private final double baseRPM = RobotConstants.Outtake.BASE_RPM;
+    private final double movingRPMRatio = RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
 
-    private double targetRPM = baseRPM.getAsDouble();
+    private double targetRPM = baseRPM;
     private double setRPM = 0;
 
     private final static Distance epsilon = new Distance(1, DistanceUnit.INCH);
@@ -37,6 +33,10 @@ public class Outtake extends SubsystemBase
 
     // For reducing the RPM while moving
     private boolean rpmRatioEnabled = false;
+    private double rpmRatio = movingRPMRatio;
+
+    // If the RPM should be adjusted using Outtake.setTargetRPM(Distance)
+    private boolean adjustWithDistance = RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
 
     /**
      * Inches -> RPM
@@ -166,7 +166,7 @@ public class Outtake extends SubsystemBase
         }
 
         if (rpmRatioEnabled)
-            targetRPM = newRPM * movingRPMRatio.getAsDouble();
+            targetRPM = newRPM * rpmRatio;
         else
             targetRPM = newRPM;
 
@@ -196,7 +196,7 @@ public class Outtake extends SubsystemBase
 
     public void setTargetRPM(Distance dist)
     {
-        if (!adjustWithDistance.getAsBoolean())
+        if (!adjustWithDistance)
         {
             return;
         }
@@ -258,12 +258,7 @@ public class Outtake extends SubsystemBase
     @Override
     public String toString()
     {
-        String str = "State: " + state + " | Target RPM: " + targetRPM + " | ";
-
-        for (int i = 0; i < motor.group.length; i++)
-        {
-            str += "Motor " + i + 1 + ": " + motor.group[i].getMotorRPM() + " RPM | ";
-        }
+        String str = "State: " + state + " | Flywheel Target: " + targetRPM + " | Flywheel RPM: " + motor.getOutputRPM();
 
         return str;
     }

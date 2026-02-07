@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.dashboard.Graph;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
@@ -211,6 +213,7 @@ public abstract class BaseStable extends CommandOpMode
             Graph.put("Turret (Degrees)", s.turret.getRelativeUnnormalizedAngle().getDegrees());
             Graph.put("Turret (Target Degrees)", s.turret.getTargetAngleDegrees());
             Graph.put("Turret (Bearing Degrees)", s.turret.bearingToTarget().getDegrees());
+            Graph.put("Turret (Power)", robot.hw.turret.getPower());
 
             Graph.put("Intake (RPM)", s.intake.getRPM());
             Graph.put("Intake (Power)", robot.hw.intake.getPower());
@@ -259,6 +262,7 @@ public abstract class BaseStable extends CommandOpMode
     {
         Supplier<Pose2d> turretPose = s.odometry::getPose;
         Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, robot.team.goal.coord, turretPose);
+        Command off = new InstantCommand(() -> s.turret.setState(Turret.State.OFF));
 
         if (autoAimToGoal.getAsBoolean())
         {
@@ -266,7 +270,7 @@ public abstract class BaseStable extends CommandOpMode
         }
         else
         {
-            driver.getGamepadButton(GamepadKeys.Button.Y).toggleWhenPressed(aimCmd);
+            driver.getGamepadButton(GamepadKeys.Button.Y).toggleWhenPressed(aimCmd, off);
         }
     }
 
@@ -274,8 +278,8 @@ public abstract class BaseStable extends CommandOpMode
     {
         if (regressionTestingMode.getAsBoolean())
         {
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 50));
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -50));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 10));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -10));
         }
         if (autoDistanceAdjustment.getAsBoolean())
         {
