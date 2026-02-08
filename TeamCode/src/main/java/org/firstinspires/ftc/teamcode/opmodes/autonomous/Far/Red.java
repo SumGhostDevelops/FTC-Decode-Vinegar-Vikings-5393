@@ -88,7 +88,7 @@ public class Red extends AutoBase
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-        // setPathState(Paths.PathState.ToShoot);
+        setPathState(Paths.PathState.ToShoot);
 
     }
 
@@ -121,20 +121,17 @@ public class Red extends AutoBase
         // complete.
         if (!follower.isBusy())
         {
-            if (Objects.requireNonNull(currentPathState) == Paths.PathState.ToShoot)
-            {
-                Shoot();
-                follower.followPath(paths.ToShoot, true);
-            }
+
             switch (currentPathState)
             {
                 case ToShoot:
                     Shoot();
-                    follower.followPath(paths.ToShoot, true);
+                    follower.followPath(paths.ToShoot);
+                    setPathState(Paths.PathState.finalPose);
                     break;
                 case finalPose:
                     // end path
-                    follower.followPath(paths.finalPose, true);
+                    follower.followPath(paths.finalPose);
             }
         }
     }
@@ -196,7 +193,7 @@ public class Red extends AutoBase
                     break;
                 case ToShoot_3:
                     Shoot();
-                    follower.followPath(paths.finalPose, true);
+                    follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose);
                     break;
                 case finalPose:
@@ -450,7 +447,7 @@ public class Red extends AutoBase
 
                     .build();
 
-            ToShoot_2 = follower.pathBuilder().addPath(
+            ToShoot_1 = follower.pathBuilder().addPath(
                             new BezierLine(
                                     ballOneFullPose,
 
@@ -477,7 +474,7 @@ public class Red extends AutoBase
 
                     .build();
 
-            ToShoot_3 = follower.pathBuilder().addPath(
+            ToShoot_2 = follower.pathBuilder().addPath(
                             new BezierLine(
                                     ballTwoFullPose,
 
