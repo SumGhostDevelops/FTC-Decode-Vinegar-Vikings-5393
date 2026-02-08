@@ -126,11 +126,11 @@ public class Blue extends AutoBase
                         {
                                 case ToShoot:
                                         Shoot();
-                                        follower.followPath(paths.ToShoot, true);
+                                        follower.followPath(paths.ToShoot);
                                         break;
                                 case FinalPose:
                                         // end path
-                                        follower.followPath(paths.FinalPose, true);
+                                        follower.followPath(paths.FinalPose);
                         }
                 }
         }
@@ -146,8 +146,11 @@ public class Blue extends AutoBase
                                 // The logic is now: when a state is finished, start the NEXT path and set the
                                 // NEXT state.
                                 case ToShoot:
+                                    // pause to build,
+                                    // shoot
                                         Shoot();
                                         follower.followPath(paths.ToBallOne); // Start NEXT path
+                                    // turn on intake
                                         setPathState(Paths.PathState.ToBallOne); // Set NEXT state
                                         break;
                                 case ToBallOne:
@@ -335,7 +338,7 @@ public class Blue extends AutoBase
 
                                 // --- End / park / random ---
                                 case finalPose:
-                                        follower.followPath(paths.finalPose, true); // true if you want hold/end
+                                        follower.followPath(paths.finalPose); // true if you want hold/end
 
                                         break;
 
