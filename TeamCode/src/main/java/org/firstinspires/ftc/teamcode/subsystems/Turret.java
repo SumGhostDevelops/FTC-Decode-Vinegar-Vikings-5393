@@ -245,7 +245,7 @@ public class Turret extends SubsystemBase
 
     /**
      * @return true if the turret has reached its target angle within the current
-     *         tolerance
+     * tolerance
      */
     public boolean isAtTarget()
     {

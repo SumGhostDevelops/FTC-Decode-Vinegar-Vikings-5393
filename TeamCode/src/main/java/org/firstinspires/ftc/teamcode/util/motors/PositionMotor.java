@@ -16,7 +16,7 @@ import java.util.function.DoubleSupplier;
  * The PositionMotor class extends the PowerMotor class to provide additional
  * functionality for controlling motor position using various control
  * algorithms.
- * 
+ *
  * @see #usePower(double)
  * @see #setPositionCoefficient(double)
  * @see #setPIDF(double, double, double, double)
@@ -286,6 +286,16 @@ public class PositionMotor extends PowerMotor
         output += feedforwardSupplier.getAsDouble();
 
         setPower(MathUtil.clamp(output, -1, 1));
+    }
+
+    /**
+     * Checks if the motor has reached the target position.
+     *
+     * @return True if the motor is at the set point, false otherwise.
+     */
+    public boolean atSetPoint()
+    {
+        return controller.atSetPoint();
     }
 
     /**

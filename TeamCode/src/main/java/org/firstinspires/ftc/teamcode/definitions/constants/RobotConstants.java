@@ -11,11 +11,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit
 import org.firstinspires.ftc.teamcode.subsystems.Drive.DriveMode;
 import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
-import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
 
 public class RobotConstants
 {
@@ -40,16 +40,16 @@ public class RobotConstants
 
     public static class AprilTags
     {
-        public static int[] GOAL_IDS = new int[]
-        { 20, 24 };
-        public static int[] OBELISK_IDS = new int[]
-        { 21, 22, 23 };
+        public static int[] GOAL_IDS = new int[]{20, 24};
+        public static int[] OBELISK_IDS = new int[]{21, 22, 23};
     }
 
     @Configurable
     // Hardware Names
     public static class Drive
     {
+        public static DriveMode DRIVE_MODE = DriveMode.RAW_ROBOT_CENTRIC;
+
         @IgnoreConfigurable
         public static class WHEEL_NAMES
         {
@@ -58,8 +58,6 @@ public class RobotConstants
             public static String BACK_LEFT = "backLeft";
             public static String BACK_RIGHT = "backRight";
         }
-
-        public static DriveMode DRIVE_MODE = DriveMode.RAW_ROBOT_CENTRIC;
 
         @Configurable
         public static class Speed
