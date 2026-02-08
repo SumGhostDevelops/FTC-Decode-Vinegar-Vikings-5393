@@ -24,7 +24,7 @@ public class RobotConstants
     {
         public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean REGRESSION_TESTING_MODE = true;
-        public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.8;
+        public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
     }
 
     @Configurable
@@ -124,7 +124,7 @@ public class RobotConstants
         @Sorter(sort = 1)
         public static double GEAR_RATIO = 4.55; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         @Sorter(sort = 2)
-        public static Angle TOLERANCE = new Angle(1, AngleUnit.DEGREES); // in degrees
+        public static Angle TOLERANCE = new Angle(2, AngleUnit.DEGREES); // in degrees
         public static Distance LINEAR_TOLERANCE = new Distance(3, DistanceUnit.INCH);
         @Sorter(sort = 3)
         public static boolean USE_LINEAR_TOLERANCE_RADIUS = false;
