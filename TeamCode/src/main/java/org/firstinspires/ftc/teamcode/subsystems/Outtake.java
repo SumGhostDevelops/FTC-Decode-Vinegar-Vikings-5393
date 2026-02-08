@@ -5,23 +5,24 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.math.BetterInterpLUT;
-import org.firstinspires.ftc.teamcode.util.math.MathUtil;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
-public class Outtake extends SubsystemBase {
+public class Outtake extends SubsystemBase
+{
 
     public enum State
     {
-        ON,
-        IDLE,
-        OFF,
+        ON, IDLE, OFF,
     }
 
     private final VelocityMotorGroup motor;
     private State state = State.OFF;
 
-    private double targetRPM = RobotConstants.Outtake.BASE_RPM;
+    private final double baseRPM = RobotConstants.Outtake.BASE_RPM;
+    private final double movingRPMRatio = RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
+
+    private double targetRPM = baseRPM;
     private double setRPM = 0;
 
     private final static Distance epsilon = new Distance(1, DistanceUnit.INCH);
@@ -32,7 +33,7 @@ public class Outtake extends SubsystemBase {
 
     // For reducing the RPM while moving
     private boolean rpmRatioEnabled = false;
-    private double rpmRatio = RobotConstants.Outtake.RPM_WHILE_MOVING_RATIO;
+    private double rpmRatio = movingRPMRatio;
 
     // If the RPM should be adjusted using Outtake.setTargetRPM(Distance)
     private boolean adjustWithDistance = RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
@@ -77,7 +78,7 @@ public class Outtake extends SubsystemBase {
         double desired = targetRPM;
         if (Math.abs(desired - setRPM) > RPM_EPS || force)
         {
-            motor.setTargetRPM(desired);
+            motor.setOutputTargetRPM(desired);
             setRPM = desired;
         }
     }
@@ -102,7 +103,7 @@ public class Outtake extends SubsystemBase {
         double desired = targetRPM / 2.0;
         if (Math.abs(desired - setRPM) > RPM_EPS || force)
         {
-            motor.setTargetRPM(desired);
+            motor.setOutputTargetRPM(desired);
             setRPM = desired;
         }
     }
@@ -114,7 +115,7 @@ public class Outtake extends SubsystemBase {
 
     public void off(boolean force)
     {
-        if (state == State.OFF & !force)
+        if (state == State.OFF && !force)
         {
             return;
         }
@@ -133,7 +134,9 @@ public class Outtake extends SubsystemBase {
     /**
      *
      * @param state
-     * @param force If this state change should be forcibly applied, even if it is the same as the current state
+     * @param force
+     *            If this state change should be forcibly applied, even if it is the
+     *            same as the current state
      */
     public void setState(State state, boolean force)
     {
@@ -162,10 +165,13 @@ public class Outtake extends SubsystemBase {
             return;
         }
 
-        if (rpmRatioEnabled) targetRPM = newRPM * rpmRatio;
-        else targetRPM = newRPM;
+        if (rpmRatioEnabled)
+            targetRPM = newRPM * rpmRatio;
+        else
+            targetRPM = newRPM;
 
-        // If motor is active, compute desired rpm for current state and update only if needed
+        // If motor is active, compute desired rpm for current state and update only if
+        // needed
         double desired;
         switch (state)
         {
@@ -183,7 +189,7 @@ public class Outtake extends SubsystemBase {
 
         if (Math.abs(desired - setRPM) > RPM_EPS)
         {
-            motor.setTargetRPM(desired);
+            motor.setOutputTargetRPM(desired);
             setRPM = desired;
         }
     }
@@ -210,14 +216,24 @@ public class Outtake extends SubsystemBase {
         return targetRPM;
     }
 
-    public double getRPM()
+    public double getMotorRPM()
     {
-        return motor.getRPM();
+        return motor.getMotorRPM();
     }
 
-    public double getRPMAcceleration()
+    public double getMotorRPMAcceleration()
     {
-        return motor.getRPMAcceleration();
+        return motor.getMotorRPMAcceleration();
+    }
+
+    public double getFlywheelRPM()
+    {
+        return motor.getOutputRPM();
+    }
+
+    public double getFlywheelRPMAcceleration()
+    {
+        return motor.getOutputRPMAcceleration();
     }
 
     /**
@@ -239,5 +255,11 @@ public class Outtake extends SubsystemBase {
         motor.update();
     }
 
+    @Override
+    public String toString()
+    {
+        String str = "State: " + state + " | Flywheel Target: " + targetRPM + " | Flywheel RPM: " + motor.getOutputRPM();
 
+        return str;
+    }
 }

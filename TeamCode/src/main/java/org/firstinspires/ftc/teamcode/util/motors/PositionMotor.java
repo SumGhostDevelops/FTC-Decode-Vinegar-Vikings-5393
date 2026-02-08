@@ -51,8 +51,10 @@ public class PositionMotor extends PowerMotor
      * VoltageSensor.
      * Sets the default controller type to PIDF and the motor run mode to RawPower.
      *
-     * @param motorEx The MotorEx instance to be controlled.
-     * @param battery The VoltageSensor for monitoring battery voltage.
+     * @param motorEx
+     *            The MotorEx instance to be controlled.
+     * @param battery
+     *            The VoltageSensor for monitoring battery voltage.
      */
     public PositionMotor(MotorEx motorEx, VoltageSensor battery)
     {
@@ -63,9 +65,28 @@ public class PositionMotor extends PowerMotor
     }
 
     /**
+     * Constructor to initialize the PositionMotor with a MotorEx instance and a
+     * DoubleSupplier.
+     * Sets the default controller type to PIDF and the motor run mode to RawPower.
+     *
+     * @param motorEx
+     *            The MotorEx instance to be controlled.
+     * @param voltageSupplier
+     *            The Supplier for monitoring battery voltage.
+     */
+    public PositionMotor(MotorEx motorEx, DoubleSupplier voltageSupplier)
+    {
+        super(motorEx, voltageSupplier);
+
+        setControllerType(PositionController.PIDF);
+        motorEx.setRunMode(Motor.RunMode.RawPower);
+    }
+
+    /**
      * Sets the power used when turning (only for SquIDF controller).
      *
-     * @param power The desired power level (0 to 1).
+     * @param power
+     *            The desired power level (0 to 1).
      * @return The current PositionMotor instance for method chaining.
      */
     public PositionMotor usePower(double power)
@@ -78,7 +99,8 @@ public class PositionMotor extends PowerMotor
     /**
      * Sets the proportional coefficient (Kp) for the position controller.
      *
-     * @param kp The proportional gain.
+     * @param kp
+     *            The proportional gain.
      * @return The current PositionMotor instance for method chaining.
      */
     public PositionMotor setPositionCoefficient(double kp)
@@ -90,7 +112,8 @@ public class PositionMotor extends PowerMotor
     /**
      * Sets the PIDF coefficients for the position controller.
      *
-     * @param coefficients The PIDFCoefficients object containing the PIDF values.
+     * @param coefficients
+     *            The PIDFCoefficients object containing the PIDF values.
      * @return The current PositionMotor instance for method chaining.
      */
     public PositionMotor setPIDF(PIDFCoefficients coefficients)
@@ -105,10 +128,14 @@ public class PositionMotor extends PowerMotor
      * Sets the PIDF coefficients for the position controller.
      * Note: The F term is not used in the SquIDF controller.
      *
-     * @param kp Proportional gain.
-     * @param ki Integral gain.
-     * @param kd Derivative gain.
-     * @param kf Feedforward gain.
+     * @param kp
+     *            Proportional gain.
+     * @param ki
+     *            Integral gain.
+     * @param kd
+     *            Derivative gain.
+     * @param kf
+     *            Feedforward gain.
      * @return The current PositionMotor instance for method chaining.
      */
     public PositionMotor setPIDF(double kp, double ki, double kd, double kf)
@@ -119,7 +146,8 @@ public class PositionMotor extends PowerMotor
     /**
      * Sets the position tolerance for the position controller.
      *
-     * @param tolerance The tolerance for position control.
+     * @param tolerance
+     *            The tolerance for position control.
      * @return The current PositionMotor instance for method chaining.
      */
     public PositionMotor setPositionTolerance(double tolerance)
@@ -166,7 +194,8 @@ public class PositionMotor extends PowerMotor
      * Calculates the output power required to reach the target distance and applies
      * it to the motor.
      *
-     * @param targetDistance The desired target distance.
+     * @param targetDistance
+     *            The desired target distance.
      */
     public void setTargetDistance(double targetDistance)
     {
@@ -183,13 +212,24 @@ public class PositionMotor extends PowerMotor
      * This is useful for velocity compensation (e.g., turret countering robot
      * rotation).
      *
-     * @param supplier A supplier that returns the feedforward power to add
+     * @param supplier
+     *            A supplier that returns the feedforward power to add
      * @return The current PositionMotor instance for method chaining.
      */
     public PositionMotor setFeedforwardSupplier(DoubleSupplier supplier)
     {
         this.feedforwardSupplier = supplier != null ? supplier : () -> 0.0;
         return this;
+    }
+
+    /**
+     * Checks if the motor has reached the target position.
+     *
+     * @return True if the motor is at the set point, false otherwise.
+     */
+    public boolean atSetPoint()
+    {
+        return controller.atSetPoint();
     }
 
     /**
@@ -205,7 +245,8 @@ public class PositionMotor extends PowerMotor
     /**
      * Sets the type of position controller to be used (e.g., PIDF, SquIDF).
      *
-     * @param positionController The desired position controller type.
+     * @param positionController
+     *            The desired position controller type.
      * @return The current PositionMotor instance for method chaining.
      */
     public PositionMotor setControllerType(PositionController positionController)
@@ -234,14 +275,9 @@ public class PositionMotor extends PowerMotor
     {
         super.update(); // Update sensors
 
-        if (atSetPoint())
-        {
-            setPower(0);
-            return;
-        }
-
-        // Always calculate. The controller will return ~0 if at setpoint anyway.
-        // If gravity pulls it off, the controller will automatically fight back.
+        // Always calculate the controller output, even at setpoint
+        // This allows the motor to hold position (respecting BRAKE mode)
+        // and automatically fight back against external forces
         double output = controller.calculate(motorEx.getDistance(), targetDistance);
 
         output *= this.power; // The max power limit

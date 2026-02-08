@@ -19,14 +19,28 @@ public class Turret extends SubsystemBase
 {
     private final PositionMotor motor;
     private final Angle initialRelativeAngle;
+    private State state = State.ON;
+
+    private final double gearRatio = RobotConstants.Turret.GEAR_RATIO;
+    private final Angle forwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
+    private final Angle aimCalibrationOffset = RobotConstants.Turret.AIM_CALIBRATION_OFFSET;
+    private final Angle tolerance = RobotConstants.Turret.TOLERANCE;
+    private final boolean useLinearToleranceRadius = RobotConstants.Turret.USE_LINEAR_TOLERANCE_RADIUS;
+    private final boolean rotationCompensationEnabled = RobotConstants.Turret.ROTATION_COMPENSATION_ENABLED;
+    private final double rotationCompensationFF = RobotConstants.Turret.ROTATION_COMPENSATION_FF;
+    private final UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
+    private final Angle safetyMargin = RobotConstants.Turret.SAFETY_MARGIN;
 
     private double targetAngleDegrees;
 
-    // Add a variable to track the active tolerance, defaulting to the constant
-    private double currentToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
+    // Add a variable to track the active tolerance, defaulting to the local
+    // tolerance
+    private double currentToleranceDegrees = tolerance.getDegrees();
 
     // Supplier for robot angular velocity (deg/s) for feedforward compensation
     private DoubleSupplier angularVelocitySupplier = () -> 0.0;
+
+    public enum State { ON, OFF }
 
     public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {
@@ -37,11 +51,22 @@ public class Turret extends SubsystemBase
         this.targetAngleDegrees = motor.getDistance();
     }
 
+    public void setState(State state)
+    {
+        this.state = state;
+    }
+
+    public State getState()
+    {
+        return this.state;
+    }
+
     /**
      * Sets the angular velocity supplier for rotation compensation.
      * Configures the motor's feedforward to counteract robot rotation.
-     *
-     * @param supplier A supplier that returns robot angular velocity in deg/s
+     * 
+     * @param supplier
+     *            A supplier that returns robot angular velocity in deg/s
      */
     public void setAngularVelocitySupplier(DoubleSupplier supplier)
     {
@@ -52,16 +77,14 @@ public class Turret extends SubsystemBase
         // power
         motor.setFeedforwardSupplier(() ->
         {
-            if (!RobotConstants.Turret.ROTATION_COMPENSATION_ENABLED)
+            if (!rotationCompensationEnabled)
             {
                 return 0.0;
             }
             double robotAngularVelocity = angularVelocitySupplier.getAsDouble();
-            double gearRatio = RobotConstants.Turret.GEAR_RATIO;
-            double ffGain = RobotConstants.Turret.ROTATION_COMPENSATION_FF;
 
             // Negative because turret must counter-rotate against robot rotation
-            return -robotAngularVelocity * gearRatio * ffGain;
+            return -robotAngularVelocity * gearRatio * rotationCompensationFF;
         });
     }
 
@@ -81,7 +104,7 @@ public class Turret extends SubsystemBase
     public void aimRelative(Angle targetAngle)
     {
         // Reset to default tolerance when using standard aiming
-        this.currentToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
+        this.currentToleranceDegrees = tolerance.getDegrees();
         setTargetRelative(targetAngle);
     }
 
@@ -91,17 +114,20 @@ public class Turret extends SubsystemBase
      */
     private void setTargetRelative(Angle targetAngle)
     {
+        // Apply calibration offset to compensate for systematic aiming errors
+        // (e.g., from localization, camera alignment, or mechanical offsets)
+        Angle calibratedTarget = targetAngle.plus(aimCalibrationOffset);
+
         // Convert from robot-relative to motor-zero-relative coordinates
-        Angle adjustedTarget = targetAngle.minus(initialRelativeAngle);
+        Angle adjustedTarget = calibratedTarget.minus(initialRelativeAngle);
         double targetDegrees = adjustedTarget.getDegrees();
 
         // Resolve the best rotation to minimize travel while respecting limits
         targetDegrees = resolveBestRotation(motor.getDistance(), targetDegrees);
 
         // Clamp to turn limits
-        UnnormalizedAngle[] limits = RobotConstants.Turret.TURN_LIMITS;
-        double minDegrees = limits[0].getDegrees();
-        double maxDegrees = limits[1].getDegrees();
+        double minDegrees = turnLimits[0].getDegrees();
+        double maxDegrees = turnLimits[1].getDegrees();
         this.targetAngleDegrees = Math.max(minDegrees, Math.min(maxDegrees, targetDegrees));
 
         motor.setTargetDistance(this.targetAngleDegrees);
@@ -109,9 +135,8 @@ public class Turret extends SubsystemBase
 
     private double resolveBestRotation(double currentDegrees, double targetDegrees)
     {
-        UnnormalizedAngle[] limits = RobotConstants.Turret.TURN_LIMITS;
-        double minDegrees = limits[0].getDegrees();
-        double maxDegrees = limits[1].getDegrees();
+        double minDegrees = turnLimits[0].getDegrees();
+        double maxDegrees = turnLimits[1].getDegrees();
 
         double closestN = Math.round((currentDegrees - targetDegrees) / 360.0);
         double bestCandidate = targetDegrees;
@@ -139,16 +164,19 @@ public class Turret extends SubsystemBase
      * box" size.
      * * @param target The target position on the field
      *
-     * @param robotPose             The robot's current pose
-     * @param linearToleranceRadius The allowable error radius at the target (e.g.,
-     *                              3 inches)
-     * @param minAngularTolerance   The minimum angle (degrees) the tolerance can
-     *                              shrink to
+     * @param robotPose
+     *            The robot's current pose
+     * @param linearToleranceRadius
+     *            The allowable error radius at the target (e.g.,
+     *            3 inches)
+     * @param minAngularTolerance
+     *            The minimum angle (degrees) the tolerance can
+     *            shrink to
      */
     public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose, Distance linearToleranceRadius,
-                                Angle minAngularTolerance)
+            Angle minAngularTolerance)
     {
-        if (!RobotConstants.Turret.USE_DYNAMIC_TOLERANCE)
+        if (!useLinearToleranceRadius)
         {
             aimToCoordinate(target, robotPose);
             return;
@@ -163,8 +191,7 @@ public class Turret extends SubsystemBase
             double dynamicTolerance = Math.toDegrees(Math.atan2(linearToleranceRadius.getInch(), distance));
             // Ensure we don't demand impossible precision
             this.currentToleranceDegrees = Math.max(dynamicTolerance, minAngularTolerance.getDegrees());
-        }
-        else
+        } else
         {
             // If we are ON the target, tolerance is effectively infinite
             this.currentToleranceDegrees = 180.0;
@@ -185,7 +212,7 @@ public class Turret extends SubsystemBase
 
     public void reset()
     {
-        aimRelative(RobotConstants.Turret.FORWARD_ANGLE);
+        aimRelative(forwardAngle);
     }
 
     public FieldHeading getFieldHeading(FieldHeading robotHeading)
@@ -223,7 +250,19 @@ public class Turret extends SubsystemBase
     public boolean isAtTarget()
     {
         // Use the active dynamic tolerance instead of the static constant
-        return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees;
+        return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees || state == State.OFF; // always return true if state is OFF
+    }
+
+    public boolean exceedingTurnLimits()
+    {
+        double currentDegrees = motor.getDistance();
+        double minDegrees = turnLimits[0].getDegrees();
+        double maxDegrees = turnLimits[1].getDegrees();
+        double safetyMarginDegrees = safetyMargin.getDegrees();
+
+        // If we are significantly outside the limits, stop the motor immediately to
+        // prevent damage
+        return (currentDegrees < minDegrees - safetyMarginDegrees) || (currentDegrees > maxDegrees + safetyMarginDegrees);
     }
 
     public Angle bearingToTarget()
@@ -240,6 +279,16 @@ public class Turret extends SubsystemBase
     @Override
     public void periodic()
     {
+        // If we are significantly outside the limits, stop the motor immediately to
+        // prevent damage
+        if (exceedingTurnLimits() || state == State.OFF)
+        {
+            motor.stopMotor();
+            return;
+        }
+
+        motor.setPositionTolerance(currentToleranceDegrees);
+
         // Always update motor to apply feedforward compensation for robot rotation
         // even when at target position (to maintain position during rotation)
         motor.update();

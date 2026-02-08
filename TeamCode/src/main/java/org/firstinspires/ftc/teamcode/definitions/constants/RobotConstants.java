@@ -23,8 +23,7 @@ public class RobotConstants
     public static class General
     {
         public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
-        public static boolean ENERGY_SAVER_MODE = false;
-        public static boolean REGRESSION_TESTING_MODE = false;
+        public static boolean REGRESSION_TESTING_MODE = true;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.8;
     }
 
@@ -82,36 +81,29 @@ public class RobotConstants
     public static class Outtake
     {
         public static final double RPM_WHILE_MOVING_RATIO = 0.8;
-        @Sorter(sort = 0)
-        public static int PPR = 28;
         @Sorter(sort = 1)
-        public static double GEAR_RATIO = 1.5; // driver::driving 3::2
+        public static double INPUT_GEAR_RATIO = 1;
+        public static double OUTPUT_GEAR_RATIO = 1;
 
         @Sorter(sort = 2)
-        public static int BASE_RPM = 3700;
+        public static int BASE_RPM = 3000;
 
         @Sorter(sort = 3)
         public static boolean ON_BY_DEFAULT = false;
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = false;
 
-        @Sorter(sort = 5)
-        public static boolean USE_FUTURE_POSE = false;
-        @Sorter(sort = 6)
-        public static double FUTURE_POSE_TIME = 1.0;
-
         @IgnoreConfigurable
         public static class Name
         {
-            public static String LAUNCHER_LEFT = "leftOuttake";
-            public static String LAUNCHER_RIGHT = "rightOuttake";
+            public static String TOP = "topOuttake";
+            public static String BOTTOM = "bottomOuttake";
         }
 
         @Configurable
         public static class Coefficients
         {
-            // public static double[] veloCoeffs = new double[]{10, 3, 2, 0};
-            public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 1);
+            public static PIDFCoefficients PIDF = new PIDFCoefficients(0.001, 0.000001, 0, 0.0002); // only change I
         }
 
         @Configurable
@@ -120,7 +112,7 @@ public class RobotConstants
             @Sorter(sort = 0)
             public static int RPM = 75;
             @Sorter(sort = 1)
-            public static int RPM_ACCELERATION = 100;
+            public static int RPM_ACCELERATION = 250;
         }
     }
 
@@ -132,32 +124,42 @@ public class RobotConstants
         @Sorter(sort = 1)
         public static double GEAR_RATIO = 4.55; // 19.2 is the gear ratio, 4.5 is the motor to lazysusan ratio
         @Sorter(sort = 2)
-        public static Angle TOLERANCE = new Angle(2, AngleUnit.DEGREES); // in degrees
+        public static Angle TOLERANCE = new Angle(1, AngleUnit.DEGREES); // in degrees
         public static Distance LINEAR_TOLERANCE = new Distance(3, DistanceUnit.INCH);
         @Sorter(sort = 3)
-        public static boolean USE_DYNAMIC_TOLERANCE = true;
+        public static boolean USE_LINEAR_TOLERANCE_RADIUS = false;
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
+
+        /**
+         * Calibration offset to compensate for systematic aiming error.
+         * Positive = turret aims more to the LEFT (CCW when viewed from above)
+         * Negative = turret aims more to the RIGHT (CW when viewed from above)
+         *
+         * If balls consistently miss to the LEFT of the goal, use a NEGATIVE value.
+         * If balls consistently miss to the RIGHT of the goal, use a POSITIVE value.
+         */
         @Sorter(sort = 5)
-        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]{
-                new UnnormalizedAngle(-270, UnnormalizedAngleUnit.DEGREES),
-                new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES)}; // in both directions, so if 0 is forward
+        public static Angle AIM_CALIBRATION_OFFSET = new Angle(0, AngleUnit.DEGREES);
         @Sorter(sort = 6)
+        public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]
+        {
+                new UnnormalizedAngle(-260, UnnormalizedAngleUnit.DEGREES),
+                new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
+        @Sorter(sort = 7)
         public static boolean AUTO_AIM_TO_GOAL = false;
 
-        @Sorter(sort = 7)
-        // public static double[] pidf = new double[]{10, 1, 1, 1};
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.1, 0.00, 0.00075, 0.00);
-
         @Sorter(sort = 8)
-        public static boolean USE_FUTURE_POSE = false;
-        @Sorter(sort = 9)
-        public static double FUTURE_POSE_TIME = 1.0;
+        // only change p and d
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.08, 0.00, 0.0007, 0.00);
 
-        @Sorter(sort = 10)
-        public static boolean ROTATION_COMPENSATION_ENABLED = true;
         @Sorter(sort = 11)
-        public static double ROTATION_COMPENSATION_FF = 0.005; // Feedforward gain: power per deg/s of robot rotation
+        public static boolean ROTATION_COMPENSATION_ENABLED = true;
+        @Sorter(sort = 12)
+        public static double ROTATION_COMPENSATION_FF = 0.0008; // Feedforward gain: power per deg/s of robot rotation
+
+        @Sorter(sort = 13)
+        public static Angle SAFETY_MARGIN = new Angle(10, AngleUnit.DEGREES);
     }
 
     @Configurable
@@ -167,24 +169,10 @@ public class RobotConstants
         public static String NAME = "transfer";
 
         @Sorter(sort = 1)
-        public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
+        public static double OPEN_ANGLE = 90; // Open means the transfer is allowing balls to pass through
 
         @Sorter(sort = 2)
-        public static double CLOSE_INTAKE_ANGLE = 0; // 210; // An angle where the trapdoor blocks balls from entering
-
-        @Sorter(sort = 3)
-        public static double CLOSE_TRANSFER_ANGLE = 0;
-
-        @Configurable
-        public static class TimerConstants
-        {
-            @Sorter(sort = 0)
-            public static int totalTime = 600;
-            @Sorter(sort = 1)
-            public static int upTime = 300;
-            @Sorter(sort = 2)
-            public static int downTime = 300;
-        }
+        public static double CLOSE_INTAKE_ANGLE = 210; // 210; // An angle where the trapdoor blocks balls from entering
     }
 
     @Configurable
@@ -194,14 +182,16 @@ public class RobotConstants
         public static String NAME = "intake";
 
         @Sorter(sort = 1)
-        public static double intakePower = 0.7;
+        public static double intakePower = 0.85;
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
-        public static double transferPower = 0.8;
+        public static double transferPower = 1.0;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
+
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 0);
     }
 
     @Configurable
@@ -212,8 +202,6 @@ public class RobotConstants
                 new FieldCoordinate(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH),
                         CoordinateSystem.DECODE_PEDROPATH),
                 new FieldHeading(new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
-        @Sorter(sort = 1)
-        public static double FUTURE_POSE_TIME = 1.0;
 
         public static boolean SET_FORWARD_DIRECTION_BASED_ON_TEAM = true;
 
@@ -231,7 +219,6 @@ public class RobotConstants
             @Configurable
             public static class Lens
             {
-
                 public static double LENS_FX = 958.876;
                 public static double LENS_FY = 958.876;
                 public static double LENS_CX = 654.11;
@@ -249,13 +236,14 @@ public class RobotConstants
                 @Sorter(sort = 0)
                 public static Distance X = new Distance(0, DistanceUnit.INCH); // camera centered left/right
                 @Sorter(sort = 1)
-                public static Distance Y = new Distance(4.75, DistanceUnit.INCH); // camera forward of center
+                public static Distance Y = new Distance(8, DistanceUnit.INCH); // camera forward of center, was 4.75
                 @Sorter(sort = 2)
                 public static Distance Z = new Distance(9, DistanceUnit.INCH);
 
                 // Camera orientation (YawPitchRoll) - FTC SDK Convention:
                 // Yaw: 0 = pointing forward, +90 = pointing left, -90 = pointing right
-                // Pitch: 0 = horizontal (forward), -90 = pointing down, +90 = pointing up
+                // Pitch: 0 = pointing straight up, -90 = horizontal (forward), +90 = pointing
+                // straight down
                 // Roll: 0 = level, +/-90 = vertical, 180 = upside-down
                 //
                 // NOTE: If camera localization became inaccurate after hardware changes,
@@ -264,7 +252,7 @@ public class RobotConstants
                 @Sorter(sort = 0)
                 public static Angle YAW = new Angle(0, AngleUnit.DEGREES);
                 @Sorter(sort = 1)
-                public static Angle PITCH = new Angle(0, AngleUnit.DEGREES); // horizontal camera looking forward
+                public static Angle PITCH = new Angle(0, AngleUnit.DEGREES); // horizontal camera pointing forward
                 @Sorter(sort = 2)
                 public static Angle ROLL = new Angle(0, AngleUnit.DEGREES);
             }
@@ -273,13 +261,9 @@ public class RobotConstants
         @Configurable
         public static class Deadwheels // These are plugged in directly to the Pinpoint
         {
-            @Sorter(sort = 0)
-            public static int COUNTS_PER_REVOLUTION = 8192;
 
             @Sorter(sort = 1)
             public static Distance WHEEL_DIAMETER = new Distance(35, DistanceUnit.MM);
-            @Sorter(sort = 2)
-            public static Distance WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER.multiply(Math.PI); // π × diameter
 
             @Configurable
             public static class Forward // also parallel
@@ -287,7 +271,7 @@ public class RobotConstants
                 // Distance from the center to the FORWARD wheel along the Y-axis (LATERAL)
                 // Positive if LEFT of center, Negative if RIGHT of center
                 // not great but good enough
-                public static Distance OFFSET = new Distance(-10, DistanceUnit.MM);
+                public static Distance OFFSET = new Distance(-38, DistanceUnit.MM);
             }
 
             @Configurable
@@ -296,7 +280,7 @@ public class RobotConstants
                 // Distance from the center to the STRAFE wheel along the X-axis (LONGITUDINAL)
                 // Positive if FORWARD of center, Negative if BACKWARD of center
                 // not great but good enough
-                public static Distance OFFSET = new Distance(-4.8, DistanceUnit.INCH);
+                public static Distance OFFSET = new Distance(-5.93, DistanceUnit.INCH);
             }
         }
     }

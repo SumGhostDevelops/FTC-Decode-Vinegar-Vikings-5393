@@ -19,31 +19,32 @@ public enum Team
     // You can change these default coordinates and IDs as needed.
     RED(
             "red",
-            new Goal(24, coord(138, 138)),
+            new Goal(24, coord(144, 138)),
+            new Goal(24, coord(138, 144)),
             new Base(coord(38.5, 33.5)),
             new Pose2d(coord(41, 9), deg(90)),
-            deg(0)
-    ),
+            deg(0)),
 
     BLUE(
             "blue",
-            new Goal(20, coord(6, 138)),
+            new Goal(20, coord(0, 138)),
+            new Goal(20, coord(6, 144)),
             new Base(coord(105.25, 33.5)),
             new Pose2d(coord(103, 9), deg(90)),
-            deg(180)
-    ),
+            deg(180)),
 
     NONE(
             "none",
             new Goal(-1, coord(72, 140.5)),
+            new Goal(-1, coord(72, 140.5)),
             new Base(coord(72, 33.5)),
             new Pose2d(coord(72, 9), deg(90)),
-            deg(90)
-    );
+            deg(90));
 
     // --- Enum Fields and Methods ---
     public final String color;
-    public final Goal goal;
+    public final Goal goalFromClose;
+    public final Goal goalFromFar;
     public final Base base;
     public final Pose2d initialPose; // currently configured for an 18in x 18in robot, starting in the small triangle corner
     public final FieldHeading forwardAngle;
@@ -53,14 +54,16 @@ public enum Team
     /**
      * Private constructor for the enum.
      *
-     * @param goal  The team's goal
-     * @param base  The team's base
-     * @param color The team's color
+     * @param color         The team's color
+     * @param goalFromClose   The team's goal
+     * @param goalFromFar
+     * @param base          The team's base
      */
-    Team(String color, Goal goal, Base base, Pose2d initialPose, FieldHeading forwardAngle)
+    Team(String color, Goal goalFromClose, Goal goalFromFar, Base base, Pose2d initialPose, FieldHeading forwardAngle)
     {
         this.color = color;
-        this.goal = goal;
+        this.goalFromClose = goalFromClose;
+        this.goalFromFar = goalFromFar;
         this.base = base;
         this.initialPose = initialPose;
         this.forwardAngle = forwardAngle;

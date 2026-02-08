@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
+import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 
 public class Intake extends SubsystemBase
 {
@@ -31,11 +32,11 @@ public class Intake extends SubsystemBase
 
     public double getRPM()
     {
-        return intake.getRPM();
+        return intake.getMotorRPM();
     }
 
     public double getAcceleration()
     {
-        return intake.getRPMAcceleration();
+        return intake.getMotorRPMAcceleration();
     }
 }

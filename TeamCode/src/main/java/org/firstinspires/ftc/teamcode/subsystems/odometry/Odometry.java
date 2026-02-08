@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.odometry;
 
-import static java.lang.Thread.sleep;
-
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -12,28 +10,32 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Webcam;
-import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.UnnormalizedAngle;
-import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 public class Odometry extends SubsystemBase
 {
     private final Pinpoint pinpoint;
     private final Webcam webcam;
 
+    private final BooleanSupplier setForwardBasedOnTeam = () -> RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM;
+
     private static final AngleUnit aUnit = AngleUnit.DEGREES;
     private static final DistanceUnit dUnit = DistanceUnit.INCH;
 
     /**
-     * The field-absolute heading that the driver considers "forward" for field-centric driving.
+     * The field-absolute heading that the driver considers "forward" for
+     * field-centric driving.
      */
     private FieldHeading driverForward;
     private Pose2d cachedPose;
@@ -43,7 +45,8 @@ public class Odometry extends SubsystemBase
 
     public Odometry(Pinpoint pinpoint, WebcamName webcam)
     {
-        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH), new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
+        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH),
+                new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
     }
 
     public Odometry(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
@@ -81,7 +84,8 @@ public class Odometry extends SubsystemBase
     }
 
     /**
-     * @return A heading where 0 is conceptually "Forward" (aligned with Pedro X-Axis/Blue Alliance)
+     * @return A heading where 0 is conceptually "Forward" (aligned with Pedro
+     *         X-Axis/Blue Alliance)
      */
     public Angle getDriverHeading()
     {
@@ -115,8 +119,7 @@ public class Odometry extends SubsystemBase
         return new Vector2d(
                 new Distance(pinpoint.getVelX(dUnit), dUnit),
                 new Distance(pinpoint.getVelY(dUnit), dUnit),
-                CoordinateSystem.DECODE_FTC
-        );
+                CoordinateSystem.DECODE_FTC);
     }
 
     /**
@@ -129,8 +132,10 @@ public class Odometry extends SubsystemBase
 
     /**
      * Sets the current field-absolute heading as the driver's "forward" direction.
-     * Call this AFTER localization to set which direction the driver considers forward
-     * for field-centric driving, without affecting the absolute heading calibration.
+     * Call this AFTER localization to set which direction the driver considers
+     * forward
+     * for field-centric driving, without affecting the absolute heading
+     * calibration.
      */
     public void setDriverForwardFromCurrent()
     {
@@ -146,6 +151,7 @@ public class Odometry extends SubsystemBase
 
     /**
      * Localizes using an AprilTag
+     *
      * @return If the localization was successful or not
      */
     public boolean localizeWithAprilTag()
@@ -154,10 +160,11 @@ public class Odometry extends SubsystemBase
         webcam.updateDetections();
 
         Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
-        if (possibleTag.isEmpty()) return false;
+        if (possibleTag.isEmpty())
+            return false;
 
         AprilTagDetection tag = possibleTag.get();
-        Pose2d estimatedPose = Pose2d.fromPose3D(tag.robotPose, CoordinateSystem.DECODE_FTC);
+        Pose2d estimatedPose = Pose2d.fromAprilTagRobotPose(tag.robotPose);
 
         // Preserve driver's relative heading before resetting hardware
         FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
@@ -172,7 +179,9 @@ public class Odometry extends SubsystemBase
     }
 
     /**
-     * Localizes using an AprilTag, and automatically sets the driver forward direction (if enabled)
+     * Localizes using an AprilTag, and automatically sets the driver forward
+     * direction (if enabled)
+     *
      * @param team
      * @return If localization was successful or not
      */
@@ -183,7 +192,7 @@ public class Odometry extends SubsystemBase
             return false;
         }
 
-        if (RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM)
+        if (setForwardBasedOnTeam.getAsBoolean())
         {
             driverForward = team.forwardAngle;
         }

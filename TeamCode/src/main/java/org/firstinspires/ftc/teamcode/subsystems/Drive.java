@@ -8,13 +8,22 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 public class Drive extends SubsystemBase
 {
     private final PowerMotor frontLeft, frontRight, backLeft, backRight;
 
-    private double speed = RobotConstants.Drive.Speed.DEFAULT;
-    private DriveMode currentMode = RobotConstants.Drive.DRIVE_MODE;
+    private final DoubleSupplier speedDefault = () -> RobotConstants.Drive.Speed.DEFAULT;
+    private final DoubleSupplier speedChange = () -> RobotConstants.Drive.Speed.CHANGE;
+    private final DoubleSupplier speedMax = () -> RobotConstants.Drive.Speed.MAXIMUM;
+    private final DoubleSupplier speedMin = () -> RobotConstants.Drive.Speed.MINIMUM;
+    private final DoubleSupplier hybridDeadband = () -> RobotConstants.Drive.HybridMode.DEADBAND;
+    private final DoubleSupplier hybridTurnP = () -> RobotConstants.Drive.HybridMode.TURN_P;
+    private final Supplier<DriveMode> currentMode = () -> RobotConstants.Drive.DRIVE_MODE;
 
+    private double speed = speedDefault.getAsDouble();
 
     public Drive(PowerMotor frontLeft, PowerMotor frontRight, PowerMotor backLeft, PowerMotor backRight)
     {
@@ -31,32 +40,38 @@ public class Drive extends SubsystemBase
 
     public void increaseSpeed()
     {
-        changeSpeed(RobotConstants.Drive.Speed.CHANGE);
+        changeSpeed(speedChange.getAsDouble());
     }
 
     public void decreaseSpeed()
     {
-        changeSpeed(-RobotConstants.Drive.Speed.CHANGE);
+        changeSpeed(-speedChange.getAsDouble());
     }
 
     public void changeSpeed(double change)
     {
         if (change > 0)
         {
-            speed = Math.min(speed + change, RobotConstants.Drive.Speed.MAXIMUM);
+            speed = Math.min(speed + change, speedMax.getAsDouble());
         }
         else
         {
-            speed = Math.max(speed + change, RobotConstants.Drive.Speed.MINIMUM);
+            speed = Math.max(speed + change, speedMin.getAsDouble());
         }
     }
 
     /**
      * Main drive method.
-     * @param lateral Left/Right strafe (Left stick X)
-     * @param axial Forward/Back (Left stick Y) - Note: Up should be positive in your command
-     * @param yaw Turn (Right stick X)
-     * @param driverHeading The robot's heading relative to the driver's forward
+     * 
+     * @param lateral
+     *            Left/Right strafe (Left stick X)
+     * @param axial
+     *            Forward/Back (Left stick Y) - Note: Up should be positive in your
+     *            command
+     * @param yaw
+     *            Turn (Right stick X)
+     * @param driverHeading
+     *            The robot's heading relative to the driver's forward
      */
     public void drive(double lateral, double axial, double yaw, Angle driverHeading)
     {
@@ -67,7 +82,7 @@ public class Drive extends SubsystemBase
         // Ensure angle is always in radians for Math functions
         double botHeading = driverHeading.getRadians();
 
-        switch (currentMode)
+        switch (currentMode.get())
         {
             case FIELD_CENTRIC:
                 // Standard Field Centric Math
@@ -80,7 +95,7 @@ public class Drive extends SubsystemBase
 
             case ROBOT_CENTRIC_HYBRID:
                 double magnitude = Math.hypot(axial, lateral);
-                if (magnitude > RobotConstants.Drive.HybridMode.DEADBAND)
+                if (magnitude > hybridDeadband.getAsDouble())
                 {
                     // Calculate target heading from joystick
                     double targetHeading = Math.atan2(lateral, axial);
@@ -89,7 +104,7 @@ public class Drive extends SubsystemBase
                     // Auto-turn to face target if not manually turning
                     if (Math.abs(yaw) < 0.05)
                     {
-                        rx = Range.clip(error * RobotConstants.Drive.HybridMode.TURN_P, -1.0, 1.0);
+                        rx = Range.clip(error * hybridTurnP.getAsDouble(), -1.0, 1.0);
                     }
 
                     // Drive forward in the new direction
@@ -133,8 +148,6 @@ public class Drive extends SubsystemBase
 
     public enum DriveMode
     {
-        FIELD_CENTRIC,
-        ROBOT_CENTRIC_HYBRID,
-        RAW_ROBOT_CENTRIC
+        FIELD_CENTRIC, ROBOT_CENTRIC_HYBRID, RAW_ROBOT_CENTRIC
     }
 }

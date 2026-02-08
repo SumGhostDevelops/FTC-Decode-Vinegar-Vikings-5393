@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public class VelocityMotorGroup
 {
-    private final VelocityMotor[] group;
+    public final VelocityMotor[] group;
 
     public VelocityMotorGroup(VelocityMotor leader)
     {
@@ -80,16 +80,29 @@ public class VelocityMotorGroup
         return this;
     }
 
-    public double getTargetRPM()
+    public double getMotorTargetRPM()
     {
-        return group[0].getTargetRPM();
+        return group[0].getMotorTargetRPM();
     }
 
-    public void setTargetRPM(double rpm)
+    public double getOutputTargetRPM()
+    {
+        return group[0].getOutputTargetRPM();
+    }
+
+    public void setMotorTargetRPM(double rpm)
     {
         for (VelocityMotor motor : group)
         {
-            motor.setTargetRPM(rpm);
+            motor.setMotorTargetRPM(rpm);
+        }
+    }
+
+    public void setOutputTargetRPM(double rpm)
+    {
+        for (VelocityMotor motor : group)
+        {
+            motor.setOutputTargetRPM(rpm);
         }
     }
 
@@ -125,21 +138,59 @@ public class VelocityMotorGroup
         return group[0].atSetPoint();
     }
 
-    public double getRPM()
+    public double getMotorRPM()
     {
-        return group[0].getRPM();
+        return group[0].getMotorRPM();
     }
 
-    public double getRPMAcceleration()
+    public double[] getMotorRPMs()
     {
-        return group[0].getRPMAcceleration();
+        double[] rpms = new double[group.length];
+
+        for (int i = 0; i < group.length; i++)
+        {
+            rpms[i] = group[i].getMotorRPM();
+        }
+
+        return rpms;
+    }
+
+    public double getMotorRPMAcceleration()
+    {
+        return group[0].getMotorRPMAcceleration();
+    }
+
+    public double getOutputRPM()
+    {
+        return group[0].getOutputRPM();
+    }
+
+    public double getOutputRPMAcceleration()
+    {
+        return group[0].getOutputRPMAcceleration();
+    }
+
+    public double getPower()
+    {
+        return group[0].getPower();
     }
 
     public void update()
     {
-        for (VelocityMotor motor : group)
+        // Leader-Follower Control:
+        // Update the leader (index 0) which runs the TBH/PID algorithm
+        VelocityMotor leader = group[0];
+        leader.update();
+
+        // Get the calculated power from the leader
+        double leaderPower = leader.getPower();
+
+        // Apply the same power to all followers
+        // We do NOT call update() on followers to avoid independent controller
+        // divergence
+        for (int i = 1; i < group.length; i++)
         {
-            motor.update();
+            group[i].setPower(leaderPower);
         }
     }
 

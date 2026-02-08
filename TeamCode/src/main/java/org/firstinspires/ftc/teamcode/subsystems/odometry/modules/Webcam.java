@@ -15,11 +15,28 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class Webcam
 {
     private final AprilTagProcessor tagProcessor;
     private final VisionPortal visionPortal;
+
+    private final DoubleSupplier xOffset = () -> RobotConstants.Odometry.Webcam.Offset.X.getDistance(DistanceUnit.INCH);
+    private final DoubleSupplier yOffset = () -> RobotConstants.Odometry.Webcam.Offset.Y.getDistance(DistanceUnit.INCH);
+    private final DoubleSupplier zOffset = () -> RobotConstants.Odometry.Webcam.Offset.Z.getDistance(DistanceUnit.INCH);
+    private final DoubleSupplier yawOffset = () -> RobotConstants.Odometry.Webcam.Offset.YAW.getAngle(AngleUnit.DEGREES);
+    private final DoubleSupplier pitchOffset = () -> RobotConstants.Odometry.Webcam.Offset.PITCH.getAngle(AngleUnit.DEGREES);
+    private final DoubleSupplier rollOffset = () -> RobotConstants.Odometry.Webcam.Offset.ROLL.getAngle(AngleUnit.DEGREES);
+
+    private final DoubleSupplier lensFX = () -> RobotConstants.Odometry.Webcam.Lens.LENS_FX;
+    private final DoubleSupplier lensFY = () -> RobotConstants.Odometry.Webcam.Lens.LENS_FY;
+    private final DoubleSupplier lensCX = () -> RobotConstants.Odometry.Webcam.Lens.LENS_CX;
+    private final DoubleSupplier lensCY = () -> RobotConstants.Odometry.Webcam.Lens.LENS_CY;
+
+    private final Supplier<int[]> goalIds = () -> RobotConstants.AprilTags.GOAL_IDS;
+    private final Supplier<int[]> obeliskIds = () -> RobotConstants.AprilTags.OBELISK_IDS;
 
     private List<AprilTagDetection> cachedTagDetections = new ArrayList<>();
 
@@ -28,7 +45,7 @@ public class Webcam
 
     public Webcam(WebcamName webcam)
     {
-        this(webcam, DistanceUnit.METER, true);
+        this(webcam, DistanceUnit.INCH, true);
     }
 
     protected Webcam(WebcamName webcam, DistanceUnit unit)
@@ -40,16 +57,16 @@ public class Webcam
     {
         // Camera position relative to robot center
         Position cameraPosition = new Position(DistanceUnit.INCH,
-                RobotConstants.Odometry.Webcam.Offset.X.getDistance(DistanceUnit.INCH),
-                RobotConstants.Odometry.Webcam.Offset.Y.getDistance(DistanceUnit.INCH),
-                RobotConstants.Odometry.Webcam.Offset.Z.getDistance(DistanceUnit.INCH),
+                xOffset.getAsDouble(),
+                yOffset.getAsDouble(),
+                zOffset.getAsDouble(),
                 0);
 
         // Camera orientation (yaw, pitch, roll)
         YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
-                RobotConstants.Odometry.Webcam.Offset.YAW.getAngle(AngleUnit.DEGREES),
-                RobotConstants.Odometry.Webcam.Offset.PITCH.getAngle(AngleUnit.DEGREES),
-                RobotConstants.Odometry.Webcam.Offset.ROLL.getAngle(AngleUnit.DEGREES),
+                yawOffset.getAsDouble(),
+                pitchOffset.getAsDouble(),
+                rollOffset.getAsDouble(),
                 0);
 
         tagProcessor = new AprilTagProcessor.Builder()
@@ -57,7 +74,7 @@ public class Webcam
                 .setDrawCubeProjection(showLiveView)
                 .setDrawTagID(showLiveView)
                 .setDrawTagOutline(showLiveView)
-                .setLensIntrinsics(RobotConstants.Odometry.Webcam.Lens.LENS_FX, RobotConstants.Odometry.Webcam.Lens.LENS_FY, RobotConstants.Odometry.Webcam.Lens.LENS_CX, RobotConstants.Odometry.Webcam.Lens.LENS_CY)
+                .setLensIntrinsics(lensFX.getAsDouble(), lensFY.getAsDouble(), lensCX.getAsDouble(), lensCY.getAsDouble())
                 .setCameraPose(cameraPosition, cameraOrientation)
                 .setOutputUnits(unit, AngleUnit.DEGREES)
                 .build();
@@ -65,14 +82,15 @@ public class Webcam
         visionPortal = new VisionPortal.Builder()
                 .addProcessor(tagProcessor)
                 .setCamera(webcam)
-                .setCameraResolution(new Size(1920, 1080))
+                .setCameraResolution(new Size(1280, 720))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .enableLiveView(showLiveView)
                 .build();
     }
 
     /**
-     * Detections are cached for efficiency. Calling this method updates the cache to the latest frame.
+     * Detections are cached for efficiency. Calling this method updates the cache
+     * to the latest frame.
      */
     public void updateDetections()
     {
@@ -81,13 +99,17 @@ public class Webcam
 
     /**
      * Checks if an AprilTag with a certain ID is in the list of cached detections.
-     * @param id The ID of the AprilTag to check.
-     * @return Whether the AprilTag with the requested ID is in the list cached detections.
+     * 
+     * @param id
+     *            The ID of the AprilTag to check.
+     * @return Whether the AprilTag with the requested ID is in the list cached
+     *         detections.
      */
     public boolean tagIdExists(int id)
     {
-        // Iterate through all of the tags and check if any of them match the requested ID
-        for (AprilTagDetection tag: cachedTagDetections)
+        // Iterate through all of the tags and check if any of them match the requested
+        // ID
+        for (AprilTagDetection tag : cachedTagDetections)
         {
             if (tag.id == id)
             {
@@ -100,9 +122,9 @@ public class Webcam
 
     public boolean tagIdExists(int[] ids)
     {
-        for (AprilTagDetection tag: cachedTagDetections)
+        for (AprilTagDetection tag : cachedTagDetections)
         {
-            for (int possibleId: ids)
+            for (int possibleId : ids)
             {
                 if (tag.id == possibleId)
                 {
@@ -116,12 +138,14 @@ public class Webcam
 
     /**
      * Returns a specific AprilTagDetection and throws an error otherwise.
-     * @param id The ID of the AprilTag to return.
+     * 
+     * @param id
+     *            The ID of the AprilTag to return.
      * @return The AprilTagDetection with the requested ID.
      */
     public Optional<AprilTagDetection> getDetection(int id)
     {
-        for (AprilTagDetection tag: cachedTagDetections)
+        for (AprilTagDetection tag : cachedTagDetections)
         {
             if (tag.id == id)
             {
@@ -134,9 +158,9 @@ public class Webcam
 
     public Optional<AprilTagDetection> getDetection(int[] ids)
     {
-        for (AprilTagDetection tag: cachedTagDetections)
+        for (AprilTagDetection tag : cachedTagDetections)
         {
-            for (int possibleId: ids)
+            for (int possibleId : ids)
             {
                 if (tag.id == possibleId)
                 {
@@ -150,23 +174,26 @@ public class Webcam
 
     public class Goal
     {
-        public Goal() {}
+        public Goal()
+        {
+        }
 
         public boolean anyVisible()
         {
-            return tagIdExists(new int[]{20, 24});
+            return tagIdExists(new int[]
+            { 20, 24 });
         }
 
         public Optional<AprilTagDetection> getAny()
         {
-            return getDetection(RobotConstants.AprilTags.GOAL_IDS);
+            return getDetection(goalIds.get());
         }
 
         public Optional<AprilTagDetection> getSpecific(int id)
         {
             boolean idIsCorrect = false;
 
-            for (int possibleId: RobotConstants.AprilTags.GOAL_IDS)
+            for (int possibleId : goalIds.get())
             {
                 if (possibleId == id)
                 {
@@ -186,16 +213,19 @@ public class Webcam
 
     public class Obelisk
     {
-        public Obelisk() {}
+        public Obelisk()
+        {
+        }
 
         public boolean anyVisible()
         {
-            return tagIdExists(new int[]{21, 22, 23});
+            return tagIdExists(new int[]
+            { 21, 22, 23 });
         }
 
         public Optional<Integer> getId()
         {
-            Optional<AprilTagDetection> tag = getDetection(RobotConstants.AprilTags.OBELISK_IDS);
+            Optional<AprilTagDetection> tag = getDetection(obeliskIds.get());
 
             return tag.map(aprilTagDetection -> aprilTagDetection.id);
         }

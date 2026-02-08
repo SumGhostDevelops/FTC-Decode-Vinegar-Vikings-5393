@@ -84,3 +84,4 @@ lint/tmp/
 /.idea
 eclipse-formatter.xml
 .vscode/settings.json
+build_output.txt
