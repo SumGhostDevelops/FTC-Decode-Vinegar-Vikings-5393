@@ -223,16 +223,6 @@ public class PositionMotor extends PowerMotor
     }
 
     /**
-     * Checks if the motor has reached the target position.
-     *
-     * @return True if the motor is at the set point, false otherwise.
-     */
-    public boolean atSetPoint()
-    {
-        return controller.atSetPoint();
-    }
-
-    /**
      * Gets the current type of position controller being used.
      *
      * @return The current PositionController type.

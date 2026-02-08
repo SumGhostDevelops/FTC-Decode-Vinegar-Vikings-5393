@@ -181,7 +181,7 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
         Pose2d pose = getPose2d();
-        Distance distToGoal = pose.distanceTo(team.goal.coord);
+        Distance distToGoal = pose.distanceTo(team.goalFromClose.coord);
         robot.subsystems.outtake.setTargetRPM(distToGoal);
     }
 
@@ -197,7 +197,7 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
         Pose2d pose = getPose2d();
-        FieldCoordinate goalCoord = team.goal.coord;
+        FieldCoordinate goalCoord = team.goalFromClose.coord;
         robot.subsystems.turret.aimToCoordinate(goalCoord, pose);
     }
 
