@@ -304,17 +304,8 @@ public class VelocityMotor extends PowerMotor
         double currentRPM = getMotorRPM();
         double output = 0;
 
-        // Calculate base output
-        switch (controllerType)
-        {
-            case PIDF:
-            case TakeBackHalf:
-                output = controller.calculate(currentRPM, targetRPM);
-                break;
-            case BangBang:
-                output = (currentRPM < targetRPM) ? 1.0 : 0.0;
-                break;
-        }
+        // Calculate base output using the controller
+        output = controller.calculate(currentRPM, targetRPM);
 
         // Send to motor (clamped in PowerMotor.setPower)
         setPower(output);

@@ -203,7 +203,7 @@ public class RobotHardware
                     .setMotorDirection(Motor.Direction.REVERSE)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
                     .setPIDF(RobotConstants.Intake.PIDF)
-                    .setControllerType(VelocityMotor.VelocityController.TakeBackHalf);
+                    .setControllerType(VelocityMotor.VelocityController.BangBang);
 
         } catch (Exception e)
         {
