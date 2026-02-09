@@ -22,7 +22,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
     }
