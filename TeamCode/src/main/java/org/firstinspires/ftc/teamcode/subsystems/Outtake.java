@@ -36,7 +36,8 @@ public class Outtake extends SubsystemBase
     private double rpmRatio = movingRPMRatio;
 
     // If the RPM should be adjusted using Outtake.setTargetRPM(Distance)
-    private boolean adjustWithDistance = RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
+    // Read dynamically to allow runtime changes via FTC Dashboard
+    private boolean adjustWithDistance() { return RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT; }
 
     /**
      * Inches -> RPM
@@ -53,11 +54,9 @@ public class Outtake extends SubsystemBase
                 .add(50.51, 2785)
                 .add(114.59, 3675)
                 .add(81.02, 3172)
-                .add(94.46, 3353)
                 .add(74.28, 3080)
                 .add(45.61, 2665)
                 .add(138.33, 3950)
-                .add(135, 3975)
                 .add(157.69, 4265)
                 .build();
     }
@@ -71,6 +70,13 @@ public class Outtake extends SubsystemBase
     {
         if (state == State.ON && !force)
         {
+            // Even if state is already ON, still check if RPM needs updating
+            double desired = targetRPM;
+            if (Math.abs(desired - setRPM) > RPM_EPS)
+            {
+                motor.setOutputTargetRPM(desired);
+                setRPM = desired;
+            }
             return;
         }
 
@@ -97,6 +103,13 @@ public class Outtake extends SubsystemBase
     {
         if (state == State.IDLE && !force)
         {
+            // Even if state is already IDLE, still check if RPM needs updating
+            double desired = targetRPM / 2.0;
+            if (Math.abs(desired - setRPM) > RPM_EPS)
+            {
+                motor.setOutputTargetRPM(desired);
+                setRPM = desired;
+            }
             return;
         }
 
@@ -198,7 +211,7 @@ public class Outtake extends SubsystemBase
 
     public void setTargetRPM(Distance dist)
     {
-        if (!adjustWithDistance)
+        if (!adjustWithDistance())
         {
             return;
         }
