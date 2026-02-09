@@ -191,7 +191,7 @@ public class RobotConstants
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
 
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 0);
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.001, 0.000001, 0, 0);
     }
 
     @Configurable
