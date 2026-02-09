@@ -51,7 +51,6 @@ public abstract class BaseStable extends CommandOpMode
     private final BooleanSupplier enableGraphOutput = () -> RobotConstants.Telemetry.ENABLE_GRAPH_OUTPUT;
     private final BooleanSupplier autoAimToGoal = () -> RobotConstants.Turret.AUTO_AIM_TO_GOAL;
     private final BooleanSupplier regressionTestingMode = () -> RobotConstants.General.REGRESSION_TESTING_MODE;
-    private final BooleanSupplier autoDistanceAdjustment = () -> RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT;
     private final DoubleSupplier intakePower = () -> RobotConstants.Intake.intakePower;
     private final DoubleSupplier transferPower = () -> RobotConstants.Intake.transferPower;
     private final DoubleSupplier outtakePower = () -> RobotConstants.Intake.outtakePower;
@@ -284,13 +283,11 @@ public abstract class BaseStable extends CommandOpMode
             driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 10));
             driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -10));
         }
-        if (autoDistanceAdjustment.getAsBoolean())
-        {
-            // Update RPM dynamically based on distance to goal
-            active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
-                    s.outtake,
-                    () -> s.odometry.getPose().distanceTo(getGoal())));
-        }
+
+        // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
+        active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
+                s.outtake,
+                () -> s.odometry.getPose().distanceTo(getGoal())));
     }
 
     private void bindIntakeAndTransferLogic(Trigger active, GamepadEx driver, GamepadEx coDriver, Subsystems s)
