@@ -445,7 +445,7 @@ public class Red extends AutoBase
                     startPose = new Pose(123, 125, Math.toRadians(38));
                         final Pose shootPose = new Pose(71.000, 71.000);
                         final Pose ballOneLinePose = new Pose(56.000, 60.000);
-                        final Pose ballOneFullPose = new Pose(56.000, 60.000);
+                        final Pose ballOneFullPose = new Pose(15, 60.000);
                         final Pose gateLinePose = new Pose(15.000, 71.000);
                         final Pose gateControlPoint = new Pose(20.000, 64.000);
                         final Pose eatLinePose = new Pose(10.000, 61.000);
