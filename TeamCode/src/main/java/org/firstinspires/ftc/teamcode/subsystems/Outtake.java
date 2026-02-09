@@ -49,14 +49,16 @@ public class Outtake extends SubsystemBase
 
         // Inches -> RPM
         rpmLUT = BetterInterpLUT.builder()
-                .add(0, 4100)
-                .add(50.32, 4100)
-                .add(59.63, 4300)
-                .add(70.25, 4400)
-                .add(86.79, 4800)
-                .add(97.81, 5000)
-                .add(108.49, 5400)
-                .add(Math.hypot(144, 144), 5400)
+                .add(94.42, 3303)
+                .add(50.51, 2785)
+                .add(114.59, 3675)
+                .add(81.02, 3172)
+                .add(94.46, 3353)
+                .add(74.28, 3080)
+                .add(45.61, 2665)
+                .add(138.33, 3950)
+                .add(135, 3975)
+                .add(157.69, 4265)
                 .build();
     }
 

@@ -171,9 +171,7 @@ public abstract class BaseStable extends CommandOpMode
 
         telemetry.addLine("--- Odometry ---");
         telemetry.addData("Coord (Pedro)", pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
-        telemetry.addData("Coord (FTC)", pose.toCoordinateSystem(CoordinateSystem.DECODE_FTC));
         telemetry.addData("Heading (Field)", s.odometry.getFieldHeading().toSystem(CoordinateSystem.DECODE_PEDROPATH));
-        telemetry.addData("Heading (Driver)", s.odometry.getDriverHeading());
         telemetry.addData("IMU Yaw", s.odometry.getIMUYaw());
 
         telemetry.addLine("--- Hardware ---");
@@ -220,6 +218,8 @@ public abstract class BaseStable extends CommandOpMode
 
             Graph.put("Intake (RPM)", s.intake.getRPM());
             Graph.put("Intake (Power)", robot.hw.intake.getPower());
+
+            Graph.put("Transfer (Position)", robot.hw.transfer.getRawPosition());
 
             Graph.put("Battery (Voltage)", robot.hw.battery.getVoltage());
 
@@ -328,18 +328,23 @@ public abstract class BaseStable extends CommandOpMode
 
         // "Can Score" = User wants to shoot + Systems are ready ( + Manual intake hold
         // if not semi-auto)
-        Trigger canScore = semiAuto
-                ? shootBtn.and(systemsReady)
-                : intakeBtn.and(shootBtn).and(systemsReady);
+        Trigger intendShoot = semiAuto
+                ? shootBtn
+                : intakeBtn.and(shootBtn);
+
+        Trigger canScore = intendShoot.and(systemsReady);
 
         // "Keep Scoring" = Hysteresis to ensure we finish the shot even if turret
         // jitters slightly
         Trigger keepScoring = semiAuto
                 ? shootBtn
-                : intakeBtn.and(shootBtn); // Ideally this might need systemsReady too, but kept close to original logic
+                : intakeBtn.and(shootBtn);
 
-        // Action: When ready, run intake (feeder) and open transfer
-        canScore.whenActive(intakeScore).whenActive(openTransfer);
+        // Action: If intending to shoot, open the transfer
+        intendShoot.whenActive(openTransfer);
+
+        // Action: When ready to shoot, run the intake
+        canScore.whenActive(intakeScore);
 
         // Exit: When we stop holding shoot (or intake), cancel the feeding commands
         keepScoring.negate().cancelWhenActive(intakeScore).cancelWhenActive(openTransfer);

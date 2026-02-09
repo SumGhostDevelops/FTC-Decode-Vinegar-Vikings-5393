@@ -91,7 +91,7 @@ public class RobotConstants
         @Sorter(sort = 3)
         public static boolean ON_BY_DEFAULT = false;
         @Sorter(sort = 4)
-        public static boolean AUTO_DISTANCE_ADJUSMENT = false;
+        public static boolean AUTO_DISTANCE_ADJUSMENT = true;
 
         @IgnoreConfigurable
         public static class Name
@@ -169,7 +169,7 @@ public class RobotConstants
         public static String NAME = "transfer";
 
         @Sorter(sort = 1)
-        public static double OPEN_ANGLE = 90; // Open means the transfer is allowing balls to pass through
+        public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
 
         @Sorter(sort = 2)
         public static double CLOSE_INTAKE_ANGLE = 210; // 210; // An angle where the trapdoor blocks balls from entering
@@ -186,7 +186,7 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
-        public static double transferPower = 1.0;
+        public static double transferPower = 0.55;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
@@ -236,7 +236,7 @@ public class RobotConstants
                 @Sorter(sort = 0)
                 public static Distance X = new Distance(0, DistanceUnit.INCH); // camera centered left/right
                 @Sorter(sort = 1)
-                public static Distance Y = new Distance(8, DistanceUnit.INCH); // camera forward of center, was 4.75
+                public static Distance Y = new Distance(5, DistanceUnit.INCH); // camera forward of center, was 4.75
                 @Sorter(sort = 2)
                 public static Distance Z = new Distance(9, DistanceUnit.INCH);
 
