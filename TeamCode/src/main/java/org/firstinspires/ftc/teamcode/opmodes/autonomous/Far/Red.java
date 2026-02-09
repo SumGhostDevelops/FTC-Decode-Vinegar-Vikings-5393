@@ -194,13 +194,15 @@ public class Red extends AutoBase
                     setPathState(Paths.PathState.bottomBallsEat);
                     break;
                 case bottomBallsEat:
-                    // This state seems to be missing a path, assuming it leads to shoot
                     Shoot();
-                    // Assuming there's a path like paths.ToShoot_3, then final
+                    // Tell the robot to follow the final path
+                    follower.followPath(paths.FinalPose);
+                    // Set the state to match the path you just started
                     setPathState(Paths.PathState.FinalPose);
                     break;
                 case FinalPose:
-                    follower.followPath(paths.FinalPose, true);
+                    // This case is now only entered when the final path is complete.
+                    // The robot will hold its position, and the auto is effectively over.
                     break;
             }
         }
@@ -350,13 +352,14 @@ public class Red extends AutoBase
                 private void buildPathsBasic(Follower follower)
                 {
                         // Tune these poses if the robot drives too far or in the wrong direction.
-                        startPose = new Pose(123, 125, Math.toRadians(90));
+                        startPose = new Pose(123, 125, Math.toRadians(38));
                         final Pose shootPose = new Pose(101, 108);
                         final Pose randomPose = new Pose(125, 106);
 
                         ToShoot = follower.pathBuilder()
                                         .addPath(new BezierLine(startPose, shootPose))
                                         .setTangentHeadingInterpolation()
+                                        .setReversed()
                                         .build();
                         Move = follower.pathBuilder()
                                         .addPath(new BezierLine(shootPose, randomPose))
@@ -369,7 +372,7 @@ public class Red extends AutoBase
                 {
 
                         // --- Pose definitions ---
-                        startPose = new Pose(124.0, 123.0, Math.toRadians(90));
+                        startPose = new Pose(123, 125, Math.toRadians(38));
                         final Pose shootPose = new Pose(90.0, 97.200);
                         final Pose ballOneLinePose = new Pose(90.0, 84.0);
                         final Pose ballOneFullPose = new Pose(125.0, 84.0);
@@ -439,7 +442,7 @@ public class Red extends AutoBase
 
                 private void buildPathsGate(Follower follower)
                 {
-                        startPose = new Pose(67.000, 8.000);
+                    startPose = new Pose(123, 125, Math.toRadians(38));
                         final Pose shootPose = new Pose(71.000, 71.000);
                         final Pose ballOneLinePose = new Pose(56.000, 60.000);
                         final Pose ballOneFullPose = new Pose(56.000, 60.000);
