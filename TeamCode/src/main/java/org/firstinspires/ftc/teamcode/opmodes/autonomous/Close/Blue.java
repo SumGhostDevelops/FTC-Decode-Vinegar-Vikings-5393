@@ -68,6 +68,8 @@ public class Blue extends AutoBase
                                 handlePathing();
                                 follower.update();
 
+                                updateSubsystems();
+
                                 telemetry.addData("Current State", currentPathState);
                                 telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
                                 telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
@@ -77,9 +79,12 @@ public class Blue extends AutoBase
                 }
         }
 
-        public void initAuto()
-        {
+    public void initAuto()
+    {
+                initRobot();
+
                 follower = PedroConstants.createFollower(hardwareMap);
+                setFollower(follower);
                 paths = new Paths(follower, autoStrat);
                 timer = new Timer();
                 opModeTimer = new Timer();
@@ -89,8 +94,38 @@ public class Blue extends AutoBase
                 follower.update();
 
                 setPathState(Paths.PathState.ToShoot);
+    }
 
+
+
+    public void Intake()
+    {
+        if (robot == null)
+            return;
+
+        closeTransfer();
+        startIntake();
+    }
+
+    public void Shoot()
+    {
+        if (robot == null)
+            return;
+
+        startOuttake();
+        closeTransfer();
+
+        waitForSystemsReady(1500);
+
+        if (isReadyToShoot())
+        {
+            shootForDuration(500);
         }
+    }
+
+
+
+
 
         public void setPathState(Paths.PathState pathState)
         {
@@ -160,7 +195,8 @@ public class Blue extends AutoBase
                                         break;
                                 case ToBallOneFull:
                                         // has ball
-                                        follower.followPath(paths.ToShoot_1);
+                                    stopIntake();
+                                    follower.followPath(paths.ToShoot_1);
                                         setPathState(Paths.PathState.ToShoot_1);
                                         break;
                                 case ToShoot_1:
@@ -175,7 +211,8 @@ public class Blue extends AutoBase
                                         break;
                                 case ToBallTwoFull:
                                         // has ball
-                                        follower.followPath(paths.ToShoot_2);
+                                    stopIntake();
+                                    follower.followPath(paths.ToShoot_2);
                                         setPathState(Paths.PathState.ToShoot_2);
                                         break;
                                 case ToShoot_2:
@@ -190,7 +227,8 @@ public class Blue extends AutoBase
                                         break;
                                 case ToThreeFull:
                                         // has ball
-                                        follower.followPath(paths.bottomBalls);
+                                    stopIntake();
+                                    follower.followPath(paths.bottomBalls);
                                         setPathState(Paths.PathState.bottomBalls);
                                         break;
                                 case bottomBalls:
@@ -229,6 +267,7 @@ public class Blue extends AutoBase
 
                 case ToBallOneFull:
                     // has ball
+                    stopIntake();
                     follower.followPath(paths.ToShoot_1); // Start path to Shoot_1
                     setPathState(Paths.PathState.ToShoot_1); // Set state to Shoot_1
                     break;
@@ -252,6 +291,7 @@ public class Blue extends AutoBase
                     break;
 
                 case ToShoot_2:
+                    stopIntake();
                     Shoot();
                     follower.followPath(paths.Gate_2); // Start path to Gate_2
                     setPathState(Paths.PathState.Gate_2); // Set state to Gate_2
@@ -270,6 +310,7 @@ public class Blue extends AutoBase
                     break;
 
                 case ToShoot_3:
+                    stopIntake();
                     Shoot();
                     follower.followPath(paths.Gate_3); // Start path to Gate_3
                     setPathState(Paths.PathState.Gate_3); // Set state to Gate_3
@@ -288,6 +329,7 @@ public class Blue extends AutoBase
                     break;
 
                 case ToShoot_4:
+                    stopIntake();
                     Shoot();
                     // This is the last action, so now we can go to the final parking position.
                     follower.followPath(paths.finalPose);
