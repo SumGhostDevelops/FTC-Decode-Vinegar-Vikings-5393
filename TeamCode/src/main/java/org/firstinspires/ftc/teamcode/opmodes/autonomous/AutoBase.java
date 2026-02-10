@@ -97,6 +97,10 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
         Subsystems s = robot.subsystems;
+
+        s.turret.aimToCoordinate(team.goalFromClose.coord, getPose2d());
+        s.outtake.setTargetRPM(getPose2d().distanceTo(team.goalFromClose.coord));
+
         s.turret.periodic();
         s.outtake.periodic();
     }
