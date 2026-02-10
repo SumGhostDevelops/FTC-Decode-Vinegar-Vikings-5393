@@ -374,14 +374,10 @@ public class Red extends AutoBase
                         // --- Pose definitions ---
                         startPose = new Pose(123, 125, Math.toRadians(38));
                         final Pose shootPose = new Pose(90.0, 97.200);
-                        final Pose ballOneLinePose = new Pose(90.0, 84.0);
-                        final Pose ballOneFullPose = new Pose(125.0, 84.0);
-                        final Pose ballTwoLinePose = new Pose(90.0, 97.200);
-                        final Pose ballTwoFullPose = new Pose(90.0, 58.0);
-                        final Pose ballThreeLinePose = new Pose(130.0, 58.0);
-                        final Pose ballThreeFullPose = new Pose(90.0, 97.200);
-                        final Pose gateLinePose = new Pose(90.0, 35.0);
-                        final Pose gatePushPose = new Pose(135.771, 34.971);
+                        final Pose ballTwoFullPose = new Pose(90.0, 84);
+                        final Pose ballThreeLinePose = new Pose(125, 84);
+                        final Pose gateLinePose = new Pose(90.0, 58);
+                        final Pose gatePushPose = new Pose(130, 58);
                         final Pose finalPose = new Pose(118.0, 96.0); // New pose added here
                         ToShoot = follower.pathBuilder().addPath(
                                         new BezierLine(
@@ -443,25 +439,25 @@ public class Red extends AutoBase
                 private void buildPathsGate(Follower follower)
                 {
                     startPose = new Pose(123, 125, Math.toRadians(38));
-                        final Pose shootPose = new Pose(71.000, 71.000);
-                        final Pose ballOneLinePose = new Pose(56.000, 60.000);
-                        final Pose ballOneFullPose = new Pose(15, 60.000);
-                        final Pose gateLinePose = new Pose(15.000, 71.000);
-                        final Pose gateControlPoint = new Pose(20.000, 64.000);
-                        final Pose eatLinePose = new Pose(10.000, 61.000);
+                        final Pose shootPose = new Pose(73, 71);
+                        final Pose ballOneLinePose = new Pose(88.000, 60.000);
+                        final Pose ballOneFullPose = new Pose(129.000, 60.000);
+                        final Pose gateLinePose = new Pose(127, 64);
+                        final Pose gateControlPoint = new Pose(124, 62);
+                        final Pose eatLinePose = new Pose(134.000, 61.000);
                         final Pose ballThreePose = new Pose(71.000, 35.000);
-                        final Pose ballThreeFullPose = new Pose(15.000, 35.000);
-                        final Pose ballPickPose = new Pose(58.000, 84.000);
-                        final Pose TurnPose = new Pose(50.000, 84.000);
-                        final Pose topEatPose = new Pose(16.000, 84.000);
-                        final Pose randomPose = new Pose(28.000, 84.000);
+                        final Pose ballThreeFullPose = new Pose(129.000, 35.000);
+                        final Pose ballPickPose = new Pose(86.000, 84.000);
+                        final Pose TurnPose = new Pose(128.000, 84.000);
+                        final Pose topEatPose = new Pose(86.000, 84.000);
+                        final Pose randomPose = new Pose(116.000, 84.000);
 
                         ToShoot = follower.pathBuilder().addPath(
                                         new BezierLine(
                                                         startPose,
 
                                                         shootPose))
-                                        .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(144))
+                                        .setLinearHeadingInterpolation(Math.toRadians(38), Math.toRadians(38))
 
                                         .build();
 

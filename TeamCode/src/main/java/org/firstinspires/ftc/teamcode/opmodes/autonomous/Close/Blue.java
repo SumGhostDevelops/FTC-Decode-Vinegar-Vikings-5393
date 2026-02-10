@@ -449,9 +449,9 @@ public class Blue extends AutoBase
                         final Pose shootPose = new Pose(71.000, 71.000);
                         final Pose ballOneLinePose = new Pose(56.000, 60.000);
                         final Pose ballOneFullPose = new Pose(15.000, 60.000);
-                        final Pose gateLinePose = new Pose(15.000, 71.000);
+                        final Pose gateLinePose = new Pose(17, 66);
                         final Pose gateControlPoint = new Pose(20.000, 64.000);
-                        final Pose eatLinePose = new Pose(10.000, 61.000);
+                        final Pose eatLinePose = new Pose(10.000, 59.000);
                         final Pose ballThreePose = new Pose(71.000, 35.000);
                         final Pose ballThreeFullPose = new Pose(15.000, 35.000);
                         final Pose ballPickPose = new Pose(58.000, 84.000);
