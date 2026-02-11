@@ -80,7 +80,7 @@ public class Blue extends AutoBase
 
         public void initAuto()
         {
-                initRobot();
+
 
                 follower = PedroConstants.createFollower(hardwareMap);
                 setFollower(follower);
@@ -90,6 +90,7 @@ public class Blue extends AutoBase
                 opModeTimer.resetTimer();
                 follower.setStartingPose(paths.startPose);
                 follower.update();
+                initRobot();
                 setPathState(Paths.PathState.ToShoot);
 
         }
