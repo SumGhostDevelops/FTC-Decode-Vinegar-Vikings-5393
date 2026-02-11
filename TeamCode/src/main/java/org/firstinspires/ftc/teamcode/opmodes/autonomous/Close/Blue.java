@@ -160,8 +160,12 @@ public class Blue extends AutoBase
                                         break;
                                 case ToBallOneFull:
                                         // has ball
-                                        follower.followPath(paths.ToShoot_1);
-                                        setPathState(Paths.PathState.ToShoot_1);
+                                        follower.followPath(paths.ToBallOneFull_Back);
+                                        setPathState(Paths.PathState.ToBallOneFull_Back);
+                            case ToBallOneFull_Back:
+                                // has ball
+                                follower.followPath(paths.ToShoot_1);
+                                setPathState(Paths.PathState.ToShoot_1);
                                         break;
                                 case ToShoot_1:
                                         Shoot();
@@ -175,9 +179,14 @@ public class Blue extends AutoBase
                                         break;
                                 case ToBallTwoFull:
                                         // has ball
-                                        follower.followPath(paths.ToShoot_2);
-                                        setPathState(Paths.PathState.ToShoot_2);
+                                        follower.followPath(paths.ToBallTwoFull_Back);
+                                        setPathState(Paths.PathState.ToBallTwoFull_Back);
                                         break;
+                            case ToBallTwoFull_Back:
+                                // has ball
+                                follower.followPath(paths.ToShoot_2);
+                                setPathState(Paths.PathState.ToShoot_2);
+                                break;
                                 case ToShoot_2:
                                         Shoot();
                                         follower.followPath(paths.ToThree);
@@ -307,15 +316,15 @@ public class Blue extends AutoBase
 
                 public Pose startPose = new Pose(123, 125, Math.toRadians(90));
                 public PathChain ToShoot,
-                                ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
-                                ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+                                ToBallOne, ToBallOneFull, ToBallOneFull_Back, ToBallTwo, ToBallTwoFull, ToThree,
+                                ToThreeFull, ToBallTwoFull_Back,ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
                                 // Gate-specific paths used in buildPathsGate
                                 Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
                                 bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, FinalPose, finalPose;
 
                 public enum PathState
                 {
-                        ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+                        ToShoot, ToBallOne, ToBallOneFull,ToBallOneFull_Back, ToBallTwoFull_Back, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
                         // Gate-specific states
                         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPose
                 }
@@ -385,10 +394,16 @@ public class Blue extends AutoBase
                                                         ballOneFullPose))
                                         .setTangentHeadingInterpolation()
                                         .build();
+                    ToBallOneFull_Back = follower.pathBuilder().addPath(
+                                    new BezierLine(
+                                            ballOneFullPose,
+                                            ballOneLinePose))
+                            .setTangentHeadingInterpolation()
+                            .build();
 
                         ToShoot_1 = follower.pathBuilder().addPath(
                                         new BezierLine(
-                                                        ballOneFullPose,
+                                                ballOneLinePose,
                                                         shootPose))
                                         .setConstantHeadingInterpolation(Math.toRadians(144))
                                         .build();
@@ -406,10 +421,16 @@ public class Blue extends AutoBase
                                                         ballTwoFullPose))
                                         .setTangentHeadingInterpolation()
                                         .build();
+                    ToBallTwoFull_Back = follower.pathBuilder().addPath(
+                                    new BezierLine(
+                                            ballTwoFullPose,
+                                            ballTwoLinePose))
+                            .setTangentHeadingInterpolation()
+                            .build();
 
                         ToShoot_2 = follower.pathBuilder().addPath(
                                         new BezierLine(
-                                                        ballTwoFullPose,
+                                                ballTwoLinePose,
                                                         shootPose))
                                         .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(144))
                                         .build();
