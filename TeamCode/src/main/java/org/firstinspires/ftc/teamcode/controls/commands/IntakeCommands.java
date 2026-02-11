@@ -4,14 +4,21 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
+import java.util.function.DoubleSupplier;
+
 public class IntakeCommands
 {
     public static class In extends CommandBase
     {
         protected final Intake intake;
-        private final double power;
+        private final DoubleSupplier power;
 
         public In(Intake intake, double power)
+        {
+            this(intake, () -> power);
+        }
+
+        public In(Intake intake, DoubleSupplier power)
         {
             this.intake = intake;
             this.power = power;
@@ -21,7 +28,7 @@ public class IntakeCommands
         @Override
         public void execute()
         {
-            intake.intake(power);
+            intake.intake(power.getAsDouble());
         }
 
         @Override

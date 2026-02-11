@@ -131,6 +131,8 @@ public class RobotConstants
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
 
+        public static boolean TARGET_ONLY_WHEN_INTENDING_TO_SHOOT = true;
+
         /**
          * Calibration offset to compensate for systematic aiming error.
          * Positive = turret aims more to the LEFT (CCW when viewed from above)
@@ -186,7 +188,7 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
-        public static double transferPower = 0.55;
+        public static double minimumTransferPower = 0.55; // goes from this number -> 1
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
@@ -230,15 +232,15 @@ public class RobotConstants
             {
                 // Position of camera relative to robot center
                 // Uses FTC SDK conventions for setCameraPose():
-                // X: Left/right (positive = RIGHT of center)
-                // Y: Forward/backward (positive = FORWARD of center)
-                // Z: Height above ground
+                // X: Forward/backward (positive is forward)
+                // Y: Left/right (positive is left)
+                // Z: Positive is up
                 @Sorter(sort = 0)
-                public static Distance X = new Distance(0, DistanceUnit.INCH); // camera centered left/right
+                public static Distance X = new Distance(5.5, DistanceUnit.INCH); // camera centered left/right
                 @Sorter(sort = 1)
-                public static Distance Y = new Distance(5, DistanceUnit.INCH); // camera forward of center, was 4.75
+                public static Distance Y = new Distance(0.25, DistanceUnit.INCH); // camera forward of center, was 4.75
                 @Sorter(sort = 2)
-                public static Distance Z = new Distance(9, DistanceUnit.INCH);
+                public static Distance Z = new Distance(9.5, DistanceUnit.INCH);
 
                 // Camera orientation (YawPitchRoll) - FTC SDK Convention:
                 // Yaw: 0 = pointing forward, +90 = pointing left, -90 = pointing right

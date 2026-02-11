@@ -19,7 +19,7 @@ public class Turret extends SubsystemBase
 {
     private final PositionMotor motor;
     private final Angle initialRelativeAngle;
-    private State state = State.ON;
+    private State state = State.OFF;
 
     private final double gearRatio = RobotConstants.Turret.GEAR_RATIO;
     private final Angle forwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
@@ -40,7 +40,7 @@ public class Turret extends SubsystemBase
     // Supplier for robot angular velocity (deg/s) for feedforward compensation
     private DoubleSupplier angularVelocitySupplier = () -> 0.0;
 
-    public enum State { ON, OFF }
+    public enum State { ON, OFF, CENTERED }
 
     public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {
@@ -210,9 +210,10 @@ public class Turret extends SubsystemBase
         aimRelative(robotPose.bearingTo(target));
     }
 
-    public void reset()
+    public void center()
     {
         aimRelative(forwardAngle);
+        state = State.CENTERED;
     }
 
     public FieldHeading getFieldHeading(FieldHeading robotHeading)
@@ -249,8 +250,13 @@ public class Turret extends SubsystemBase
      */
     public boolean isAtTarget()
     {
+        switch (state)
+        {
+            case CENTERED: return false;
+            case OFF: return true;
+        }
         // Use the active dynamic tolerance instead of the static constant
-        return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees || state == State.OFF; // always return true if state is OFF
+        return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees;
     }
 
     public boolean exceedingTurnLimits()

@@ -27,8 +27,8 @@ public enum Team
 
     BLUE(
             "blue",
+            new Goal(20, coord(0, 138)),
             new Goal(20, coord(0, 144)),
-            new Goal(20, coord(6, 144)),
             new Base(coord(105.25, 33.5)),
             new Pose2d(coord(103, 9), deg(90)),
             deg(180)),

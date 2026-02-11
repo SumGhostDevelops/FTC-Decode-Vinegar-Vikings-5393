@@ -29,7 +29,7 @@ public abstract class AutoBase extends LinearOpMode
 
     // Constants from RobotConstants
     private final double intakePower = RobotConstants.Intake.intakePower;
-    private final double transferPower = RobotConstants.Intake.transferPower;
+    private final double transferPower = RobotConstants.Intake.minimumTransferPower;
 
     protected enum AutoStrat
     {
@@ -97,6 +97,10 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
         Subsystems s = robot.subsystems;
+
+        s.turret.aimToCoordinate(team.goalFromClose.coord, getPose2d());
+        s.outtake.setTargetRPM(getPose2d().distanceTo(team.goalFromClose.coord));
+
         s.turret.periodic();
         s.outtake.periodic();
     }
@@ -229,6 +233,12 @@ public abstract class AutoBase extends LinearOpMode
         ElapsedTime timer = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested() && timer.milliseconds() < timeoutMs)
         {
+            // Update follower pose
+            if (follower != null)
+            {
+                follower.update();
+            }
+
             // Update subsystems (PIDF loops)
             updateSubsystems();
 
@@ -270,6 +280,12 @@ public abstract class AutoBase extends LinearOpMode
         ElapsedTime timer = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested() && timer.milliseconds() < durationMs)
         {
+            // Update follower pose
+            if (follower != null)
+            {
+                follower.update();
+            }
+
             updateSubsystems();
             aimTurret();
             sleep(10);
