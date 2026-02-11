@@ -233,6 +233,12 @@ public abstract class AutoBase extends LinearOpMode
         ElapsedTime timer = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested() && timer.milliseconds() < timeoutMs)
         {
+            // Update follower pose
+            if (follower != null)
+            {
+                follower.update();
+            }
+
             // Update subsystems (PIDF loops)
             updateSubsystems();
 
@@ -274,6 +280,12 @@ public abstract class AutoBase extends LinearOpMode
         ElapsedTime timer = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested() && timer.milliseconds() < durationMs)
         {
+            // Update follower pose
+            if (follower != null)
+            {
+                follower.update();
+            }
+
             updateSubsystems();
             aimTurret();
             sleep(10);

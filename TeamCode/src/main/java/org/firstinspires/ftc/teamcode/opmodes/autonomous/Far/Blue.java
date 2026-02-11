@@ -68,6 +68,8 @@ public class Blue extends AutoBase
                                 handlePathing();
                                 follower.update();
 
+                                updateSubsystems();
+
                                 telemetry.addData("Current State", currentPathState);
                                 telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
                                 telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
@@ -78,7 +80,10 @@ public class Blue extends AutoBase
 
         public void initAuto()
         {
+                initRobot();
+
                 follower = PedroConstants.createFollower(hardwareMap);
+                setFollower(follower);
                 paths = new Paths(follower, autoStrat);
                 timer = new Timer();
                 opModeTimer = new Timer();

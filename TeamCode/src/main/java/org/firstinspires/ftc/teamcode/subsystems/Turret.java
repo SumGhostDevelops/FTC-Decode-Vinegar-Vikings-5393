@@ -40,7 +40,7 @@ public class Turret extends SubsystemBase
     // Supplier for robot angular velocity (deg/s) for feedforward compensation
     private DoubleSupplier angularVelocitySupplier = () -> 0.0;
 
-    public enum State { ON, OFF, ZERO }
+    public enum State { ON, OFF, CENTERED }
 
     public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {
@@ -210,9 +210,10 @@ public class Turret extends SubsystemBase
         aimRelative(robotPose.bearingTo(target));
     }
 
-    public void reset()
+    public void center()
     {
         aimRelative(forwardAngle);
+        state = State.CENTERED;
     }
 
     public FieldHeading getFieldHeading(FieldHeading robotHeading)

@@ -267,8 +267,9 @@ public abstract class BaseStable extends CommandOpMode
     {
         Supplier<Pose2d> turretPose = s.odometry::getPose;
         Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, this::getGoal, turretPose);
-        Command aimForward = new TurretCommands.AimRelative(s.turret, () -> RobotConstants.Turret.FORWARD_ANGLE);
         Command off = new InstantCommand(() -> s.turret.setState(Turret.State.OFF));
+        Command aimCenter = new InstantCommand(s.turret::center);
+
 
         Trigger intakeBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1);
         Trigger shootBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1);
@@ -285,7 +286,7 @@ public abstract class BaseStable extends CommandOpMode
         {
             if (RobotConstants.Turret.TARGET_ONLY_WHEN_INTENDING_TO_SHOOT)
             {
-                opModeActive.and(intendShoot).toggleWhenActive(aimCmd, aimForward);
+                opModeActive.and(intendShoot).toggleWhenActive(aimCmd, aimCenter);
             }
             else
             {
@@ -307,7 +308,7 @@ public abstract class BaseStable extends CommandOpMode
                 // When turret is enabled AND NOT intending to shoot -> aim forward
                 // When turret is disabled -> turn off
                 turretEnabledTrigger.and(intendShoot).whileActiveContinuous(aimCmd);
-                turretEnabledTrigger.and(intendShoot.negate()).whileActiveContinuous(aimForward);
+                turretEnabledTrigger.and(intendShoot.negate()).whileActiveContinuous(aimCenter);
                 turretEnabledTrigger.negate().whenActive(off);
             }
             else

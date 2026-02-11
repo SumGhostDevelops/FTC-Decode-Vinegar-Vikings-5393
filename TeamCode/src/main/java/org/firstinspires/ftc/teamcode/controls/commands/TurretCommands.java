@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.controls.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
@@ -39,7 +38,7 @@ public class TurretCommands
         @Override
         public void end(boolean interrupted)
         {
-            turret.reset();
+            turret.center();
         }
     }
 
@@ -65,7 +64,7 @@ public class TurretCommands
         @Override
         public void end(boolean interrupted)
         {
-            turret.reset();
+            turret.center();
         }
     }
 
@@ -115,7 +114,7 @@ public class TurretCommands
         @Override
         public void end(boolean interrupted)
         {
-            turret.reset();
+            turret.center();
         }
     }
 }
