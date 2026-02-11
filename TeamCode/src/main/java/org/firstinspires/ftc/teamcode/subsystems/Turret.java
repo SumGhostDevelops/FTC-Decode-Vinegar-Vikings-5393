@@ -40,7 +40,7 @@ public class Turret extends SubsystemBase
     // Supplier for robot angular velocity (deg/s) for feedforward compensation
     private DoubleSupplier angularVelocitySupplier = () -> 0.0;
 
-    public enum State { ON, OFF }
+    public enum State { ON, OFF, ZERO }
 
     public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {

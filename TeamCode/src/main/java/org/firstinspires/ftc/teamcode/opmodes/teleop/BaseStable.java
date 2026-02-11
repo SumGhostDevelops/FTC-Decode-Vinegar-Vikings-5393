@@ -260,19 +260,62 @@ public abstract class BaseStable extends CommandOpMode
                 .whenPressed(new OdometryCommands.LocalizeWithDebugTelemetry(s.odometry, telemetry));
     }
 
+    // Turret manual aiming state
+    private boolean turretEnabled = false;
+
     private void bindTurretControls(Trigger opModeActive, GamepadEx driver, Subsystems s)
     {
         Supplier<Pose2d> turretPose = s.odometry::getPose;
         Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, this::getGoal, turretPose);
+        Command aimForward = new TurretCommands.AimRelative(s.turret, () -> RobotConstants.Turret.FORWARD_ANGLE);
         Command off = new InstantCommand(() -> s.turret.setState(Turret.State.OFF));
+
+        Trigger intakeBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1);
+        Trigger shootBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1);
+
+        // Scoring Logic
+        boolean semiAuto = intakeByDefault.getAsBoolean() || outtakeOnByDefault.getAsBoolean();
+
+        // "Intend Shoot" = User wants to shoot ( + Manual intake hold if not semi-auto)
+        Trigger intendShoot = semiAuto
+                ? shootBtn
+                : intakeBtn.and(shootBtn);
 
         if (autoAimToGoal.getAsBoolean())
         {
-            opModeActive.whileActiveContinuous(aimCmd);
+            if (RobotConstants.Turret.TARGET_ONLY_WHEN_INTENDING_TO_SHOOT)
+            {
+                opModeActive.and(intendShoot).toggleWhenActive(aimCmd, aimForward);
+            }
+            else
+            {
+                opModeActive.whileActiveContinuous(aimCmd);
+            }
         }
         else
         {
-            driver.getGamepadButton(GamepadKeys.Button.Y).toggleWhenPressed(aimCmd, off);
+            // Manual aiming mode: Y toggles turret on/off
+            Trigger turretEnabledTrigger = new Trigger(() -> turretEnabled);
+
+            // Toggle turret enabled state with Y button
+            driver.getGamepadButton(GamepadKeys.Button.Y)
+                    .whenPressed(new InstantCommand(() -> turretEnabled = !turretEnabled));
+
+            if (RobotConstants.Turret.TARGET_ONLY_WHEN_INTENDING_TO_SHOOT)
+            {
+                // When turret is enabled AND intending to shoot -> aim to target
+                // When turret is enabled AND NOT intending to shoot -> aim forward
+                // When turret is disabled -> turn off
+                turretEnabledTrigger.and(intendShoot).whileActiveContinuous(aimCmd);
+                turretEnabledTrigger.and(intendShoot.negate()).whileActiveContinuous(aimForward);
+                turretEnabledTrigger.negate().whenActive(off);
+            }
+            else
+            {
+                // Original behavior: Y toggles between aiming and off
+                turretEnabledTrigger.whileActiveContinuous(aimCmd);
+                turretEnabledTrigger.negate().whenActive(off);
+            }
         }
     }
 
