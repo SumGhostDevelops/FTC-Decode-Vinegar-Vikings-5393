@@ -52,7 +52,7 @@ public abstract class BaseStable extends CommandOpMode
     private final BooleanSupplier autoAimToGoal = () -> RobotConstants.Turret.AUTO_AIM_TO_GOAL;
     private final BooleanSupplier regressionTestingMode = () -> RobotConstants.General.REGRESSION_TESTING_MODE;
     private final DoubleSupplier intakePower = () -> RobotConstants.Intake.intakePower;
-    private final DoubleSupplier transferPower = () -> RobotConstants.Intake.transferPower;
+    private final DoubleSupplier transferPower = () -> RobotConstants.Intake.minimumTransferPower;
     private final DoubleSupplier outtakePower = () -> RobotConstants.Intake.outtakePower;
     private final BooleanSupplier intakeByDefault = () -> RobotConstants.Intake.INTAKE_BY_DEFAULT;
     private final BooleanSupplier outtakeOnByDefault = () -> RobotConstants.Outtake.ON_BY_DEFAULT;
@@ -261,7 +261,7 @@ public abstract class BaseStable extends CommandOpMode
     }
 
     // Turret manual aiming state
-    private boolean turretEnabled = false;
+    private boolean turretEnabled = true;
 
     private void bindTurretControls(Trigger opModeActive, GamepadEx driver, Subsystems s)
     {
@@ -269,7 +269,6 @@ public abstract class BaseStable extends CommandOpMode
         Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, this::getGoal, turretPose);
         Command off = new InstantCommand(() -> s.turret.setState(Turret.State.OFF));
         Command aimCenter = new InstantCommand(s.turret::center);
-
 
         Trigger intakeBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1);
         Trigger shootBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1);
@@ -345,7 +344,7 @@ public abstract class BaseStable extends CommandOpMode
 
         // --- Commands ---
         Command intakeIn = new IntakeCommands.In(s.intake, intakePower.getAsDouble());
-        Command intakeScore = new IntakeCommands.In(s.intake, transferPower.getAsDouble());
+        Command intakeScore = new IntakeCommands.In(s.intake, this::getIntakeTransferPower);
         Command reverseIntake = new IntakeCommands.Reverse(s.intake, outtakePower.getAsDouble());
         //Command closeTransfer = new TransferCommands.CloseOnce(s.transfer);
         Command openTransfer = new TransferCommands.Open(s.transfer);
@@ -411,6 +410,20 @@ public abstract class BaseStable extends CommandOpMode
         else
         {
             return robot.team.goalFromFar.coord;
+        }
+    }
+
+    private double getIntakeTransferPower()
+    {
+        Odometry odometry = robot.subsystems.odometry;
+
+        if (odometry.getFieldCoord().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).y.getInch() > 48)
+        {
+            return 1.0;
+        }
+        else
+        {
+            return transferPower.getAsDouble();
         }
     }
 }

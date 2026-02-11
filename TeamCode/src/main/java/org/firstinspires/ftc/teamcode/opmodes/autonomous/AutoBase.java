@@ -29,7 +29,7 @@ public abstract class AutoBase extends LinearOpMode
 
     // Constants from RobotConstants
     private final double intakePower = RobotConstants.Intake.intakePower;
-    private final double transferPower = RobotConstants.Intake.transferPower;
+    private final double transferPower = RobotConstants.Intake.minimumTransferPower;
 
     protected enum AutoStrat
     {
