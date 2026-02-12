@@ -19,7 +19,7 @@ public enum Team
     // You can change these default coordinates and IDs as needed.
     RED(
             "red",
-            new Goal(24, coord(144, 138)),
+            new Goal(24, coord(137, 137)),
             new Goal(24, coord(144, 144)),
             new Base(coord(38.5, 33.5)),
             new Pose2d(coord(41, 9), deg(90)),
@@ -27,7 +27,7 @@ public enum Team
 
     BLUE(
             "blue",
-            new Goal(20, coord(0, 138)),
+            new Goal(20, coord(7, 137)),
             new Goal(20, coord(0, 144)),
             new Base(coord(105.25, 33.5)),
             new Pose2d(coord(103, 9), deg(90)),
