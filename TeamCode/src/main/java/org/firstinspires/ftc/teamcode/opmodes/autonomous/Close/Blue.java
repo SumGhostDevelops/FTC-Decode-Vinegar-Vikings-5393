@@ -230,6 +230,11 @@ public class Blue extends AutoBase
 
                 case bottomBalls: // At ball three full, going to bottom balls
                     follower.followPath(paths.bottomBalls);
+                    setPathState(Paths.PathState.bottomBallsShoot);
+                    break;
+
+                case bottomBallsShoot:
+                    follower.followPath(paths.ballBallsShoot);
                     setPathState(Paths.PathState.bottomBallsEat);
                     break;
 
@@ -357,7 +362,7 @@ public class Blue extends AutoBase
 
         public Pose startPose = new Pose(123, 125, Math.toRadians(90));
         public PathChain ToShoot,
-                ToBallOne, ToBallOneFull,ToBallOneBack, ToBallTwo, ToBallTwoFull, ToThree,
+                ToBallOne, ToBallOneFull,ToBallOneBack,ballBallsShoot, ToBallTwo, ToBallTwoFull, ToThree,
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
         // Gate-specific paths used in buildPathsGate
         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
@@ -694,10 +699,15 @@ public class Blue extends AutoBase
             bottomBalls = follower.pathBuilder().addPath(
                             new BezierLine(
                                     ballThreeFullPose,
+                                    shootPose))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(136))
+                    .build();
+            ballBallsShoot = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    shootPose,
                                     gateLinePose))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(136))
                     .build();
-
             bottomBallsEat = follower.pathBuilder().addPath(
                             new BezierLine(
                                     gateLinePose,
@@ -708,7 +718,7 @@ public class Blue extends AutoBase
 
         public enum PathState
         {
-            ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+            ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull,   bottomBallsShoot,Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, ToBallOneBack, FinalPose
         }
