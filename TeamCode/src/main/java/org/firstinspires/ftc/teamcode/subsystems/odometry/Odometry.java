@@ -146,7 +146,7 @@ public class Odometry extends SubsystemBase
     {
         driverForward = referencePose.heading;
 
-        pinpoint.setPosition(referencePose.toPose2D());
+        pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
     }
 
     /**

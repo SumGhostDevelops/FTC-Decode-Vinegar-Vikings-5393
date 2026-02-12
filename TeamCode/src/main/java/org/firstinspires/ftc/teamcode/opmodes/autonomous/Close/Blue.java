@@ -104,7 +104,18 @@ public class Blue extends AutoBase
         follower.setStartingPose(paths.startPose);
         follower.update();
         initRobot();
-        setPathState(Paths.PathState.ToShoot);
+
+        // Set initial state based on strategy
+        switch (autoStrat) {
+            case REGULAR:
+                setPathState(Paths.PathState.ToBallOne);
+                break;
+            case BASIC:
+            case GATE:
+            default:
+                setPathState(Paths.PathState.ToShoot);
+                break;
+        }
     }
 
     private void handlePathing()
@@ -146,6 +157,11 @@ public class Blue extends AutoBase
                     Shoot();
 
                     follower.followPath(paths.FinalPose, false);
+                    setPathState(Paths.PathState.finalPose); // Move to terminal state
+                    break;
+                case finalPose:
+                    // Terminal state - do nothing
+                    break;
             }
         }
     }
@@ -159,12 +175,11 @@ public class Blue extends AutoBase
             switch (currentPathState)
             {
                 case ToShoot: // Going to shoot
-                    follower.followPath(paths.toShoot);
+                    follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
                 case ToBallOne: // At the shooting position & going to ball one after
-                    Shoot();
 
                     startIntake();
                     follower.followPath(paths.ToBallOne);
@@ -224,6 +239,11 @@ public class Blue extends AutoBase
                 case bottomBallsEat: // At bottom balls, going to eat
                     stopIntake();
                     follower.followPath(paths.bottomBallsEat);
+                    setPathState(Paths.PathState.finalPose); // Move to terminal state
+                    break;
+
+                case finalPose:
+                    // Terminal state - do nothing
                     break;
             }
         }
