@@ -188,6 +188,10 @@ public class Blue extends AutoBase
 
                 case ToBallOneFull: // At ball one, going to ball one full
                     follower.followPath(paths.ToBallOneFull);
+                    setPathState(Paths.PathState.ToBallOneBack);
+                    break;
+                case ToBallOneBack: // At ball one, going to ball one full
+                    follower.followPath(paths.ToBallOneBack);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
@@ -360,7 +364,7 @@ public class Blue extends AutoBase
 
         public Pose startPose = new Pose(123, 125, Math.toRadians(90));
         public PathChain ToShoot,
-                ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
+                ToBallOne, ToBallOneFull,ToBallOneBack, ToBallTwo, ToBallTwoFull, ToThree,
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
         // Gate-specific paths used in buildPathsGate
         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
@@ -445,6 +449,7 @@ public class Blue extends AutoBase
                     .setTangentHeadingInterpolation()
 
                     .build();
+
 
             ToShoot_1 = follower.pathBuilder().addPath(
                             new BezierLine(
@@ -620,12 +625,12 @@ public class Blue extends AutoBase
 
             // --- Pose definitions ---
             startPose = new Pose(65.000, 9.000, Math.toRadians(90));
-            final Pose ballOneLinePose = new Pose(40.000, 36.000);
+            final Pose ballOneLinePose = new Pose(55.000, 36.000);
             final Pose ballOneFullPose = new Pose(19.000, 36.000);
             final Pose shootPose = new Pose(69.000, 68.000);
-            final Pose ballTwoLinePose = new Pose(41.000, 60.000);
+            final Pose ballTwoLinePose = new Pose(55.000, 60.000);
             final Pose ballTwoFullPose = new Pose(19.000, 60.000);
-            final Pose ballThreeLinePose = new Pose(40.000, 84.000);
+            final Pose ballThreeLinePose = new Pose(55.000, 84.000);
             final Pose ballThreeFullPose = new Pose(19.000, 84.000);
             final Pose gateLinePose = new Pose(54.000, 84.000);
             final Pose gatePushPose = new Pose(49.000, 79.000);
@@ -643,10 +648,17 @@ public class Blue extends AutoBase
                                     ballOneFullPose))
                     .setTangentHeadingInterpolation()
                     .build();
+            ToBallOneBack = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    ballOneFullPose,
+                                    ballOneLinePose))
+                    .setTangentHeadingInterpolation()
+                    .setReversed()
+                    .build();
 
             ToShoot_1 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    ballOneFullPose,
+                                    ballOneLinePose,
                                     shootPose))
                     .setConstantHeadingInterpolation(Math.toRadians(144))
                     .build();
@@ -705,7 +717,7 @@ public class Blue extends AutoBase
         {
             ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
-            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPose
+            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, ToBallOneBack, FinalPose
         }
 
     }
