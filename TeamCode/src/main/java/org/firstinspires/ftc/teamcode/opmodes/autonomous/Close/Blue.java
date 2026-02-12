@@ -624,7 +624,7 @@ public class Blue extends AutoBase
         {
 
             // --- Pose definitions ---
-            startPose = new Pose(65.000, 9.000, Math.toRadians(90));
+            startPose = new Pose(60.500, 9.000, Math.toRadians(90));
             final Pose ballOneLinePose = new Pose(55.000, 36.000);
             final Pose ballOneFullPose = new Pose(19.000, 36.000);
             final Pose shootPose = new Pose(69.000, 68.000);
