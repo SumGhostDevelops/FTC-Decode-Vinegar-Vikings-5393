@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
+import org.firstinspires.ftc.teamcode.definitions.localization.Hardpoints;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
@@ -38,7 +40,7 @@ import java.util.function.Supplier;
  * - Simplified binding logic
  * - Cleaned up subsystem access
  */
-public abstract class BaseStable extends CommandOpMode
+public abstract class Base extends CommandOpMode
 {
     protected Team team;
     protected RobotContext robot;
@@ -246,6 +248,24 @@ public abstract class BaseStable extends CommandOpMode
         bindOuttakeControls(opModeActive, driver, s);
         bindIntakeAndTransferLogic(opModeActive, driver, coDriver, s);
         bindCoDriverControls(coDriver, s);
+
+        // Bind corner localization
+        if (RobotConstants.Odometry.ENABLE_CORNER_LOCALIZATION)
+        {
+            GamepadButton driverB = driver.getGamepadButton(GamepadKeys.Button.B);
+            GamepadButton driverA = driver.getGamepadButton(GamepadKeys.Button.A);
+
+            switch (team)
+            {
+                case RED:
+                    driverB.whenPressed(new OdometryCommands.SetReferencePose(s.odometry, Hardpoints.Poses.RED_GOAL));
+                    driverA.whenPressed(new OdometryCommands.SetReferencePose(s.odometry, Hardpoints.Poses.RED_LOADING_ZONE));
+                    break;
+                case BLUE:
+                    driverB.whenPressed(new OdometryCommands.SetReferencePose(s.odometry, Hardpoints.Poses.BLUE_GOAL));
+                    driverA.whenPressed(new OdometryCommands.SetReferencePose(s.odometry, Hardpoints.Poses.BLUE_LOADING_ZONE));
+            }
+        }
     }
 
     private void bindDriveControls(GamepadEx driver, Subsystems s)

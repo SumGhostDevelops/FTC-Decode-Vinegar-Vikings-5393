@@ -206,6 +206,7 @@ public class RobotConstants
                 new FieldHeading(new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
 
         public static boolean SET_FORWARD_DIRECTION_BASED_ON_TEAM = true;
+        public static boolean ENABLE_CORNER_LOCALIZATION = true;
 
         @IgnoreConfigurable
         public static class Pinpoint

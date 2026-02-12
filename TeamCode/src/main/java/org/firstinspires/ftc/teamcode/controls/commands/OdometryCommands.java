@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 
 public class OdometryCommands
 {
@@ -88,6 +89,17 @@ public class OdometryCommands
                 {
                     telemetry.log().add("Localization: FAILED - no AprilTag");
                 }
+            });
+        }
+    }
+
+    public static class SetReferencePose extends InstantCommand
+    {
+        public SetReferencePose(Odometry odometry, Pose2d pose)
+        {
+            super(() ->
+            {
+                odometry.updateReferencePose(pose);
             });
         }
     }
