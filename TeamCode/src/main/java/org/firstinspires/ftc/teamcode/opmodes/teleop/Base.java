@@ -54,7 +54,8 @@ public abstract class Base extends CommandOpMode
     private final BooleanSupplier autoAimToGoal = () -> RobotConstants.Turret.AUTO_AIM_TO_GOAL;
     private final BooleanSupplier regressionTestingMode = () -> RobotConstants.General.REGRESSION_TESTING_MODE;
     private final DoubleSupplier intakePower = () -> RobotConstants.Intake.intakePower;
-    private final DoubleSupplier transferPower = () -> RobotConstants.Intake.minimumTransferPower;
+    private final DoubleSupplier minimumTransferPower = () -> RobotConstants.Intake.minimumTransferPower;
+    private final DoubleSupplier maximumTransferPower = () -> RobotConstants.Intake.maximumTransferPower;
     private final DoubleSupplier outtakePower = () -> RobotConstants.Intake.outtakePower;
     private final BooleanSupplier intakeByDefault = () -> RobotConstants.Intake.INTAKE_BY_DEFAULT;
     private final BooleanSupplier outtakeOnByDefault = () -> RobotConstants.Outtake.ON_BY_DEFAULT;
@@ -439,11 +440,11 @@ public abstract class Base extends CommandOpMode
 
         if (odometry.getFieldCoord().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).y.getInch() > 48)
         {
-            return 1.0;
+            return maximumTransferPower.getAsDouble();
         }
         else
         {
-            return transferPower.getAsDouble();
+            return minimumTransferPower.getAsDouble();
         }
     }
 }

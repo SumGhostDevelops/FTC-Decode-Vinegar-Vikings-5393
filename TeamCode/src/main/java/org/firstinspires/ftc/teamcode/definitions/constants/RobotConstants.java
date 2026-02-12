@@ -196,6 +196,7 @@ public class RobotConstants
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
         public static double minimumTransferPower = 0.55; // goes from this number -> 1
+        public static double maximumTransferPower = 0.85;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
