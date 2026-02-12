@@ -17,6 +17,7 @@ public class Transfer extends SubsystemBase
     public Transfer(ServoEx transfer)
     {
         this.transfer = transfer;
+        close();
     }
 
     /**

@@ -32,14 +32,6 @@ public abstract class AutoBase extends LinearOpMode
     private final double intakePower = RobotConstants.Intake.intakePower;
     private final double transferPower = RobotConstants.Intake.minimumTransferPower;
 
-    // Turret state (matching BaseStable logic)
-    protected boolean turretEnabled = true;
-
-    // Subsystem state flags (matching BaseStable logic)
-    protected boolean intendingToShoot = false;
-    protected boolean isScoring = false;
-    protected boolean isIntaking = false;
-
     protected enum AutoStrat
     {
         BASIC, REGULAR, GATE
@@ -58,6 +50,11 @@ public abstract class AutoBase extends LinearOpMode
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
         telemetry.addData("Status", "Initialized for " + team);
         telemetry.update();
+    }
+
+    protected void displayTelemetry()
+    {
+
     }
 
     /**
@@ -114,52 +111,18 @@ public abstract class AutoBase extends LinearOpMode
             return;
         Subsystems s = robot.subsystems;
 
-        // --- Turret Logic ---
-        if (turretEnabled)
-        {
-            s.turret.setState(Turret.State.ON);
-            s.turret.aimToCoordinate(getGoal(), getPose2d());
-        }
-        else
-        {
-            s.turret.setState(Turret.State.OFF);
-        }
-
-        // --- Outtake Logic ---
-        s.outtake.setTargetRPM(getPose2d().distanceTo(getGoal()));
-
-        // --- Transfer Logic ---
-        // Transfer opens ONLY when intending to shoot AND intake is not running
-        // Otherwise, transfer stays closed
-        if (intendingToShoot && !isIntaking)
-        {
-            s.transfer.open();
-        }
-        else
-        {
-            s.transfer.close();
-        }
-
-        // --- Intake/Scoring Logic ---
-        // Only transfer balls when systems are ready
-        boolean systemsReady = s.turret.isAtTarget() && s.outtake.isStable();
-
-        if (intendingToShoot && !isIntaking && systemsReady)
-        {
-            // Start scoring - feed balls through
-            isScoring = true;
-            s.intake.intake(getIntakeTransferPower());
-        }
-        else if (!intendingToShoot)
-        {
-            // Stop scoring when we stop intending to shoot
-            isScoring = false;
-        }
-        // Note: If intending to shoot but not ready, intake keeps its current state
-
         // --- PIDF Updates ---
         s.turret.periodic();
         s.outtake.periodic();
+    }
+
+    /**
+     * Updates subsystems and telemetry
+     */
+    protected void updateEverything()
+    {
+        updateSubsystems();
+        displayTelemetry();
     }
 
     // ========================
@@ -174,8 +137,15 @@ public abstract class AutoBase extends LinearOpMode
     {
         if (robot == null)
             return;
-        isIntaking = true;
         robot.subsystems.intake.intake(intakePower);
+    }
+
+    protected void transferIntake()
+    {
+        if (robot == null)
+            return;
+
+        robot.subsystems.intake.intake(getIntakeTransferPower());
     }
 
     /**
@@ -186,7 +156,6 @@ public abstract class AutoBase extends LinearOpMode
     {
         if (robot == null)
             return;
-        isIntaking = false;
         robot.subsystems.intake.stop();
     }
 
@@ -226,6 +195,7 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
         robot.subsystems.outtake.on();
+        robot.subsystems.outtake.setTargetRPM(getPose2d().distanceTo(getGoal()));
     }
 
     /**
@@ -267,6 +237,14 @@ public abstract class AutoBase extends LinearOpMode
         robot.subsystems.turret.aimToCoordinate(goalCoord, pose);
     }
 
+    protected void centerTurret()
+    {
+        if (robot == null)
+            return;
+
+        robot.subsystems.turret.center();
+    }
+
     // ========================
     // Ready Checks
     // ========================
@@ -303,7 +281,7 @@ public abstract class AutoBase extends LinearOpMode
             }
 
             // Update subsystems (PIDF loops)
-            updateSubsystems();
+            updateEverything();
 
             // Continuously aim and adjust RPM
             aimTurret();
@@ -333,7 +311,7 @@ public abstract class AutoBase extends LinearOpMode
      * @param durationMs
      *            how long to continue feeding balls through
      */
-    protected void shootForDuration(long durationMs)
+    protected void waitForDuration(long durationMs)
     {
         if (robot == null)
             return;
@@ -348,17 +326,17 @@ public abstract class AutoBase extends LinearOpMode
             }
 
             // State machine handles transfer and intake
-            updateSubsystems();
+            updateEverything();
             sleep(10);
         }
     }
 
     /**
      * Complete shoot sequence using state machine logic.
-     * 1. Stops intake and sets intendingToShoot = true (opens transfer, starts aiming)
+     * 1. Ensures outtake is on, opens transfer, and aims turret
      * 2. Waits for systems to be ready
-     * 3. Scoring happens automatically when ready (via updateSubsystems)
-     * 4. Shoots for duration, then resets state
+     * 3. If ready, transfer & shoot for duration
+     * 4. Stop the intake, close the transfer, and center the turret
      */
     public void Shoot()
     {
@@ -366,92 +344,24 @@ public abstract class AutoBase extends LinearOpMode
             return;
 
         // Start outtake if not already running
+        openTransfer();
         startOuttake();
-
-        // Stop intake so transfer can open
-        isIntaking = false;
-        robot.subsystems.intake.stop();
-
-        // Signal intent to shoot - this opens transfer and prepares systems
-        intendingToShoot = true;
-        isScoring = false;
+        aimTurret();
 
         // Wait up to 2 seconds for systems to be ready
         // updateSubsystems() will handle transfer and intake state
-        waitForSystemsReady(2000);
+        boolean isReady = waitForSystemsReady(2000);
 
         // If ready, let it score for the duration
-        if (isReadyToShoot())
+        if (isReady)
         {
-            shootForDuration(500);
+            transferIntake();
+            waitForDuration(500);
         }
 
-        // Reset state
-        intendingToShoot = false;
-        isScoring = false;
-        closeTransfer();
         stopIntake();
-    }
-
-    /**
-     * Complete intake sequence: runs intake and closes transfer.
-     * Resets shooting state to allow normal intake operation.
-     */
-    public void Intake()
-    {
-        if (robot == null)
-            return;
-
-        // Reset shooting state
-        intendingToShoot = false;
-        isScoring = false;
-
         closeTransfer();
-        startIntake();
-    }
-
-    // ========================
-    // State Control
-    // ========================
-
-    /**
-     * Signals intent to shoot. This will:
-     * - Open the transfer gate (ready position)
-     * - Continue aiming turret
-     * - Spin up outtake
-     * Once systems are ready, scoring will start automatically.
-     */
-    protected void setIntendingToShoot(boolean intending)
-    {
-        this.intendingToShoot = intending;
-        if (!intending)
-        {
-            this.isScoring = false;
-        }
-    }
-
-    /**
-     * @return true if currently intending to shoot
-     */
-    protected boolean isIntendingToShoot()
-    {
-        return intendingToShoot;
-    }
-
-    /**
-     * @return true if currently actively scoring (feeding balls)
-     */
-    protected boolean isScoring()
-    {
-        return isScoring;
-    }
-
-    /**
-     * Enables or disables the turret.
-     */
-    protected void setTurretEnabled(boolean enabled)
-    {
-        this.turretEnabled = enabled;
+        centerTurret();
     }
 
     // ========================

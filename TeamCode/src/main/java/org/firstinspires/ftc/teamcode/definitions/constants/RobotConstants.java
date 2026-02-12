@@ -28,6 +28,12 @@ public class RobotConstants
     }
 
     @Configurable
+    public static class Autonomous
+    {
+
+    }
+
+    @Configurable
     public static class Telemetry
     {
         public static boolean SET_AUTOCLEAR = true;
