@@ -85,6 +85,7 @@ public class Blue extends AutoBase
         telemetry.addData("Heading", follower.getHeading());
         telemetry.addLine("-----");
         telemetry.addData("Pose", getPose2d());
+        telemetry.addData("Velocity", robot.subsystems.odometry.getVelocity());
         telemetry.addData("Distance to Goal", getPose2d().distanceTo(getGoal()).toUnit(DistanceUnit.INCH));
         telemetry.addData("Outtake RPM", robot.subsystems.outtake.getMotorRPM());
         telemetry.addData("Turret Angle", robot.subsystems.turret.getRelativeAngle().toUnit(AngleUnit.DEGREES));
@@ -165,85 +166,77 @@ public class Blue extends AutoBase
         {
             switch (currentPathState)
             {
-                case ToShoot: // Going to shoot
+                case ToShoot: // Shoot, then go to pre-ball-one
                     Shoot();
 
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
-                case ToBallOne: // At the shooting position & going to ball one after
-
+                case ToBallOne: // Get ready to pick up balls
                     startIntake();
+
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
 
-                case ToBallOneFull: // At ball one, going to ball one full
+                case ToBallOneFull: // Picked up all the balls, now drive back
+                    stopIntake();
+
                     follower.followPath(paths.ToBallOneBack);
                     setPathState(Paths.PathState.ToBallOneBack);
                     break;
-                case ToBallOneBack: // At ball one, going to ball one full
+
+                case ToBallOneBack: // Drive to shooting position
+
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
-                case ToShoot_1: // At ball one full, going to shooting position
+                case ToShoot_1: // At shoot position; shoot and drive to pre ball two
                     Shoot();
-                    stopIntake();
+
                     follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
 
-                case ToBallTwo: // At shooting position, going to ball two
-
+                case ToBallTwo: // Pick up the balls
                     startIntake();
+
                     follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
 
-                case ToBallTwoFull: // At ball two, going to ball two full
+                case ToBallTwoFull:  // Picked up the balls, drive to shoot
+                    stopIntake();
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
-                case ToShoot_2: // At ball two full, going to shooting position
-                    stopIntake();
+                case ToShoot_2: // Shoot, then drive to three
                     Shoot();
+
                     follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.ToThree);
                     break;
 
-                case ToThree: // At shooting position, going to ball three
-
-
+                case ToThree: // Pick up the balls
                     startIntake();
                     follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.ToThreeFull);
                     break;
 
-                case ToThreeFull: // At ball three, going to ball three full
+                case ToThreeFull: // Picked up balls, drive to shoot
                     stopIntake();
+
                     follower.followPath(paths.bottomBalls);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
 
-                case ToShoot_3: // At ball three full, going to bottom balls
+                case ToShoot_3: // Shoot, then drive to final pose
                     Shoot();
-                    follower.followPath(paths.ballBallsShoot);
-                    setPathState(Paths.PathState.bottomBallsShoot);
-                    break;
-
-                case bottomBallsShoot:
-
-                    follower.followPath(paths.bottomBallsEat);
-                    setPathState(Paths.PathState.bottomBallsEat);
-                    break;
-
-                case bottomBallsEat: // At bottom balls, going to eat
-
                     follower.followPath(paths.finalPose);
-                    setPathState(Paths.PathState.finalPose); // Move to terminal state
+                    setPathState(Paths.PathState.finalPose);
                     break;
 
                 case finalPose:
