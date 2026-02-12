@@ -190,15 +190,10 @@ public class Red extends AutoBase
                     setPathState(Paths.PathState.ToThreeFull); // Corrected this from Gate2
                     break;
                 case ToThreeFull:
-                    follower.followPath(paths.bottomBalls);
+                    follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.bottomBalls); // Corrected this from ToEatGate
                     break;
                 case bottomBalls:
-                    
-                    follower.followPath(paths.bottomBallsEat);
-                    setPathState(Paths.PathState.bottomBallsEat);
-                    break;
-                case bottomBallsEat:
                     Shoot();
                     // Tell the robot to follow the final path
                     follower.followPath(paths.FinalPose);
