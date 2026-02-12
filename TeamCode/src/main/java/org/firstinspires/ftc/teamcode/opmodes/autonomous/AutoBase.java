@@ -350,13 +350,13 @@ public abstract class AutoBase extends LinearOpMode
 
         // Wait up to 2 seconds for systems to be ready
         // updateSubsystems() will handle transfer and intake state
-        boolean isReady = waitForSystemsReady(2000);
+        boolean isReady = waitForSystemsReady(RobotConstants.Autonomous.WAIT_SYS_READY_MS);
 
         // If ready, let it score for the duration
         if (isReady)
         {
             transferIntake();
-            waitForDuration(500);
+            waitForDuration(RobotConstants.Autonomous.SHOOT_LENGTH_MS);
         }
 
         stopIntake();
