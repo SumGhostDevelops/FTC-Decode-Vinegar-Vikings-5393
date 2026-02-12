@@ -189,14 +189,13 @@ public class Blue extends AutoBase
                     break;
 
                 case ToShoot_1: // At ball one full, going to shooting position
+                    Shoot();
                     stopIntake();
-
                     follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
 
                 case ToBallTwo: // At shooting position, going to ball two
-                    Shoot();
 
                     startIntake();
                     follower.followPath(paths.ToBallTwoFull);
