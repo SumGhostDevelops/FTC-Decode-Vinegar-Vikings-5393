@@ -30,8 +30,8 @@ public class RobotConstants
     @Configurable
     public static class Autonomous
     {
-        public static int WAIT_SYS_READY_MS = 2000;
-        public static int SHOOT_LENGTH_MS = 500;
+        public static int WAIT_SYS_READY_MS = 4000;
+        public static int SHOOT_LENGTH_MS = 1500;
     }
 
     @Configurable

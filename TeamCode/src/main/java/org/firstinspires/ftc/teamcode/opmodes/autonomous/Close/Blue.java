@@ -175,6 +175,8 @@ public class Blue extends AutoBase
             switch (currentPathState)
             {
                 case ToShoot: // Going to shoot
+                    Shoot();
+
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
