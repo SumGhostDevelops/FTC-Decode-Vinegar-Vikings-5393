@@ -60,16 +60,15 @@ import java.util.Locale;
  */
 
 @TeleOp(name = "Tuning: Utility: Camera Frame Capture", group = "Utility")
-@Disabled
 public class UtilityCameraFrameCapture extends LinearOpMode
 {
     /*
      * EDIT THESE PARAMETERS AS NEEDED
      */
     final boolean USING_WEBCAM = false;
-    final BuiltinCameraDirection INTERNAL_CAM_DIR = BuiltinCameraDirection.BACK;
-    final int RESOLUTION_WIDTH = 1280;
-    final int RESOLUTION_HEIGHT = 720;
+    final BuiltinCameraDirection INTERNAL_CAM_DIR = BuiltinCameraDirection.FRONT;
+    final int RESOLUTION_WIDTH = 1920;
+    final int RESOLUTION_HEIGHT = 1080;
 
     // Internal state
     boolean lastX;

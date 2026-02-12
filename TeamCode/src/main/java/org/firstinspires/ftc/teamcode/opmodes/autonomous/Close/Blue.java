@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
 
-import java.util.Objects;
 
 @Autonomous(name = "CloseBlueAuto", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
 public class Blue extends AutoBase
@@ -68,6 +67,8 @@ public class Blue extends AutoBase
                                 handlePathing();
                                 follower.update();
 
+                                updateSubsystems();
+
                                 telemetry.addData("Current State", currentPathState);
                                 telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
                                 telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
@@ -77,9 +78,12 @@ public class Blue extends AutoBase
                 }
         }
 
-        public void initAuto()
-        {
+    public void initAuto()
+    {
+
+
                 follower = PedroConstants.createFollower(hardwareMap);
+                setFollower(follower);
                 paths = new Paths(follower, autoStrat);
                 timer = new Timer();
                 opModeTimer = new Timer();
@@ -87,10 +91,11 @@ public class Blue extends AutoBase
 
                 follower.setStartingPose(paths.startPose);
                 follower.update();
-
+                initRobot();
                 setPathState(Paths.PathState.ToShoot);
+    }
 
-        }
+
 
         public void setPathState(Paths.PathState pathState)
         {
@@ -107,6 +112,7 @@ public class Blue extends AutoBase
                                 PathBasic();
                                 break;
                         case REGULAR:
+                            Shoot();
                                 PathRegular();
                                 break;
                         case GATE:
@@ -130,7 +136,7 @@ public class Blue extends AutoBase
                                         break;
                                 case FinalPose:
                                         // end path
-                                        follower.followPath(paths.FinalPose);
+                                        follower.followPath(paths.FinalPose, false);
                         }
                 }
         }
@@ -160,7 +166,8 @@ public class Blue extends AutoBase
                                         break;
                                 case ToBallOneFull:
                                         // has ball
-                                        follower.followPath(paths.ToShoot_1);
+                                    stopIntake();
+                                    follower.followPath(paths.ToShoot_1);
                                         setPathState(Paths.PathState.ToShoot_1);
                                         break;
                                 case ToShoot_1:
@@ -175,7 +182,8 @@ public class Blue extends AutoBase
                                         break;
                                 case ToBallTwoFull:
                                         // has ball
-                                        follower.followPath(paths.ToShoot_2);
+                                    stopIntake();
+                                    follower.followPath(paths.ToShoot_2);
                                         setPathState(Paths.PathState.ToShoot_2);
                                         break;
                                 case ToShoot_2:
@@ -190,7 +198,8 @@ public class Blue extends AutoBase
                                         break;
                                 case ToThreeFull:
                                         // has ball
-                                        follower.followPath(paths.bottomBalls);
+                                    stopIntake();
+                                    follower.followPath(paths.bottomBalls);
                                         setPathState(Paths.PathState.bottomBalls);
                                         break;
                                 case bottomBalls:
@@ -229,6 +238,7 @@ public class Blue extends AutoBase
 
                 case ToBallOneFull:
                     // has ball
+                    stopIntake();
                     follower.followPath(paths.ToShoot_1); // Start path to Shoot_1
                     setPathState(Paths.PathState.ToShoot_1); // Set state to Shoot_1
                     break;
@@ -252,6 +262,7 @@ public class Blue extends AutoBase
                     break;
 
                 case ToShoot_2:
+                    stopIntake();
                     Shoot();
                     follower.followPath(paths.Gate_2); // Start path to Gate_2
                     setPathState(Paths.PathState.Gate_2); // Set state to Gate_2
@@ -270,6 +281,7 @@ public class Blue extends AutoBase
                     break;
 
                 case ToShoot_3:
+                    stopIntake();
                     Shoot();
                     follower.followPath(paths.Gate_3); // Start path to Gate_3
                     setPathState(Paths.PathState.Gate_3); // Set state to Gate_3
@@ -288,6 +300,7 @@ public class Blue extends AutoBase
                     break;
 
                 case ToShoot_4:
+                    stopIntake();
                     Shoot();
                     // This is the last action, so now we can go to the final parking position.
                     follower.followPath(paths.finalPose);
@@ -302,7 +315,7 @@ public class Blue extends AutoBase
         }
     }
 
-    public static class Paths
+    static class Paths
         {
 
                 public Pose startPose = new Pose(123, 125, Math.toRadians(90));
@@ -449,9 +462,9 @@ public class Blue extends AutoBase
                         final Pose shootPose = new Pose(71.000, 71.000);
                         final Pose ballOneLinePose = new Pose(56.000, 60.000);
                         final Pose ballOneFullPose = new Pose(15.000, 60.000);
-                        final Pose gateLinePose = new Pose(15.000, 71.000);
+                        final Pose gateLinePose = new Pose(17, 66);
                         final Pose gateControlPoint = new Pose(20.000, 64.000);
-                        final Pose eatLinePose = new Pose(10.000, 61.000);
+                        final Pose eatLinePose = new Pose(10.000, 59.000);
                         final Pose ballThreePose = new Pose(71.000, 35.000);
                         final Pose ballThreeFullPose = new Pose(15.000, 35.000);
                         final Pose ballPickPose = new Pose(58.000, 84.000);

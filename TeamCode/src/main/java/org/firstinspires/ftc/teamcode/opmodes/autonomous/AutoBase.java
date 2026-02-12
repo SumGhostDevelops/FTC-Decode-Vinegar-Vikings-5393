@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
 import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
@@ -30,6 +31,14 @@ public abstract class AutoBase extends LinearOpMode
     // Constants from RobotConstants
     private final double intakePower = RobotConstants.Intake.intakePower;
     private final double transferPower = RobotConstants.Intake.minimumTransferPower;
+
+    // Turret state (matching BaseStable logic)
+    protected boolean turretEnabled = true;
+
+    // Subsystem state flags (matching BaseStable logic)
+    protected boolean intendingToShoot = false;
+    protected boolean isScoring = false;
+    protected boolean isIntaking = false;
 
     protected enum AutoStrat
     {
@@ -90,7 +99,14 @@ public abstract class AutoBase extends LinearOpMode
     // ========================
 
     /**
-     * Updates subsystem PIDF controllers. Call this in wait loops.
+     * Updates subsystem PIDF controllers and manages state machine.
+     * Call this in wait loops.
+     *
+     * State machine logic (matching BaseStable):
+     * - Turret: Aims when enabled, otherwise off
+     * - Outtake: RPM set based on distance to goal
+     * - Transfer: Opens when intending to shoot AND intake is not running
+     * - Intake: Only transfers when turret aimed AND outtake stable
      */
     protected void updateSubsystems()
     {
@@ -98,9 +114,50 @@ public abstract class AutoBase extends LinearOpMode
             return;
         Subsystems s = robot.subsystems;
 
-        s.turret.aimToCoordinate(team.goalFromClose.coord, getPose2d());
-        s.outtake.setTargetRPM(getPose2d().distanceTo(team.goalFromClose.coord));
+        // --- Turret Logic ---
+        if (turretEnabled)
+        {
+            s.turret.setState(Turret.State.ON);
+            s.turret.aimToCoordinate(getGoal(), getPose2d());
+        }
+        else
+        {
+            s.turret.setState(Turret.State.OFF);
+        }
 
+        // --- Outtake Logic ---
+        s.outtake.setTargetRPM(getPose2d().distanceTo(getGoal()));
+
+        // --- Transfer Logic ---
+        // Transfer opens ONLY when intending to shoot AND intake is not running
+        // Otherwise, transfer stays closed
+        if (intendingToShoot && !isIntaking)
+        {
+            s.transfer.open();
+        }
+        else
+        {
+            s.transfer.close();
+        }
+
+        // --- Intake/Scoring Logic ---
+        // Only transfer balls when systems are ready
+        boolean systemsReady = s.turret.isAtTarget() && s.outtake.isStable();
+
+        if (intendingToShoot && !isIntaking && systemsReady)
+        {
+            // Start scoring - feed balls through
+            isScoring = true;
+            s.intake.intake(getIntakeTransferPower());
+        }
+        else if (!intendingToShoot)
+        {
+            // Stop scoring when we stop intending to shoot
+            isScoring = false;
+        }
+        // Note: If intending to shoot but not ready, intake keeps its current state
+
+        // --- PIDF Updates ---
         s.turret.periodic();
         s.outtake.periodic();
     }
@@ -111,21 +168,25 @@ public abstract class AutoBase extends LinearOpMode
 
     /**
      * Starts the intake motor at default power.
+     * Sets isIntaking flag to keep transfer closed.
      */
     protected void startIntake()
     {
         if (robot == null)
             return;
+        isIntaking = true;
         robot.subsystems.intake.intake(intakePower);
     }
 
     /**
      * Stops the intake motor.
+     * Clears isIntaking flag to allow transfer to open.
      */
     protected void stopIntake()
     {
         if (robot == null)
             return;
+        isIntaking = false;
         robot.subsystems.intake.stop();
     }
 
@@ -185,7 +246,7 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
         Pose2d pose = getPose2d();
-        Distance distToGoal = pose.distanceTo(team.goalFromClose.coord);
+        Distance distToGoal = pose.distanceTo(getGoal());
         robot.subsystems.outtake.setTargetRPM(distToGoal);
     }
 
@@ -201,7 +262,8 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
         Pose2d pose = getPose2d();
-        FieldCoordinate goalCoord = team.goalFromClose.coord;
+        FieldCoordinate goalCoord = getGoal();
+        robot.subsystems.turret.setState(Turret.State.ON);
         robot.subsystems.turret.aimToCoordinate(goalCoord, pose);
     }
 
@@ -230,6 +292,7 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected boolean waitForSystemsReady(long timeoutMs)
     {
+
         ElapsedTime timer = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested() && timer.milliseconds() < timeoutMs)
         {
@@ -263,19 +326,17 @@ public abstract class AutoBase extends LinearOpMode
     // ========================
 
     /**
-     * Shoots by opening transfer and running intake at transfer power.
-     * Waits for the specified duration while updating subsystems.
-     * 
+     * Continues shooting for the specified duration while updating subsystems.
+     * Assumes intendingToShoot is already true and systems are ready.
+     * The state machine in updateSubsystems() handles intake power.
+     *
      * @param durationMs
-     *            how long to feed balls through
+     *            how long to continue feeding balls through
      */
     protected void shootForDuration(long durationMs)
     {
         if (robot == null)
             return;
-
-        openTransfer();
-        robot.subsystems.intake.intake(transferPower);
 
         ElapsedTime timer = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested() && timer.milliseconds() < durationMs)
@@ -286,18 +347,18 @@ public abstract class AutoBase extends LinearOpMode
                 follower.update();
             }
 
+            // State machine handles transfer and intake
             updateSubsystems();
-            aimTurret();
             sleep(10);
         }
-
-        closeTransfer();
-        stopIntake();
     }
 
     /**
-     * Complete shoot sequence: waits for ready, then shoots.
-     * Wraps waitForSystemsReady() and shootForDuration().
+     * Complete shoot sequence using state machine logic.
+     * 1. Stops intake and sets intendingToShoot = true (opens transfer, starts aiming)
+     * 2. Waits for systems to be ready
+     * 3. Scoring happens automatically when ready (via updateSubsystems)
+     * 4. Shoots for duration, then resets state
      */
     public void Shoot()
     {
@@ -306,27 +367,134 @@ public abstract class AutoBase extends LinearOpMode
 
         // Start outtake if not already running
         startOuttake();
-        closeTransfer();
+
+        // Stop intake so transfer can open
+        isIntaking = false;
+        robot.subsystems.intake.stop();
+
+        // Signal intent to shoot - this opens transfer and prepares systems
+        intendingToShoot = true;
+        isScoring = false;
 
         // Wait up to 2 seconds for systems to be ready
+        // updateSubsystems() will handle transfer and intake state
         waitForSystemsReady(2000);
 
-        // Shoot for 500ms
+        // If ready, let it score for the duration
         if (isReadyToShoot())
         {
             shootForDuration(500);
         }
+
+        // Reset state
+        intendingToShoot = false;
+        isScoring = false;
+        closeTransfer();
+        stopIntake();
     }
 
     /**
      * Complete intake sequence: runs intake and closes transfer.
+     * Resets shooting state to allow normal intake operation.
      */
     public void Intake()
     {
         if (robot == null)
             return;
 
+        // Reset shooting state
+        intendingToShoot = false;
+        isScoring = false;
+
         closeTransfer();
         startIntake();
+    }
+
+    // ========================
+    // State Control
+    // ========================
+
+    /**
+     * Signals intent to shoot. This will:
+     * - Open the transfer gate (ready position)
+     * - Continue aiming turret
+     * - Spin up outtake
+     * Once systems are ready, scoring will start automatically.
+     */
+    protected void setIntendingToShoot(boolean intending)
+    {
+        this.intendingToShoot = intending;
+        if (!intending)
+        {
+            this.isScoring = false;
+        }
+    }
+
+    /**
+     * @return true if currently intending to shoot
+     */
+    protected boolean isIntendingToShoot()
+    {
+        return intendingToShoot;
+    }
+
+    /**
+     * @return true if currently actively scoring (feeding balls)
+     */
+    protected boolean isScoring()
+    {
+        return isScoring;
+    }
+
+    /**
+     * Enables or disables the turret.
+     */
+    protected void setTurretEnabled(boolean enabled)
+    {
+        this.turretEnabled = enabled;
+    }
+
+    // ========================
+    // Goal Selection (matching BaseStable logic)
+    // ========================
+
+    /**
+     * Gets the appropriate goal based on field position.
+     * Uses close goal if Y > 48 inches, otherwise far goal.
+     *
+     * @return the target goal coordinate
+     */
+    protected FieldCoordinate getGoal()
+    {
+        Pose2d pose = getPose2d();
+
+        if (pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).coord.y.getInch() > 48)
+        {
+            return team.goalFromClose.coord;
+        }
+        else
+        {
+            return team.goalFromFar.coord;
+        }
+    }
+
+    /**
+     * Gets the appropriate intake transfer power based on field position.
+     * Uses full power if Y > 48 inches, otherwise minimum transfer power.
+     *
+     * @return the intake power to use for transferring balls
+     */
+    protected double getIntakeTransferPower()
+    {
+        Pose2d pose = getPose2d();
+
+        if (pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).coord.y.getInch() > 48)
+        {
+            return 1.0;
+        }
+        else
+        {
+            return transferPower;
+        }
     }
 }

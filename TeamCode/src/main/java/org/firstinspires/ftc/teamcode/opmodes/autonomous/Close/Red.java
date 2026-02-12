@@ -165,6 +165,7 @@ public class Red extends AutoBase
                     break;
                 case ToBallOneFull:
                     // has ball
+                    stopIntake();
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
@@ -180,6 +181,7 @@ public class Red extends AutoBase
                     break;
                 case ToBallTwoFull:
                     // has ball
+                    stopIntake();
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
@@ -195,6 +197,7 @@ public class Red extends AutoBase
                     break;
                 case ToThreeFull:
                     // has ball
+                    stopIntake();
                     follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
@@ -235,6 +238,7 @@ public class Red extends AutoBase
 
                 case ToBallOneFull:
                     // full ball
+                    stopIntake();
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
@@ -247,13 +251,14 @@ public class Red extends AutoBase
 
                 // --- Gate cycle 1 ---
                 case Gate:
-
+                    Intake();
                     follower.followPath(paths.Gate);
                     setPathState(Paths.PathState.Eat);
                     break;
 
                 case Eat:
                     // intake
+                    stopIntake();
                     follower.followPath(paths.Eat);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
@@ -266,12 +271,13 @@ public class Red extends AutoBase
 
                 // --- Gate cycle 2 ---
                 case Gate_2:
+                    Intake();
                     follower.followPath(paths.Gate_2);
                     setPathState(Paths.PathState.Eat_2);
                     break;
 
                 case Eat_2:
-                    Intake();
+                    stopIntake();
                     follower.followPath(paths.Eat_2);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
@@ -284,12 +290,13 @@ public class Red extends AutoBase
 
                 // --- Gate cycle 3 ---
                 case Gate_3:
+                    Intake();
                     follower.followPath(paths.Gate_3);
                     setPathState(Paths.PathState.Eat_3);
                     break;
 
                 case Eat_3:
-                    Intake();
+                    stopIntake();
                     follower.followPath(paths.Eat_3);
                     setPathState(Paths.PathState.ToShoot_4);
                     break;
@@ -302,12 +309,13 @@ public class Red extends AutoBase
 
                 // --- Bottom balls sequence ---
                 case bottomBalls:
+                    Intake();
                     follower.followPath(paths.bottomBalls);
                     setPathState(Paths.PathState.bottomBallsEat);
                     break;
 
                 case bottomBallsEat:
-                    Intake();
+                    stopIntake();
                     follower.followPath(paths.bottomBallsEat);
                     setPathState(Paths.PathState.ToShoot_5);
                     break;
@@ -320,12 +328,13 @@ public class Red extends AutoBase
 
                 // --- Upper balls sequence ---
                 case upperBalls:
+                    Intake();
                     follower.followPath(paths.upperBalls);
                     setPathState(Paths.PathState.upperEat);
                     break;
 
                 case upperEat:
-                    Intake();
+                    stopIntake();
                     follower.followPath(paths.upperEat);
                     setPathState(Paths.PathState.upperTurn);
                     break;
@@ -352,7 +361,7 @@ public class Red extends AutoBase
     }
 
 
-    public static class Paths
+    static class Paths
     {
         public Pose startPose = new Pose(21.000, 125.000, Math.toRadians(39));
 

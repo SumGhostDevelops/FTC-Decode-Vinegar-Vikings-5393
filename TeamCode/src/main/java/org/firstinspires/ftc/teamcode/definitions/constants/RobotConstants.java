@@ -221,10 +221,10 @@ public class RobotConstants
             @Configurable
             public static class Lens
             {
-                public static double LENS_FX = 958.876;
-                public static double LENS_FY = 958.876;
-                public static double LENS_CX = 654.11;
-                public static double LENS_CY = 358.336;
+                public static double LENS_FX = 947.111; // 958.876
+                public static double LENS_FY = 947.111; // 958.876
+                public static double LENS_CX = 635.055; // 654.11
+                public static double LENS_CY = 365.043; // 358.336
             }
 
             @Configurable
@@ -232,13 +232,13 @@ public class RobotConstants
             {
                 // Position of camera relative to robot center
                 // Uses FTC SDK conventions for setCameraPose():
-                // X: Forward/backward (positive is forward)
-                // Y: Left/right (positive is left)
-                // Z: Positive is up
+                // X: Left/right (positive is RIGHT, negative is LEFT)
+                // Y: Forward/backward (positive is FORWARD)
+                // Z: Positive is UP
                 @Sorter(sort = 0)
-                public static Distance X = new Distance(5.5, DistanceUnit.INCH); // camera centered left/right
+                public static Distance X = new Distance(0.25, DistanceUnit.INCH); // camera left/right of center (positive = right)
                 @Sorter(sort = 1)
-                public static Distance Y = new Distance(0.25, DistanceUnit.INCH); // camera forward of center, was 4.75
+                public static Distance Y = new Distance(5.5, DistanceUnit.INCH); // camera forward of center
                 @Sorter(sort = 2)
                 public static Distance Z = new Distance(9.5, DistanceUnit.INCH);
 
