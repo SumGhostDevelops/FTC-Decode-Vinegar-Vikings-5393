@@ -344,8 +344,8 @@ public abstract class Base extends CommandOpMode
     {
         if (regressionTestingMode.getAsBoolean())
         {
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 10));
-            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -10));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 5));
+            driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -5));
         }
 
         // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
