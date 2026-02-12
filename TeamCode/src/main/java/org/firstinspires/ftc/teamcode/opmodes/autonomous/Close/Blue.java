@@ -106,16 +106,7 @@ public class Blue extends AutoBase
         initRobot();
 
         // Set initial state based on strategy
-        switch (autoStrat) {
-            case REGULAR:
-                setPathState(Paths.PathState.ToBallOne);
-                break;
-            case BASIC:
-            case GATE:
-            default:
-                setPathState(Paths.PathState.ToShoot);
-                break;
-        }
+        setPathState(Paths.PathState.ToShoot);
     }
 
     private void handlePathing()
