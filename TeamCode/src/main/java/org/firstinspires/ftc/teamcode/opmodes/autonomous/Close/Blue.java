@@ -175,23 +175,23 @@ public class Blue extends AutoBase
                 case ToBallOne: // At the shooting position & going to ball one after
 
                     startIntake();
-                    follower.followPath(paths.ToBallOne);
+                    follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
 
                 case ToBallOneFull: // At ball one, going to ball one full
-                    follower.followPath(paths.ToBallOneFull);
+                    follower.followPath(paths.ToBallOneBack);
                     setPathState(Paths.PathState.ToBallOneBack);
                     break;
                 case ToBallOneBack: // At ball one, going to ball one full
-                    follower.followPath(paths.ToBallOneBack);
+                    follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
                 case ToShoot_1: // At ball one full, going to shooting position
                     stopIntake();
 
-                    follower.followPath(paths.ToShoot_1);
+                    follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
 
@@ -199,19 +199,19 @@ public class Blue extends AutoBase
                     Shoot();
 
                     startIntake();
-                    follower.followPath(paths.ToBallTwo);
+                    follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
 
                 case ToBallTwoFull: // At ball two, going to ball two full
-                    follower.followPath(paths.ToBallTwoFull);
+                    follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
                 case ToShoot_2: // At ball two full, going to shooting position
                     stopIntake();
 
-                    follower.followPath(paths.ToShoot_2);
+                    follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.ToThree);
                     break;
 
@@ -219,28 +219,28 @@ public class Blue extends AutoBase
                     Shoot();
 
                     startIntake();
-                    follower.followPath(paths.ToThree);
+                    follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.ToThreeFull);
                     break;
 
                 case ToThreeFull: // At ball three, going to ball three full
-                    follower.followPath(paths.ToThreeFull);
+                    follower.followPath(paths.bottomBalls);
                     setPathState(Paths.PathState.bottomBalls);
                     break;
 
                 case bottomBalls: // At ball three full, going to bottom balls
-                    follower.followPath(paths.bottomBalls);
+                    follower.followPath(paths.ballBallsShoot);
                     setPathState(Paths.PathState.bottomBallsShoot);
                     break;
 
                 case bottomBallsShoot:
-                    follower.followPath(paths.ballBallsShoot);
+                    follower.followPath(paths.bottomBallsEat);
                     setPathState(Paths.PathState.bottomBallsEat);
                     break;
 
                 case bottomBallsEat: // At bottom balls, going to eat
                     stopIntake();
-                    follower.followPath(paths.bottomBallsEat);
+                    follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose); // Move to terminal state
                     break;
 
