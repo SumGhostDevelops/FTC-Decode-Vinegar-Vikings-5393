@@ -30,8 +30,8 @@ public class RobotConstants
     @Configurable
     public static class Autonomous
     {
-        public static int WAIT_SYS_READY_MS = 2000;
-        public static int SHOOT_LENGTH_MS = 500;
+        public static int WAIT_SYS_READY_MS = 4000;
+        public static int SHOOT_LENGTH_MS = 1500;
     }
 
     @Configurable
@@ -99,6 +99,8 @@ public class RobotConstants
         public static boolean ON_BY_DEFAULT = false;
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = true;
+
+        public static boolean USE_LUT = false;
 
         @IgnoreConfigurable
         public static class Name
@@ -195,7 +197,8 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
-        public static double minimumTransferPower = 0.55; // goes from this number -> 1
+        public static double minimumTransferPower = 0.5;
+        public static double maximumTransferPower = 0.5;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;

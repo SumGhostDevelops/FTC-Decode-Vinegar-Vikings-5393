@@ -109,6 +109,11 @@ public abstract class AutoBase extends LinearOpMode
     {
         if (robot == null)
             return;
+
+        // Clear bulk cache to get fresh sensor readings (required for MANUAL caching mode)
+        robot.hw.clearHubCache();
+        robot.hw.readBattery();
+
         Subsystems s = robot.subsystems;
 
         // --- PIDF Updates ---
@@ -257,7 +262,7 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return false;
         Subsystems s = robot.subsystems;
-        return s.turret.isAtTarget() && s.outtake.isStable();
+        return s.turret.isAtTarget() && s.outtake.isStable() && s.odometry.getVelocity().getLength().toUnit(DistanceUnit.INCH).magnitude < 1;
     }
 
     /**

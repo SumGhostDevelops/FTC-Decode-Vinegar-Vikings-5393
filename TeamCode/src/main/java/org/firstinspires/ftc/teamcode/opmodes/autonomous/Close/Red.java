@@ -164,74 +164,81 @@ public class Red extends AutoBase
             switch (currentPathState)
             {
                 case ToShoot: // Going to shoot
-                    follower.followPath(paths.ToShoot);
+                    Shoot();
+
+                    follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
                 case ToBallOne: // At shooting position, going to ball one
-                    Shoot();
-
                     startIntake();
-                    follower.followPath(paths.ToBallOne);
-                    setPathState(Paths.PathState.ToBallOneFull);
+
+                    follower.followPath(paths.ToBallOneBack);
+                    setPathState(Paths.PathState.ToBallOneBack);
                     break;
 
-                case ToBallOneFull: // At ball one, going to ball one full
-                    follower.followPath(paths.ToBallOneFull);
+                case ToBallOneBack:
+                    stopIntake();
+
+                    follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
                 case ToShoot_1: // At ball one full, going back to shooting position
-                    stopIntake();
+                    Shoot();
 
-                    follower.followPath(paths.ToShoot_1);
+                    follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
 
                 case ToBallTwo: // At shooting position, going to ball two
-                    Shoot();
-
                     startIntake();
-                    follower.followPath(paths.ToBallTwo);
+
+                    follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
 
                 case ToBallTwoFull: // At ball two, going to ball two full
-                    follower.followPath(paths.ToBallTwoFull);
+                    stopIntake();
+
+                    follower.followPath(paths.ToBallTwoBack);
+                    setPathState(Paths.PathState.ToBallTwoBack);
+                    break;
+
+                case ToBallTwoBack:
+                    follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
                 case ToShoot_2: // At ball two full, going back to shooting position
-                    stopIntake();
+                    Shoot();
 
-                    follower.followPath(paths.ToShoot_2);
+                    follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.ToThree);
                     break;
 
                 case ToThree: // At shooting position, going to ball three
-                    Shoot();
 
                     startIntake();
-                    follower.followPath(paths.ToThree);
+                    follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.ToThreeFull);
                     break;
 
                 case ToThreeFull: // At ball three, going to ball three full
-                    follower.followPath(paths.ToThreeFull);
+                    stopIntake();
+                    follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
 
                 case ToShoot_3: // At ball three full, going back to shooting position
-                    stopIntake();
+                  Shoot();
 
-                    follower.followPath(paths.ToShoot_3);
+                    follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose);
                     break;
 
                 case finalPose: // At shooting position, going to final pose
-                    Shoot();
 
-                    follower.followPath(paths.finalPose, false);
                     break;
             }
         }
@@ -388,10 +395,10 @@ public class Red extends AutoBase
 
     static class Paths
     {
-        public Pose startPose = new Pose(21.000, 125.000, Math.toRadians(39));
+        public Pose startPose = new Pose(21.000, 125.000, Math.toRadians(0));
 
         public PathChain ToShoot,
-                ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
+                ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack, ToThree,
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
         // Gate-specific paths used in buildPathsGate
         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
@@ -399,7 +406,7 @@ public class Red extends AutoBase
 
         public enum PathState
         {
-            ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+            ToShoot, ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose,
         }
@@ -425,9 +432,9 @@ public class Red extends AutoBase
 
         private void buildPathsBasic(Follower follower)
         {
-            startPose = new Pose(21.000, 125.000,  Math.toRadians(145));
-            final Pose shootPose = new Pose(43.000, 108.000);
-            final Pose leavePose = new Pose(19.000, 106.000);
+            startPose = new Pose(79, 9,  Math.toRadians(90));
+            final Pose shootPose = new Pose(80, 8);
+            final Pose leavePose = new Pose(85, 14);
 
             ToShoot = follower.pathBuilder().addPath(
                             new BezierLine(
@@ -450,118 +457,83 @@ public class Red extends AutoBase
 
         private void buildPathsReg(Follower follower)
         {
+            // --- Pose definitions ---
+            startPose = new Pose(79, 9, Math.toRadians(90));
 
-            startPose = new Pose(20.000, 123.000);
-            final Pose ballOneLinePose = new Pose(54.000, 84.000);
-            final Pose ballOneFullPose = new Pose(18.000, 84.000);
-            final Pose shootPose = new Pose(54.000, 97.200);
-            final Pose ballTwoLinePose = new Pose(54.000, 60.000);
-            final Pose ballTwoFullPose = new Pose(17.000, 60.000);
-            final Pose ballThreeLinePose = new Pose(54.000, 35.000);
-            final Pose ballThreeFullPose = new Pose(16.000, 35.000);
-            final Pose randomPose = new Pose(53.890, 69.156);
+            final Pose ballOneLinePose = new Pose(86, 36);
+            final Pose ballOneFullPose = new Pose(125, 36);
+            final Pose shootPose = new Pose(75, 68.5);
 
-            ToShoot = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    startPose,
-                                    shootPose
+            final Pose ballTwoLinePose = new Pose(87, 60.000);
+            final Pose ballTwoFullPose = new Pose(125, 60.000);
 
-                            )).setTangentHeadingInterpolation()
+            final Pose ballThreeLinePose = new Pose(87, 84);
+            final Pose ballThreeFullPose = new Pose(125, 84);
+
+            final Pose randomPose = new Pose(96, 78);
+
+            final Pose shootThreeLinePose = new Pose(90, 84);
+
+            // --- Paths ---
+            ToShoot = follower.pathBuilder()
+                    .addPath(new BezierLine(startPose, ballOneLinePose))
+                    .setTangentHeadingInterpolation()
+                    .build();
+
+            ToBallOne = follower.pathBuilder()
+                    .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
+                    .setLinearHeadingInterpolation(ballOneLinePose.getHeading(), Math.toRadians(0))
+                    .build();
+            ToBallOneBack =  follower.pathBuilder()
+                    .addPath(new BezierLine(ballOneFullPose, ballOneLinePose))
+                    .setTangentHeadingInterpolation()
                     .setReversed()
                     .build();
 
-            ToBallOne = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    shootPose,
-
-                                    ballOneLinePose))
-                    .setLinearHeadingInterpolation(Math.toRadians(143), Math.toRadians(180))
-
+            ToShoot_1 = follower.pathBuilder()
+                    .addPath(new BezierLine(ballOneLinePose, shootPose))
+                    .setConstantHeadingInterpolation(Math.toRadians(36))
                     .build();
 
-            ToBallOneFull = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    ballOneLinePose,
+            ToBallTwo = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, ballTwoLinePose))
+                    .setLinearHeadingInterpolation(Math.toRadians(36), Math.toRadians(0))
+                    .build();
 
-                                    ballOneFullPose))
+            ToBallTwoFull = follower.pathBuilder()
+                    .addPath(new BezierLine(ballTwoLinePose, ballTwoFullPose))
                     .setTangentHeadingInterpolation()
-
                     .build();
-
-            ToShoot_1 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    ballOneFullPose,
-
-                                    shootPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
-
-                    .build();
-
-            ToBallTwo = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    shootPose,
-
-                                    ballTwoLinePose))
-                    .setLinearHeadingInterpolation(Math.toRadians(143), Math.toRadians(180))
-
-                    .build();
-
-            ToBallTwoFull = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    ballTwoLinePose,
-
-                                    ballTwoFullPose))
+            ToBallTwoBack = follower.pathBuilder()
+                    .addPath(new BezierLine(ballTwoFullPose, ballTwoLinePose))
                     .setTangentHeadingInterpolation()
-
+                    .setReversed()
+                    .build();
+            ToShoot_2 = follower.pathBuilder()
+                    .addPath(new BezierLine(ballTwoLinePose, shootPose))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(36))
+                    .build();
+            ToThree = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, ballThreeLinePose))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(36))
                     .build();
 
-            ToShoot_2 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    ballTwoFullPose,
-
-                                    shootPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
-
+            ToThreeFull = follower.pathBuilder()
+                    .addPath(new BezierLine(ballThreeLinePose, ballThreeFullPose))
+                    .setLinearHeadingInterpolation(Math.toRadians(36), Math.toRadians(0))
                     .build();
 
-            ToThree = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    shootPose,
-
-                                    ballThreeLinePose
-
-                            )).setLinearHeadingInterpolation(Math.toRadians(143), Math.toRadians(180))
-
+            ToShoot_3 = follower.pathBuilder()
+                    .addPath(new BezierLine(ballThreeFullPose, shootThreeLinePose))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(44))
                     .build();
 
-            ToThreeFull = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    ballThreeLinePose,
-
-                                    ballThreeFullPose))
-                    .setTangentHeadingInterpolation()
-
-                    .build();
-
-            ToShoot_3 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    ballThreeFullPose,
-
-                                    shootPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
-
-                    .build();
-
-            finalPose = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    shootPose,
-
-                                    randomPose
-
-                            )).setConstantHeadingInterpolation(Math.toRadians(143))
-
+            finalPose = follower.pathBuilder()
+                    .addPath(new BezierLine(shootThreeLinePose, randomPose))
+                    .setConstantHeadingInterpolation(Math.toRadians(44))
                     .build();
         }
+
 
         private void buildPathsGate(Follower follower)
         {
