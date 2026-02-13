@@ -452,7 +452,7 @@ public class Red extends AutoBase
         private void buildPathsReg(Follower follower)
         {
             // --- Pose definitions ---
-            startPose = new Pose(79, 9, Math.toRadians(0));
+            startPose = new Pose(79, 9, Math.toRadians(90));
 
             final Pose ballOneLinePose = new Pose(86, 36);
             final Pose ballOneFullPose = new Pose(125, 36);
