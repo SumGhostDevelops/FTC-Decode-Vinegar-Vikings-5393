@@ -389,7 +389,7 @@ public class Red extends AutoBase
 
     static class Paths
     {
-        public Pose startPose = new Pose(21.000, 125.000, Math.toRadians(39));
+        public Pose startPose = new Pose(21.000, 125.000, Math.toRadians(0));
 
         public PathChain ToShoot,
                 ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
@@ -426,7 +426,7 @@ public class Red extends AutoBase
 
         private void buildPathsBasic(Follower follower)
         {
-            startPose = new Pose(79, 9,  Math.toRadians(0));
+            startPose = new Pose(79, 9,  Math.toRadians(90));
             final Pose shootPose = new Pose(80, 8);
             final Pose leavePose = new Pose(85, 14);
 

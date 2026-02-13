@@ -213,6 +213,7 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
+
                 case ToShoot_2: // Shoot, then drive to three
                     Shoot();
 
