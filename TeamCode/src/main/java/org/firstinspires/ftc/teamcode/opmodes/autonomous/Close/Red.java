@@ -471,12 +471,12 @@ public class Red extends AutoBase
             // --- Paths ---
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, ballOneLinePose))
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
                     .build();
 
             ToBallOne = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
-                    .setTangentHeadingInterpolation()
+                    .setLinearHeadingInterpolation(Math.toRadians(75),Math.toRadians(0))
                     .build();
 
             ToShoot_1 = follower.pathBuilder()
