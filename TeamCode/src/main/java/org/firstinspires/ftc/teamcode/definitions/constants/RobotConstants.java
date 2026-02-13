@@ -100,6 +100,8 @@ public class RobotConstants
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = true;
 
+        public static boolean USE_LUT = false;
+
         @IgnoreConfigurable
         public static class Name
         {

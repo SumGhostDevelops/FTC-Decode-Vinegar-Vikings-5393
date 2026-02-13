@@ -163,23 +163,27 @@ public class Red extends AutoBase
         {
             switch (currentPathState)
             {
-
                 case ToShoot: // Going to shoot
                     Shoot();
+
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
                 case ToBallOne: // At shooting position, going to ball one
-
-
                     startIntake();
+
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
 
                 case ToBallOneFull: // At ball one, going to ball one full
                     stopIntake();
+                    follower.followPath(paths.ToBallOneBack);
+                    setPathState(Paths.PathState.ToBallOneBack);
+                    break;
+
+                case ToBallOneBack:
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
@@ -200,6 +204,11 @@ public class Red extends AutoBase
 
                 case ToBallTwoFull: // At ball two, going to ball two full
                     stopIntake();
+                    follower.followPath(paths.ToBallTwoBack);
+                    setPathState(Paths.PathState.ToBallTwoBack);
+                    break;
+
+                case ToBallTwoBack:
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
@@ -392,7 +401,7 @@ public class Red extends AutoBase
         public Pose startPose = new Pose(21.000, 125.000, Math.toRadians(0));
 
         public PathChain ToShoot,
-                ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
+                ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack, ToThree,
                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
         // Gate-specific paths used in buildPathsGate
         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
@@ -400,7 +409,7 @@ public class Red extends AutoBase
 
         public enum PathState
         {
-            ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+            ToShoot, ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose,
         }
@@ -456,7 +465,6 @@ public class Red extends AutoBase
 
             final Pose ballOneLinePose = new Pose(86, 36);
             final Pose ballOneFullPose = new Pose(125, 36);
-
             final Pose shootPose = new Pose(75, 68.5);
 
             final Pose ballTwoLinePose = new Pose(87, 60.000);
