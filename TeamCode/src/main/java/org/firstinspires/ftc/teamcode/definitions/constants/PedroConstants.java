@@ -27,7 +27,7 @@ public class PedroConstants {
             .lateralZeroPowerAcceleration(-61.67424035159679)
             .translationalPIDFCoefficients(new PIDFCoefficients(.13,0,.0001,.019))
             .headingPIDFCoefficients(new PIDFCoefficients(1,0,.01,.001))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(.025,0,.00001,.6,.01));
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(.0125,0,.00001,.6,.01));
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()

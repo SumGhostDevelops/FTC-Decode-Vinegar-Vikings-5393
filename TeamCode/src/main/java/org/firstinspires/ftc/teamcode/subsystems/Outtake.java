@@ -223,7 +223,14 @@ public class Outtake extends SubsystemBase
 
         lastDistance = dist;
 
-        setTargetRPM(rpmLUT.get(lastDistance.getInch()));
+        //setTargetRPM(rpmLUT.get(lastDistance.getInch()));
+
+        setTargetRPM(regression(lastDistance.getInch()));
+    }
+
+    private double regression(double inches)
+    {
+        return 2453 + 5.6*inches + 0.044*inches*inches;
     }
 
     public double getTargetRPM()
