@@ -681,13 +681,15 @@ public class Blue extends AutoBase
                     .setTangentHeadingInterpolation()
                     .build();
             ToBallTwoBack = follower.pathBuilder()
-                    .addPath(new BezierLine(ballTwoFullPose, shootPose))
+                    .addPath(new BezierLine(
+                            ballTwoFullPose, ballTwoLinePose)
+                    )
                     .setTangentHeadingInterpolation()
                     .build();
 
             ToShoot_2 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    ballTwoFullPose,
+                                    ballTwoLinePose,
                                     shootPose))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(144))
                     .build();
