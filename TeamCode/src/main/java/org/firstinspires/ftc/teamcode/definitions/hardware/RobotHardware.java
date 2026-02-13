@@ -106,8 +106,17 @@ public class RobotHardware
             pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
             pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.REVERSED);
 
-            pinpoint.recalibrateIMU();
-        } catch (Exception e)
+            // hopefully fixes turret jitter problems
+            if (RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT)
+            {
+                pinpoint.resetPosAndIMU();
+            }
+            else
+            {
+                pinpoint.recalibrateIMU();
+            }
+        }
+        catch (Exception e)
         {
             telemetry.log().add("Warning: goBilda Pinpoint not found");
         }
