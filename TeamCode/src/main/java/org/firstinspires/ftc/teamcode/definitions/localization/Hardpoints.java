@@ -31,8 +31,8 @@ public class Hardpoints
     {
         public static final Pose2d BLUE_LOADING_ZONE = new Pose2d(coord(135.32, 8.17), deg(0));
         public static final Pose2d RED_LOADING_ZONE = new Pose2d(coord(8.68, 8.17), deg(180));
-        public static final Pose2d BLUE_GOAL = new Pose2d(new FieldCoordinate(new Distance(23.35, INCH), new Distance(127.41, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(144));
-        public static final Pose2d RED_GOAL = new Pose2d(new FieldCoordinate(new Distance(120.74, INCH), new Distance(127.41, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(36));
+        public static final Pose2d BLUE_GOAL = new Pose2d(new FieldCoordinate(new Distance(24.59, INCH), new Distance(128.285, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(144));
+        public static final Pose2d RED_GOAL = new Pose2d(new FieldCoordinate(new Distance(114.56, INCH), new Distance(128.285, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(36));
         public static final Pose2d SMALL_TRIANGLE = new Pose2d(new FieldCoordinate(new Distance(72, INCH), new Distance(8.625, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(90));
     }
 

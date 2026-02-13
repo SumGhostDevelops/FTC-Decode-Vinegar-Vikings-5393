@@ -152,12 +152,12 @@ public class Red extends AutoBase
             switch (currentPathState) {
                 // Corrected Logic: When in a state, start the NEXT path.
                 case ToShoot:
-                    Shoot();
+
                     follower.followPath(paths.ToBallOne); // Start path TO BallOne
                     setPathState(Paths.PathState.ToBallOne);
                     break;
                 case ToBallOne:
-                    
+                    Shoot();
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
