@@ -163,75 +163,76 @@ public class Red extends AutoBase
         {
             switch (currentPathState)
             {
+
                 case ToShoot: // Going to shoot
-                    follower.followPath(paths.ToShoot);
+                    Shoot();
+                    follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
                 case ToBallOne: // At shooting position, going to ball one
-                    Shoot();
+
 
                     startIntake();
-                    follower.followPath(paths.ToBallOne);
+                    follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
 
                 case ToBallOneFull: // At ball one, going to ball one full
-                    follower.followPath(paths.ToBallOneFull);
+                    stopIntake();
+                    follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
                 case ToShoot_1: // At ball one full, going back to shooting position
-                    stopIntake();
+                  Shoot();
 
-                    follower.followPath(paths.ToShoot_1);
+                    follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
 
                 case ToBallTwo: // At shooting position, going to ball two
-                    Shoot();
 
                     startIntake();
-                    follower.followPath(paths.ToBallTwo);
+                    follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
 
                 case ToBallTwoFull: // At ball two, going to ball two full
-                    follower.followPath(paths.ToBallTwoFull);
+                    stopIntake();
+                    follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
                 case ToShoot_2: // At ball two full, going back to shooting position
-                    stopIntake();
+                    Shoot();
 
-                    follower.followPath(paths.ToShoot_2);
+                    follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.ToThree);
                     break;
 
                 case ToThree: // At shooting position, going to ball three
-                    Shoot();
 
                     startIntake();
-                    follower.followPath(paths.ToThree);
+                    follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.ToThreeFull);
                     break;
 
                 case ToThreeFull: // At ball three, going to ball three full
-                    follower.followPath(paths.ToThreeFull);
+                    stopIntake();
+                    follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
 
                 case ToShoot_3: // At ball three full, going back to shooting position
-                    stopIntake();
+                  Shoot();
 
-                    follower.followPath(paths.ToShoot_3);
+                    follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose);
                     break;
 
                 case finalPose: // At shooting position, going to final pose
-                    Shoot();
 
-                    follower.followPath(paths.finalPose, false);
                     break;
             }
         }
