@@ -177,28 +177,30 @@ public class Red extends AutoBase
                     setPathState(Paths.PathState.ToBallOneBack);
                     break;
 
-
                 case ToBallOneBack:
+                    stopIntake();
+
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
                 case ToShoot_1: // At ball one full, going back to shooting position
-                  Shoot();
+                    Shoot();
 
                     follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
 
                 case ToBallTwo: // At shooting position, going to ball two
-
                     startIntake();
+
                     follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
 
                 case ToBallTwoFull: // At ball two, going to ball two full
                     stopIntake();
+
                     follower.followPath(paths.ToBallTwoBack);
                     setPathState(Paths.PathState.ToBallTwoBack);
                     break;
@@ -507,9 +509,12 @@ public class Red extends AutoBase
                     .setTangentHeadingInterpolation()
                     .setReversed()
                     .build();
-
+            ToShoot_2 = follower.pathBuilder()
+                    .addPath(new BezierLine(ballTwoLinePose, shootPose))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(36))
+                    .build();
             ToThree = follower.pathBuilder()
-                    .addPath(new BezierLine(ballTwoLinePose, ballThreeLinePose))
+                    .addPath(new BezierLine(shootPose, ballThreeLinePose))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(36))
                     .build();
 
