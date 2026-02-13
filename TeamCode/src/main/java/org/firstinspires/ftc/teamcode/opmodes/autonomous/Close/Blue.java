@@ -627,6 +627,8 @@ public class Blue extends AutoBase
             final Pose ballThreeFullPose = new Pose(19.000, 84.000);
             final Pose gateLinePose = new Pose(54.000, 84.000);
             final Pose gatePushPose = new Pose(49.000, 79.000);
+            final Pose randomPose = new Pose(55, 65);
+
 
             ToBallOne = follower.pathBuilder().addPath(
                             new BezierLine(
@@ -707,6 +709,12 @@ public class Blue extends AutoBase
                             new BezierLine(
                                     gateLinePose,
                                     gatePushPose))
+                    .setConstantHeadingInterpolation(Math.toRadians(136))
+                    .build();
+            finalPose = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    gateLinePose,
+                                    randomPose))
                     .setConstantHeadingInterpolation(Math.toRadians(136))
                     .build();
         }
