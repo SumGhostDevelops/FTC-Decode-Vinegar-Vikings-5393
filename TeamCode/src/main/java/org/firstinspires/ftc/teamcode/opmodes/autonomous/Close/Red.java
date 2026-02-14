@@ -530,12 +530,12 @@ public class Red extends AutoBase
                     .build();
             ToThree = follower.pathBuilder()
                     .addPath(new BezierLine(shootPose, ballThreeLinePose))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(36))
+                    .setLinearHeadingInterpolation(Math.toRadians(36),Math.toRadians(0))
                     .build();
 
             ToThreeFull = follower.pathBuilder()
                     .addPath(new BezierLine(ballThreeLinePose, ballThreeFullPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(36), Math.toRadians(0))
+                    .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
 
             ToShoot_3 = follower.pathBuilder()
