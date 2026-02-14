@@ -49,8 +49,8 @@ public class Blue extends AutoBase
             telemetry.addLine("--- SELECT AUTO STRATEGY ---");
             telemetry.addData("Selected", autoStrat);
             telemetry.addLine("\nControls:");
-            telemetry.addLine("DPAD UP: 12 Ball (GATE)");
-            telemetry.addLine("DPAD RIGHT: 9 Ball (REGULAR)");
+            telemetry.addLine("DPAD UP: GATE METHOD (GATE)");
+            telemetry.addLine("DPAD RIGHT: 12 Ball (REGULAR)");
             telemetry.addLine("DPAD DOWN: 3 Ball (BASIC)");
             telemetry.update();
         }
