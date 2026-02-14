@@ -174,7 +174,7 @@ public class Red extends AutoBase
                 //  When in a state, start the NEXT path.
                 case ToShoot:
                     // before following next path, it shoots.
-
+                follower.followPath(paths.ToShoot);
                   setPathState(Paths.PathState.ToShootFar);
 
                 case ToShootFar:
