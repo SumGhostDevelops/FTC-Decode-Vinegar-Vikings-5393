@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
@@ -17,6 +18,13 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Common base class for all autonomous modes with ball flow methods.
@@ -424,11 +432,33 @@ public abstract class AutoBase extends LinearOpMode
         }
     }
 
+    /**
+     * Writes a pose to a file in the PedroPath coordinate system, in inches, in degrees.
+     */
     protected void writePoseToFile()
     {
         if (!RobotConstants.Autonomous.SAVE_END_AUTONOMOUS_POSE)
         {
             return;
+        }
+
+        Pose2d pose = getPose2d().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH).toAngleUnit(AngleUnit.DEGREES);
+
+        String coordinateSystem = String.valueOf(pose.coord.coordSys);
+        String x = String.valueOf(pose.coord.x.getInch());
+        String y = String.valueOf(pose.coord.y.getInch());
+        String heading = String.valueOf(pose.heading.angle);
+
+        File file = AppUtil.getInstance().getSettingsFile(RobotConstants.Autonomous.AUTONOMOUS_POSE_FILE_NAME);
+        String data = x + "," + y + "," + heading + "," + coordinateSystem;
+
+        try (PrintWriter out = new PrintWriter(new FileOutputStream(file)))
+        {
+            out.println(data);
+        }
+        catch (Exception e)
+        {
+            telemetry.addData("Error", "Save failed: ", e.getMessage());
         }
     }
 }

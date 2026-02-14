@@ -20,7 +20,7 @@ public class FieldHeading
         this.system = system;
     }
 
-    public FieldHeading toSystem(CoordinateSystem targetSystem)
+    public FieldHeading toCoordinateSystem(CoordinateSystem targetSystem)
     {
         if (this.system == targetSystem) return this;
 
@@ -54,14 +54,14 @@ public class FieldHeading
 
     public FieldHeading plus(FieldHeading other)
     {
-        other = other.toSystem(this.system);
+        other = other.toCoordinateSystem(this.system);
 
         return new FieldHeading(this.angle.plus(other.angle), this.system);
     }
 
     public FieldHeading minus(FieldHeading other)
     {
-        other = other.toSystem(this.system);
+        other = other.toCoordinateSystem(this.system);
 
         return new FieldHeading(this.angle.minus(other.angle), this.system);
     }
