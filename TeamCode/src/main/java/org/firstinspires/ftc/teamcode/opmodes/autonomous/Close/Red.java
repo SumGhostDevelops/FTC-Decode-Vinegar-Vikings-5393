@@ -160,6 +160,7 @@ public class Red extends AutoBase
                     break;
 
                 case finalPose:
+                    finishedAutonomous = true;
                     break;
             }
         }
@@ -403,7 +404,6 @@ public class Red extends AutoBase
 
                     follower.followPath(paths.finalPose, false);
                     break;
-
             }
         }
     }
