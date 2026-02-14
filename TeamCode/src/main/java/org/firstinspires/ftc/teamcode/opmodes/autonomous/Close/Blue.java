@@ -66,7 +66,7 @@ public class Blue extends AutoBase
             opModeTimer.resetTimer();
             startOuttake();
 
-            while (opModeIsActive() && !isStopRequested())
+            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
             {
                 handlePathing();
                 follower.update();
