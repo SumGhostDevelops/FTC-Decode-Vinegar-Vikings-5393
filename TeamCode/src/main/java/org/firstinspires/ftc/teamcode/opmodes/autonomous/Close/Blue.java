@@ -399,8 +399,8 @@ public class Blue extends AutoBase
         {
             // Tune these poses if the robot drives too far or in the wrong direction.
             startPose = new Pose(80, 8.3, Math.toRadians(90));
-            final Pose shootPose = new Pose(80, 27); // adjust values if distance is incorrect
-            final Pose finalPose = new Pose(80, 38.5);
+            final Pose shootPose = new Pose(80, 8.3);
+            final Pose finalPose = new Pose(80, 50);
 
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, shootPose))

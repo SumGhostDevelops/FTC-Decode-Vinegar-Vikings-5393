@@ -448,8 +448,8 @@ public class Red extends AutoBase
         private void buildPathsBasic(Follower follower)
         {
             startPose = new Pose(79, 9,  Math.toRadians(90));
-            final Pose shootPose = new Pose(80, 8);
-            final Pose leavePose = new Pose(85, 14);
+            final Pose shootPose = new Pose(79, 9);
+            final Pose leavePose = new Pose(85, 50);
 
             ToShoot = follower.pathBuilder().addPath(
                             new BezierLine(
