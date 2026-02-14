@@ -74,6 +74,9 @@ public class Blue extends AutoBase
                 RobotUpdates();
             }
         }
+
+        stopSubsystems();
+        writePoseToFile();
     }
 
     @Override
