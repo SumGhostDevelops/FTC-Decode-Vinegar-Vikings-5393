@@ -71,7 +71,7 @@ public class Blue extends AutoBase
                 handlePathing();
                 follower.update();
 
-                updateEverything();
+                RobotUpdates();
             }
         }
     }
@@ -92,26 +92,34 @@ public class Blue extends AutoBase
         telemetry.addData("Turret Target Angle", robot.subsystems.turret.getTargetAngleDegrees());
         telemetry.update();
     }
-
+    /**
+     * --- Initialize robot and paths ---
+     * Starts Local Timer, and Sets Follower Pose
+     * Starts First Path.
+     */
     public void initAuto()
     {
+        // --- Initialize pedro Path Constants and Followers ---
         follower = PedroConstants.createFollower(hardwareMap);
         setFollower(follower);
         paths = new Paths(follower, autoStrat);
+        // --- Initialize Timers ---
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-
+        //Sets Starting pose and updates follower
         follower.setStartingPose(paths.startPose);
         follower.update();
+        //Init Robot Hardware.
         initRobot();
 
-        // Set initial state based on strategy
+        //starts first Path
         setPathState(Paths.PathState.ToShoot);
     }
 
     private void handlePathing()
     {
+        //Sets paths based on set strat
         switch (autoStrat)
         {
             case BASIC:
@@ -135,24 +143,21 @@ public class Blue extends AutoBase
 
     private void PathBasic()
     {
-        // This check ensures we only try to start a new path *after* the current one is
-        // complete.
+
         if (!follower.isBusy())
         {
             switch (currentPathState)
             {
                 case ToShoot:
-                    follower.followPath(paths.ToShoot);
-                    setPathState(Paths.PathState.FinalPose);
-                    break;
-                case FinalPose:
-                    Shoot();
+                    //Shoots first, then drives to final pose
 
+                    Shoot();
+                    //at starting position, starts driving to position 2.
                     follower.followPath(paths.FinalPose, false);
-                    setPathState(Paths.PathState.finalPose); // Move to terminal state
+                    setPathState(Paths.PathState.finalPose);
                     break;
                 case finalPose:
-                    // Terminal state - do nothing
+
                     break;
             }
         }
@@ -160,12 +165,12 @@ public class Blue extends AutoBase
 
     private void PathRegular()
     {
-        // This check ensures we only try to start a new path *after* the current one is
-        // complete.
+
         if (!follower.isBusy())
         {
             switch (currentPathState)
             {
+                //  When in a state, start the NEXT path.
                 case ToShoot: // Shoot, then go to pre-ball-one
                     Shoot();
 

@@ -124,7 +124,7 @@ public abstract class AutoBase extends LinearOpMode
     /**
      * Updates subsystems and telemetry
      */
-    protected void updateEverything()
+    protected void RobotUpdates()
     {
         updateSubsystems();
         displayTelemetry();
@@ -286,7 +286,7 @@ public abstract class AutoBase extends LinearOpMode
             }
 
             // Update subsystems (PIDF loops)
-            updateEverything();
+            RobotUpdates();
 
             // Continuously aim and adjust RPM
             aimTurret();
@@ -331,7 +331,7 @@ public abstract class AutoBase extends LinearOpMode
             }
 
             // State machine handles transfer and intake
-            updateEverything();
+            RobotUpdates();
             sleep(10);
         }
     }

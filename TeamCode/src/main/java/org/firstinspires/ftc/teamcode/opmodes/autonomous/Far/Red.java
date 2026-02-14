@@ -8,12 +8,14 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.pedropathing.util.Timer;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
 
-// AUTO IS EXACTLY THE SAME AS BLUE WILL CHANGE LATER!!!!
+
 @Autonomous(name = "FarRedAuto", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
 public class Red extends AutoBase
 {
@@ -23,7 +25,6 @@ public class Red extends AutoBase
         private Follower follower;
 
         private Paths.PathState currentPathState;
-
         private AutoStrat autoStrat = AutoStrat.REGULAR;
 
         @Override
@@ -37,7 +38,8 @@ public class Red extends AutoBase
                         if (gamepad1.dpad_up)
                         {
                                 autoStrat = AutoStrat.GATE;
-                        } else if (gamepad1.dpad_right)
+                        }
+                        else if (gamepad1.dpad_right)
                         {
                                 autoStrat = AutoStrat.REGULAR;
                         } else if (gamepad1.dpad_down)
@@ -45,7 +47,7 @@ public class Red extends AutoBase
                                 autoStrat = AutoStrat.BASIC;
                         }
 
-                        // --- Keep your telemetry inside the loop for live feedback ---
+                        // CUSTOM AND LEGAL TELEMETRY MENU
                         telemetry.addLine("--- SELECT AUTO STRATEGY ---");
                         telemetry.addData("Selected", autoStrat);
                         telemetry.addLine("\nControls:");
@@ -70,42 +72,57 @@ public class Red extends AutoBase
                                 handlePathing();
                                 follower.update();
 
-                                updateSubsystems();
-
-                                telemetry.addData("Current State", currentPathState);
-                                telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
-                                telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
-                                telemetry.update();
+                            RobotUpdates();
                         }
                 }
         }
-
+    @Override
+    protected void displayTelemetry()
+    {
+        telemetry.addData("Current State", currentPathState);
+        telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
+        telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
+        telemetry.addData("Heading", follower.getHeading());
+        telemetry.addLine("-----");
+        telemetry.addData("Distance to Goal", getPose2d().distanceTo(getGoal()).toUnit(DistanceUnit.INCH));
+        telemetry.addData("Outtake RPM", robot.subsystems.outtake.getMotorRPM());
+        telemetry.addData("Turret Angle", robot.subsystems.turret.getRelativeAngle().toUnit(AngleUnit.DEGREES));
+        telemetry.addData("Turret Target Angle", robot.subsystems.turret.getTargetAngleDegrees());
+        telemetry.update();
+    }
+            /**
+             * --- Initialize robot and paths ---
+             * Starts Local Timer, and Sets Follower Pose
+             * Starts First Path.
+             */
         public void initAuto()
         {
-                initRobot();
 
+                // --- Initialize pedro Path Constants and Followers ---
                 follower = PedroConstants.createFollower(hardwareMap);
                 setFollower(follower);
                 paths = new Paths(follower, autoStrat);
+                // --- Initialize Timers ---
                 timer = new Timer();
                 opModeTimer = new Timer();
                 opModeTimer.resetTimer();
+                //Sets Starting pose and updates follower
                 follower.setStartingPose(paths.startPose);
                 follower.update();
-
-
+                //Init Robot Hardware.
+                initRobot();
+                //starts first Path
                 setPathState(Paths.PathState.ToShoot);
 
+
+
         }
 
-        public void setPathState(Paths.PathState pathState)
-        {
-                currentPathState = pathState;
-                timer.resetTimer();
-        }
+
 
         private void handlePathing()
         {
+            //Sets paths based on set strat
                 switch (autoStrat)
                 {
 
@@ -121,43 +138,49 @@ public class Red extends AutoBase
                 }
 
         }
-
+    public void setPathState(Paths.PathState pathState)
+    {
+        currentPathState = pathState;
+        timer.resetTimer();
+    }
         private void PathBasic()
         {
-                // This check ensures we only try to start a new path *after* the current one is
-                // complete.
-                if (!follower.isBusy())
-                {
 
-                        switch (currentPathState)
-                        {
+        if (!follower.isBusy())
+     {
+            switch (currentPathState)
+            {
+                    case ToShoot:
 
-                                case ToShoot:
-                                        Shoot();
 
-                                        follower.followPath(paths.ToShoot);
-                                        setPathState(Paths.PathState.Move);
+                            follower.followPath(paths.Move);
+                            setPathState(Paths.PathState.Move);
 
-                                        break;
-                                case Move:
-                                        // end path
-                                        follower.followPath(paths.Move, true); // true if you want hold/end
-                                        break;
-                        }
-                }
+                            break;
+                    case Move:
+                        // after it reachest the last state, it starts moving.
+                        Shoot();
+
+                        break;
+            }
         }
+    }
 
     private void PathRegular() {
-        if (!follower.isBusy()) {
-            switch (currentPathState) {
-                // Corrected Logic: When in a state, start the NEXT path.
+        if (!follower.isBusy())
+        {
+            switch (currentPathState)
+            {
+                //  When in a state, start the NEXT path.
                 case ToShoot:
-
+                    // before following next path, it shoots.
+                    Shoot();
                     follower.followPath(paths.ToBallOne); // Start path TO BallOne
                     setPathState(Paths.PathState.ToBallOne);
                     break;
                 case ToBallOne:
-                    Shoot();
+
+
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
