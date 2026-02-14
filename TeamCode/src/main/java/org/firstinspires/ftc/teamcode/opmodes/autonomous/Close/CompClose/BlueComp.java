@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.Close.CompClose;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -14,8 +13,8 @@ import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
 
-@Autonomous(name = "ShootingCloseRedAuto", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
-public class RedComp extends AutoBase
+@Autonomous(name = "ShootingCloseBlueAuto", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
+public class BlueComp extends AutoBase
 {
 
     private Paths paths;
@@ -30,7 +29,7 @@ public class RedComp extends AutoBase
     public void runOpMode() throws InterruptedException
     {
 
-        team = Team.RED;
+        team = Team.BLUE;
 
         while (opModeInInit())
         {
@@ -53,7 +52,7 @@ public class RedComp extends AutoBase
 
             telemetry.addLine("DPAD UP: 3 Ball (BASIC)");
 
-            telemetry.addLine("DPAD RIGHT: 9 Ball (REGULAR)");
+            telemetry.addLine("DOESNT WORK !! DPAD RIGHT: 9 Ball (REGULAR)");
 
             telemetry.update();
         }
@@ -194,9 +193,9 @@ public class RedComp extends AutoBase
 
 
                 case ToShoot_1: // At ball one full, going back to shooting position
+                  Shoot();
 
                     follower.followPath(paths.ToShoot_1);
-                    Shoot();
                     setPathState(Paths.PathState.finalPose);
                     break;
 
