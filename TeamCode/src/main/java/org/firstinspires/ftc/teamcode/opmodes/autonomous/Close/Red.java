@@ -477,7 +477,7 @@ public class Red extends AutoBase
 
             final Pose ballOneLinePose = new Pose(86, 36);
             final Pose ballOneFullPose = new Pose(125, 36);
-            final Pose shootPose = new Pose(75, 68.5);
+            final Pose shootPose = new Pose(95, 100.5);
 
             final Pose ballTwoLinePose = new Pose(87, 60.000);
             final Pose ballTwoFullPose = new Pose(125, 60.000);
