@@ -184,8 +184,6 @@ public class BlueComp extends AutoBase
                     break;
 
                 case ToBallOne: // At shooting position, going to ball one
-
-
                     startIntake();
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToShoot_1);
@@ -193,14 +191,17 @@ public class BlueComp extends AutoBase
 
 
                 case ToShoot_1: // At ball one full, going back to shooting position
-
+                    stopIntake();
                     follower.followPath(paths.ToShoot_1);
-                    Shoot();
                     setPathState(Paths.PathState.finalPose);
                     break;
 
                 case finalPose: // At shooting position, going to final pose
+                    Shoot();
                     follower.followPath(paths.finalPose);
+                    setPathState(Paths.PathState.FinalPos);
+                    break;
+                case FinalPos:
                     finishedAutonomous = true;
                     break;
             }
@@ -228,7 +229,7 @@ public class BlueComp extends AutoBase
         {
             ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
-            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose,
+            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPos
         }
 
 
@@ -288,29 +289,30 @@ public class BlueComp extends AutoBase
         private void buildPathsReg(Follower follower)
         {
             // --- Pose definitions ---
-            startPose = new Pose(79, 9, Math.toRadians(90));
+            startPose = new Pose(65, 9, Math.toRadians(90));
 
-            final Pose ballOneLinePose = new Pose(79, 36);
-            final Pose ballOneFullPose = new Pose(125, 36);
+            final Pose ballOneLinePose = new Pose(48, 36);
+            final Pose ballOneFullPose = new Pose(14, 36);
 
-            final Pose shootPose = new Pose(79, 9);
+            final Pose shootPose = new Pose(65, 9);
 
-            final Pose randomPose = new Pose(120, 12);
+            final Pose randomPose = new Pose(31, 11);
 
             // --- Paths ---
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, ballOneLinePose))
-                    .setTangentHeadingInterpolation()
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
                     .build();
 
             ToBallOne = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(75),Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
                     .build();
 
             ToShoot_1 = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneFullPose, shootPose))
-                    .setConstantHeadingInterpolation(Math.toRadians(36))
+                    .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build();
 
 
