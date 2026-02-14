@@ -22,7 +22,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
     }
@@ -32,6 +32,9 @@ public class RobotConstants
     {
         public static int WAIT_SYS_READY_MS = 4000;
         public static int SHOOT_LENGTH_MS = 1500;
+        public static boolean SAVE_END_AUTONOMOUS_POSE = false;
+        public static double AUTONOMOUS_POSE_TIMEOUT = 90; // use this pose if it was created in the last 90 seconds
+        public static String AUTONOMOUS_POSE_FILE_NAME = "saved_pose.txt";
     }
 
     @Configurable
@@ -99,6 +102,8 @@ public class RobotConstants
         public static boolean ON_BY_DEFAULT = false;
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = true;
+
+        public static boolean USE_LUT = false;
 
         @IgnoreConfigurable
         public static class Name
@@ -195,8 +200,8 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
-        public static double minimumTransferPower = 0.5;
-        public static double maximumTransferPower = 0.5;
+        public static double minimumTransferPower = 0.65;
+        public static double maximumTransferPower = 1.0;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
@@ -215,6 +220,7 @@ public class RobotConstants
 
         public static boolean SET_FORWARD_DIRECTION_BASED_ON_TEAM = true;
         public static boolean ENABLE_CORNER_LOCALIZATION = true;
+        public static boolean RESET_PINPOINT_FULLY_ON_INIT = true;
 
         @IgnoreConfigurable
         public static class Pinpoint

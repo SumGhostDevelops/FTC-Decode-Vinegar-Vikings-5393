@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -11,8 +12,10 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.util.Timing;
 import com.seattlesolvers.solverslib.util.Timing.Timer;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.controls.commands.*;
 import org.firstinspires.ftc.teamcode.definitions.constants.ConstantsPresets;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
@@ -28,7 +31,11 @@ import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
+import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -69,6 +76,7 @@ public abstract class Base extends CommandOpMode
     @Override
     public void initialize()
     {
+        RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT = true;
         loopStopwatch = new Timing.Stopwatch(TimeUnit.MILLISECONDS);
         loopStopwatch.start();
 
@@ -79,6 +87,14 @@ public abstract class Base extends CommandOpMode
 
         // 2. Register Subsystems
         Subsystems s = robot.subsystems;
+
+        Pose2d savedPose = getSavedAutonomousPose(RobotConstants.Autonomous.AUTONOMOUS_POSE_TIMEOUT);
+
+        if (savedPose != null)
+        {
+            s.odometry.setReferencePose(savedPose);
+        }
+
         register(s.drive, s.intake, s.transfer, s.turret, s.outtake, s.odometry);
 
         // 3. Set Defaults & Init Commands
@@ -96,22 +112,33 @@ public abstract class Base extends CommandOpMode
         bindKeys();
 
         // 5. Finalize Telemetry
-        telemetry.log().add("Initialized in " + loopStopwatch.deltaTime() + "ms");
         telemetry.setAutoClear(setAutoclear.getAsBoolean());
-        telemetry.addData("Status", "Initialized for " + team);
 
         // Initialize Dashboard tools
         FieldDrawing.init();
 
-        // Push initial state
-        update();
+        final long timeToInit = loopStopwatch.deltaTime();
+
+        do
+        {
+            // Continually attempt to load/configure/calibrate Pinpoint until ready
+            boolean pinpointReady = robot.hw.loadPinpoint(hardwareMap, telemetry);
+
+            s.odometry.periodic();
+
+            telemetry.addData("Status", "Initialized for " + team);
+            telemetry.addLine("Initialized in " + timeToInit + "ms");
+            telemetry.addLine(savedPose != null ? "Loaded Autonomous Pose" : "No Autonomous Pose Loaded");
+            telemetry.addData("Reference Pose Set", robot.subsystems.odometry.referencePoseWasSet());
+            telemetry.addData("Pinpoint Status", robot.hw.pinpoint != null ? robot.hw.pinpoint.getDeviceStatus() : "NULL");
+            telemetry.addData("Pinpoint Ready", pinpointReady ? "YES" : "Waiting...");
+            telemetry.update();
+        } while (!isStarted() && opModeInInit());
     }
 
     @Override
     public void run()
     {
-        robot.hw.clearHubCache();
-        robot.hw.readBattery();
         manageMatchTimer();
         update();
         super.run();
@@ -127,6 +154,10 @@ public abstract class Base extends CommandOpMode
 
     protected void update()
     {
+        // Reset the cache and battery
+        robot.hw.clearHubCache();
+        robot.hw.readBattery();
+
         // Cache the subsystem reference for this loop iteration
         Subsystems s = robot.subsystems;
 
@@ -173,7 +204,7 @@ public abstract class Base extends CommandOpMode
 
         telemetry.addLine("--- Odometry ---");
         telemetry.addData("Coord (Pedro)", pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
-        telemetry.addData("Heading (Field)", s.odometry.getFieldHeading().toSystem(CoordinateSystem.DECODE_PEDROPATH));
+        telemetry.addData("Heading (Field)", s.odometry.getFieldHeading().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
         telemetry.addData("IMU Yaw", s.odometry.getIMUYaw());
 
         telemetry.addLine("--- Hardware ---");
@@ -445,6 +476,50 @@ public abstract class Base extends CommandOpMode
         else
         {
             return minimumTransferPower.getAsDouble();
+        }
+    }
+
+    /**
+     * @return The autonomous pose or null if it does not exist.
+     *
+     * @param timeout The maximum acceptable time to wait for saved pose to have existed for.
+     */
+    private Pose2d getSavedAutonomousPose(double timeout)
+    {
+        // get the file reference
+        File file = AppUtil.getInstance().getSettingsFile(RobotConstants.Autonomous.AUTONOMOUS_POSE_FILE_NAME);
+
+        // check if the file exists
+        if (!file.exists())
+        {
+            return null;
+        }
+
+        // check if the file is fresh enough
+        long fileAge = System.currentTimeMillis() - file.lastModified();
+        if (fileAge > RobotConstants.Autonomous.AUTONOMOUS_POSE_TIMEOUT)
+        {
+            return null;
+        }
+
+        // read the data; pedropath, inches, degrees
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = br.readLine();
+            if (line == null) return null;
+
+            String[] parts = line.split(",");
+
+            // x, y, heading, coordinate system
+            return new Pose2d(
+                    new Distance(Double.parseDouble(parts[0]), DistanceUnit.INCH),
+                    new Distance(Double.parseDouble(parts[1]), DistanceUnit.INCH),
+                    new Angle(Double.parseDouble(parts[2]), AngleUnit.DEGREES),
+                    CoordinateSystem.valueOf(parts[3])
+            );
+        }
+        catch (Exception e)
+        {
+            return null;
         }
     }
 }

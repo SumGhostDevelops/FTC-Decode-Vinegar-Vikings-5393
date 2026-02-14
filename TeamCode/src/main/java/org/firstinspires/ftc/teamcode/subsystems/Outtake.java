@@ -8,6 +8,8 @@ import org.firstinspires.ftc.teamcode.util.math.BetterInterpLUT;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
+import java.util.function.BooleanSupplier;
+
 public class Outtake extends SubsystemBase
 {
 
@@ -39,6 +41,8 @@ public class Outtake extends SubsystemBase
     // Read dynamically to allow runtime changes via FTC Dashboard
     private boolean adjustWithDistance() { return RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT; }
 
+    private BooleanSupplier useLUT = () -> RobotConstants.Outtake.USE_LUT;
+
     /**
      * Inches -> RPM
      */
@@ -50,14 +54,11 @@ public class Outtake extends SubsystemBase
 
         // Inches -> RPM
         rpmLUT = BetterInterpLUT.builder()
-                .add(94.42, 3303)
-                .add(50.51, 2785)
-                .add(114.59, 3675)
-                .add(81.02, 3172)
-                .add(74.28, 3080)
-                .add(45.61, 2665)
-                .add(138.33, 3950)
-                .add(157.69, 4265)
+                .add(52.37, 2845)
+                .add(62.41, 3005)
+                .add(71.18, 3090)
+                .add(82.37, 3185)
+                .add(121.67, 3790)
                 .build();
     }
 
@@ -223,9 +224,14 @@ public class Outtake extends SubsystemBase
 
         lastDistance = dist;
 
-        //setTargetRPM(rpmLUT.get(lastDistance.getInch()));
-
-        setTargetRPM(regression(lastDistance.getInch()));
+        if (useLUT.getAsBoolean())
+        {
+            setTargetRPM(rpmLUT.get(lastDistance.getInch()));
+        }
+        else
+        {
+            setTargetRPM(regression(lastDistance.getInch()));
+        }
     }
 
     private double regression(double inches)

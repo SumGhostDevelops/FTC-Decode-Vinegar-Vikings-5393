@@ -99,7 +99,7 @@ public class OdometryCommands
         {
             super(() ->
             {
-                odometry.updateReferencePose(pose);
+                odometry.setReferencePose(pose);
             });
         }
     }

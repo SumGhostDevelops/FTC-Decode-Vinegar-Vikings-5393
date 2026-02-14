@@ -49,8 +49,8 @@ public class Blue extends AutoBase
             telemetry.addLine("--- SELECT AUTO STRATEGY ---");
             telemetry.addData("Selected", autoStrat);
             telemetry.addLine("\nControls:");
-            telemetry.addLine("DPAD UP: 12 Ball (GATE)");
-            telemetry.addLine("DPAD RIGHT: 9 Ball (REGULAR)");
+            telemetry.addLine("DPAD UP: GATE METHOD (GATE)");
+            telemetry.addLine("DPAD RIGHT: 12 Ball (REGULAR)");
             telemetry.addLine("DPAD DOWN: 3 Ball (BASIC)");
             telemetry.update();
         }
@@ -66,14 +66,17 @@ public class Blue extends AutoBase
             opModeTimer.resetTimer();
             startOuttake();
 
-            while (opModeIsActive() && !isStopRequested())
+            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
             {
                 handlePathing();
                 follower.update();
 
-                updateEverything();
+                RobotUpdates();
             }
         }
+
+        stopSubsystems();
+        writePoseToFile();
     }
 
     @Override
@@ -92,26 +95,34 @@ public class Blue extends AutoBase
         telemetry.addData("Turret Target Angle", robot.subsystems.turret.getTargetAngleDegrees());
         telemetry.update();
     }
-
+    /**
+     * --- Initialize robot and paths ---
+     * Starts Local Timer, and Sets Follower Pose
+     * Starts First Path.
+     */
     public void initAuto()
     {
+        // --- Initialize pedro Path Constants and Followers ---
         follower = PedroConstants.createFollower(hardwareMap);
         setFollower(follower);
         paths = new Paths(follower, autoStrat);
+        // --- Initialize Timers ---
         timer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
-
+        //Sets Starting pose and updates follower
         follower.setStartingPose(paths.startPose);
         follower.update();
+        //Init Robot Hardware.
         initRobot();
 
-        // Set initial state based on strategy
+        //starts first Path
         setPathState(Paths.PathState.ToShoot);
     }
 
     private void handlePathing()
     {
+        //Sets paths based on set strat
         switch (autoStrat)
         {
             case BASIC:
@@ -135,24 +146,20 @@ public class Blue extends AutoBase
 
     private void PathBasic()
     {
-        // This check ensures we only try to start a new path *after* the current one is
-        // complete.
         if (!follower.isBusy())
         {
             switch (currentPathState)
             {
                 case ToShoot:
-                    follower.followPath(paths.ToShoot);
-                    setPathState(Paths.PathState.FinalPose);
-                    break;
-                case FinalPose:
-                    Shoot();
+                    //Shoots first, then drives to final pose
 
+                    Shoot();
+                    //at starting position, starts driving to position 2.
                     follower.followPath(paths.FinalPose, false);
-                    setPathState(Paths.PathState.finalPose); // Move to terminal state
+                    setPathState(Paths.PathState.finalPose);
                     break;
                 case finalPose:
-                    // Terminal state - do nothing
+                    finishedAutonomous = true;
                     break;
             }
         }
@@ -160,12 +167,12 @@ public class Blue extends AutoBase
 
     private void PathRegular()
     {
-        // This check ensures we only try to start a new path *after* the current one is
-        // complete.
+
         if (!follower.isBusy())
         {
             switch (currentPathState)
             {
+                //  When in a state, start the NEXT path.
                 case ToShoot: // Shoot, then go to pre-ball-one
                     Shoot();
 
@@ -213,7 +220,7 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.ToBallTwoBack);
                     break;
                 case ToBallTwoBack:  // Picked up the balls, drive to shoot
-                    stopIntake();
+
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
@@ -246,7 +253,7 @@ public class Blue extends AutoBase
                     break;
 
                 case finalPose:
-                    // Terminal state - do nothing
+                    finishedAutonomous = true;
                     break;
             }
         }
@@ -353,6 +360,7 @@ public class Blue extends AutoBase
                     break;
 
                 case FinalPose:
+                    finishedAutonomous = true;
                     break;
             }
         }
@@ -391,8 +399,8 @@ public class Blue extends AutoBase
         {
             // Tune these poses if the robot drives too far or in the wrong direction.
             startPose = new Pose(80, 8.3, Math.toRadians(90));
-            final Pose shootPose = new Pose(80, 27); // adjust values if distance is incorrect
-            final Pose finalPose = new Pose(80, 38.5);
+            final Pose shootPose = new Pose(80, 8.3);
+            final Pose finalPose = new Pose(80, 50);
 
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, shootPose))
@@ -627,10 +635,13 @@ public class Blue extends AutoBase
             final Pose ballOneLinePose = new Pose(55.000, 36.000);
             final Pose ballOneFullPose = new Pose(19.000, 36.000);
             final Pose shootPose = new Pose(48, 95.200);
+
             final Pose ballTwoLinePose = new Pose(55.000, 60.000);
             final Pose ballTwoFullPose = new Pose(19.000, 60.000);
+
             final Pose ballThreeLinePose = new Pose(55.000, 84.000);
             final Pose ballThreeFullPose = new Pose(19.000, 84.000);
+
             final Pose gateLinePose = new Pose(54.000, 84.000);
             final Pose gatePushPose = new Pose(49.000, 79.000);
             final Pose randomPose = new Pose(55, 65);
@@ -678,13 +689,16 @@ public class Blue extends AutoBase
                     .setTangentHeadingInterpolation()
                     .build();
             ToBallTwoBack = follower.pathBuilder()
-                    .addPath(new BezierLine(ballTwoFullPose, shootPose))
+                    .addPath(new BezierLine(
+                            ballTwoFullPose, ballTwoLinePose)
+                    )
                     .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build();
 
             ToShoot_2 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    ballTwoFullPose,
+                                    ballTwoLinePose,
                                     shootPose))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(144))
                     .build();

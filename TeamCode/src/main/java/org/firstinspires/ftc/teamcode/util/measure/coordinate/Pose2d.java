@@ -25,7 +25,7 @@ public class Pose2d {
 
     public Pose2d(FieldCoordinate coord, FieldHeading heading) {
         this.coord = coord;
-        this.heading = heading.toSystem(coord.coordSys);
+        this.heading = heading.toCoordinateSystem(coord.coordSys);
     }
 
     public static Pose2d fromPose2D(Pose2D pose, CoordinateSystem coordSys) {
@@ -85,7 +85,7 @@ public class Pose2d {
         // Fix: Explicitly convert the heading to the target system as well
         return new Pose2d(
                 coord.toCoordinateSystem(coordSys),
-                heading.toSystem(coordSys));
+                heading.toCoordinateSystem(coordSys));
     }
 
     public Pose2d toAngleUnit(AngleUnit angleUnit) {
