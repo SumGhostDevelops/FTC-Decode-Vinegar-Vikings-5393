@@ -193,9 +193,9 @@ public class BlueComp extends AutoBase
 
 
                 case ToShoot_1: // At ball one full, going back to shooting position
-                  Shoot();
 
                     follower.followPath(paths.ToShoot_1);
+                    Shoot();
                     setPathState(Paths.PathState.finalPose);
                     break;
 
@@ -253,19 +253,19 @@ public class BlueComp extends AutoBase
         private void buildPathsBasic(Follower follower)
         {
             // --- Pose definitions ---
-            startPose = new Pose(79, 9, Math.toRadians(90));
+            startPose = new Pose(65, 9, Math.toRadians(90));
 
-            final Pose ballOneLinePose = new Pose(136, 26);
-            final Pose ballOneFullPose = new Pose(136, 9);
+            final Pose ballOneLinePose = new Pose(8, 26);
+            final Pose ballOneFullPose = new Pose(8, 9);
 
-            final Pose shootPose = new Pose(79, 9);
+            final Pose shootPose = new Pose(65, 9);
 
-            final Pose randomPose = new Pose(120, 12);
+            final Pose randomPose = new Pose(24, 12);
 
             // --- Paths ---
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, ballOneLinePose))
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(270))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(-90))
                     .build();
 
             ToBallOne = follower.pathBuilder()
@@ -275,7 +275,7 @@ public class BlueComp extends AutoBase
 
             ToShoot_1 = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneFullPose, shootPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(90))
+                    .setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(90))
                     .build();
 
 
