@@ -69,7 +69,7 @@ public class BlueComp extends AutoBase
             startOuttake();
             // follower.followPath(paths.ToShoot);
 
-            while (opModeIsActive() && !isStopRequested())
+            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
             {
                 handlePathing();
                 follower.update();
@@ -201,7 +201,7 @@ public class BlueComp extends AutoBase
 
                 case finalPose: // At shooting position, going to final pose
                     follower.followPath(paths.finalPose);
-
+                    finishedAutonomous = true;
                     break;
             }
         }

@@ -70,7 +70,7 @@ public class RedComp extends AutoBase
             startOuttake();
             // follower.followPath(paths.ToShoot);
 
-            while (opModeIsActive() && !isStopRequested())
+            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
             {
                 handlePathing();
                 follower.update();
@@ -200,6 +200,9 @@ public class RedComp extends AutoBase
                 case finalPose: // At shooting position, going to final pose
                     Shoot();
                     follower.followPath(paths.finalPose);
+                    setPathState(Paths.PathState.FinalPos);
+                    break;
+                case FinalPos:
                     finishedAutonomous = true;
                     break;
             }
@@ -227,7 +230,7 @@ public class RedComp extends AutoBase
         {
             ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
-            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose,
+            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPos
         }
 
 
@@ -310,6 +313,7 @@ public class RedComp extends AutoBase
             ToShoot_1 = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneFullPose, shootPose))
                     .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build();
 
 
