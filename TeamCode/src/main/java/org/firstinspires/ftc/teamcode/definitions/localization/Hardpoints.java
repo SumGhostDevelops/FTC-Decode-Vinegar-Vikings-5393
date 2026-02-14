@@ -35,7 +35,7 @@ public class Hardpoints
         @Sorter(sort = 0)
         public static final Pose2d BLUE_LOADING_ZONE = new Pose2d(coord(135.32, 8.17), deg(0));
         @Sorter(sort = 1)
-        public static final Pose2d RED_LOADING_ZONE = new Pose2d(coord(8.68, 8.17), deg(180));
+        public static final Pose2d RED_LOADING_ZONE = new Pose2d(coord(9.47, 10.91), deg(180));
         @Sorter(sort = 2)
         public static final Pose2d BLUE_GOAL = new Pose2d(new FieldCoordinate(new Distance(29.89, INCH), new Distance(133.30, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(140.294));
         @Sorter(sort = 3)

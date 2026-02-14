@@ -200,8 +200,8 @@ public class RobotConstants
         @Sorter(sort = 2)
         public static double outtakePower = 0.6;
         @Sorter(sort = 3)
-        public static double minimumTransferPower = 0.5;
-        public static double maximumTransferPower = 0.5;
+        public static double minimumTransferPower = 0.7;
+        public static double maximumTransferPower = 1.0;
 
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
