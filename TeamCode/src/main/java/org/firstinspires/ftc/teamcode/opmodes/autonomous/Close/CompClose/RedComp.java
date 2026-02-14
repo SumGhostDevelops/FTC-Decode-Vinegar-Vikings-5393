@@ -37,7 +37,7 @@ public class RedComp extends AutoBase
             // --- Move your selection logic inside this loop ---
             if (gamepad1.dpad_up)
             {
-                autoStrat = AutoStrat.REGULAR;
+                autoStrat = AutoStrat.BASIC;
             } else if (gamepad1.dpad_right)
             {
                 autoStrat = AutoStrat.REGULAR;
@@ -50,6 +50,8 @@ public class RedComp extends AutoBase
             telemetry.addLine("--- SELECT AUTO STRATEGY ---");
             telemetry.addData("Selected", autoStrat);
             telemetry.addLine("\nControls:");
+
+            telemetry.addLine("DPAD UP: 3 Ball (BASIC)");
 
             telemetry.addLine("DPAD RIGHT: 9 Ball (REGULAR)");
 
@@ -134,7 +136,37 @@ public class RedComp extends AutoBase
 
     private void PathBasic()
     {
+        if (!follower.isBusy()) {
+            switch (currentPathState) {
 
+                case ToShoot: // Going to shoot
+                    Shoot();
+                    follower.followPath(paths.ToShoot);
+                    setPathState(Paths.PathState.ToBallOne);
+                    break;
+
+                case ToBallOne: // At shooting position, going to ball one
+
+
+                    startIntake();
+                    follower.followPath(paths.ToBallOne);
+                    setPathState(Paths.PathState.ToShoot_1);
+                    break;
+
+
+                case ToShoot_1: // At ball one full, going back to shooting position
+                    Shoot();
+
+                    follower.followPath(paths.ToShoot_1);
+                    setPathState(Paths.PathState.finalPose);
+                    break;
+
+                case finalPose: // At shooting position, going to final pose
+                    follower.followPath(paths.finalPose);
+
+                    break;
+            }
+        }
     }
 
     private void PathRegular()
@@ -157,6 +189,7 @@ public class RedComp extends AutoBase
 
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToShoot_1);
+
 
                 case ToShoot_1: // At ball one full, going back to shooting position
                     stopIntake();
@@ -219,7 +252,37 @@ public class RedComp extends AutoBase
 
         private void buildPathsBasic(Follower follower)
         {
+            // --- Pose definitions ---
+            startPose = new Pose(79, 9, Math.toRadians(90));
 
+            final Pose ballOneLinePose = new Pose(136, 26);
+            final Pose ballOneFullPose = new Pose(136, 9);
+
+            final Pose shootPose = new Pose(79, 9);
+
+            final Pose randomPose = new Pose(120, 12);
+
+            // --- Paths ---
+            ToShoot = follower.pathBuilder()
+                    .addPath(new BezierLine(startPose, ballOneLinePose))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(270))
+                    .build();
+
+            ToBallOne = follower.pathBuilder()
+                    .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
+                    .setTangentHeadingInterpolation()
+                    .build();
+
+            ToShoot_1 = follower.pathBuilder()
+                    .addPath(new BezierLine(ballOneFullPose, shootPose))
+                    .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(90))
+                    .build();
+
+
+            finalPose = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, randomPose))
+                    .setTangentHeadingInterpolation()
+                    .build();
         }
 
         private void buildPathsReg(Follower follower)
