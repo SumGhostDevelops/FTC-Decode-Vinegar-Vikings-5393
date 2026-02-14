@@ -230,4 +230,103 @@ public class RobotHardware
             cachedVoltage = battery.getVoltage();
         }
     }
+
+    private boolean pinpointConfigured = false;
+    private boolean pinpointCalibrationStarted = false;
+    private boolean pinpointReady = false;
+
+    /**
+     * Attempts to configure and calibrate the Pinpoint. Call this repeatedly during init
+     * until isPinpointReady() returns true.
+     *
+     * Waits for the Pinpoint to be READY before sending any configuration commands.
+     *
+     * @return true if Pinpoint is fully ready to use
+     */
+    public boolean loadPinpoint(HardwareMap hardwareMap, Telemetry telemetry)
+    {
+        // Already fully ready
+        if (pinpointReady)
+        {
+            return true;
+        }
+
+        // Grab the pinpoint if we haven't already
+        if (pinpoint == null)
+        {
+            try
+            {
+                pinpoint = hardwareMap.get(Pinpoint.class, pinpointName);
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: goBilda Pinpoint not found");
+                return false;
+            }
+        }
+
+        // Always update to get fresh status
+        pinpoint.update();
+
+        Pinpoint.DeviceStatus status = pinpoint.getDeviceStatus();
+
+        // Wait for device to be READY before doing anything
+        if (status != Pinpoint.DeviceStatus.READY)
+        {
+            return false;
+        }
+
+        // Step 1: Configure offsets and encoder settings (only once, when READY)
+        if (!pinpointConfigured)
+        {
+            try
+            {
+                DistanceUnit dUnit = forwardWheelOffset.unit;
+
+                pinpoint.setOffsets(
+                        forwardWheelOffset.magnitude,
+                        strafeWheelOffset.toUnit(dUnit).magnitude,
+                        dUnit);
+
+                pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+                pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.REVERSED);
+
+                pinpointConfigured = true;
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Failed to configure Pinpoint");
+                return false;
+            }
+        }
+
+        // Step 2: Start calibration (only once, after configuration)
+        if (!pinpointCalibrationStarted)
+        {
+            if (RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT)
+            {
+                pinpoint.resetPosAndIMU();
+            }
+            else
+            {
+                pinpoint.recalibrateIMU();
+            }
+            pinpointCalibrationStarted = true;
+            return false; // Calibration just started, not ready yet
+        }
+
+        // Step 3: Calibration was started and device is now READY again
+        // (status == READY is already checked above, and calibrationStarted is true)
+        pinpointReady = true;
+        return true;
+    }
+
+
+    /**
+     * @return true if the Pinpoint has been fully configured and calibrated
+     */
+    public boolean isPinpointReady()
+    {
+        return pinpointReady;
+    }
 }
