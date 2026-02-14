@@ -185,8 +185,6 @@ public class RedComp extends AutoBase
                     break;
 
                 case ToBallOne: // At shooting position, going to ball one
-
-
                     startIntake();
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToShoot_1);
@@ -194,15 +192,15 @@ public class RedComp extends AutoBase
 
 
                 case ToShoot_1: // At ball one full, going back to shooting position
-
+                    stopIntake();
                     follower.followPath(paths.ToShoot_1);
-                    Shoot();
                     setPathState(Paths.PathState.finalPose);
                     break;
 
                 case finalPose: // At shooting position, going to final pose
+                    Shoot();
                     follower.followPath(paths.finalPose);
-
+                    finishedAutonomous = true;
                     break;
             }
         }
@@ -289,12 +287,12 @@ public class RedComp extends AutoBase
         private void buildPathsReg(Follower follower)
         {
             // --- Pose definitions ---
-            startPose = new Pose(79, 9, Math.toRadians(90));
+            startPose = new Pose(84, 9, Math.toRadians(90));
 
-            final Pose ballOneLinePose = new Pose(79, 36);
+            final Pose ballOneLinePose = new Pose(84, 36);
             final Pose ballOneFullPose = new Pose(125, 36);
 
-            final Pose shootPose = new Pose(79, 9);
+            final Pose shootPose = new Pose(84, 9);
 
             final Pose randomPose = new Pose(120, 12);
 
@@ -306,12 +304,12 @@ public class RedComp extends AutoBase
 
             ToBallOne = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(75),Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
                     .build();
 
             ToShoot_1 = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneFullPose, shootPose))
-                    .setConstantHeadingInterpolation(Math.toRadians(36))
+                    .setTangentHeadingInterpolation()
                     .build();
 
 
