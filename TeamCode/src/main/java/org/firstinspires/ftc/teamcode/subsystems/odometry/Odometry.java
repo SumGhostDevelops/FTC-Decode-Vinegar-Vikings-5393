@@ -72,7 +72,7 @@ public class Odometry extends SubsystemBase
      */
     public Angle getIMUYaw()
     {
-        return cachedPose.heading.toSystem(CoordinateSystem.DECODE_FTC).angle;
+        return cachedPose.heading.toCoordinateSystem(CoordinateSystem.DECODE_FTC).angle;
     }
 
     /**
@@ -89,8 +89,8 @@ public class Odometry extends SubsystemBase
      */
     public Angle getDriverHeading()
     {
-        FieldHeading currentPedro = getFieldHeading().toSystem(CoordinateSystem.DECODE_PEDROPATH);
-        FieldHeading startPedro = driverForward.toSystem(CoordinateSystem.DECODE_PEDROPATH);
+        FieldHeading currentPedro = getFieldHeading().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
+        FieldHeading startPedro = driverForward.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
 
         return currentPedro.minus(startPedro).angle;
     }
@@ -142,6 +142,9 @@ public class Odometry extends SubsystemBase
         driverForward = getFieldHeading();
     }
 
+    /**
+     * @param referencePose The reference pose to update the Pinpoint with.
+     */
     public void setReferencePose(Pose2d referencePose)
     {
         referencePoseWasSet = false; // set the flag to false
@@ -156,6 +159,9 @@ public class Odometry extends SubsystemBase
         setReferencePose();
     }
 
+    /**
+     * Attempt to send the reference pose to the Pinpoint
+     */
     private void setReferencePose()
     {
         // don't update the pinpoint's reference pose if we already did it

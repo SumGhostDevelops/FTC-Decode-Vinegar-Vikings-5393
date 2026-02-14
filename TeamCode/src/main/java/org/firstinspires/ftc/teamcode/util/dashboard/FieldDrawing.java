@@ -79,7 +79,7 @@ public class FieldDrawing
         {
             // Convert everything to Pedro pathing system for drawing consistency
             Pose2d robotPedro = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
-            FieldHeading turretPedro = turretHeading.toSystem(CoordinateSystem.DECODE_PEDROPATH);
+            FieldHeading turretPedro = turretHeading.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
 
             double turretRad = turretPedro.angle.getRadians();
 
@@ -178,7 +178,7 @@ public class FieldDrawing
 
         // Ensure both robot pose and draw angle are in the Dashboard's native system (Pedro)
         Pose2d convertedPose = pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).toDistanceUnit(DistanceUnit.INCH);
-        FieldHeading convertedHeading = heading.toSystem(CoordinateSystem.DECODE_PEDROPATH);
+        FieldHeading convertedHeading = heading.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
 
         double x = convertedPose.coord.x.magnitude;
         double y = convertedPose.coord.y.magnitude;

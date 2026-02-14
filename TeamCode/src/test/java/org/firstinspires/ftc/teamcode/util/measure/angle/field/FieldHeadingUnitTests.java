@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.measure.angle.field;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -24,7 +23,7 @@ public class FieldHeadingUnitTests
         // Pedro 0 = Facing Blue
         FieldHeading pedroHeading = new FieldHeading(0, AngleUnit.DEGREES, CoordinateSystem.DECODE_PEDROPATH);
 
-        FieldHeading ftcHeading = pedroHeading.toSystem(CoordinateSystem.DECODE_FTC);
+        FieldHeading ftcHeading = pedroHeading.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
 
         // FTC 90 = Facing Blue (since FTC 0 = Audience)
         assertEquals(90.0, ftcHeading.angle.measure, DELTA);
@@ -37,7 +36,7 @@ public class FieldHeadingUnitTests
         // FTC 0 = Facing Audience
         FieldHeading ftcHeading = new FieldHeading(0, AngleUnit.DEGREES, CoordinateSystem.DECODE_FTC);
 
-        FieldHeading pedroHeading = ftcHeading.toSystem(CoordinateSystem.DECODE_PEDROPATH);
+        FieldHeading pedroHeading = ftcHeading.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
 
         // Pedro Y = Backstage. Audience is -Backstage (-Y).
         // Pedro X = Blue.
@@ -81,7 +80,7 @@ public class FieldHeadingUnitTests
         // FTC: Pedro 0 is Blue (FTC 90). Pedro 180 is Red (FTC 270 or -90).
         FieldHeading pedroRed = new FieldHeading(180, AngleUnit.DEGREES, CoordinateSystem.DECODE_PEDROPATH);
 
-        FieldHeading ftcRed = pedroRed.toSystem(CoordinateSystem.DECODE_FTC);
+        FieldHeading ftcRed = pedroRed.toCoordinateSystem(CoordinateSystem.DECODE_FTC);
 
         // We expect -90 or 270.
         // If your Angle class normalizes to [-180, 180), expect -90.
