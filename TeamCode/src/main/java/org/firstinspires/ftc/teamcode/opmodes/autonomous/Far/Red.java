@@ -221,18 +221,17 @@ public class Red extends AutoBase
                 case ToThreeFull:
                     stopIntake();
                     follower.followPath(paths.ToShoot_3);
-                    setPathState(Paths.PathState.bottomBalls); // Corrected this from ToEatGate
+                    setPathState(Paths.PathState.ToShoot_3); // Corrected this from ToEatGate
                     break;
-                case bottomBalls:
+                case ToShoot_3:
                     Shoot();
-                    // Tell the robot to follow the final path
+
                     follower.followPath(paths.FinalPose);
                     // Set the state to match the path you just started
                     setPathState(Paths.PathState.finalPose);
                     break;
                 case finalPose:
-                    // This case is now only entered when the final path is complete.
-                    // The robot will hold its position, and the auto is effectively over.
+
                     break;
             }
         }
