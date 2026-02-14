@@ -131,8 +131,6 @@ public abstract class Base extends CommandOpMode
     @Override
     public void run()
     {
-        robot.hw.clearHubCache();
-        robot.hw.readBattery();
         manageMatchTimer();
         update();
         super.run();
@@ -148,6 +146,10 @@ public abstract class Base extends CommandOpMode
 
     protected void update()
     {
+        // Reset the cache and battery
+        robot.hw.clearHubCache();
+        robot.hw.readBattery();
+
         // Cache the subsystem reference for this loop iteration
         Subsystems s = robot.subsystems;
 
