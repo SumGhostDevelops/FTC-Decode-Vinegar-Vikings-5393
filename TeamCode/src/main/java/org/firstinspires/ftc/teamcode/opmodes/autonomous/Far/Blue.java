@@ -170,6 +170,9 @@ public class Blue extends AutoBase
                 case ToShoot: // Going to shoot
                     // //  When in a state, start the NEXT path.
                     // before following next path, it shoots.
+                    setPathState(Paths.PathState.ToShootFar);
+
+                case ToShootFar:
                     Shoot();
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
@@ -703,7 +706,7 @@ public class Blue extends AutoBase
 
         public enum PathState
         {
-            ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+            ToShoot, ToShootFar, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose,
         }

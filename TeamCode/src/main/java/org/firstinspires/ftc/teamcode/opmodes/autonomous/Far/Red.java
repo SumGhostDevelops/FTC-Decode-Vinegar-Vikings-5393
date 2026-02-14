@@ -174,12 +174,16 @@ public class Red extends AutoBase
                 //  When in a state, start the NEXT path.
                 case ToShoot:
                     // before following next path, it shoots.
+
+                  setPathState(Paths.PathState.ToShootFar);
+
+                case ToShootFar:
                     Shoot();
-                    follower.followPath(paths.ToBallOne); // Start path TO BallOne
+                    follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
-                case ToBallOne:
 
+                case ToBallOne:
 
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
@@ -341,7 +345,7 @@ public class Red extends AutoBase
                 public Pose startPose = new Pose(123, 125, Math.toRadians(90));
 
                 public PathChain ToShoot,
-                                ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, ToThree,
+                                ToBallOne, ToBallOneFull, ToShootFar, ToBallTwo, ToBallTwoFull, ToThree,
                                 ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
                                 // Gate-specific paths used in buildPathsGate
                                 Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, Move,
@@ -349,7 +353,7 @@ public class Red extends AutoBase
 
                 public enum PathState
                 {
-                        ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4, Move,
+                        ToShoot, ToBallOne,  ToShootFar, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4, Move,
                         // Gate-specific states
                         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPose
                 }
