@@ -146,7 +146,6 @@ public class Blue extends AutoBase
 
     private void PathBasic()
     {
-
         if (!follower.isBusy())
         {
             switch (currentPathState)
@@ -160,7 +159,7 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.finalPose);
                     break;
                 case finalPose:
-
+                    finishedAutonomous = true;
                     break;
             }
         }
@@ -361,6 +360,7 @@ public class Blue extends AutoBase
                     break;
 
                 case FinalPose:
+                    finishedAutonomous = true;
                     break;
             }
         }
