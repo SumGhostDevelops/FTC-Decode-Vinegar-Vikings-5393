@@ -174,7 +174,6 @@ public class Red extends AutoBase
                 case ToShoot:
                     // Shoot, then go to pre-ball-one
                     Shoot();
-
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
@@ -186,8 +185,14 @@ public class Red extends AutoBase
                     setPathState(Paths.PathState.ToBallOneBack);
                     break;
 
-                case ToBallOneBack:
+                case ToBallOneFull: // Picked up all the balls, now drive back
                     stopIntake();
+
+                    follower.followPath(paths.ToBallOneBack);
+                    setPathState(Paths.PathState.ToBallOneBack);
+                    break;
+
+                case ToBallOneBack: // Drive to shooting position
 
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
@@ -483,12 +488,12 @@ public class Red extends AutoBase
             final Pose shootThreeLinePose = new Pose(90, 84);
 
             // --- Paths ---
-            ToShoot = follower.pathBuilder()
+            ToBallOne = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, ballOneLinePose))
-                    .setTangentHeadingInterpolation()
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(0))
                     .build();
 
-            ToBallOne = follower.pathBuilder()
+            ToBallOneFull = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
                     .setLinearHeadingInterpolation(ballOneLinePose.getHeading(), Math.toRadians(0))
                     .build();
