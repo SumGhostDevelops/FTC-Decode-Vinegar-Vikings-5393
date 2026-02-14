@@ -181,8 +181,8 @@ public class Red extends AutoBase
                 case ToBallOne: // At shooting position, going to ball one
                     startIntake();
 
-                    follower.followPath(paths.ToBallOneBack);
-                    setPathState(Paths.PathState.ToBallOneBack);
+                    follower.followPath(paths.ToBallOneFull);
+                    setPathState(Paths.PathState.ToBallOneFull);
                     break;
 
                 case ToBallOneFull: // Picked up all the balls, now drive back
