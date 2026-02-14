@@ -56,6 +56,7 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void initRobot()
     {
+        RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT = false;
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
         telemetry.addData("Status", "Initialized for " + team);
         telemetry.update();
