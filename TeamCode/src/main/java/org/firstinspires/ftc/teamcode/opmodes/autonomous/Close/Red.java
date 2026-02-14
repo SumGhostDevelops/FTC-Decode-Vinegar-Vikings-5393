@@ -65,10 +65,10 @@ public class Red extends AutoBase
         if (opModeIsActive() && !isStopRequested())
         {
             opModeTimer.resetTimer();
-            startOuttake();
+            startOuttake(); // keep outtake always on until the end
             // follower.followPath(paths.ToShoot);
 
-            while (opModeIsActive() && !isStopRequested())
+            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
             {
                 handlePathing();
                 follower.update();
@@ -76,6 +76,9 @@ public class Red extends AutoBase
                 RobotUpdates();
             }
         }
+
+        stopSubsystems();
+        writePoseToFile();
     }
 
     protected void displayTelemetry()
@@ -141,7 +144,6 @@ public class Red extends AutoBase
     }
     private void PathBasic()
     {
-
         if (!follower.isBusy())
         {
             switch (currentPathState)
@@ -156,8 +158,6 @@ public class Red extends AutoBase
                     break;
 
                 case finalPose:
-
-
                     break;
             }
         }
@@ -240,7 +240,7 @@ public class Red extends AutoBase
                     break;
 
                 case ToShoot_3: // At ball three full, going back to shooting position
-                  Shoot();
+                    Shoot();
 
                     follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose);
@@ -436,7 +436,6 @@ public class Red extends AutoBase
                     buildPathsReg(follower);
                     break;
             }
-
         }
 
         private void buildPathsBasic(Follower follower)
@@ -479,7 +478,7 @@ public class Red extends AutoBase
             final Pose ballThreeLinePose = new Pose(87, 84);
             final Pose ballThreeFullPose = new Pose(125, 84);
 
-            final Pose randomPose = new Pose(96, 78);
+            final Pose finalPose = new Pose(96, 78);
 
             final Pose shootThreeLinePose = new Pose(90, 84);
 
@@ -537,8 +536,8 @@ public class Red extends AutoBase
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(44))
                     .build();
 
-            finalPose = follower.pathBuilder()
-                    .addPath(new BezierLine(shootThreeLinePose, randomPose))
+            this.finalPose = follower.pathBuilder()
+                    .addPath(new BezierLine(shootThreeLinePose, finalPose))
                     .setConstantHeadingInterpolation(Math.toRadians(44))
                     .build();
         }

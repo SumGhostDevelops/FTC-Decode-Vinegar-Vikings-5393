@@ -142,11 +142,37 @@ public class Odometry extends SubsystemBase
         driverForward = getFieldHeading();
     }
 
-    public void updateReferencePose(Pose2d referencePose)
+    public void setReferencePose(Pose2d referencePose)
     {
+        referencePoseWasSet = false; // set the flag to false
+
+        // update the desired reference pose
+        this.referencePose = referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D();
+
+        // update the poses that get used
+        cachedPose = referencePose;
         driverForward = referencePose.heading;
 
-        pinpoint.setPosition(referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D());
+        setReferencePose();
+    }
+
+    private void setReferencePose()
+    {
+        // don't update the pinpoint's reference pose if we already did it
+        if (referencePoseWasSet)
+        {
+            return;
+        }
+
+        // don't try if the pinpoint isn't ready
+        if (this.pinpoint.getDeviceStatus() != Pinpoint.DeviceStatus.READY)
+        {
+            return;
+        }
+
+        this.pinpoint.setPosition(this.referencePose); // set the reference pose on the pinpoint
+        this.pinpoint.update(); // update the pinpoint
+        this.referencePoseWasSet = true; // set the flag
     }
 
     /**
@@ -203,14 +229,20 @@ public class Odometry extends SubsystemBase
     @Override
     public void periodic()
     {
-        if (!this.referencePoseWasSet && pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY)
-        {
-            this.pinpoint.setPosition(this.referencePose);
-            this.referencePoseWasSet = true;
-        }
+        setReferencePose(); // attempt to update the reference pose on the pinpoint
 
         pinpoint.update();
-        cachedPose = Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
+
+        // if we have sent the reference pose to the pinpoint, use the pinpoint
+        if (referencePoseWasSet)
+        {
+            cachedPose = Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
+        }
+        // otherwise
+        else
+        {
+            cachedPose = Pose2d.fromPose2D(referencePose, CoordinateSystem.DECODE_FTC);
+        }
     }
 
     public void close()

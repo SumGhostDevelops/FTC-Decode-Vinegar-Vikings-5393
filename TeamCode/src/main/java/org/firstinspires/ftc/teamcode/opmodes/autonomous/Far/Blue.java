@@ -64,9 +64,9 @@ public class Blue extends AutoBase
         if (opModeIsActive() && !isStopRequested())
         {
             opModeTimer.resetTimer();
+            startOuttake(); // keep outtake always on until the end
 
-
-            while (opModeIsActive() && !isStopRequested())
+            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
             {
                 handlePathing();
                 follower.update();
@@ -74,6 +74,8 @@ public class Blue extends AutoBase
                 RobotUpdates();
             }
         }
+        stopSubsystems();
+        writePoseToFile();
     }
 
     @Override
@@ -97,7 +99,6 @@ public class Blue extends AutoBase
      */
     public void initAuto()
     {
-
         // --- Initialize pedro Path Constants and Followers ---
         follower = PedroConstants.createFollower(hardwareMap);
         setFollower(follower);
@@ -120,7 +121,6 @@ public class Blue extends AutoBase
     //Sets paths based on set strat
         switch (autoStrat)
         {
-
             case BASIC:
                 PathBasic();
                 break;
@@ -148,13 +148,13 @@ public class Blue extends AutoBase
             switch (currentPathState)
             {
                 case ToShoot:
-                // starts the path from pos 1 (starting position, to pos 2 (final position)
+                    Shoot();
+
                     follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose);
                     break;
 
                 case finalPose:
-                    Shoot();
                     // after it reachest the last state, it starts moving.
                     break;
             }
@@ -163,12 +163,10 @@ public class Blue extends AutoBase
 
     private void PathRegular()
     {
-
         if (!follower.isBusy())
         {
             switch (currentPathState)
             {
-
                 case ToShoot: // Going to shoot
                     // //  When in a state, start the NEXT path.
                     // before following next path, it shoots.
@@ -178,8 +176,6 @@ public class Blue extends AutoBase
                     break;
 
                 case ToBallOne: // At shooting position, going to ball one
-
-
                     startIntake();
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
@@ -190,16 +186,20 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
-                case ToShoot_1: // At ball one full, going back to shooting position
+                case ToShoot_1:
+                    // At ball one full
                     stopIntake();
 
+                    // Going back to shooting position
                     follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
 
-                case ToBallTwo: // At shooting position, going to ball two
+                case ToBallTwo:
+                    // At shooting position
                     Shoot();
 
+                    // Going to ball two
                     startIntake();
                     follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
@@ -210,16 +210,20 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
-                case ToShoot_2: // At ball two full, going back to shooting position
+                case ToShoot_2:
+                    // At ball two full
                     stopIntake();
 
+                    // Going back to shooting position
                     follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.ToThree);
                     break;
 
-                case ToThree: // At shooting position, going to ball three
+                case ToThree:
+                    // At shooting position
                     Shoot();
 
+                    // Going to ball three
                     startIntake();
                     follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.ToThreeFull);
@@ -230,9 +234,10 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
 
-                case ToShoot_3: // At ball three full, going back to shooting position
+                case ToShoot_3: // At ball three full
                     stopIntake();
 
+                    // Going back to shooting position
                     follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose);
                     break;
@@ -592,7 +597,7 @@ public class Blue extends AutoBase
             final Pose ballTwoFullPose = new Pose(17.000, 60.000);
             final Pose ballThreeLinePose = new Pose(54.000, 35.000);
             final Pose ballThreeFullPose = new Pose(16.000, 35.000);
-            final Pose randomPose = new Pose(53.890, 69.156);
+            final Pose finalPose = new Pose(53.890, 69.156);
 
             ToShoot = follower.pathBuilder().addPath(
                             new BezierLine(
@@ -685,11 +690,11 @@ public class Blue extends AutoBase
 
                     .build();
 
-            finalPose = follower.pathBuilder().addPath(
+            this.finalPose = follower.pathBuilder().addPath(
                             new BezierLine(
                                     shootPose,
 
-                                    randomPose
+                                    finalPose
 
                             )).setConstantHeadingInterpolation(Math.toRadians(143))
 
@@ -702,6 +707,5 @@ public class Blue extends AutoBase
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose,
         }
-
     }
 }

@@ -104,6 +104,8 @@ public abstract class Base extends CommandOpMode
         FieldDrawing.init();
 
         // Push initial state
+
+        s.odometry.setReferencePose(getSavedAutonomouPose());
         update();
     }
 
@@ -446,5 +448,10 @@ public abstract class Base extends CommandOpMode
         {
             return minimumTransferPower.getAsDouble();
         }
+    }
+
+    private Pose2d getSavedAutonomouPose()
+    {
+        return null;
     }
 }
