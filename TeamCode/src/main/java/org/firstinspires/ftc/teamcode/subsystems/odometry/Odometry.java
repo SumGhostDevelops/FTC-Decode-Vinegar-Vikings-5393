@@ -54,17 +54,18 @@ public class Odometry extends SubsystemBase
         this.pinpoint = pinpoint;
         this.webcam = new Webcam(webcam);
 
-        this.referencePose = referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D();
-
-        if (!referencePoseWasSet && this.pinpoint.getDeviceStatus() == Pinpoint.DeviceStatus.READY)
-        {
-            this.pinpoint.setPosition(this.referencePose);
-            this.pinpoint.update();
-            referencePoseWasSet = true;
-        }
-
+        // Initialize cached values first
         this.cachedPose = referencePose;
         this.driverForward = referencePose.heading;
+
+        // Store the reference pose and attempt to send it to Pinpoint
+        this.referencePose = referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D();
+
+        // Must call update() first to refresh deviceStatus before checking it
+        this.pinpoint.update();
+
+        // Attempt to set the reference pose (will retry in periodic() if not ready)
+        trySetReferencePose();
     }
 
     /**
@@ -147,7 +148,7 @@ public class Odometry extends SubsystemBase
      */
     public void setReferencePose(Pose2d referencePose)
     {
-        referencePoseWasSet = false; // set the flag to false
+        referencePoseWasSet = false; // reset the flag to trigger a new attempt
 
         // update the desired reference pose
         this.referencePose = referencePose.toCoordinateSystem(CoordinateSystem.DECODE_FTC).toPose2D();
@@ -156,13 +157,18 @@ public class Odometry extends SubsystemBase
         cachedPose = referencePose;
         driverForward = referencePose.heading;
 
-        setReferencePose();
+        // Refresh device status before attempting to set pose
+        this.pinpoint.update();
+
+        // Attempt to send to Pinpoint (will retry in periodic() if not ready)
+        trySetReferencePose();
     }
 
     /**
-     * Attempt to send the reference pose to the Pinpoint
+     * Attempt to send the reference pose to the Pinpoint.
+     * Call this after pinpoint.update() to ensure deviceStatus is fresh.
      */
-    private void setReferencePose()
+    private void trySetReferencePose()
     {
         // don't update the pinpoint's reference pose if we already did it
         if (referencePoseWasSet)
@@ -176,9 +182,13 @@ public class Odometry extends SubsystemBase
             return;
         }
 
-        this.pinpoint.setPosition(this.referencePose); // set the reference pose on the pinpoint
-        this.pinpoint.update(); // update the pinpoint
-        this.referencePoseWasSet = true; // set the flag
+        // Set the reference pose on the pinpoint
+        this.pinpoint.setPosition(this.referencePose);
+
+        // Mark as set - the next periodic() cycle will read back the position
+        // We don't call update() here to avoid I2C timing issues where the
+        // Pinpoint hasn't processed the write yet
+        this.referencePoseWasSet = true;
     }
 
     /**
@@ -232,19 +242,26 @@ public class Odometry extends SubsystemBase
         return true;
     }
 
+    public boolean referencePoseWasSet()
+    {
+        return this.referencePoseWasSet;
+    }
+
     @Override
     public void periodic()
     {
-        setReferencePose(); // attempt to update the reference pose on the pinpoint
-
+        // IMPORTANT: Call update() FIRST to refresh deviceStatus before checking it
         pinpoint.update();
+
+        // Now attempt to set reference pose (status check will use fresh data)
+        trySetReferencePose();
 
         // if we have sent the reference pose to the pinpoint, use the pinpoint
         if (referencePoseWasSet)
         {
             cachedPose = Pose2d.fromPose2D(pinpoint.getPosition(), CoordinateSystem.DECODE_FTC);
         }
-        // otherwise
+        // otherwise use the cached reference pose
         else
         {
             cachedPose = Pose2d.fromPose2D(referencePose, CoordinateSystem.DECODE_FTC);

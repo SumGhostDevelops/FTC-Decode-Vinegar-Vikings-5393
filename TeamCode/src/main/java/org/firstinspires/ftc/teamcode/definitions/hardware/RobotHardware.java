@@ -88,33 +88,11 @@ public class RobotHardware
             telemetry.log().add("Warning: Voltage sensor not found");
         }
 
-        // Odometry
+        // Odometry - only get reference, configuration is done via loadPinpoint()
         try
         {
             pinpoint = hardwareMap.get(Pinpoint.class, pinpointName);
-
-            // Pinpoint convention: X offset (left=positive), Y offset (forward=positive)
-            // Our RobotConstants convention matches Pinpoint: left=positive,
-            // forward=positive
-            DistanceUnit dUnit = forwardWheelOffset.unit;
-
-            pinpoint.setOffsets(
-                    forwardWheelOffset.magnitude, // Left is positive in both conventions
-                    strafeWheelOffset.toUnit(dUnit).magnitude, // Forward is positive in both conventions
-                    dUnit);
-
-            pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-            pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.REVERSED);
-
-            // hopefully fixes turret jitter problems
-            if (RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT)
-            {
-                pinpoint.resetPosAndIMU();
-            }
-            else
-            {
-                pinpoint.recalibrateIMU();
-            }
+            loadPinpoint(hardwareMap, telemetry);
         }
         catch (Exception e)
         {
@@ -300,17 +278,12 @@ public class RobotHardware
             }
         }
 
-        // Step 2: Start calibration (only once, after configuration)
+        // Step 2: Recalibrate IMU (only once, after configuration)
+        // NOTE: We only recalibrate IMU here, NOT reset position.
+        // The Odometry subsystem handles position via setReferencePose().
         if (!pinpointCalibrationStarted)
         {
-            if (RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT)
-            {
-                pinpoint.resetPosAndIMU();
-            }
-            else
-            {
-                pinpoint.recalibrateIMU();
-            }
+            pinpoint.recalibrateIMU();
             pinpointCalibrationStarted = true;
             return false; // Calibration just started, not ready yet
         }

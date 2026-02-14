@@ -124,9 +124,12 @@ public abstract class Base extends CommandOpMode
             // Continually attempt to load/configure/calibrate Pinpoint until ready
             boolean pinpointReady = robot.hw.loadPinpoint(hardwareMap, telemetry);
 
+            s.odometry.periodic();
+
             telemetry.addData("Status", "Initialized for " + team);
             telemetry.addLine("Initialized in " + timeToInit + "ms");
             telemetry.addLine(savedPose != null ? "Loaded Autonomous Pose" : "No Autonomous Pose Loaded");
+            telemetry.addData("Reference Pose Set", robot.subsystems.odometry.referencePoseWasSet());
             telemetry.addData("Pinpoint Status", robot.hw.pinpoint != null ? robot.hw.pinpoint.getDeviceStatus() : "NULL");
             telemetry.addData("Pinpoint Ready", pinpointReady ? "YES" : "Waiting...");
             telemetry.update();
