@@ -148,25 +148,18 @@ public class RedComp extends AutoBase
 
                 case ToShoot: // Going to shoot
                     Shoot();
+                    startIntake();
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
                 case ToBallOne: // At shooting position, going to ball one
 
-
-                    startIntake();
                     follower.followPath(paths.ToBallOne);
-                    setPathState(Paths.PathState.ToBallOneFull);
-                    break;
-
-                case ToBallOneFull: // At ball one, going to ball one full
-                    stopIntake();
-                    follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToShoot_1);
-                    break;
 
                 case ToShoot_1: // At ball one full, going back to shooting position
+                    stopIntake();
                   Shoot();
 
                     follower.followPath(paths.ToShoot_1);
@@ -249,12 +242,12 @@ public class RedComp extends AutoBase
 
             ToBallOne = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(75),Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
                     .build();
 
             ToShoot_1 = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneFullPose, shootPose))
-                    .setConstantHeadingInterpolation(Math.toRadians(36))
+                    .setTangentHeadingInterpolation()
                     .build();
 
 
