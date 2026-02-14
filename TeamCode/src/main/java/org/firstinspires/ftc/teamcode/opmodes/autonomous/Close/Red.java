@@ -254,7 +254,7 @@ public class Red extends AutoBase
                     break;
 
                 case finalPose: // At shooting position, going to final pose
-
+                    finishedAutonomous = true;
                     break;
             }
         }

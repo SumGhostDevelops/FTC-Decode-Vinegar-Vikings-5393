@@ -254,7 +254,7 @@ public class Blue extends AutoBase
                     break;
 
                 case finalPose:
-                    // Terminal state - do nothing
+                    finishedAutonomous = true;
                     break;
             }
         }
