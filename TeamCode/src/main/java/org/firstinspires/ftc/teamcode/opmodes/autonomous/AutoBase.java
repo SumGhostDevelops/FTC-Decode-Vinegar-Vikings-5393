@@ -27,6 +27,7 @@ public abstract class AutoBase extends LinearOpMode
     protected Team team;
     protected RobotContext robot;
     protected Follower follower;
+    protected boolean finishedAutonomous = false; // flag for if the robot should end the teleop mode early
 
     // Constants from RobotConstants
     private final double intakePower = RobotConstants.Intake.intakePower;
@@ -115,6 +116,7 @@ public abstract class AutoBase extends LinearOpMode
         robot.hw.readBattery();
 
         Subsystems s = robot.subsystems;
+        updateOuttakeRPM(); // update the outtake rpm constantly
 
         // --- PIDF Updates ---
         s.turret.periodic();
@@ -128,6 +130,16 @@ public abstract class AutoBase extends LinearOpMode
     {
         updateSubsystems();
         displayTelemetry();
+    }
+
+    /**
+     * Stops the intake & outtake and closes the transfer.
+     */
+    protected void stopSubsystems()
+    {
+        stopIntake();
+        stopOuttake();
+        closeTransfer();
     }
 
     // ========================
@@ -348,9 +360,8 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
 
-        // Start outtake if not already running
         openTransfer();
-        startOuttake();
+        startOuttake(); // start outtake if not already running
         aimTurret();
 
         // Wait up to 2 seconds for systems to be ready
@@ -410,6 +421,14 @@ public abstract class AutoBase extends LinearOpMode
         else
         {
             return transferPower;
+        }
+    }
+
+    protected void writePoseToFile()
+    {
+        if (!RobotConstants.Autonomous.SAVE_END_AUTONOMOUS_POSE)
+        {
+            return;
         }
     }
 }
