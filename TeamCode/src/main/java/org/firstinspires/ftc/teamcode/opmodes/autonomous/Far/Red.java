@@ -184,11 +184,12 @@ public class Red extends AutoBase
                     break;
 
                 case ToBallOne:
-
+                    startIntake();
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
                 case ToBallOneFull:
+                    stopIntake();
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
@@ -198,11 +199,12 @@ public class Red extends AutoBase
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
                 case ToBallTwo:
-                    
+                    startIntake();
                     follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
                 case ToBallTwoFull:
+                    stopIntake();
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
@@ -212,11 +214,12 @@ public class Red extends AutoBase
                     setPathState(Paths.PathState.ToThree); // Corrected this from Gate1
                     break;
                 case ToThree:
-                    
+                    startIntake();
                     follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.ToThreeFull); // Corrected this from Gate2
                     break;
                 case ToThreeFull:
+                    stopIntake();
                     follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.bottomBalls); // Corrected this from ToEatGate
                     break;
@@ -225,9 +228,9 @@ public class Red extends AutoBase
                     // Tell the robot to follow the final path
                     follower.followPath(paths.FinalPose);
                     // Set the state to match the path you just started
-                    setPathState(Paths.PathState.FinalPose);
+                    setPathState(Paths.PathState.finalPose);
                     break;
-                case FinalPose:
+                case finalPose:
                     // This case is now only entered when the final path is complete.
                     // The robot will hold its position, and the auto is effectively over.
                     break;
