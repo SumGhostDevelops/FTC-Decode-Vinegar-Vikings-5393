@@ -218,7 +218,7 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.ToBallTwoBack);
                     break;
                 case ToBallTwoBack:  // Picked up the balls, drive to shoot
-                    stopIntake();
+
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
