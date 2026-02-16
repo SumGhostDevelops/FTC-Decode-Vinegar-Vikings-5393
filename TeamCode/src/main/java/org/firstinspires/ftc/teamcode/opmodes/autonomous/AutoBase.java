@@ -171,7 +171,7 @@ public abstract class AutoBase extends LinearOpMode
         if (robot == null)
             return;
 
-        robot.subsystems.intake.transfer(getIntakeTransferPower());
+        robot.subsystems.intake.intake(getIntakeTransferPower());
     }
 
     /**

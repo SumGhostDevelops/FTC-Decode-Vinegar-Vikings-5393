@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.definitions.hardware;
 
-import static org.firstinspires.ftc.teamcode.util.motors.VelocityMotor.VelocityController.PIDF;
-
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -35,7 +33,7 @@ public class RobotHardware
     public WebcamName webcam;
 
     public PowerMotor frontLeft, frontRight, backLeft, backRight;
-    public VelocityMotor intake;
+    public PowerMotor intake;
     public VelocityMotorGroup outtake;
     public PositionMotor turret;
     public ServoEx transfer;
@@ -187,11 +185,9 @@ public class RobotHardware
 
         try
         {
-            intake = new VelocityMotor(new MotorEx(hardwareMap, intakeName, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
+            intake = new PowerMotor(new MotorEx(hardwareMap, intakeName, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
                     .setVoltageCompensation(12)
                     .setMotorDirection(Motor.Direction.REVERSE)
-                    .setControllerType(VelocityMotor.VelocityController.PIDF)
-                    .setPIDF(intakePIDF)
                     .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         } catch (Exception e)
