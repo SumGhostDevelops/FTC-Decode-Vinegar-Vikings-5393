@@ -5,11 +5,8 @@ import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
@@ -17,135 +14,62 @@ import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
 @Autonomous(name = "FarBlueAuto", group = "Blue", preselectTeleOp = "BlueVikingsTeleOp")
 public class Blue extends AutoBase
 {
-
     private Paths paths;
-    private Timer timer, opModeTimer;
-    private Follower follower;
-
-    private Paths.PathState currentPathState;
-    private AutoStrat autoStrat = AutoStrat.REGULAR;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
         team = Team.BLUE;
-        while (opModeInInit())
-        {
-            // --- Move your selection logic inside this loop ---
-            if (gamepad1.dpad_up)
-            {
-                autoStrat = AutoStrat.GATE;
-            }
-            else if (gamepad1.dpad_right)
-            {
-                autoStrat = AutoStrat.REGULAR;
-            }
-            else if (gamepad1.dpad_down)
-            {
-                autoStrat = AutoStrat.BASIC;
-            }
 
-            // CUSTOM AND LEGAL TELEMETRY MENU
-            telemetry.addLine("--- SELECT AUTO STRATEGY ---");
-            telemetry.addData("Selected", autoStrat);
-            telemetry.addLine("\nControls:");
-            telemetry.addLine("DPAD UP: GATE METHOD (GATE)");
-            telemetry.addLine("DPAD RIGHT: 12 Ball (REGULAR)");
-            telemetry.addLine("DPAD DOWN: 3 Ball (BASIC)");
-            telemetry.update();
-        }
+        // Strategy selection
+        autoStrat = selectStrategy();
 
-        // Now the selection is locked in. Initialize paths and timers.
-        initAuto();
-
-        // The OpMode will wait here until you press START
-        waitForStart();
-
-        if (opModeIsActive() && !isStopRequested())
-        {
-            opModeTimer.resetTimer();
-            startOuttake(); // keep outtake always on until the end
-
-            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
-            {
-                handlePathing();
-                follower.update();
-
-                RobotUpdates();
-            }
-        }
-        stopSubsystems();
-        writePoseToFile();
-    }
-
-    @Override
-    protected void displayTelemetry()
-    {
-        telemetry.addData("Current State", currentPathState);
-        telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
-        telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
-        telemetry.addData("Heading", follower.getHeading());
-        telemetry.addLine("-----");
-        telemetry.addData("Distance to Goal", getPose2d().distanceTo(getGoal()).toUnit(DistanceUnit.INCH));
-        telemetry.addData("Outtake RPM", robot.subsystems.outtake.getMotorRPM());
-        telemetry.addData("Turret Angle", robot.subsystems.turret.getRelativeAngle().toUnit(AngleUnit.DEGREES));
-        telemetry.addData("Turret Target Angle", robot.subsystems.turret.getTargetAngleDegrees());
-        telemetry.update();
-    }
-    /**
-     * --- Initialize robot and paths ---
-     * Starts Local Timer, and Sets Follower Pose
-     * Starts First Path.
-     */
-    public void initAuto()
-    {
-        // --- Initialize pedro Path Constants and Followers ---
+        // Initialize autonomous
         follower = PedroConstants.createFollower(hardwareMap);
         setFollower(follower);
         paths = new Paths(follower, autoStrat);
-        // --- Initialize Timers ---
-        timer = new Timer();
-        opModeTimer = new Timer();
-        opModeTimer.resetTimer();
-        //Sets Starting pose and updates follower
-        follower.setStartingPose(paths.startPose);
-        follower.update();
-        //Init Robot Hardware.
-        initRobot();
-        //starts first Path
+        initAuto(paths);
+
+        // Set initial state
         setPathState(Paths.PathState.ToShoot);
+
+        // Wait for start
+        waitForStart();
+
+        // Run the main autonomous loop
+        runAutoLoop();
     }
 
-    private void handlePathing()
+    @Override
+    protected Object createPaths(Follower follower, AutoStrat autoStrat)
     {
-    //Sets paths based on set strat
-        switch (autoStrat)
-        {
-            case BASIC:
-                PathBasic();
-                break;
-            case REGULAR:
-                PathRegular();
-                break;
-            case GATE:
-                PathGate();
-                break;
-        }
+        return new Paths(follower, autoStrat);
     }
 
-    public void setPathState(Paths.PathState pathState)
+    @Override
+    protected Pose getStartingPose(Object paths)
     {
-        currentPathState = pathState;
-        timer.resetTimer();
+        return ((Paths) paths).startPose;
     }
 
-    private void PathBasic()
+    private void setPathState(Paths.PathState pathState)
+    {
+        setPathState((Object) pathState);
+    }
+
+    private Paths.PathState getPathState()
+    {
+        return (Paths.PathState) currentPathState;
+    }
+
+    @Override
+    protected void PathBasic()
     {
         // This check ensures we only try to start a new path *after* the current one is
         // complete.
         if (!follower.isBusy())
         {
-            switch (currentPathState)
+            switch (getPathState())
             {
                 case ToShoot:
                     Shoot();
@@ -161,11 +85,12 @@ public class Blue extends AutoBase
         }
     }
 
-    private void PathRegular()
+    @Override
+    protected void PathRegular()
     {
         if (!follower.isBusy())
         {
-            switch (currentPathState)
+            switch (getPathState())
             {
                 case ToShoot: // Going to shoot
                     // //  When in a state, start the NEXT path.
@@ -251,13 +176,14 @@ public class Blue extends AutoBase
         }
     }
 
-    private void PathGate()
+    @Override
+    protected void PathGate()
     {
         // This check ensures we only try to start a new path *after* the current one is
         // complete.
         if (!follower.isBusy())
         {
-            switch (currentPathState)
+            switch (getPathState())
             {
                 case ToShoot: // Going to shoot
                     follower.followPath(paths.ToShoot);

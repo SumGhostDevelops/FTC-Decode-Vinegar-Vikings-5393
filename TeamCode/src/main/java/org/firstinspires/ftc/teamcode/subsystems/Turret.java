@@ -53,6 +53,11 @@ public class Turret extends SubsystemBase
 
     public void setState(State state)
     {
+        if (this.state == state)
+        {
+            return;
+        }
+
         this.state = state;
     }
 
