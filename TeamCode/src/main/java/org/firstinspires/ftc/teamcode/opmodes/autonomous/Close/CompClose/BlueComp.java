@@ -60,21 +60,13 @@ public class BlueComp extends AutoBase
         return ((Paths) paths).startPose;
     }
 
-    private void setPathState(Paths.PathState pathState)
-    {
-        setPathState((Object) pathState);
-    }
-
-    private Paths.PathState getPathState()
-    {
-        return (Paths.PathState) currentPathState;
-    }
-
     @Override
     protected void PathBasic()
     {
-        if (!follower.isBusy()) {
-            switch (getPathState()) {
+        if (!follower.isBusy())
+        {
+            switch (getPathState())
+            {
 
                 case ToShoot: // Going to shoot
                     Shoot();
@@ -104,6 +96,16 @@ public class BlueComp extends AutoBase
                     break;
             }
         }
+    }
+
+    private Paths.PathState getPathState()
+    {
+        return (Paths.PathState) currentPathState;
+    }
+
+    private void setPathState(Paths.PathState pathState)
+    {
+        setPathState((Object) pathState);
     }
 
     @Override
@@ -165,14 +167,6 @@ public class BlueComp extends AutoBase
         Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
                 bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, finalPose;
 
-        public enum PathState
-        {
-            ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
-            // Gate-specific states
-            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPos
-        }
-
-
         public Paths(Follower follower, AutoStrat autoStrat)
         {
             switch (autoStrat)
@@ -226,6 +220,11 @@ public class BlueComp extends AutoBase
                     .build();
         }
 
+        private void buildPathsGate(Follower follower)
+        {
+
+        }
+
         private void buildPathsReg(Follower follower)
         {
             // --- Pose definitions ---
@@ -263,8 +262,11 @@ public class BlueComp extends AutoBase
         }
 
 
-        private void buildPathsGate(Follower follower) {
-
+        public enum PathState
+        {
+            ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
+            // Gate-specific states
+            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPos
         }
     }
 }

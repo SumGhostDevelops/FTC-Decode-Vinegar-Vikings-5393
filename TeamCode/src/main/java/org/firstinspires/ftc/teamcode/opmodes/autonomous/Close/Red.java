@@ -648,8 +648,5 @@ public class Red extends AutoBase
 
                     .build();
         }
-
-        
-
     }
 }

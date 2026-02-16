@@ -72,12 +72,13 @@ public class Blue extends AutoBase
             {
                 case ToShoot:
                     //Shoots first, then drives to final pose
-
                     Shoot();
+
                     //at starting position, starts driving to position 2.
                     follower.followPath(paths.FinalPose, false);
                     setPathState(Paths.PathState.finalPose);
                     break;
+
                 case finalPose:
                     finishedAutonomous = true;
                     break;
@@ -116,7 +117,6 @@ public class Blue extends AutoBase
                     break;
 
                 case ToBallOneBack: // Drive to shooting position
-
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
@@ -671,7 +671,5 @@ public class Blue extends AutoBase
             // Gate-specific states
             Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, ToBallOneBack, FinalPose
         }
-
     }
-
 }

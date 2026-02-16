@@ -52,16 +52,6 @@ public class Blue extends AutoBase
         return ((Paths) paths).startPose;
     }
 
-    private void setPathState(Paths.PathState pathState)
-    {
-        setPathState((Object) pathState);
-    }
-
-    private Paths.PathState getPathState()
-    {
-        return (Paths.PathState) currentPathState;
-    }
-
     @Override
     protected void PathBasic()
     {
@@ -83,6 +73,16 @@ public class Blue extends AutoBase
                     break;
             }
         }
+    }
+
+    private Paths.PathState getPathState()
+    {
+        return (Paths.PathState) currentPathState;
+    }
+
+    private void setPathState(Paths.PathState pathState)
+    {
+        setPathState((Object) pathState);
     }
 
     @Override

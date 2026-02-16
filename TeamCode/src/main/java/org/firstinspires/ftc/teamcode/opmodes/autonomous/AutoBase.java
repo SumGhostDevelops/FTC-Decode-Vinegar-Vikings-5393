@@ -46,7 +46,7 @@ public abstract class AutoBase extends LinearOpMode
     }
 
     // Common autonomous state - shared by all subclasses
-    protected Timer timer;
+    protected Timer pathStateTimer;
     protected Timer opModeTimer;
     protected AutoStrat autoStrat = AutoStrat.REGULAR;
     protected Object currentPathState;
@@ -155,9 +155,9 @@ public abstract class AutoBase extends LinearOpMode
     protected void setPathState(Object pathState)
     {
         currentPathState = pathState;
-        if (timer != null)
+        if (pathStateTimer != null)
         {
-            timer.resetTimer();
+            pathStateTimer.resetTimer();
         }
     }
 
@@ -240,7 +240,7 @@ public abstract class AutoBase extends LinearOpMode
     protected void initAuto(Object paths)
     {
         // Initialize Timers
-        timer = new Timer();
+        pathStateTimer = new Timer();
         opModeTimer = new Timer();
         opModeTimer.resetTimer();
 
@@ -282,11 +282,11 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void displayTelemetry()
     {
-        if (timer == null || opModeTimer == null || follower == null)
+        if (pathStateTimer == null || opModeTimer == null || follower == null)
             return;
 
         telemetry.addData("Current State", currentPathState);
-        telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
+        telemetry.addData("State Time (s)", pathStateTimer.getElapsedTimeSeconds());
         telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
         telemetry.addData("Heading", follower.getHeading());
         telemetry.addLine("-----");
