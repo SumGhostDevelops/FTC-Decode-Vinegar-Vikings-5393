@@ -482,8 +482,8 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void startOuttake()
     {
+        updateOuttakeRPM();
         subsystems.outtake.on();
-        subsystems.outtake.setTargetRPM(getPose2d().distanceTo(getGoal()));
     }
 
     /**
