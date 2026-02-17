@@ -336,7 +336,7 @@ public abstract class AutoBase extends LinearOpMode
         assert transferExists() : "Transfer is null";
         assert turretExists() : "Turret is null";
         assert outtakeExists() : "Outtake is null";
-        assert !odometryExists() : "Odometry is not null";
+        assert !odometryDoesNotExist() : "Odometry is not null";
 
         telemetry.addData("Status", "Initialized for " + team);
         telemetry.update();
@@ -733,8 +733,8 @@ public abstract class AutoBase extends LinearOpMode
         return hw.outtake != null && subsystems.outtake != null;
     }
 
-    private boolean odometryExists()
+    private boolean odometryDoesNotExist()
     {
-        return hw.pinpoint != null && subsystems.odometry != null;
+        return hw.pinpoint == null && subsystems.odometry == null;
     }
 }
