@@ -114,7 +114,7 @@ public class Pose2d
      * Useful for determining the position of components (turrets, cameras, intakes)
      * mounted at a fixed offset from the robot center.
      *
-     * @param offset The forward (positive) or backward (negative) and left (positive) or right (negative) distances from the center.
+     * @param offset The forward (positive) or backward (negative) X and left (positive) or right (negative) Y distances from the center.
      * @return A new Pose2d representing the translated point.
      */
     public Pose2d transform(Vector2d offset)
