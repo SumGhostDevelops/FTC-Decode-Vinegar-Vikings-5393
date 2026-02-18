@@ -16,6 +16,16 @@ public class Vector2d
     public final DistanceUnit distUnit;
     public final AngleUnit angUnit;
 
+    public Vector2d(double xInches, double yInches)
+    {
+        this(new Distance(xInches, DistanceUnit.INCH), new Distance(yInches, DistanceUnit.INCH));
+    }
+
+    public Vector2d(Distance x, Distance y)
+    {
+        this(x, y, CoordinateSystem.GENERIC);
+    }
+
     public Vector2d(Distance x, Distance y, CoordinateSystem coordSys)
     {
         this(x, y, coordSys, AngleUnit.DEGREES);
