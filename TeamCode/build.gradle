@@ -56,8 +56,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     // SolversLib: Latest Stable Version
-    implementation "org.solverslib:core:0.3.4-beta1" // core
-    implementation "org.solverslib:pedroPathing:0.3.3" // pedroPathing
+    implementation "org.solverslib:core:0.3.4" // core
+    implementation "org.solverslib:pedroPathing:0.3.4" // pedroPathing
 
     // Pedro Pathing
     implementation 'com.pedropathing:ftc:2.0.5'
