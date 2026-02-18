@@ -76,7 +76,6 @@ public abstract class Base extends CommandOpMode
     @Override
     public void initialize()
     {
-        RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT = true;
         loopStopwatch = new Timing.Stopwatch(TimeUnit.MILLISECONDS);
         loopStopwatch.start();
 
