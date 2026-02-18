@@ -330,10 +330,27 @@ public class RobotHardware
 
         public Builder withOdometry()
         {
-            // Pinpoint
+            final String pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
+            final Distance forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
+            final Distance strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
+
             try
             {
-                pinpoint = hardwareMap.get(Pinpoint.class, RobotConstants.Odometry.Pinpoint.NAME);
+                pinpoint = hardwareMap.get(Pinpoint.class, pinpointName);
+
+                DistanceUnit dUnit = forwardWheelOffset.unit;
+                pinpoint.setOffsets(forwardWheelOffset.magnitude, strafeWheelOffset.toUnit(dUnit).magnitude, dUnit);
+                pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+                pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.REVERSED);
+
+                if (RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT)
+                {
+                    pinpoint.resetPosAndIMU();
+                }
+                else
+                {
+                    pinpoint.recalibrateIMU();
+                }
             }
             catch (Exception e)
             {

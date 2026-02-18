@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.localization.Hardpoints;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
+import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.dashboard.Graph;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
@@ -76,7 +77,6 @@ public abstract class Base extends CommandOpMode
     @Override
     public void initialize()
     {
-        RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT = true;
         loopStopwatch = new Timing.Stopwatch(TimeUnit.MILLISECONDS);
         loopStopwatch.start();
 
@@ -122,8 +122,7 @@ public abstract class Base extends CommandOpMode
         do
         {
             // Continually attempt to load/configure/calibrate Pinpoint until ready
-            boolean pinpointReady = robot.hw.loadPinpoint(hardwareMap, telemetry);
-
+            //boolean pinpointReady = robot.hw.loadPinpoint(hardwareMap, telemetry);
             s.odometry.periodic();
 
             telemetry.addData("Status", "Initialized for " + team);
@@ -131,7 +130,6 @@ public abstract class Base extends CommandOpMode
             telemetry.addLine(savedPose != null ? "Loaded Autonomous Pose" : "No Autonomous Pose Loaded");
             telemetry.addData("Reference Pose Set", robot.subsystems.odometry.referencePoseWasSet());
             telemetry.addData("Pinpoint Status", robot.hw.pinpoint != null ? robot.hw.pinpoint.getDeviceStatus() : "NULL");
-            telemetry.addData("Pinpoint Ready", pinpointReady ? "YES" : "Waiting...");
             telemetry.update();
         } while (!isStarted() && opModeInInit());
     }
