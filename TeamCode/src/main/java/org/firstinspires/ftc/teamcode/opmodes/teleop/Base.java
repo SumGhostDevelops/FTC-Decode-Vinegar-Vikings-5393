@@ -381,7 +381,7 @@ public abstract class Base extends CommandOpMode
         // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
         active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
                 s.outtake,
-                () -> s.odometry.getPose().distanceTo(getGoal())));
+                () -> s.odometry.getPose().transform(RobotConstants.Outtake.OFFSET_FROM_CENTER, Distance.ZERO).distanceTo(getGoal())));
     }
 
     private void bindIntakeAndTransferLogic(Trigger active, GamepadEx driver, GamepadEx coDriver, Subsystems s)

@@ -106,6 +106,8 @@ public class RobotConstants
 
         public static boolean USE_LUT = false;
 
+        public static Distance OFFSET_FROM_CENTER = new Distance(-2.5, DistanceUnit.INCH);
+
         @IgnoreConfigurable
         public static class Name
         {
@@ -177,7 +179,7 @@ public class RobotConstants
         public static Angle SAFETY_MARGIN = new Angle(10, AngleUnit.DEGREES);
 
         // right hand rule: forward = x, strafe = y
-        public static Vector2d OFFSET_FROM_CENTER = new Vector2d(-5, 0);
+        public static Distance OFFSET_FROM_CENTER = new Distance(-5, DistanceUnit.INCH);
     }
 
     @Configurable

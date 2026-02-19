@@ -174,7 +174,7 @@ public class Turret extends SubsystemBase
             return;
         }
 
-        Pose2d turretPose = robotPose.transform(RobotConstants.Turret.OFFSET_FROM_CENTER);
+        Pose2d turretPose = robotPose.transform(RobotConstants.Turret.OFFSET_FROM_CENTER, Distance.ZERO);
 
         // Calculate distance to target
         double distance = turretPose.coord.distanceTo(target).getInch();
@@ -202,7 +202,7 @@ public class Turret extends SubsystemBase
      */
     public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose)
     {
-        Pose2d turretPose = robotPose.transform(RobotConstants.Turret.OFFSET_FROM_CENTER);
+        Pose2d turretPose = robotPose.transform(RobotConstants.Turret.OFFSET_FROM_CENTER, Distance.ZERO);
 
         aimRelative(turretPose.bearingTo(target));
     }

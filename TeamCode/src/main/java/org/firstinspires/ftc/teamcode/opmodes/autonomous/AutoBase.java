@@ -240,7 +240,7 @@ public abstract class AutoBase extends LinearOpMode
     {
         if (robot == null)
             return;
-        Pose2d pose = getPose2d();
+        Pose2d pose = getPose2d().transform(RobotConstants.Outtake.OFFSET_FROM_CENTER, Distance.ZERO);
         Distance distToGoal = pose.distanceTo(getGoal());
         robot.subsystems.outtake.setTargetRPM(distToGoal);
     }
