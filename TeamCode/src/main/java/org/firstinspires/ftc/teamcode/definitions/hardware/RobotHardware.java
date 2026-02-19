@@ -172,7 +172,7 @@ public class RobotHardware
         private PowerMotor frontLeft, frontRight, backLeft, backRight;
         private VelocityMotorGroup outtake;
         private PositionMotor turret;
-        private PowerMotor intake;
+        private VelocityMotor intake;
         private ServoEx transfer;
         private Pinpoint pinpoint;
         private WebcamName webcam;
@@ -302,10 +302,12 @@ public class RobotHardware
         {
             try
             {
-                intake = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
+                intake = new VelocityMotor(new MotorEx(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
                         .setVoltageCompensation(12)
                         .setMotorDirection(Motor.Direction.REVERSE)
-                        .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+                        .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
+                        .setControllerType(VelocityMotor.VelocityController.PIDF)
+                        .setPIDF(RobotConstants.Intake.PIDF);
             }
             catch (Exception e)
             {

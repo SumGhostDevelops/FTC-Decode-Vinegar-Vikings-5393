@@ -93,10 +93,10 @@ public class Blue extends AutoBase
             switch (getPathState())
             {
                 case ToShoot: // Going to shoot
-                    // //  When in a state, start the NEXT path.
                     // before following next path, it shoots.
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToShootFar);
+                    break;
 
                 case ToShootFar:
                     Shoot();

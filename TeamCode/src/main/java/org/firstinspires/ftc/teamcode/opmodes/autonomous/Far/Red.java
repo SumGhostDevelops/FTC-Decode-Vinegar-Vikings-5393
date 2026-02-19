@@ -99,6 +99,7 @@ public class Red extends AutoBase
                     // before following next path, it shoots.
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToShootFar);
+                    break;
 
                 case ToShootFar:
                     Shoot();

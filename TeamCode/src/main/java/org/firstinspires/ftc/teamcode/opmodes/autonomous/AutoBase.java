@@ -318,7 +318,6 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void initRobot()
     {
-        robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
         hw = new RobotHardware.Builder(hardwareMap, telemetry)
                 .withIntake()
                 .withTransfer()
@@ -333,11 +332,35 @@ public abstract class AutoBase extends LinearOpMode
                 .withOuttake()
                 .build();
 
-        assert intakeExists() : "Intake is null";
-        assert transferExists() : "Transfer is null";
-        assert turretExists() : "Turret is null";
-        assert outtakeExists() : "Outtake is null";
-        assert !odometryDoesNotExist() : "Odometry is not null";
+        if (!intakeExists())
+        {
+            telemetry.log().add("ERROR: Intake failed to initialize");
+            requestOpModeStop();
+            return;
+        }
+        if (!transferExists())
+        {
+            telemetry.log().add("ERROR: Transfer failed to initialize");
+            requestOpModeStop();
+            return;
+        }
+        if (!turretExists())
+        {
+            telemetry.log().add("ERROR: Turret failed to initialize");
+            requestOpModeStop();
+            return;
+        }
+        if (!outtakeExists())
+        {
+            telemetry.log().add("ERROR: Outtake failed to initialize");
+            requestOpModeStop();
+            return;
+        }
+        // Odometry is intentionally NOT built in AutoBase — Pedro handles localization
+        if (!odometryDoesNotExist())
+        {
+            telemetry.log().add("WARNING: Odometry unexpectedly initialized in Auto");
+        }
 
         telemetry.addData("Status", "Initialized for " + team);
         telemetry.update();
@@ -394,7 +417,7 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void updateSubsystems()
     {
-        if (hw == null)
+        if (hw == null || subsystems == null)
             return;
 
         // Clear bulk cache to get fresh sensor readings (required for MANUAL caching mode)
@@ -404,8 +427,10 @@ public abstract class AutoBase extends LinearOpMode
         updateOuttakeRPM(); // update the outtake rpm constantly
 
         // --- PIDF Updates ---
-        subsystems.turret.periodic();
-        subsystems.outtake.periodic();
+        if (subsystems.turret != null)
+            subsystems.turret.periodic();
+        if (subsystems.outtake != null)
+            subsystems.outtake.periodic();
     }
 
     /**

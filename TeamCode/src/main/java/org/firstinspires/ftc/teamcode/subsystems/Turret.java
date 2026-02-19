@@ -62,11 +62,6 @@ public class Turret extends SubsystemBase
         return this.state;
     }
 
-    public void setState(State state)
-    {
-        this.state = state;
-    }
-
     /**
      * Sets the angular velocity supplier for rotation compensation.
      * Configures the motor's feedforward to counteract robot rotation.

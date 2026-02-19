@@ -67,15 +67,8 @@ public class Red extends AutoBase
         {
             switch (getPathState())
             {
-
-                case ToShoot: // Going to shoot
+                case ToShoot: // Shoot, then drive to final pose
                     Shoot();
-                    follower.followPath(paths.ToShoot);
-                    setPathState(Paths.PathState.ToBallOne);
-                    break;
-
-                    Shoot();
-                    //at starting position, starts driving to position 2.
                     follower.followPath(paths.finalPose, false);
                     setPathState(Paths.PathState.finalPose);
                     break;
@@ -206,10 +199,7 @@ public class Red extends AutoBase
 
         public PathChain ToShoot,
                 ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack, ToThree,
-                ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
-        // Gate-specific paths used in buildPathsGate
-        Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
-                bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, finalPose;
+                ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, finalPose;
 
         public Paths(Follower follower, AutoStrat autoStrat)
         {
@@ -248,11 +238,6 @@ public class Red extends AutoBase
                     .setConstantHeadingInterpolation(Math.toRadians(142))
 
                     .build();
-        }
-
-        private void buildPathsGate(Follower follower)
-        {
-
         }
 
         private void buildPathsReg(Follower follower)
@@ -337,9 +322,8 @@ public class Red extends AutoBase
 
         public enum PathState
         {
-            ToShoot, ToBallOne, ToBallOneFull, ToBallTwo, ToBallTwoFull, Gate1, Gate2, ToEatGate, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
-            // Gate-specific states
-            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose, FinalPos
+            ToShoot, ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack,
+            ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, finalPose
         }
     }
 }

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -25,7 +24,6 @@ import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.definitions.localization.Hardpoints;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.odometry.Odometry;
-import org.firstinspires.ftc.teamcode.subsystems.odometry.modules.Pinpoint;
 import org.firstinspires.ftc.teamcode.util.dashboard.FieldDrawing;
 import org.firstinspires.ftc.teamcode.util.dashboard.Graph;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
@@ -90,12 +88,18 @@ public abstract class Base extends CommandOpMode
 
         Pose2d savedPose = getSavedAutonomousPose(RobotConstants.Autonomous.AUTONOMOUS_POSE_TIMEOUT);
 
-        if (savedPose != null)
+        if (savedPose != null && s.odometry != null)
         {
             s.odometry.setReferencePose(savedPose);
         }
 
-        register(s.drive, s.intake, s.transfer, s.turret, s.outtake, s.odometry);
+        // Register only non-null subsystems to prevent CommandScheduler NPE
+        if (s.drive != null)    register(s.drive);
+        if (s.intake != null)   register(s.intake);
+        if (s.transfer != null) register(s.transfer);
+        if (s.turret != null)   register(s.turret);
+        if (s.outtake != null)  register(s.outtake);
+        if (s.odometry != null) register(s.odometry);
 
         // 3. Set Defaults & Init Commands
         // s.transfer.setDefaultCommand(new TransferCommands.CloseOnce(s.transfer));
@@ -104,9 +108,12 @@ public abstract class Base extends CommandOpMode
         DoubleSupplier x = () -> gamepad1.left_stick_x;
         DoubleSupplier y = () -> -gamepad1.left_stick_y;
         DoubleSupplier rx = () -> gamepad1.right_stick_x;
-        Supplier<Angle> driverHeading = s.odometry::getDriverHeading;
 
-        s.drive.setDefaultCommand(new DriveCommands.Manuever(s.drive, x, y, rx, driverHeading));
+        if (s.drive != null && s.odometry != null)
+        {
+            Supplier<Angle> driverHeading = s.odometry::getDriverHeading;
+            s.drive.setDefaultCommand(new DriveCommands.Manuever(s.drive, x, y, rx, driverHeading));
+        }
 
         // 4. Bind Controls
         bindKeys();
@@ -122,13 +129,13 @@ public abstract class Base extends CommandOpMode
         do
         {
             // Continually attempt to load/configure/calibrate Pinpoint until ready
-            //boolean pinpointReady = robot.hw.loadPinpoint(hardwareMap, telemetry);
-            s.odometry.periodic();
+            if (s.odometry != null)
+                s.odometry.periodic();
 
             telemetry.addData("Status", "Initialized for " + team);
             telemetry.addLine("Initialized in " + timeToInit + "ms");
             telemetry.addLine(savedPose != null ? "Loaded Autonomous Pose" : "No Autonomous Pose Loaded");
-            telemetry.addData("Reference Pose Set", robot.subsystems.odometry.referencePoseWasSet());
+            telemetry.addData("Reference Pose Set", s.odometry != null ? s.odometry.referencePoseWasSet() : "N/A");
             telemetry.addData("Pinpoint Status", robot.hw.pinpoint != null ? robot.hw.pinpoint.getDeviceStatus() : "NULL");
             telemetry.update();
         } while (!isStarted() && opModeInInit());
@@ -159,14 +166,12 @@ public abstract class Base extends CommandOpMode
         // Cache the subsystem reference for this loop iteration
         Subsystems s = robot.subsystems;
 
-        // Pre-fetch pose once per loop to avoid re-calculating it for every telemetry
-        // line
-        Pose2d loopPose = s.odometry.getPose();
+        // Pre-fetch pose once per loop to avoid re-calculating it for every telemetry line
+        Pose2d loopPose = s.odometry != null ? s.odometry.getPose() : null;
 
         displayTelemetry(s, loopPose);
 
-        // Throttle dashboard updates to save bandwidth (~20Hz is plenty for
-        // visualization)
+        // Throttle dashboard updates to save bandwidth (~20Hz is plenty for visualization)
         if (dashboardTimer.milliseconds() > 50)
         {
             updateDashboard(s, loopPose);
@@ -198,30 +203,45 @@ public abstract class Base extends CommandOpMode
 
         // --- Testing Telemetry ---
         telemetry.addData("Team", team);
-        telemetry.addData("Dist. to Goal", pose.coord.distanceTo(team.goalFromClose.coord).toUnit(DistanceUnit.INCH));
 
-        telemetry.addLine("--- Odometry ---");
-        telemetry.addData("Coord (Pedro)", pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
-        telemetry.addData("Heading (Field)", s.odometry.getFieldHeading().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
-        telemetry.addData("IMU Yaw", s.odometry.getIMUYaw());
+        if (pose != null)
+        {
+            telemetry.addData("Dist. to Goal", pose.coord.distanceTo(team.goalFromClose.coord).toUnit(DistanceUnit.INCH));
+
+            telemetry.addLine("--- Odometry ---");
+            telemetry.addData("Coord (Pedro)", pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
+        }
+
+        if (s.odometry != null)
+        {
+            telemetry.addData("Heading (Field)", s.odometry.getFieldHeading().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
+            telemetry.addData("IMU Yaw", s.odometry.getIMUYaw());
+        }
 
         telemetry.addLine("--- Hardware ---");
-        telemetry.addData("Drive Speed", s.drive.getSpeed());
-        telemetry.addData("Intake RPM", s.intake.getRPM());
-        telemetry.addData("Outtake", s.outtake.toString());
-        telemetry.addData("Outtake Stable", s.outtake.isStable());
+        if (s.drive != null)    telemetry.addData("Drive Speed", s.drive.getSpeed());
+        if (s.intake != null)   telemetry.addData("Intake RPM", s.intake.getRPM());
+        if (s.outtake != null)
+        {
+            telemetry.addData("Outtake", s.outtake.toString());
+            telemetry.addData("Outtake Stable", s.outtake.isStable());
+        }
 
-        telemetry.addLine("--- Turret ---");
-        telemetry.addData("At Target", s.turret.isAtTarget());
-        telemetry.addData("Err/Tol", String.format("%.2f / %.2f", s.turret.bearingToTarget().getDegrees(), s.turret.getTolerance().getDegrees()));
-        telemetry.addData("Heading (Abs)", s.turret.getFieldHeading(s.odometry.getFieldHeading()).toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
+        if (s.turret != null)
+        {
+            telemetry.addLine("--- Turret ---");
+            telemetry.addData("At Target", s.turret.isAtTarget());
+            telemetry.addData("Err/Tol", String.format("%.2f / %.2f", s.turret.bearingToTarget().getDegrees(), s.turret.getTolerance().getDegrees()));
+            if (s.odometry != null)
+                telemetry.addData("Heading (Abs)", s.turret.getFieldHeading(s.odometry.getFieldHeading()).toUnnormalized().toUnit(UnnormalizedAngleUnit.DEGREES));
+        }
 
         telemetry.update();
     }
 
     private void updateDashboard(Subsystems s, Pose2d pose)
     {
-        if (enableFieldDrawing.getAsBoolean())
+        if (enableFieldDrawing.getAsBoolean() && pose != null && s.turret != null && s.odometry != null)
         {
             FieldDrawing.draw(
                     () -> pose,
@@ -233,26 +253,34 @@ public abstract class Base extends CommandOpMode
 
         if (enableGraphOutput.getAsBoolean())
         {
-            Graph.put("Outtake (Motor RPM)", s.outtake.getMotorRPM());
-            Graph.put("Outtake (Motor RPM^2", s.outtake.getMotorRPMAcceleration());
-            Graph.put("Outtake (Flywheel RPM)", s.outtake.getFlywheelRPM());
-            Graph.put("Outtake (Flywheel RPM^2", s.outtake.getFlywheelRPMAcceleration());
-            Graph.put("Outtake (Flywheel RPM Target)", robot.hw.outtake.getOutputTargetRPM());
-            Graph.put("Outtake (Motor Target RPM)", robot.hw.outtake.getMotorTargetRPM());
-            Graph.put("Outtake (Power)", robot.hw.outtake.getPower());
-            Graph.put("Outtake Ready", s.outtake.isStable() ? 1 : 0);
+            if (s.outtake != null && robot.hw.outtake != null)
+            {
+                Graph.put("Outtake (Motor RPM)", s.outtake.getMotorRPM());
+                Graph.put("Outtake (Motor RPM^2", s.outtake.getMotorRPMAcceleration());
+                Graph.put("Outtake (Flywheel RPM)", s.outtake.getFlywheelRPM());
+                Graph.put("Outtake (Flywheel RPM^2", s.outtake.getFlywheelRPMAcceleration());
+                Graph.put("Outtake (Flywheel RPM Target)", robot.hw.outtake.getOutputTargetRPM());
+                Graph.put("Outtake (Motor Target RPM)", robot.hw.outtake.getMotorTargetRPM());
+                Graph.put("Outtake (Power)", robot.hw.outtake.getPower());
+                Graph.put("Outtake Ready", s.outtake.isStable() ? 1 : 0);
+            }
 
-            Graph.put("Turret (Degrees)", s.turret.getRelativeUnnormalizedAngle().getDegrees());
-            Graph.put("Turret (Target Degrees)", s.turret.getTargetAngleDegrees());
-            Graph.put("Turret (Bearing Degrees)", s.turret.bearingToTarget().getDegrees());
-            Graph.put("Turret (Power)", robot.hw.turret.getPower());
+            if (s.turret != null && robot.hw.turret != null)
+            {
+                Graph.put("Turret (Degrees)", s.turret.getRelativeUnnormalizedAngle().getDegrees());
+                Graph.put("Turret (Target Degrees)", s.turret.getTargetAngleDegrees());
+                Graph.put("Turret (Bearing Degrees)", s.turret.bearingToTarget().getDegrees());
+                Graph.put("Turret (Power)", robot.hw.turret.getPower());
+            }
 
-            Graph.put("Intake (RPM)", s.intake.getRPM());
-            Graph.put("Intake (Power)", robot.hw.intake.getPower());
+            if (s.intake != null && robot.hw.intake != null)
+            {
+                Graph.put("Intake (RPM)", s.intake.getRPM());
+                Graph.put("Intake (Power)", robot.hw.intake.getPower());
+            }
 
-            Graph.put("Transfer (Position)", robot.hw.transfer.getRawPosition());
-
-            Graph.put("Battery (Voltage)", robot.hw.battery.getVoltage());
+            if (robot.hw.transfer != null) Graph.put("Transfer (Position)", robot.hw.transfer.getRawPosition());
+            if (robot.hw.battery != null)  Graph.put("Battery (Voltage)", robot.hw.battery.getVoltage());
 
             Graph.update();
         }
@@ -261,7 +289,8 @@ public abstract class Base extends CommandOpMode
     @Override
     public void end()
     {
-        robot.subsystems.odometry.close();
+        if (robot.subsystems.odometry != null)
+            robot.subsystems.odometry.close();
     }
 
     public void bindKeys()
@@ -280,7 +309,7 @@ public abstract class Base extends CommandOpMode
         bindCoDriverControls(coDriver, s);
 
         // Bind corner localization
-        if (RobotConstants.Odometry.ENABLE_CORNER_LOCALIZATION)
+        if (RobotConstants.Odometry.ENABLE_CORNER_LOCALIZATION && s.odometry != null)
         {
             GamepadButton driverB = driver.getGamepadButton(GamepadKeys.Button.B);
             GamepadButton driverA = driver.getGamepadButton(GamepadKeys.Button.A);
@@ -304,10 +333,13 @@ public abstract class Base extends CommandOpMode
                 .whenPressed(new DriveCommands.DecreaseSpeed(s.drive));
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new DriveCommands.IncreaseSpeed(s.drive));
-        driver.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(s.odometry));
-        driver.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new OdometryCommands.LocalizeWithDebugTelemetry(s.odometry, telemetry));
+        if (s.odometry != null)
+        {
+            driver.getGamepadButton(GamepadKeys.Button.B)
+                    .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(s.odometry));
+            driver.getGamepadButton(GamepadKeys.Button.X)
+                    .whenPressed(new OdometryCommands.LocalizeWithDebugTelemetry(s.odometry, telemetry));
+        }
     }
 
     // Turret manual aiming state
@@ -315,6 +347,8 @@ public abstract class Base extends CommandOpMode
 
     private void bindTurretControls(Trigger opModeActive, GamepadEx driver, Subsystems s)
     {
+        if (s.turret == null || s.odometry == null) return;
+
         Supplier<Pose2d> turretPose = s.odometry::getPose;
         Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, this::getGoal, turretPose);
         Command off = new InstantCommand(() -> s.turret.setState(Turret.State.OFF));
@@ -371,20 +405,27 @@ public abstract class Base extends CommandOpMode
 
     private void bindOuttakeControls(Trigger active, GamepadEx driver, Subsystems s)
     {
+        if (s.outtake == null) return;
+
         if (regressionTestingMode.getAsBoolean())
         {
             driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, 5));
             driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new OuttakeCommands.ChangeTargetRPM(s.outtake, -5));
         }
 
-        // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
-        active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
-                s.outtake,
-                () -> s.odometry.getPose().transform(RobotConstants.Outtake.OFFSET_FROM_CENTER, Distance.ZERO).distanceTo(getGoal())));
+        if (s.odometry != null)
+        {
+            // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
+            active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
+                    s.outtake,
+                    () -> s.odometry.getPose().transform(RobotConstants.Outtake.OFFSET_FROM_CENTER, Distance.ZERO).distanceTo(getGoal())));
+        }
     }
 
     private void bindIntakeAndTransferLogic(Trigger active, GamepadEx driver, GamepadEx coDriver, Subsystems s)
     {
+        if (s.intake == null || s.transfer == null || s.outtake == null || s.turret == null) return;
+
         // --- Triggers ---
         Trigger intakeBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1);
         Trigger shootBtn = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1);
@@ -453,6 +494,9 @@ public abstract class Base extends CommandOpMode
     {
         Odometry odometry = robot.subsystems.odometry;
 
+        if (odometry == null)
+            return robot.team.goalFromFar.coord;
+
         if (odometry.getFieldCoord().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).y.getInch() > 48)
         {
             return robot.team.goalFromClose.coord;
@@ -466,6 +510,9 @@ public abstract class Base extends CommandOpMode
     private double getIntakeTransferPower()
     {
         Odometry odometry = robot.subsystems.odometry;
+
+        if (odometry == null)
+            return minimumTransferPower.getAsDouble();
 
         if (odometry.getFieldCoord().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).y.getInch() > 48)
         {
