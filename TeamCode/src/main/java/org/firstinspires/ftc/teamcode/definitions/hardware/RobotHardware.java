@@ -34,7 +34,7 @@ public class RobotHardware
     public Pinpoint pinpoint;
     public WebcamName webcam;
     public PowerMotor frontLeft, frontRight, backLeft, backRight;
-    public PowerMotor intake;
+    public VelocityMotor intake;
     public VelocityMotorGroup outtake;
     public PositionMotor turret;
     public ServoEx transfer;

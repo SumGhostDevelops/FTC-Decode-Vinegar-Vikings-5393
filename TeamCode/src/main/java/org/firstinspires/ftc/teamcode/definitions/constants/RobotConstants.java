@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 
 public class RobotConstants
 {
@@ -105,6 +106,8 @@ public class RobotConstants
 
         public static boolean USE_LUT = false;
 
+        public static Distance OFFSET_FROM_CENTER = new Distance(-4.5, DistanceUnit.INCH);
+
         @IgnoreConfigurable
         public static class Name
         {
@@ -174,6 +177,9 @@ public class RobotConstants
 
         @Sorter(sort = 13)
         public static Angle SAFETY_MARGIN = new Angle(10, AngleUnit.DEGREES);
+
+        // right hand rule: forward = x, strafe = y
+        public static Distance OFFSET_FROM_CENTER = new Distance(-4.5, DistanceUnit.INCH);
     }
 
     @Configurable

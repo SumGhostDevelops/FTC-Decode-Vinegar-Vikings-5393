@@ -7,8 +7,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 
-public class Pose2d {
+public class Pose2d
+{
     public final FieldCoordinate coord;
     public final FieldHeading heading;
 
@@ -18,17 +20,20 @@ public class Pose2d {
      * @param heading the orientation angle of the pose
      * @see FieldCoordinate#FieldCoordinate(Distance, Distance)
      */
-    public Pose2d(Distance x, Distance y, Angle heading, CoordinateSystem coordinateSystem) {
+    public Pose2d(Distance x, Distance y, Angle heading, CoordinateSystem coordinateSystem)
+    {
         this.coord = new FieldCoordinate(x, y, coordinateSystem);
         this.heading = new FieldHeading(heading, coordinateSystem);
     }
 
-    public Pose2d(FieldCoordinate coord, FieldHeading heading) {
+    public Pose2d(FieldCoordinate coord, FieldHeading heading)
+    {
         this.coord = coord;
         this.heading = heading.toCoordinateSystem(coord.coordSys);
     }
 
-    public static Pose2d fromPose2D(Pose2D pose, CoordinateSystem coordSys) {
+    public static Pose2d fromPose2D(Pose2D pose, CoordinateSystem coordSys)
+    {
         FieldCoordinate coord = new FieldCoordinate(
                 new Distance(pose.getX(DistanceUnit.INCH), DistanceUnit.INCH),
                 new Distance(pose.getY(DistanceUnit.INCH), DistanceUnit.INCH),
@@ -42,7 +47,8 @@ public class Pose2d {
     /**
      * Converts a {@link Pose3D} into a more useful {@link Pose2d}
      */
-    public static Pose2d fromPose3D(Pose3D pose, CoordinateSystem coordSys) {
+    public static Pose2d fromPose3D(Pose3D pose, CoordinateSystem coordSys)
+    {
         FieldCoordinate coord = new FieldCoordinate(
                 new Distance(pose.getPosition().x, pose.getPosition().unit),
                 new Distance(pose.getPosition().y, pose.getPosition().unit),
@@ -59,7 +65,8 @@ public class Pose2d {
      * @param pose The robotPose from AprilTagDetection
      * @return A Pose2d
      */
-    public static Pose2d fromAprilTagRobotPose(Pose3D pose) {
+    public static Pose2d fromAprilTagRobotPose(Pose3D pose)
+    {
         FieldCoordinate coord = new FieldCoordinate(
                 new Distance(pose.getPosition().x, pose.getPosition().unit),
                 new Distance(pose.getPosition().y, pose.getPosition().unit),
@@ -69,16 +76,20 @@ public class Pose2d {
                 new FieldHeading((pose.getOrientation().getYaw(AngleUnit.DEGREES)), AngleUnit.DEGREES, CoordinateSystem.DECODE_PEDROPATH));
     }
 
-    public Pose2d toDistanceUnit(DistanceUnit distanceUnit) {
-        if (coord.isDistanceUnit(distanceUnit)) {
+    public Pose2d toDistanceUnit(DistanceUnit distanceUnit)
+    {
+        if (coord.isDistanceUnit(distanceUnit))
+        {
             return this;
         }
 
         return new Pose2d(coord.toDistanceUnit(distanceUnit), heading);
     }
 
-    public Pose2d toCoordinateSystem(CoordinateSystem coordSys) {
-        if (coord.isCoordinateSystem(coordSys)) {
+    public Pose2d toCoordinateSystem(CoordinateSystem coordSys)
+    {
+        if (coord.isCoordinateSystem(coordSys))
+        {
             return this;
         }
 
@@ -88,8 +99,10 @@ public class Pose2d {
                 heading.toCoordinateSystem(coordSys));
     }
 
-    public Pose2d toAngleUnit(AngleUnit angleUnit) {
-        if (heading.angle.isUnit(angleUnit)) {
+    public Pose2d toAngleUnit(AngleUnit angleUnit)
+    {
+        if (heading.angle.isUnit(angleUnit))
+        {
             return this;
         }
 
@@ -97,11 +110,60 @@ public class Pose2d {
     }
 
     /**
+     * Creates a new Pose2d shifted by the given local coordinates relative to this pose.
+     * Useful for determining the position of components (turrets, cameras, intakes)
+     * mounted at a fixed offset from the robot center.
+     *
+     * @param offset The forward (positive) or backward (negative) X and left (positive) or right (negative) Y distances from the center.
+     * @return A new Pose2d representing the translated point.
+     */
+    public Pose2d transform(Vector2d offset)
+    {
+        return transform(offset.x, offset.y);
+    }
+
+    /**
+     * Creates a new Pose2d shifted by the given local coordinates relative to this pose.
+     * Useful for determining the position of components (turrets, cameras, intakes)
+     * mounted at a fixed offset from the robot center.
+     *
+     * @param forwardOffset The distance forward (positive) or backward (negative) from the center.
+     * @param strafeOffset  The distance left (positive) or right (negative) from the center.
+     * @return A new Pose2d representing the translated point.
+     */
+    public Pose2d transform(Distance forwardOffset, Distance strafeOffset)
+    {
+        double xLocal = forwardOffset.getInch();
+        double yLocal = strafeOffset.getInch();
+
+        double theta = this.heading.angle.getRadians();
+
+        // Apply Rotation Matrix to convert Local(Robot) -> Global(Field)
+        // dx_global = x_local * cos(theta) - y_local * sin(theta)
+        // dy_global = x_local * sin(theta) + y_local * cos(theta)
+        double dxField = xLocal * Math.cos(theta) - yLocal * Math.sin(theta);
+        double dyField = xLocal * Math.sin(theta) + yLocal * Math.cos(theta);
+
+        // Add global deltas to current global coordinates
+        double newX = this.coord.x.getDistance(DistanceUnit.INCH) + dxField;
+        double newY = this.coord.y.getDistance(DistanceUnit.INCH) + dyField;
+
+        FieldCoordinate newCoord = new FieldCoordinate(
+                new Distance(newX, DistanceUnit.INCH),
+                new Distance(newY, DistanceUnit.INCH),
+                this.coord.coordSys
+        );
+
+        return new Pose2d(newCoord, this.heading);
+    }
+
+    /**
      * @param otherPose
      * @return The straight line {@link Distance} to another {@link Pose2d}'s
-     *         {@link Pose2d#coord}
+     * {@link Pose2d#coord}
      */
-    public Distance distanceTo(Pose2d otherPose) {
+    public Distance distanceTo(Pose2d otherPose)
+    {
         return distanceTo(otherPose.coord);
     }
 
@@ -109,17 +171,19 @@ public class Pose2d {
      * @param coord The target field coordinate to calculate distance to
      * @return The straight line {@link Distance} to another {@link FieldCoordinate}
      */
-    public Distance distanceTo(FieldCoordinate coord) {
+    public Distance distanceTo(FieldCoordinate coord)
+    {
         return this.coord.distanceTo(coord);
     }
 
     /**
      * @param otherPose
      * @return The {@link Angle} to another {@link Pose2d}'s {@link Pose2d#coord},
-     *         taking into account this {@link Pose2d}'s {@link Pose2d#heading}; the
-     *         relative {@link Angle}
+     * taking into account this {@link Pose2d}'s {@link Pose2d#heading}; the
+     * relative {@link Angle}
      */
-    public Angle bearingTo(Pose2d otherPose) {
+    public Angle bearingTo(Pose2d otherPose)
+    {
         return bearingTo(otherPose.coord);
     }
 
@@ -127,34 +191,38 @@ public class Pose2d {
      * @param otherCoord The target {@link FieldCoordinate} to calculate the
      *                   relative bearing to
      * @return The {@link Angle} to another {@link FieldCoordinate}, taking into
-     *         account this {@link Pose2d}'s {@link Pose2d#heading}; the relative
-     *         {@link Angle}
+     * account this {@link Pose2d}'s {@link Pose2d#heading}; the relative
+     * {@link Angle}
      */
-    public Angle bearingTo(FieldCoordinate otherCoord) {
+    public Angle bearingTo(FieldCoordinate otherCoord)
+    {
         return angleTo(otherCoord).minus(this.heading.angle);
+    }
+
+    /**
+     * @param otherCoord
+     * @return The {@link Angle} to another {@link FieldCoordinate} from this
+     * {@link Pose2d}'s {@link Pose2d#coord}; the absolute {@link Angle}
+     */
+    public Angle angleTo(FieldCoordinate otherCoord)
+    {
+        return this.coord.angleTo(otherCoord);
     }
 
     /**
      * @param otherPose The target {@link Pose2d} whose {@link Pose2d#coord} is used
      *                  to compute the absolute {@link Angle}
      * @return The {@link Angle} to another {@link Pose2d}'s {@link Pose2d#coord}
-     *         from this {@link Pose2d}'s {@link Pose2d#coord}; the absolute
-     *         {@link Angle}
+     * from this {@link Pose2d}'s {@link Pose2d#coord}; the absolute
+     * {@link Angle}
      */
-    public Angle angleTo(Pose2d otherPose) {
+    public Angle angleTo(Pose2d otherPose)
+    {
         return angleTo(otherPose.coord);
     }
 
-    /**
-     * @param otherCoord
-     * @return The {@link Angle} to another {@link FieldCoordinate} from this
-     *         {@link Pose2d}'s {@link Pose2d#coord}; the absolute {@link Angle}
-     */
-    public Angle angleTo(FieldCoordinate otherCoord) {
-        return this.coord.angleTo(otherCoord);
-    }
-
-    public Pose2D toPose2D() {
+    public Pose2D toPose2D()
+    {
         double headingRad = this.heading.angle.getRadians();
         Coordinate univCoord = this.coord.coordSys.toUniversal(this.coord.x, this.coord.y);
         double xMeter = univCoord.x.getDistance(DistanceUnit.METER);
@@ -164,7 +232,8 @@ public class Pose2d {
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return coord.toString() + "; " + heading.toString();
     }
 }

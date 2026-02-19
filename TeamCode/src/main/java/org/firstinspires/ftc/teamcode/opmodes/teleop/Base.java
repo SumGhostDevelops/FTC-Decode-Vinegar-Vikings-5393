@@ -380,7 +380,7 @@ public abstract class Base extends CommandOpMode
         // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
         active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
                 s.outtake,
-                () -> s.odometry.getPose().distanceTo(getGoal())));
+                () -> s.odometry.getPose().transform(RobotConstants.Outtake.OFFSET_FROM_CENTER, Distance.ZERO).distanceTo(getGoal())));
     }
 
     private void bindIntakeAndTransferLogic(Trigger active, GamepadEx driver, GamepadEx coDriver, Subsystems s)
@@ -394,7 +394,7 @@ public abstract class Base extends CommandOpMode
 
         // --- Commands ---
         Command intakeIn = new IntakeCommands.In(s.intake, intakePower.getAsDouble());
-        Command intakeScore = new IntakeCommands.In(s.intake, this::getIntakeTransferPower);
+        Command intakeScore = new IntakeCommands.Transfer(s.intake, this::getIntakeTransferPower);
         Command reverseIntake = new IntakeCommands.Reverse(s.intake, outtakePower.getAsDouble());
         //Command closeTransfer = new TransferCommands.CloseOnce(s.transfer);
         Command openTransfer = new TransferCommands.Open(s.transfer);

@@ -318,6 +318,7 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void initRobot()
     {
+        robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
         hw = new RobotHardware.Builder(hardwareMap, telemetry)
                 .withIntake()
                 .withTransfer()

@@ -19,8 +19,6 @@ public class Turret extends SubsystemBase
 {
     private final PositionMotor motor;
     private final Angle initialRelativeAngle;
-    private State state = State.OFF;
-
     private final double gearRatio = RobotConstants.Turret.GEAR_RATIO;
     private final Angle forwardAngle = RobotConstants.Turret.FORWARD_ANGLE;
     private final Angle aimCalibrationOffset = RobotConstants.Turret.AIM_CALIBRATION_OFFSET;
@@ -30,7 +28,7 @@ public class Turret extends SubsystemBase
     private final double rotationCompensationFF = RobotConstants.Turret.ROTATION_COMPENSATION_FF;
     private final UnnormalizedAngle[] turnLimits = RobotConstants.Turret.TURN_LIMITS;
     private final Angle safetyMargin = RobotConstants.Turret.SAFETY_MARGIN;
-
+    private State state = State.OFF;
     private double targetAngleDegrees;
 
     // Add a variable to track the active tolerance, defaulting to the local
@@ -39,8 +37,6 @@ public class Turret extends SubsystemBase
 
     // Supplier for robot angular velocity (deg/s) for feedforward compensation
     private DoubleSupplier angularVelocitySupplier = () -> 0.0;
-
-    public enum State { ON, OFF, CENTERED }
 
     public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {
@@ -66,12 +62,16 @@ public class Turret extends SubsystemBase
         return this.state;
     }
 
+    public void setState(State state)
+    {
+        this.state = state;
+    }
+
     /**
      * Sets the angular velocity supplier for rotation compensation.
      * Configures the motor's feedforward to counteract robot rotation.
-     * 
-     * @param supplier
-     *            A supplier that returns robot angular velocity in deg/s
+     *
+     * @param supplier A supplier that returns robot angular velocity in deg/s
      */
     public void setAngularVelocitySupplier(DoubleSupplier supplier)
     {
@@ -169,17 +169,14 @@ public class Turret extends SubsystemBase
      * box" size.
      * * @param target The target position on the field
      *
-     * @param robotPose
-     *            The robot's current pose
-     * @param linearToleranceRadius
-     *            The allowable error radius at the target (e.g.,
-     *            3 inches)
-     * @param minAngularTolerance
-     *            The minimum angle (degrees) the tolerance can
-     *            shrink to
+     * @param robotPose             The robot's current pose
+     * @param linearToleranceRadius The allowable error radius at the target (e.g.,
+     *                              3 inches)
+     * @param minAngularTolerance   The minimum angle (degrees) the tolerance can
+     *                              shrink to
      */
     public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose, Distance linearToleranceRadius,
-            Angle minAngularTolerance)
+                                Angle minAngularTolerance)
     {
         if (!useLinearToleranceRadius)
         {
@@ -187,8 +184,10 @@ public class Turret extends SubsystemBase
             return;
         }
 
+        Pose2d turretPose = robotPose.transform(RobotConstants.Turret.OFFSET_FROM_CENTER, Distance.ZERO);
+
         // Calculate distance to target
-        double distance = robotPose.coord.distanceTo(target).getInch();
+        double distance = turretPose.coord.distanceTo(target).getInch();
 
         // Calculate dynamic tolerance (Inverse Tangent of radius / distance)
         if (distance > 1e-6)
@@ -196,14 +195,15 @@ public class Turret extends SubsystemBase
             double dynamicTolerance = Math.toDegrees(Math.atan2(linearToleranceRadius.getInch(), distance));
             // Ensure we don't demand impossible precision
             this.currentToleranceDegrees = Math.max(dynamicTolerance, minAngularTolerance.getDegrees());
-        } else
+        }
+        else
         {
             // If we are ON the target, tolerance is effectively infinite
             this.currentToleranceDegrees = 180.0;
         }
 
         // Aim using the calculated bearing without resetting the tolerance we just set
-        setTargetRelative(robotPose.bearingTo(target));
+        setTargetRelative(turretPose.bearingTo(target));
     }
 
     /**
@@ -212,7 +212,9 @@ public class Turret extends SubsystemBase
      */
     public void aimToCoordinate(FieldCoordinate target, Pose2d robotPose)
     {
-        aimRelative(robotPose.bearingTo(target));
+        Pose2d turretPose = robotPose.transform(RobotConstants.Turret.OFFSET_FROM_CENTER, Distance.ZERO);
+
+        aimRelative(turretPose.bearingTo(target));
     }
 
     public void center()
@@ -257,23 +259,13 @@ public class Turret extends SubsystemBase
     {
         switch (state)
         {
-            case CENTERED: return false;
-            case OFF: return true;
+            case CENTERED:
+                return false;
+            case OFF:
+                return true;
         }
         // Use the active dynamic tolerance instead of the static constant
         return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees;
-    }
-
-    public boolean exceedingTurnLimits()
-    {
-        double currentDegrees = motor.getDistance();
-        double minDegrees = turnLimits[0].getDegrees();
-        double maxDegrees = turnLimits[1].getDegrees();
-        double safetyMarginDegrees = safetyMargin.getDegrees();
-
-        // If we are significantly outside the limits, stop the motor immediately to
-        // prevent damage
-        return (currentDegrees < minDegrees - safetyMarginDegrees) || (currentDegrees > maxDegrees + safetyMarginDegrees);
     }
 
     public Angle bearingToTarget()
@@ -304,4 +296,19 @@ public class Turret extends SubsystemBase
         // even when at target position (to maintain position during rotation)
         motor.update();
     }
+
+    public boolean exceedingTurnLimits()
+    {
+        double currentDegrees = motor.getDistance();
+        double minDegrees = turnLimits[0].getDegrees();
+        double maxDegrees = turnLimits[1].getDegrees();
+        double safetyMarginDegrees = safetyMargin.getDegrees();
+
+        // If we are significantly outside the limits, stop the motor immediately to
+        // prevent damage
+        return (currentDegrees < minDegrees - safetyMarginDegrees) || (currentDegrees > maxDegrees + safetyMarginDegrees);
+    }
+
+    public enum State
+    {ON, OFF, CENTERED}
 }
