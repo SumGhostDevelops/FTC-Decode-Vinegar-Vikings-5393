@@ -480,9 +480,9 @@ public abstract class Base extends CommandOpMode
     /**
      * @return The autonomous pose or null if it does not exist.
      *
-     * @param timeout The maximum acceptable time to wait for saved pose to have existed for.
+     * @param timeout The maximum acceptable file age in milliseconds.
      */
-    private Pose2d getSavedAutonomousPose(double timeout)
+    private Pose2d getSavedAutonomousPose(long timeout)
     {
         // get the file reference
         File file = AppUtil.getInstance().getSettingsFile(RobotConstants.Autonomous.AUTONOMOUS_POSE_FILE_NAME);
@@ -495,7 +495,7 @@ public abstract class Base extends CommandOpMode
 
         // check if the file is fresh enough
         long fileAge = System.currentTimeMillis() - file.lastModified();
-        if (fileAge > RobotConstants.Autonomous.AUTONOMOUS_POSE_TIMEOUT)
+        if (fileAge > timeout)
         {
             return null;
         }

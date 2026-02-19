@@ -32,8 +32,8 @@ public class RobotConstants
     {
         public static int WAIT_SYS_READY_MS = 4000;
         public static int SHOOT_LENGTH_MS = 1500;
-        public static boolean SAVE_END_AUTONOMOUS_POSE = false;
-        public static double AUTONOMOUS_POSE_TIMEOUT = 90; // use this pose if it was created in the last 90 seconds
+        public static boolean SAVE_END_AUTONOMOUS_POSE = true;
+        public static long AUTONOMOUS_POSE_TIMEOUT = 90_000; // use this pose if it was created in the last 90,000 milliseconds (90 seconds)
         public static String AUTONOMOUS_POSE_FILE_NAME = "saved_pose.txt";
     }
 

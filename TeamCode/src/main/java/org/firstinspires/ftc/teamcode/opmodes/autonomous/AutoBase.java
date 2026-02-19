@@ -698,7 +698,7 @@ public abstract class AutoBase extends LinearOpMode
         String coordinateSystem = String.valueOf(pose.coord.coordSys);
         String x = String.valueOf(pose.coord.x.getInch());
         String y = String.valueOf(pose.coord.y.getInch());
-        String heading = String.valueOf(pose.heading.angle);
+        String heading = String.valueOf(pose.heading.angle.measure);
 
         File file = AppUtil.getInstance().getSettingsFile(RobotConstants.Autonomous.AUTONOMOUS_POSE_FILE_NAME);
         String data = x + "," + y + "," + heading + "," + coordinateSystem;
@@ -706,10 +706,11 @@ public abstract class AutoBase extends LinearOpMode
         try (PrintWriter out = new PrintWriter(new FileOutputStream(file)))
         {
             out.println(data);
+            telemetry.addData("Pose", "Saved: %s", data);
         }
         catch (Exception e)
         {
-            telemetry.addData("Error", "Save failed: ", e.getMessage());
+            telemetry.addData("Error", "Save failed: %s", e.getMessage());
         }
     }
 
