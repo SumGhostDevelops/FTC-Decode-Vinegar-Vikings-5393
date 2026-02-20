@@ -92,8 +92,7 @@ public class Blue extends AutoBase
         {
             switch (getPathState())
             {
-                case ToShoot: // Going to shoot
-                    // before following next path, it shoots.
+                case ToShoot:
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToShootFar);
                     break;
@@ -104,73 +103,66 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
-                case ToBallOne: // At shooting position, going to ball one
+                case ToBallOne:
                     startIntake();
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                     break;
 
-                case ToBallOneFull: // At ball one, going to ball one full
+                case ToBallOneFull:
                     stopIntake();
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
 
                 case ToShoot_1:
-                    // At ball one full
                     Shoot();
-
-                    // Going back to shooting position
                     follower.followPath(paths.ToBallTwo);
                     setPathState(Paths.PathState.ToBallTwo);
                     break;
 
                 case ToBallTwo:
-                    // Going to ball two
                     startIntake();
                     follower.followPath(paths.ToBallTwoFull);
                     setPathState(Paths.PathState.ToBallTwoFull);
                     break;
 
-                case ToBallTwoFull: // At ball two, going to ball two full
+                case ToBallTwoFull:
                     stopIntake();
+                    follower.followPath(paths.Gate);
+                    setPathState(Paths.PathState.Gate);
+                    break;
+
+                case Gate:
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
 
                 case ToShoot_2:
-
-                    // At shooting position
                     Shoot();
-                    // Going back to shooting position
                     follower.followPath(paths.ToThree);
                     setPathState(Paths.PathState.ToThree);
                     break;
 
                 case ToThree:
-
-
                     startIntake();
                     follower.followPath(paths.ToThreeFull);
                     setPathState(Paths.PathState.ToThreeFull);
                     break;
 
-                case ToThreeFull: // At ball three, going to ball three full
+                case ToThreeFull:
                     stopIntake();
                     follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
 
-                case ToShoot_3: // At ball three full
+                case ToShoot_3:
                     Shoot();
-
-                    // Going back to shooting position
                     follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose);
                     break;
 
-                case finalPose: // At shooting position, going to final pose
-
+                case finalPose:
                     break;
             }
         }
@@ -528,6 +520,7 @@ public class Blue extends AutoBase
 
             final Pose ballThreeLinePose = new Pose(54.000, 35.000);
             final Pose ballThreeFullPose = new Pose(16.000, 35.000);
+            final Pose gateHitPose = new Pose(55.000, 59.000);
 
             final Pose finalPose = new Pose(53.890, 69.156);
 
@@ -585,13 +578,21 @@ public class Blue extends AutoBase
 
                     .build();
 
+
+            Gate = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            ballTwoFullPose,
+                            gateHitPose))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .build();
+
+
+
             ToShoot_2 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    ballTwoFullPose,
-
+                                    gateHitPose,
                                     shootPose))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
-
                     .build();
 
             ToThree = follower.pathBuilder().addPath(
