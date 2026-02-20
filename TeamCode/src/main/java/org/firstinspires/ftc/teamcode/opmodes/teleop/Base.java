@@ -420,7 +420,7 @@ public abstract class Base extends CommandOpMode
             // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
             active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
                     s.outtake,
-                    () -> s.outtake.getFlywheelPose(s.turret.getTurretPose(s.odometry.getPose()), s.turret.getRelativeAngle()).distanceTo(getGoal())));
+                    () -> s.turret.getTurretPose(s.odometry.getPose()).distanceTo(getGoal())));
         }
     }
 
