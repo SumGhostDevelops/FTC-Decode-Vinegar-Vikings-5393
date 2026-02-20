@@ -243,23 +243,23 @@ public class Red extends AutoBase
         private void buildPathsReg(Follower follower)
         {
             // --- Pose definitions ---
-            startPose = new Pose(79, 9, Math.toRadians(90));
+            startPose = new Pose(80.000, 8.300, Math.toRadians(90));
 
-            final Pose ballOneLinePose = new Pose(86, 36);
-            final Pose ballOneFullPose = new Pose(125, 36);
-            final Pose shootPose = new Pose(95, 100.5);
+            final Pose ballOneLinePose = new Pose(104.000, 36.000);
+            final Pose ballOneFullPose = new Pose(125.000, 36.000);
 
-            final Pose ballTwoLinePose = new Pose(87, 60.000);
-            final Pose ballTwoFullPose = new Pose(125, 60.000);
+            final Pose ballTwoLinePose = new Pose(103.000, 60.000);
+            final Pose ballTwoFullPose = new Pose(125.000, 60.000);
 
-            final Pose ballThreeLinePose = new Pose(87, 84);
-            final Pose ballThreeFullPose = new Pose(125, 84);
+            final Pose ballThreeLinePose = new Pose(104.000, 84.000);
+            final Pose ballThreeFullPose = new Pose(125.000, 84.000);
 
-            final Pose finalPose = new Pose(96, 78);
+            final Pose shootPose = new Pose(80.000, 8.300);
+            final Pose finalPosePoint = new Pose(102.000, 41.000);
 
-            final Pose shootThreeLinePose = new Pose(90, 84);
 
-            // --- Paths ---
+// --- Paths ---
+
             ToBallOne = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, ballOneLinePose))
                     .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(0))
@@ -267,55 +267,53 @@ public class Red extends AutoBase
 
             ToBallOneFull = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
-                    .setLinearHeadingInterpolation(ballOneLinePose.getHeading(), Math.toRadians(0))
-                    .build();
-            ToBallOneBack =  follower.pathBuilder()
-                    .addPath(new BezierLine(ballOneFullPose, ballOneLinePose))
                     .setTangentHeadingInterpolation()
                     .setReversed()
                     .build();
 
             ToShoot_1 = follower.pathBuilder()
-                    .addPath(new BezierLine(ballOneLinePose, shootPose))
-                    .setConstantHeadingInterpolation(Math.toRadians(36))
+                    .addPath(new BezierLine(ballOneFullPose, shootPose))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
                     .build();
+
 
             ToBallTwo = follower.pathBuilder()
                     .addPath(new BezierLine(shootPose, ballTwoLinePose))
-                    .setLinearHeadingInterpolation(Math.toRadians(36), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(0))
                     .build();
 
             ToBallTwoFull = follower.pathBuilder()
                     .addPath(new BezierLine(ballTwoLinePose, ballTwoFullPose))
                     .setTangentHeadingInterpolation()
-                    .build();
-            ToBallTwoBack = follower.pathBuilder()
-                    .addPath(new BezierLine(ballTwoFullPose, ballTwoLinePose))
-                    .setTangentHeadingInterpolation()
                     .setReversed()
                     .build();
+
             ToShoot_2 = follower.pathBuilder()
-                    .addPath(new BezierLine(ballTwoLinePose, shootPose))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(36))
+                    .addPath(new BezierLine(ballTwoFullPose, shootPose))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
                     .build();
+
+
             ToThree = follower.pathBuilder()
                     .addPath(new BezierLine(shootPose, ballThreeLinePose))
-                    .setLinearHeadingInterpolation(Math.toRadians(36),Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(88), Math.toRadians(0))
                     .build();
 
             ToThreeFull = follower.pathBuilder()
                     .addPath(new BezierLine(ballThreeLinePose, ballThreeFullPose))
-                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build();
 
             ToShoot_3 = follower.pathBuilder()
-                    .addPath(new BezierLine(ballThreeFullPose, shootThreeLinePose))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(44))
+                    .addPath(new BezierLine(ballThreeFullPose, shootPose))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
                     .build();
 
-            this.finalPose = follower.pathBuilder()
-                    .addPath(new BezierLine(shootThreeLinePose, finalPose))
-                    .setConstantHeadingInterpolation(Math.toRadians(44))
+
+            finalPose = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, finalPosePoint))
+                    .setConstantHeadingInterpolation(Math.toRadians(90))
                     .build();
         }
 
