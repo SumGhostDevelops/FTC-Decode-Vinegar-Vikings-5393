@@ -2,14 +2,15 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
+import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 
 public class Intake extends SubsystemBase
 {
 
-    private final VelocityMotor intake;
+    private final PowerMotor intake;
 
-    public Intake(VelocityMotor intake)
+    public Intake(PowerMotor intake)
     {
         this.intake = intake;
     }
