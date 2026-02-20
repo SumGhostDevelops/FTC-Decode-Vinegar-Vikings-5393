@@ -75,23 +75,6 @@ public class Blue extends AutoBase
     }
 
     @Override
-    protected void displayTelemetry()
-    {
-        telemetry.addData("Current State", currentPathState);
-        telemetry.addData("State Time (s)", pathStateTimer.getElapsedTimeSeconds());
-        telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
-        telemetry.addData("Heading", follower.getHeading());
-        telemetry.addLine("-----");
-        telemetry.addData("Pose", getPose2d());
-        telemetry.addData("Velocity", follower.getVelocity());
-        telemetry.addData("Distance to Goal", getPose2d().distanceTo(getGoal()).toUnit(DistanceUnit.INCH));
-        telemetry.addData("Outtake RPM", subsystems.outtake.getMotorRPM());
-        telemetry.addData("Turret Angle", subsystems.turret.getRelativeAngle().toUnit(AngleUnit.DEGREES));
-        telemetry.addData("Turret Target Angle", subsystems.turret.getTargetAngleDegrees());
-        telemetry.update();
-    }
-
-    @Override
     protected void PathBasic()
     {
         if (!follower.isBusy())
