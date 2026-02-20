@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.definitions.constants;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.definitions.localization.Hardpoints;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.angle.field.FieldHeading;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
@@ -22,7 +23,7 @@ public enum Team
             new Goal(24, coord(134, 134)),
             new Goal(24, coord(138, 137)),
             new Base(coord(38.5, 33.5)),
-            new Pose2d(coord(41, 9), deg(90)),
+            new Pose2d(Hardpoints.Coordinates.RED_BASE, deg(90)),
             deg(0)),
 
     BLUE(
@@ -30,7 +31,7 @@ public enum Team
             new Goal(20, coord(10, 134)),
             new Goal(20, coord(6, 137)),
             new Base(coord(105.25, 33.5)),
-            new Pose2d(coord(103, 9), deg(90)),
+            new Pose2d(Hardpoints.Coordinates.BLUE_BASE, deg(90)),
             deg(180)),
 
     NONE(

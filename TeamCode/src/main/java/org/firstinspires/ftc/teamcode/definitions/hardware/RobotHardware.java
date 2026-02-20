@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.definitions.hardware;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -24,183 +23,56 @@ import java.util.List;
 
 public class RobotHardware
 {
+    // Constants for internal configuration
+    private final String pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
+    private final Distance forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
+    private final Distance strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
+    // Global Hardware
     public VoltageSensor battery;
-    private double cachedVoltage = 12.0;
-
     public List<LynxModule> hubs;
-
+    // Subsystems (Nullable if not built)
     public Pinpoint pinpoint;
     public WebcamName webcam;
-
     public PowerMotor frontLeft, frontRight, backLeft, backRight;
     public VelocityMotor intake;
     public VelocityMotorGroup outtake;
     public PositionMotor turret;
     public ServoEx transfer;
+    private double cachedVoltage = 12.0;
+    // Pinpoint State
+    private boolean pinpointConfigured = false;
+    private boolean pinpointCalibrationStarted = false;
+    private boolean pinpointReady = false;
 
-    private String pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
-    private Distance forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
-    private Distance strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
-    private String webcamName = RobotConstants.Odometry.Webcam.NAME;
-
-    private String frontLeftName = RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT;
-    private String frontRightName = RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT;
-    private String backLeftName = RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT;
-    private String backRightName = RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT;
-
-    private String outtakeLauncherLeftName = RobotConstants.Outtake.Name.TOP;
-    private String outtakeLauncherRightName = RobotConstants.Outtake.Name.BOTTOM;
-    private PIDFCoefficients outtakePIDF = RobotConstants.Outtake.Coefficients.PIDF;
-    private int outtakeToleranceRPM = RobotConstants.Outtake.Tolerance.RPM;
-    private int outtakeToleranceRPMAccel = RobotConstants.Outtake.Tolerance.RPM_ACCELERATION;
-    private double outtakeInputGearRatio = RobotConstants.Outtake.INPUT_GEAR_RATIO;
-    private double outtakeOutputGearRatio = RobotConstants.Outtake.OUTPUT_GEAR_RATIO;
-
-    private String turretName = RobotConstants.Turret.NAME;
-    private double turretGearRatio = RobotConstants.Turret.GEAR_RATIO;
-    private PIDFCoefficients turretPIDF = RobotConstants.Turret.PIDF;
-    private double turretToleranceDegrees = RobotConstants.Turret.TOLERANCE.getDegrees();
-
-    private String transferName = RobotConstants.Transfer.NAME;
-    private double transferCloseIntakeAngle = RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
-
-    private String intakeName = RobotConstants.Intake.NAME;
-    private PIDFCoefficients intakePIDF = RobotConstants.Intake.PIDF;
-
-    public RobotHardware(HardwareMap hardwareMap, Telemetry telemetry)
+    /**
+     * Private constructor used by the Builder.
+     */
+    private RobotHardware(Builder builder)
     {
-        try
-        {
-            hubs = hardwareMap.getAll(LynxModule.class);
+        this.hubs = builder.hubs;
+        this.battery = builder.battery;
+        this.cachedVoltage = builder.cachedVoltage;
 
-            hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
-        } catch (Exception e)
-        {
-            telemetry.log().add("Warning: Hubs not found");
-        }
+        this.frontLeft = builder.frontLeft;
+        this.frontRight = builder.frontRight;
+        this.backLeft = builder.backLeft;
+        this.backRight = builder.backRight;
 
-        try
-        {
-            battery = hardwareMap.voltageSensor.iterator().next();
-            cachedVoltage = battery.getVoltage();
-        } catch (Exception e)
-        {
-            telemetry.log().add("Warning: Voltage sensor not found");
-        }
+        this.outtake = builder.outtake;
+        this.turret = builder.turret;
+        this.intake = builder.intake;
+        this.transfer = builder.transfer;
 
-        // Odometry - only get reference, configuration is done via loadPinpoint()
-        try
-        {
-            pinpoint = hardwareMap.get(Pinpoint.class, pinpointName);
-            loadPinpoint(hardwareMap, telemetry);
-        }
-        catch (Exception e)
-        {
-            telemetry.log().add("Warning: goBilda Pinpoint not found");
-        }
-
-        try
-        {
-            webcam = hardwareMap.get(WebcamName.class, webcamName);
-        } catch (Exception e)
-        {
-            telemetry.log().add("Warning: Webcam not found");
-        }
-
-        // Drive
-        try
-        {
-            frontLeft = new PowerMotor(new MotorEx(hardwareMap, frontLeftName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
-                    .setMotorDirection(Motor.Direction.REVERSE)
-                    .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-
-            frontRight = new PowerMotor(new MotorEx(hardwareMap, frontRightName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
-                    .setMotorDirection(Motor.Direction.REVERSE)
-                    .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-
-            backLeft = new PowerMotor(new MotorEx(hardwareMap, backLeftName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
-                    .setMotorDirection(Motor.Direction.REVERSE)
-                    .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-
-            backRight = new PowerMotor(new MotorEx(hardwareMap, backRightName, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
-                    .setMotorDirection(Motor.Direction.FORWARD)
-                    .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        } catch (Exception e)
-        {
-            telemetry.log().add("Warning: One or more drive motors not found");
-        }
-
-        // Outtake
-        try
-        {
-            MotorEx outtakeTopEx = new MotorEx(hardwareMap, outtakeLauncherLeftName, Motor.GoBILDA.BARE);
-            MotorEx outtakeBottomEx = new MotorEx(hardwareMap, outtakeLauncherRightName, Motor.GoBILDA.BARE);
-
-            outtakeBottomEx.encoder = outtakeTopEx.encoder;
-
-            VelocityMotor outtakeTop = new VelocityMotor(outtakeTopEx, () -> cachedVoltage)
-                    .setDistancePerPulse(outtakeInputGearRatio, outtakeOutputGearRatio);
-            VelocityMotor outtakeBottom = new VelocityMotor(outtakeBottomEx, () -> cachedVoltage)
-                    .setDistancePerPulse(outtakeInputGearRatio, outtakeOutputGearRatio)
-                    .setMotorDirection(Motor.Direction.REVERSE);
-
-            outtake = new VelocityMotorGroup(outtakeTop, outtakeBottom)
-                    .setVoltageCompensation(12)
-                    .setControllerType(VelocityMotor.VelocityController.TakeBackHalf)
-                    .setPIDF(outtakePIDF)
-                    .setTolerance(outtakeToleranceRPM, outtakeToleranceRPMAccel);
-        } catch (Exception e)
-        {
-            telemetry.log().add("Warning: One or more outtake motors not found");
-            telemetry.log().add(e.getMessage());
-        }
-
-        try
-        {
-            turret = new PositionMotor(new MotorEx(hardwareMap, turretName, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
-                    .setVoltageCompensation(12) // 100% power >= 12 volts
-                    .usePower(1)
-                    .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
-                    .setDistancePerPulse(1.0, turretGearRatio, AngleUnit.DEGREES) // keep in degrees
-                    .setControllerType(PositionMotor.PositionController.SquIDF)
-                    .setPIDF(turretPIDF)
-                    .setPositionTolerance(turretToleranceDegrees);
-
-            turret.setTargetDistance(0);
-        } catch (Exception e)
-        {
-            telemetry.log().add("Warning: Turret motor not found");
-            telemetry.log().add(e.getMessage());
-        }
-
-        try
-        {
-            transfer = new ServoEx(hardwareMap, transferName, 0, 360);
-            transfer.set(transferCloseIntakeAngle);
-        } catch (Exception e)
-        {
-            telemetry.log().add("Warning: Transfer servo not found");
-            telemetry.log().add(e.getMessage());
-        }
-
-        try
-        {
-            intake = new VelocityMotor(new MotorEx(hardwareMap, intakeName, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
-                    .setVoltageCompensation(12)
-                    .setMotorDirection(Motor.Direction.REVERSE)
-                    .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
-                    .setControllerType(VelocityMotor.VelocityController.PIDF)
-                    .setPIDF(intakePIDF);
-
-        } catch (Exception e)
-        {
-            telemetry.log().add("Warning: Intake motor not found");
-        }
+        this.pinpoint = builder.pinpoint;
+        this.webcam = builder.webcam;
     }
 
     public void clearHubCache()
     {
-        hubs.forEach(LynxModule::clearBulkCache);
+        if (hubs != null)
+        {
+            hubs.forEach(LynxModule::clearBulkCache);
+        }
     }
 
     public void readBattery()
@@ -211,27 +83,22 @@ public class RobotHardware
         }
     }
 
-    private boolean pinpointConfigured = false;
-    private boolean pinpointCalibrationStarted = false;
-    private boolean pinpointReady = false;
+    public double getCachedVoltage()
+    {
+        return cachedVoltage;
+    }
 
     /**
      * Attempts to configure and calibrate the Pinpoint. Call this repeatedly during init
      * until isPinpointReady() returns true.
      *
-     * Waits for the Pinpoint to be READY before sending any configuration commands.
-     *
      * @return true if Pinpoint is fully ready to use
      */
     public boolean loadPinpoint(HardwareMap hardwareMap, Telemetry telemetry)
     {
-        // Already fully ready
-        if (pinpointReady)
-        {
-            return true;
-        }
+        if (pinpointReady) return true;
 
-        // Grab the pinpoint if we haven't already
+        // Attempt to fetch if missing (redundant check if built correctly, but safe)
         if (pinpoint == null)
         {
             try
@@ -245,32 +112,20 @@ public class RobotHardware
             }
         }
 
-        // Always update to get fresh status
         pinpoint.update();
-
         Pinpoint.DeviceStatus status = pinpoint.getDeviceStatus();
 
-        // Wait for device to be READY before doing anything
-        if (status != Pinpoint.DeviceStatus.READY)
-        {
-            return false;
-        }
+        if (status != Pinpoint.DeviceStatus.READY) return false;
 
-        // Step 1: Configure offsets and encoder settings (only once, when READY)
+        // Step 1: Configure
         if (!pinpointConfigured)
         {
             try
             {
                 DistanceUnit dUnit = forwardWheelOffset.unit;
-
-                pinpoint.setOffsets(
-                        forwardWheelOffset.magnitude,
-                        strafeWheelOffset.toUnit(dUnit).magnitude,
-                        dUnit);
-
+                pinpoint.setOffsets(forwardWheelOffset.magnitude, strafeWheelOffset.toUnit(dUnit).magnitude, dUnit);
                 pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
                 pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.REVERSED);
-
                 pinpointConfigured = true;
             }
             catch (Exception e)
@@ -280,28 +135,245 @@ public class RobotHardware
             }
         }
 
-        // Step 2: Recalibrate IMU (only once, after configuration)
-        // NOTE: We only recalibrate IMU here, NOT reset position.
-        // The Odometry subsystem handles position via setReferencePose().
+        // Step 2: Recalibrate IMU
         if (!pinpointCalibrationStarted)
         {
             pinpoint.recalibrateIMU();
             pinpointCalibrationStarted = true;
-            return false; // Calibration just started, not ready yet
+            return false;
         }
 
-        // Step 3: Calibration was started and device is now READY again
-        // (status == READY is already checked above, and calibrationStarted is true)
+        // Step 3: Ready
         pinpointReady = true;
         return true;
     }
 
+    // --- Runtime Configuration Methods (Pinpoint Logic) ---
 
-    /**
-     * @return true if the Pinpoint has been fully configured and calibrated
-     */
     public boolean isPinpointReady()
     {
         return pinpointReady;
+    }
+
+    /**
+     * Builder Class for RobotHardware
+     */
+    public static class Builder
+    {
+        private final HardwareMap hardwareMap;
+        private final Telemetry telemetry;
+
+        // Base
+        private List<LynxModule> hubs;
+        private VoltageSensor battery;
+        private double cachedVoltage = 12.0;
+
+        // Subsystems
+        private PowerMotor frontLeft, frontRight, backLeft, backRight;
+        private VelocityMotorGroup outtake;
+        private PositionMotor turret;
+        private VelocityMotor intake;
+        private ServoEx transfer;
+        private Pinpoint pinpoint;
+        private WebcamName webcam;
+
+        public Builder(HardwareMap hardwareMap, Telemetry telemetry)
+        {
+            this.hardwareMap = hardwareMap;
+            this.telemetry = telemetry;
+            initializeBaseHardware();
+        }
+
+        private void initializeBaseHardware()
+        {
+            try
+            {
+                hubs = hardwareMap.getAll(LynxModule.class);
+                hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Hubs not found");
+            }
+
+            try
+            {
+                battery = hardwareMap.voltageSensor.iterator().next();
+                cachedVoltage = battery.getVoltage();
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Voltage sensor not found");
+            }
+        }
+
+        public Builder withAll()
+        {
+            return this
+                    .withDrive()
+                    .withOuttake()
+                    .withTurret()
+                    .withIntake()
+                    .withTransfer()
+                    .withOdometry();
+        }
+
+        public Builder withDrive()
+        {
+            try
+            {
+                frontLeft = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+                        .setMotorDirection(Motor.Direction.REVERSE)
+                        .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
+                frontRight = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+                        .setMotorDirection(Motor.Direction.REVERSE)
+                        .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
+                backLeft = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+                        .setMotorDirection(Motor.Direction.REVERSE)
+                        .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
+                backRight = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+                        .setMotorDirection(Motor.Direction.FORWARD)
+                        .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Drive motors failed to initialize");
+            }
+            return this;
+        }
+
+        public Builder withOuttake()
+        {
+            try
+            {
+                MotorEx outtakeTopEx = new MotorEx(hardwareMap, RobotConstants.Outtake.Name.TOP, Motor.GoBILDA.BARE);
+                MotorEx outtakeBottomEx = new MotorEx(hardwareMap, RobotConstants.Outtake.Name.BOTTOM, Motor.GoBILDA.BARE);
+
+                outtakeBottomEx.encoder = outtakeTopEx.encoder;
+
+                double inputRatio = RobotConstants.Outtake.INPUT_GEAR_RATIO;
+                double outputRatio = RobotConstants.Outtake.OUTPUT_GEAR_RATIO;
+
+                VelocityMotor outtakeTop = new VelocityMotor(outtakeTopEx, () -> cachedVoltage)
+                        .setDistancePerPulse(inputRatio, outputRatio);
+                VelocityMotor outtakeBottom = new VelocityMotor(outtakeBottomEx, () -> cachedVoltage)
+                        .setDistancePerPulse(inputRatio, outputRatio)
+                        .setMotorDirection(Motor.Direction.REVERSE);
+
+                outtake = new VelocityMotorGroup(outtakeTop, outtakeBottom)
+                        .setVoltageCompensation(12)
+                        .setControllerType(VelocityMotor.VelocityController.TakeBackHalf)
+                        .setPIDF(RobotConstants.Outtake.Coefficients.PIDF)
+                        .setTolerance(RobotConstants.Outtake.Tolerance.RPM, RobotConstants.Outtake.Tolerance.RPM_ACCELERATION);
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Outtake failed to initialize: " + e.getMessage());
+            }
+            return this;
+        }
+
+        public Builder withTurret()
+        {
+            try
+            {
+                turret = new PositionMotor(new MotorEx(hardwareMap, RobotConstants.Turret.NAME, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
+                        .setVoltageCompensation(12)
+                        .usePower(1)
+                        .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
+                        .setDistancePerPulse(1.0, RobotConstants.Turret.GEAR_RATIO, AngleUnit.DEGREES)
+                        .setControllerType(PositionMotor.PositionController.SquIDF)
+                        .setPIDF(RobotConstants.Turret.PIDF)
+                        .setPositionTolerance(RobotConstants.Turret.TOLERANCE.getDegrees());
+
+                turret.setTargetDistance(0);
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Turret failed to initialize: " + e.getMessage());
+            }
+            return this;
+        }
+
+        public Builder withIntake()
+        {
+            try
+            {
+                intake = new VelocityMotor(new MotorEx(hardwareMap, RobotConstants.Intake.NAME, Motor.GoBILDA.RPM_1620), () -> cachedVoltage)
+                        .setVoltageCompensation(12)
+                        .setMotorDirection(Motor.Direction.REVERSE)
+                        .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
+                        .setControllerType(VelocityMotor.VelocityController.PIDF)
+                        .setPIDF(RobotConstants.Intake.PIDF)
+                        .setTolerance(50, 100);
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Intake failed to initialize");
+            }
+            return this;
+        }
+
+        public Builder withTransfer()
+        {
+            try
+            {
+                transfer = new ServoEx(hardwareMap, RobotConstants.Transfer.NAME, 0, 360);
+                transfer.set(RobotConstants.Transfer.CLOSE_INTAKE_ANGLE);
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Transfer servo failed to initialize");
+            }
+            return this;
+        }
+
+        public Builder withOdometry()
+        {
+            final String pinpointName = RobotConstants.Odometry.Pinpoint.NAME;
+            final Distance forwardWheelOffset = RobotConstants.Odometry.Deadwheels.Forward.OFFSET;
+            final Distance strafeWheelOffset = RobotConstants.Odometry.Deadwheels.Strafe.OFFSET;
+
+            try
+            {
+                pinpoint = hardwareMap.get(Pinpoint.class, pinpointName);
+
+                DistanceUnit dUnit = forwardWheelOffset.unit;
+                pinpoint.setOffsets(forwardWheelOffset.magnitude, strafeWheelOffset.toUnit(dUnit).magnitude, dUnit);
+                pinpoint.setEncoderResolution(Pinpoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+                pinpoint.setEncoderDirections(Pinpoint.EncoderDirection.FORWARD, Pinpoint.EncoderDirection.REVERSED);
+
+                if (RobotConstants.Odometry.RESET_PINPOINT_FULLY_ON_INIT)
+                {
+                    pinpoint.resetPosAndIMU();
+                }
+                else
+                {
+                    pinpoint.recalibrateIMU();
+                }
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: goBilda Pinpoint not found");
+            }
+            // Webcam
+            try
+            {
+                webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.Webcam.NAME);
+            }
+            catch (Exception e)
+            {
+                telemetry.log().add("Warning: Webcam not found");
+            }
+            return this;
+        }
+
+        public RobotHardware build()
+        {
+            return new RobotHardware(this);
+        }
     }
 }

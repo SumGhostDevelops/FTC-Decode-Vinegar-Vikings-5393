@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
-import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
-import org.firstinspires.ftc.teamcode.util.motors.PowerMotor;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 
 public class Intake extends SubsystemBase
@@ -18,11 +16,13 @@ public class Intake extends SubsystemBase
 
     public void intake(double power)
     {
-        intake.setPower(Math.abs(power));
+        intake.setScale(Math.abs(power));
     }
 
     public void reverse(double power)
     {
+        // setScale clamps to [0, maxRPM], so use setPower directly for reverse
+        intake.stopMotor();
         intake.setPower(-Math.abs(power));
     }
 
@@ -34,6 +34,12 @@ public class Intake extends SubsystemBase
     public void stop()
     {
         intake.stopMotor();
+    }
+
+    @Override
+    public void periodic()
+    {
+        intake.update();
     }
 
     public double getRPM()

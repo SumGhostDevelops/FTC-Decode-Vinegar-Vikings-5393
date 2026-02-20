@@ -23,7 +23,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
     }
@@ -33,8 +33,8 @@ public class RobotConstants
     {
         public static int WAIT_SYS_READY_MS = 4000;
         public static int SHOOT_LENGTH_MS = 1500;
-        public static boolean SAVE_END_AUTONOMOUS_POSE = false;
-        public static double AUTONOMOUS_POSE_TIMEOUT = 90; // use this pose if it was created in the last 90 seconds
+        public static boolean SAVE_END_AUTONOMOUS_POSE = true;
+        public static long AUTONOMOUS_POSE_TIMEOUT = 90_000; // use this pose if it was created in the last 90,000 milliseconds (90 seconds)
         public static String AUTONOMOUS_POSE_FILE_NAME = "saved_pose.txt";
     }
 
@@ -107,6 +107,8 @@ public class RobotConstants
         public static boolean USE_LUT = false;
 
         public static Distance OFFSET_FROM_CENTER = new Distance(-4.5, DistanceUnit.INCH);
+
+        public static Distance OFFSET_FROM_TURRET = new Distance(4, DistanceUnit.INCH);
 
         @IgnoreConfigurable
         public static class Name
@@ -192,7 +194,7 @@ public class RobotConstants
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
 
         @Sorter(sort = 2)
-        public static double CLOSE_INTAKE_ANGLE = 210; // 210; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSE_INTAKE_ANGLE = 110; // 210; // An angle where the trapdoor blocks balls from entering
     }
 
     @Configurable
@@ -212,7 +214,7 @@ public class RobotConstants
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
 
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 0);
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.001, 0.1, 0, 0.0006);
     }
 
     @Configurable

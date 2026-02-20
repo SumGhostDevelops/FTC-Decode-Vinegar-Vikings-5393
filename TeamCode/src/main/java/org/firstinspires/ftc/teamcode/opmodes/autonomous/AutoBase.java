@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -10,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
-import org.firstinspires.ftc.teamcode.definitions.hardware.RobotContext;
+import org.firstinspires.ftc.teamcode.definitions.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.definitions.hardware.Subsystems;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
@@ -20,11 +21,8 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * Common base class for all autonomous modes with ball flow methods.
@@ -33,7 +31,8 @@ import java.nio.file.Paths;
 public abstract class AutoBase extends LinearOpMode
 {
     protected Team team;
-    protected RobotContext robot;
+    protected RobotHardware hw;
+    protected Subsystems subsystems;
     protected Follower follower;
     protected boolean finishedAutonomous = false; // flag for if the robot should end the teleop mode early
 
@@ -46,6 +45,269 @@ public abstract class AutoBase extends LinearOpMode
         BASIC, REGULAR, GATE
     }
 
+    // Common autonomous state - shared by all subclasses
+    protected Timer pathStateTimer;
+    protected Timer opModeTimer;
+    protected AutoStrat autoStrat = AutoStrat.REGULAR;
+    protected Object currentPathState;
+
+    /**
+     * Strategy selection configuration for customization
+     */
+    protected static class StrategyOption
+    {
+        public final AutoStrat strat;
+        public final String button;
+        public final String description;
+
+        public StrategyOption(AutoStrat strat, String button, String description)
+        {
+            this.strat = strat;
+            this.button = button;
+            this.description = description;
+        }
+    }
+
+    // ========================
+    // Template Methods - Override in subclasses as needed
+    // ========================
+
+    /**
+     * Get strategy options for selection menu.
+     * Override to customize available strategies and their descriptions.
+     */
+    protected StrategyOption[] getStrategyOptions()
+    {
+        return new StrategyOption[]{
+                new StrategyOption(AutoStrat.GATE, "DPAD UP", "GATE METHOD (GATE)"),
+                new StrategyOption(AutoStrat.REGULAR, "DPAD RIGHT", "12 Ball (REGULAR)"),
+                new StrategyOption(AutoStrat.BASIC, "DPAD DOWN", "3 Ball (BASIC)")
+        };
+    }
+
+    /**
+     * Create and initialize paths object.
+     * Subclasses must implement this to return their specific Paths instance.
+     */
+    protected abstract Object createPaths(Follower follower, AutoStrat autoStrat);
+
+    /**
+     * Get the starting pose for the autonomous.
+     * Subclasses must implement this to return the starting pose from their Paths object.
+     */
+    protected abstract Pose getStartingPose(Object paths);
+
+    /**
+     * Handle pathing logic based on current state.
+     * Default implementation delegates to strategy-specific methods.
+     * Override for custom behavior.
+     */
+    protected void handlePathing()
+    {
+        switch (autoStrat)
+        {
+            case BASIC:
+                PathBasic();
+                break;
+            case REGULAR:
+                PathRegular();
+                break;
+            case GATE:
+                PathGate();
+                break;
+        }
+    }
+
+    /**
+     * Path logic for BASIC strategy.
+     * Override in subclasses.
+     */
+    protected void PathBasic()
+    {
+        // Default: do nothing
+    }
+
+    /**
+     * Path logic for REGULAR strategy.
+     * Override in subclasses.
+     */
+    protected void PathRegular()
+    {
+        // Default: do nothing
+    }
+
+    /**
+     * Path logic for GATE strategy.
+     * Override in subclasses.
+     */
+    protected void PathGate()
+    {
+        // Default: do nothing
+    }
+
+    // ========================
+    // Common Helper Methods
+    // ========================
+
+    /**
+     * Sets the current path state and resets the state timer.
+     */
+    protected void setPathState(Object pathState)
+    {
+        currentPathState = pathState;
+        if (pathStateTimer != null)
+        {
+            pathStateTimer.resetTimer();
+        }
+    }
+
+    /**
+     * Display strategy selection menu during init.
+     * Handles gamepad input and shows available options.
+     * @return selected strategy
+     */
+    protected AutoStrat selectStrategy()
+    {
+        AutoStrat selected = AutoStrat.REGULAR;
+        StrategyOption[] options = getStrategyOptions();
+
+        while (opModeInInit())
+        {
+            // Handle gamepad input
+            if (gamepad1.dpad_up)
+            {
+                for (StrategyOption opt : options)
+                {
+                    if (opt.button.contains("UP"))
+                    {
+                        selected = opt.strat;
+                        break;
+                    }
+                }
+            }
+            else if (gamepad1.dpad_right)
+            {
+                for (StrategyOption opt : options)
+                {
+                    if (opt.button.contains("RIGHT"))
+                    {
+                        selected = opt.strat;
+                        break;
+                    }
+                }
+            }
+            else if (gamepad1.dpad_down)
+            {
+                for (StrategyOption opt : options)
+                {
+                    if (opt.button.contains("DOWN"))
+                    {
+                        selected = opt.strat;
+                        break;
+                    }
+                }
+            }
+            else if (gamepad1.dpad_left)
+            {
+                for (StrategyOption opt : options)
+                {
+                    if (opt.button.contains("LEFT"))
+                    {
+                        selected = opt.strat;
+                        break;
+                    }
+                }
+            }
+
+            // Display menu
+            telemetry.addLine("--- SELECT AUTO STRATEGY ---");
+            telemetry.addData("Selected", selected);
+            telemetry.addLine("\nControls:");
+            for (StrategyOption opt : options)
+            {
+                telemetry.addLine(opt.button + ": " + opt.description);
+            }
+            telemetry.update();
+        }
+
+        return selected;
+    }
+
+    /**
+     * Initialize autonomous with common setup.
+     * Creates timers, follower, paths, and initializes robot hardware.
+     */
+    protected void initAuto(Object paths)
+    {
+        // Initialize Timers
+        pathStateTimer = new Timer();
+        opModeTimer = new Timer();
+        opModeTimer.resetTimer();
+
+        // Set starting pose and update follower
+        follower.setStartingPose(getStartingPose(paths));
+        follower.update();
+
+        // Init Robot Hardware
+        initRobot();
+    }
+
+    /**
+     * Main autonomous loop template method.
+     * Handles the common structure: start outtake, run paths, update robot, cleanup.
+     * Call this from runOpMode() after initialization.
+     */
+    protected void runAutoLoop()
+    {
+        if (opModeIsActive() && !isStopRequested())
+        {
+            opModeTimer.resetTimer();
+            startOuttake();
+
+            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
+            {
+                handlePathing();
+                follower.update();
+                updateRobot();
+            }
+        }
+
+        stopSubsystems();
+        writePoseToFile();
+    }
+
+    /**
+     * Default telemetry display with common autonomous info.
+     * Override to add custom telemetry.
+     */
+    protected void displayTelemetry()
+    {
+        if (pathStateTimer == null || opModeTimer == null || follower == null)
+            return;
+
+        telemetry.addData("Current State", currentPathState);
+        telemetry.addData("State Time (s)", pathStateTimer.getElapsedTimeSeconds());
+        telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
+        telemetry.addData("Heading", follower.getHeading());
+        telemetry.addLine("-----");
+        telemetry.addData("Pose", getPose2d());
+        telemetry.addData("Velocity", follower.getVelocity());
+        telemetry.addData("Distance to Goal", getPose2d().distanceTo(getGoal()).toUnit(DistanceUnit.INCH));
+
+        if (subsystems != null && subsystems.outtake != null)
+        {
+            telemetry.addData("Outtake RPM", subsystems.outtake.getMotorRPM());
+        }
+
+        if (subsystems != null && subsystems.turret != null)
+        {
+            telemetry.addData("Turret Angle", subsystems.turret.getRelativeAngle().toUnit(AngleUnit.DEGREES));
+            telemetry.addData("Turret Target Angle", subsystems.turret.getTargetAngleDegrees());
+        }
+
+        telemetry.update();
+    }
+
     // ========================
     // Initialization
     // ========================
@@ -56,15 +318,54 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void initRobot()
     {
-        robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
+        hw = new RobotHardware.Builder(hardwareMap, telemetry)
+                .withIntake()
+                .withTransfer()
+                .withTurret()
+                .withOuttake()
+                .build();
+
+        subsystems = new Subsystems.Builder(hw, team)
+                .withIntake()
+                .withTransfer()
+                .withTurret()
+                .withOuttake()
+                .build();
+
+        if (!intakeExists())
+        {
+            telemetry.log().add("ERROR: Intake failed to initialize");
+            requestOpModeStop();
+            return;
+        }
+        if (!transferExists())
+        {
+            telemetry.log().add("ERROR: Transfer failed to initialize");
+            requestOpModeStop();
+            return;
+        }
+        if (!turretExists())
+        {
+            telemetry.log().add("ERROR: Turret failed to initialize");
+            requestOpModeStop();
+            return;
+        }
+        if (!outtakeExists())
+        {
+            telemetry.log().add("ERROR: Outtake failed to initialize");
+            requestOpModeStop();
+            return;
+        }
+        // Odometry is intentionally NOT built in AutoBase — Pedro handles localization
+        if (!odometryDoesNotExist())
+        {
+            telemetry.log().add("WARNING: Odometry unexpectedly initialized in Auto");
+        }
+
         telemetry.addData("Status", "Initialized for " + team);
         telemetry.update();
     }
 
-    protected void displayTelemetry()
-    {
-
-    }
 
     /**
      * Set the Pedro follower reference so we can get pose from it.
@@ -116,25 +417,26 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void updateSubsystems()
     {
-        if (robot == null)
+        if (hw == null || subsystems == null)
             return;
 
         // Clear bulk cache to get fresh sensor readings (required for MANUAL caching mode)
-        robot.hw.clearHubCache();
-        robot.hw.readBattery();
+        hw.clearHubCache();
+        hw.readBattery();
 
-        Subsystems s = robot.subsystems;
         updateOuttakeRPM(); // update the outtake rpm constantly
 
         // --- PIDF Updates ---
-        s.turret.periodic();
-        s.outtake.periodic();
+        if (subsystems.turret != null)
+            subsystems.turret.periodic();
+        if (subsystems.outtake != null)
+            subsystems.outtake.periodic();
     }
 
     /**
      * Updates subsystems and telemetry
      */
-    protected void RobotUpdates()
+    protected void updateRobot()
     {
         updateSubsystems();
         displayTelemetry();
@@ -160,17 +462,12 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void startIntake()
     {
-        if (robot == null)
-            return;
-        robot.subsystems.intake.intake(intakePower);
+        subsystems.intake.intake(intakePower);
     }
 
     protected void transferIntake()
     {
-        if (robot == null)
-            return;
-
-        robot.subsystems.intake.transfer(getIntakeTransferPower());
+        subsystems.intake.intake(getIntakeTransferPower());
     }
 
     /**
@@ -179,9 +476,7 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void stopIntake()
     {
-        if (robot == null)
-            return;
-        robot.subsystems.intake.stop();
+        subsystems.intake.stop();
     }
 
     // ========================
@@ -193,9 +488,7 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void closeTransfer()
     {
-        if (robot == null)
-            return;
-        robot.subsystems.transfer.close();
+        subsystems.transfer.close();
     }
 
     /**
@@ -203,9 +496,7 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void openTransfer()
     {
-        if (robot == null)
-            return;
-        robot.subsystems.transfer.open();
+        subsystems.transfer.open();
     }
 
     // ========================
@@ -217,10 +508,8 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void startOuttake()
     {
-        if (robot == null)
-            return;
-        robot.subsystems.outtake.on();
-        robot.subsystems.outtake.setTargetRPM(getPose2d().distanceTo(getGoal()));
+        updateOuttakeRPM();
+        subsystems.outtake.on();
     }
 
     /**
@@ -228,9 +517,7 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void stopOuttake()
     {
-        if (robot == null)
-            return;
-        robot.subsystems.outtake.off();
+        subsystems.outtake.off();
     }
 
     /**
@@ -238,11 +525,9 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void updateOuttakeRPM()
     {
-        if (robot == null)
-            return;
-        Pose2d pose = getPose2d().transform(RobotConstants.Outtake.OFFSET_FROM_CENTER, Distance.ZERO);
+        Pose2d pose = getPose2d();
         Distance distToGoal = pose.distanceTo(getGoal());
-        robot.subsystems.outtake.setTargetRPM(distToGoal);
+        subsystems.outtake.setTargetRPM(distToGoal);
     }
 
     // ========================
@@ -254,20 +539,15 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void aimTurret()
     {
-        if (robot == null)
-            return;
         Pose2d pose = getPose2d();
         FieldCoordinate goalCoord = getGoal();
-        robot.subsystems.turret.setState(Turret.State.ON);
-        robot.subsystems.turret.aimToCoordinate(goalCoord, pose);
+        subsystems.turret.setState(Turret.State.ON);
+        subsystems.turret.aimToCoordinate(goalCoord, pose);
     }
 
     protected void centerTurret()
     {
-        if (robot == null)
-            return;
-
-        robot.subsystems.turret.center();
+        subsystems.turret.center();
     }
 
     // ========================
@@ -279,10 +559,13 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected boolean isReadyToShoot()
     {
-        if (robot == null)
-            return false;
-        Subsystems s = robot.subsystems;
-        return s.turret.isAtTarget() && s.outtake.isStable() && s.odometry.getVelocity().getLength().toUnit(DistanceUnit.INCH).magnitude < 1;
+        Subsystems s = subsystems;
+
+        boolean turretAtTarget = s.turret.isAtTarget();
+        boolean outtakeStable = s.outtake.isStable();
+        boolean notMoving = follower.getVelocity().getMagnitude() < 1;
+
+        return turretAtTarget && outtakeStable && notMoving;
     }
 
     /**
@@ -306,7 +589,7 @@ public abstract class AutoBase extends LinearOpMode
             }
 
             // Update subsystems (PIDF loops)
-            RobotUpdates();
+            updateRobot();
 
             // Continuously aim and adjust RPM
             aimTurret();
@@ -338,9 +621,6 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void waitForDuration(long durationMs)
     {
-        if (robot == null)
-            return;
-
         ElapsedTime timer = new ElapsedTime();
         while (opModeIsActive() && !isStopRequested() && timer.milliseconds() < durationMs)
         {
@@ -351,7 +631,7 @@ public abstract class AutoBase extends LinearOpMode
             }
 
             // State machine handles transfer and intake
-            RobotUpdates();
+            updateRobot();
             sleep(10);
         }
     }
@@ -365,9 +645,6 @@ public abstract class AutoBase extends LinearOpMode
      */
     public void Shoot()
     {
-        if (robot == null)
-            return;
-
         openTransfer();
         startOuttake(); // start outtake if not already running
         aimTurret();
@@ -447,7 +724,7 @@ public abstract class AutoBase extends LinearOpMode
         String coordinateSystem = String.valueOf(pose.coord.coordSys);
         String x = String.valueOf(pose.coord.x.getInch());
         String y = String.valueOf(pose.coord.y.getInch());
-        String heading = String.valueOf(pose.heading.angle);
+        String heading = String.valueOf(pose.heading.angle.measure);
 
         File file = AppUtil.getInstance().getSettingsFile(RobotConstants.Autonomous.AUTONOMOUS_POSE_FILE_NAME);
         String data = x + "," + y + "," + heading + "," + coordinateSystem;
@@ -455,10 +732,36 @@ public abstract class AutoBase extends LinearOpMode
         try (PrintWriter out = new PrintWriter(new FileOutputStream(file)))
         {
             out.println(data);
+            telemetry.addData("Pose", "Saved: %s", data);
         }
         catch (Exception e)
         {
-            telemetry.addData("Error", "Save failed: ", e.getMessage());
+            telemetry.addData("Error", "Save failed: %s", e.getMessage());
         }
+    }
+
+    private boolean intakeExists()
+    {
+        return hw.intake != null && subsystems.intake != null;
+    }
+
+    private boolean transferExists()
+    {
+        return hw.transfer != null && subsystems.transfer != null;
+    }
+
+    private boolean turretExists()
+    {
+        return hw.turret != null && subsystems.turret != null;
+    }
+
+    private boolean outtakeExists()
+    {
+        return hw.outtake != null && subsystems.outtake != null;
+    }
+
+    private boolean odometryDoesNotExist()
+    {
+        return hw.pinpoint == null && subsystems.odometry == null;
     }
 }

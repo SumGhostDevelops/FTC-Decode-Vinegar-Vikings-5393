@@ -17,7 +17,7 @@ public class BetterInterpLUT extends InterpLUT
      * Private constructor used by the Builder.
      * It populates the parent class immediately, ensuring this object is valid from the moment it exists.
      */
-    private BetterInterpLUT(List<Point> sortedPoints, boolean safeMode)
+    private BetterInterpLUT(List<Point> sortedPoints)
     {
         super(); // Initialize parent
 
@@ -26,9 +26,6 @@ public class BetterInterpLUT extends InterpLUT
         {
             super.add(p.x, p.y);
         }
-
-        // 2. Configure safety
-        super.setSafeMode(safeMode);
 
         // 3. Finalize the LUT immediately.
         // Since the constructor is private, we know this is safe to do here.
@@ -74,7 +71,6 @@ public class BetterInterpLUT extends InterpLUT
     public static class Builder
     {
         private final List<Point> points = new ArrayList<>();
-        private boolean safeMode = true;
 
         /**
          * Convenience method to add a list of inputs and outputs at once.
@@ -98,12 +94,6 @@ public class BetterInterpLUT extends InterpLUT
             return this;
         }
 
-        public Builder setSafeMode(boolean enabled)
-        {
-            this.safeMode = enabled;
-            return this;
-        }
-
         public BetterInterpLUT build()
         {
             if (points.size() < 2)
@@ -114,7 +104,7 @@ public class BetterInterpLUT extends InterpLUT
             // Sort logic: Crucial for Spline interpolation
             points.sort(Comparator.comparingDouble(p -> p.x));
 
-            return new BetterInterpLUT(points, safeMode);
+            return new BetterInterpLUT(points);
         }
     }
 

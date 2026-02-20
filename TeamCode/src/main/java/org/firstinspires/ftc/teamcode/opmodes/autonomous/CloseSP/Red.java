@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.CloseSP;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
@@ -17,136 +13,62 @@ import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
 @Autonomous(name = "SpecialCloseRedAuto", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
 public class Red extends AutoBase
 {
-
     private Paths paths;
-    private Timer timer, opModeTimer;
-    private Follower follower;
 
-    private Paths.PathState currentPathState;
-
-    private AutoStrat autoStrat = AutoStrat.REGULAR;
+    @Override
+    protected StrategyOption[] getStrategyOptions()
+    {
+        return new StrategyOption[]{
+                new StrategyOption(AutoStrat.BASIC, "DPAD UP", "3 Ball (BASIC)"),
+                new StrategyOption(AutoStrat.REGULAR, "DPAD RIGHT", "9 Ball (REGULAR)")
+        };
+    }
 
     @Override
     public void runOpMode() throws InterruptedException
     {
-
         team = Team.RED;
 
-        while (opModeInInit())
-        {
-            // --- Move your selection logic inside this loop ---
-            if (gamepad1.dpad_right)
-            {
-                autoStrat = AutoStrat.REGULAR;
-            } else if (gamepad1.dpad_down)
-            {
-                autoStrat = AutoStrat.BASIC;
-            }
+        // Strategy selection
+        autoStrat = selectStrategy();
 
-            // --- Keep your telemetry inside the loop for live feedback ---
-            telemetry.addLine("--- SELECT AUTO STRATEGY ---");
-            telemetry.addData("Selected", autoStrat);
-            telemetry.addLine("\nControls:");
-            telemetry.addLine("DPAD RIGHT: 12 Ball Close (REGULAR)");
-            telemetry.addLine("DPAD DOWN: 6 Ball (BASIC)");
-            telemetry.update();
-        }
-
-        // Now the selection is locked in. Initialize paths and timers.
-        initAuto();
-
-        // The OpMode will wait here until you press START
-        waitForStart();
-
-        if (opModeIsActive() && !isStopRequested())
-        {
-            opModeTimer.resetTimer();
-            startOuttake(); // keep outtake always on until the end
-            // follower.followPath(paths.ToShoot);
-
-            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
-            {
-                handlePathing();
-                follower.update();
-
-                RobotUpdates();
-            }
-        }
-
-        stopSubsystems();
-        writePoseToFile();
-    }
-
-    protected void displayTelemetry()
-    {
-        telemetry.addData("Current State", currentPathState);
-        telemetry.addData("State Time (s)", timer.getElapsedTimeSeconds());
-        telemetry.addData("OpMode Time (s)", opModeTimer.getElapsedTimeSeconds());
-        telemetry.addData("Heading", follower.getHeading());
-        telemetry.addLine("-----");
-        telemetry.addData("Distance to Goal", getPose2d().distanceTo(getGoal()).toUnit(DistanceUnit.INCH));
-        telemetry.addData("Outtake RPM", robot.subsystems.outtake.getMotorRPM());
-        telemetry.addData("Turret Angle", robot.subsystems.turret.getRelativeAngle().toUnit(AngleUnit.DEGREES));
-        telemetry.addData("Turret Target Angle", robot.subsystems.turret.getTargetAngleDegrees());
-        telemetry.update();
-    }
-        /**
-         * --- Initialize robot and paths ---
-         * Starts Local Timer, and Sets Follower Pose
-         * Starts First Path.
-         */
-    public void initAuto()
-    {
-        // --- Initialize pedro Path Constants and Followers ---
+        // Initialize autonomous
         follower = PedroConstants.createFollower(hardwareMap);
         setFollower(follower);
-        paths = new Paths(follower,  autoStrat);
-        // --- Initialize Timers ---
-        timer = new Timer();
-        opModeTimer = new Timer();
-        opModeTimer.resetTimer();
-        //Sets Starting pose and updates follower
-        follower.setStartingPose(paths.startPose);
-        follower.update();
-        //Init Robot Hardware.
-        initRobot();
-        //starts first Path
+        paths = new Paths(follower, autoStrat);
+        initAuto(paths);
+
+        // Set initial state
         setPathState(Paths.PathState.ToShoot);
+
+        // Wait for start
+        waitForStart();
+
+        // Run the main autonomous loop
+        runAutoLoop();
     }
 
-
-
-    private void handlePathing()
+    @Override
+    protected Object createPaths(Follower follower, AutoStrat autoStrat)
     {
-        //Sets paths based on set strat
-        switch (autoStrat)
-        {
-            case BASIC:
-               PathBasic();
-                break;
-            case REGULAR:
-                PathRegular();
-                break;
-
-        }
+        return new Paths(follower, autoStrat);
     }
 
-    public void setPathState(Paths.PathState pathState)
+    @Override
+    protected Pose getStartingPose(Object paths)
     {
-        currentPathState = pathState;
-        timer.resetTimer();
+        return ((Paths) paths).startPose;
     }
-    private void PathBasic()
+
+    @Override
+    protected void PathBasic()
     {
         if (!follower.isBusy())
         {
-            switch (currentPathState)
+            switch (getPathState())
             {
-                case ToShoot:
-                    //Shoots first, then drives to final pose
-
+                case ToShoot: // Shoot, then drive to final pose
                     Shoot();
-                    //at starting position, starts driving to position 2.
                     follower.followPath(paths.finalPose, false);
                     setPathState(Paths.PathState.finalPose);
                     break;
@@ -158,12 +80,23 @@ public class Red extends AutoBase
         }
     }
 
-    private void PathRegular()
+    private Paths.PathState getPathState()
+    {
+        return (Paths.PathState) currentPathState;
+    }
+
+    private void setPathState(Paths.PathState pathState)
+    {
+        setPathState((Object) pathState);
+    }
+
+    @Override
+    protected void PathRegular()
     {
 
         if (!follower.isBusy())
         {
-            switch (currentPathState)
+            switch (getPathState())
             {
                 //  When in a state, start the NEXT path.
                 case ToShoot:
@@ -253,7 +186,11 @@ public class Red extends AutoBase
         }
     }
 
-
+    @Override
+    protected void PathGate()
+    {
+        // Not implemented for this autonomous
+    }
 
 
     static class Paths
@@ -262,18 +199,7 @@ public class Red extends AutoBase
 
         public PathChain ToShoot,
                 ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack, ToThree,
-                ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
-        // Gate-specific paths used in buildPathsGate
-        Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3,
-                bottomBalls, bottomBallsEat, ToShoot_5, upperBalls, upperEat, upperTurn, toShoot, finalPose;
-
-        public enum PathState
-        {
-            ToShoot, ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack, ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, ToShoot_4,
-            // Gate-specific states
-            Gate, Eat, Gate_2, Eat_2, Gate_3, Eat_3, bottomBalls, bottomBallsEat, ToShoot_5, upperEat, upperBalls, upperTurn, toShoot, finalPose,
-        }
-
+                ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, finalPose;
 
         public Paths(Follower follower, AutoStrat autoStrat)
         {
@@ -393,5 +319,11 @@ public class Red extends AutoBase
                     .build();
         }
 
+
+        public enum PathState
+        {
+            ToShoot, ToBallOne, ToBallOneFull, ToBallOneBack, ToBallTwo, ToBallTwoFull, ToBallTwoBack,
+            ToThree, ToThreeFull, ToShoot_1, ToShoot_2, ToShoot_3, finalPose
+        }
     }
 }
