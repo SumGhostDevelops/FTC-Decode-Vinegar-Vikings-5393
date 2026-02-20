@@ -16,19 +16,18 @@ public class Intake extends SubsystemBase
 
     public void intake(double power)
     {
-        intake.setScale(Math.abs(power));
+        intake.setPower(Math.abs(power));
     }
 
     public void reverse(double power)
     {
         // setScale clamps to [0, maxRPM], so use setPower directly for reverse
-        intake.stopMotor();
         intake.setPower(-Math.abs(power));
     }
 
     public void transfer(double power)
     {
-        intake.setScale(Math.abs(power));
+        intake.setPower(Math.abs(power));
     }
 
     public void stop()
