@@ -431,6 +431,8 @@ public abstract class AutoBase extends LinearOpMode
             subsystems.turret.periodic();
         if (subsystems.outtake != null)
             subsystems.outtake.periodic();
+        if (subsystems.intake != null)
+            subsystems.intake.periodic();
     }
 
     /**
