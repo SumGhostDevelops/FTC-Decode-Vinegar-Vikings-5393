@@ -8,27 +8,27 @@ import org.firstinspires.ftc.teamcode.util.motors.VelocityMotor;
 public class Intake extends SubsystemBase
 {
 
-    private final PowerMotor intake;
+    private final VelocityMotor intake;
 
-    public Intake(PowerMotor intake)
+    public Intake(VelocityMotor intake)
     {
         this.intake = intake;
     }
 
     public void intake(double power)
     {
-        intake.setPower(Math.abs(power));
+        intake.setScale(Math.abs(power));
     }
 
     public void reverse(double power)
     {
         // setScale clamps to [0, maxRPM], so use setPower directly for reverse
-        intake.setPower(-Math.abs(power));
+        intake.setScale(-Math.abs(power));
     }
 
     public void transfer(double power)
     {
-        intake.setPower(Math.abs(power));
+        intake.setScale(Math.abs(power));
     }
 
     public void stop()
