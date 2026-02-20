@@ -105,6 +105,7 @@ public class Blue extends AutoBase
                     setPathState(Paths.PathState.ToBallOne);
                     break;
                 case ToBallOne:
+                    startIntake();
                     follower.followPath(paths.ToBallOneFull);
                     setPathState(Paths.PathState.ToBallOneFull);
                 case ToBallOneFull:
