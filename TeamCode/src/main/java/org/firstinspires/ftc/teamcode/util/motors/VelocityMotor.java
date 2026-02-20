@@ -159,6 +159,7 @@ public class VelocityMotor extends PowerMotor
      */
     public VelocityMotor setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior)
     {
+        super.setZeroPowerBehavior(behavior);
         return this;
     }
 
@@ -269,7 +270,7 @@ public class VelocityMotor extends PowerMotor
      */
     public VelocityMotor setRpmCachingTolerance(double rpm)
     {
-        rpmCachingTolerance = MathUtil.clamp(25, 0, Double.POSITIVE_INFINITY);
+        rpmCachingTolerance = MathUtil.clamp(rpm, 0, Double.POSITIVE_INFINITY);
 
         return this;
     }

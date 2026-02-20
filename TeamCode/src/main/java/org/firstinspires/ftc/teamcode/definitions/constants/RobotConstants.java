@@ -23,7 +23,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
     }
@@ -107,6 +107,8 @@ public class RobotConstants
         public static boolean USE_LUT = false;
 
         public static Distance OFFSET_FROM_CENTER = new Distance(-4.5, DistanceUnit.INCH);
+
+        public static Distance OFFSET_FROM_TURRET = new Distance(4, DistanceUnit.INCH);
 
         @IgnoreConfigurable
         public static class Name
@@ -192,7 +194,7 @@ public class RobotConstants
         public static double OPEN_ANGLE = 75; // Open means the transfer is allowing balls to pass through
 
         @Sorter(sort = 2)
-        public static double CLOSE_INTAKE_ANGLE = 0; // 210; // An angle where the trapdoor blocks balls from entering
+        public static double CLOSE_INTAKE_ANGLE = 110; // 210; // An angle where the trapdoor blocks balls from entering
     }
 
     @Configurable
@@ -212,7 +214,7 @@ public class RobotConstants
         @Sorter(sort = 7)
         public static boolean INTAKE_BY_DEFAULT = false;
 
-        public static PIDFCoefficients PIDF = new PIDFCoefficients(1, 1, 1, 0);
+        public static PIDFCoefficients PIDF = new PIDFCoefficients(0.001, 0.1, 0, 0.0006);
     }
 
     @Configurable

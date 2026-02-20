@@ -123,6 +123,32 @@ public class Pose2d
     }
 
     /**
+     * Creates a new Pose2d shifted by a polar offset relative to this pose.
+     * The {@code radius} is the distance from the robot center to the target point,
+     * and {@code bearingOffset} is the angle measured from the robot's forward direction,
+     * counter-clockwise positive (left of forward = positive).
+     *
+     * <p>This is equivalent to converting the polar offset to local Cartesian coordinates
+     * and then calling {@link #transform(Distance, Distance)}.
+     *
+     * @param radius        The radial distance from the robot center to the offset point.
+     * @param bearingOffset The angle from the robot's forward axis to the offset direction,
+     *                      counter-clockwise positive.
+     * @return A new Pose2d representing the translated point.
+     */
+    public Pose2d transform(Distance radius, Angle bearingOffset)
+    {
+        double r   = radius.getInch();
+        double phi = bearingOffset.getRadians();
+
+        // Convert polar (r, phi) to local Cartesian: forward = x-axis, left = y-axis
+        Distance forwardOffset = new Distance(r * Math.cos(phi), DistanceUnit.INCH);
+        Distance strafeOffset  = new Distance(r * Math.sin(phi), DistanceUnit.INCH);
+
+        return transform(forwardOffset, strafeOffset);
+    }
+
+    /**
      * Creates a new Pose2d shifted by the given local coordinates relative to this pose.
      * Useful for determining the position of components (turrets, cameras, intakes)
      * mounted at a fixed offset from the robot center.

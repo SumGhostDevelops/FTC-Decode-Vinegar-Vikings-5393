@@ -307,7 +307,8 @@ public class RobotHardware
                         .setMotorDirection(Motor.Direction.REVERSE)
                         .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
                         .setControllerType(VelocityMotor.VelocityController.PIDF)
-                        .setPIDF(RobotConstants.Intake.PIDF);
+                        .setPIDF(RobotConstants.Intake.PIDF)
+                        .setTolerance(50, 100);
             }
             catch (Exception e)
             {

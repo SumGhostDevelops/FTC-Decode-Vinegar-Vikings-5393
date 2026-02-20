@@ -5,6 +5,8 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.math.BetterInterpLUT;
+import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
+import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
 import org.firstinspires.ftc.teamcode.util.motors.VelocityMotorGroup;
 
@@ -262,6 +264,11 @@ public class Outtake extends SubsystemBase
     public double getFlywheelRPMAcceleration()
     {
         return motor.getOutputRPMAcceleration();
+    }
+
+    public Pose2d getFlywheelPose(Pose2d turretPose, Angle relativeTurretHeading)
+    {
+        return turretPose.transform(RobotConstants.Outtake.OFFSET_FROM_TURRET, relativeTurretHeading);
     }
 
     /**

@@ -136,6 +136,7 @@ public abstract class Base extends CommandOpMode
             telemetry.addLine("Initialized in " + timeToInit + "ms");
             telemetry.addLine(savedPose != null ? "Loaded Autonomous Pose" : "No Autonomous Pose Loaded");
             telemetry.addData("Reference Pose Set", s.odometry != null ? s.odometry.referencePoseWasSet() : "N/A");
+            telemetry.addData("Pose", s.odometry.getPose());
             telemetry.addData("Pinpoint Status", robot.hw.pinpoint != null ? robot.hw.pinpoint.getDeviceStatus() : "NULL");
             telemetry.update();
         } while (!isStarted() && opModeInInit());
@@ -276,6 +277,7 @@ public abstract class Base extends CommandOpMode
             if (s.intake != null && robot.hw.intake != null)
             {
                 Graph.put("Intake (RPM)", s.intake.getRPM());
+                Graph.put("Intake (Target RPM)", robot.hw.intake.getMotorTargetRPM());
                 Graph.put("Intake (Power)", robot.hw.intake.getPower());
             }
 
@@ -418,7 +420,7 @@ public abstract class Base extends CommandOpMode
             // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
             active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
                     s.outtake,
-                    () -> s.odometry.getPose().transform(RobotConstants.Outtake.OFFSET_FROM_CENTER, Distance.ZERO).distanceTo(getGoal())));
+                    () -> s.outtake.getFlywheelPose(s.turret.getTurretPose(s.odometry.getPose()), s.turret.getRelativeAngle()).distanceTo(getGoal())));
         }
     }
 

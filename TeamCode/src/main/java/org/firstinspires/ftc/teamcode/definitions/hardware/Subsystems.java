@@ -68,7 +68,7 @@ public class Subsystems
         {
             if (hw.pinpoint != null)
             {
-                this.odometry = new Odometry(hw.pinpoint, hw.webcam);
+                this.odometry = new Odometry(hw.pinpoint, hw.webcam, team.initialPose);
             }
 
             // Wiring Turret Compensation if both exist
