@@ -84,10 +84,18 @@ public class Blue extends AutoBase
                 case ToShoot:
                     // Shoots first, then drives to final pose
                     Shoot();
-                    follower.followPath(paths.FinalPose, false);
-                    setPathState(Paths.PathState.finalPose);
+                    startIntake();
+                    follower.followPath(paths.ToBallOne, false);
+                    setPathState(Paths.PathState.ToBallOne);
                     break;
+                case ToBallOne:
+                   stopIntake();
+                    follower.followPath(paths.ToBallOneFull);
+                    setPathState(Paths.PathState.ToBallOneFull);
+                case ToBallOneFull:
 
+                    follower.followPath(paths.finalPose);
+                    setPathState(Paths.PathState.finalPose);
                 case finalPose:
                     finishedAutonomous = true;
                     break;
@@ -195,19 +203,51 @@ public class Blue extends AutoBase
 
         private void buildPathsBasic(Follower follower)
         {
-            startPose = new Pose(80, 8.3, Math.toRadians(90));
-            final Pose shootPose = new Pose(80, 8.3);
-            final Pose leavePose = new Pose(80, 50);
+            startPose =  new Pose(62.000, 9.000, Math.toRadians(90));
+            final Pose toBallOne =  new Pose(56.000, 36.000);
+            final Pose toBallOneFull =  new Pose(15.000, 36.000);
+            final Pose leavePose =  new Pose(50.000, 58.000);
 
             ToShoot = follower.pathBuilder()
-                    .addPath(new BezierLine(startPose, shootPose))
+                    .addPath(
+                            new BezierLine(
+                                    startPose,
+                                    toBallOne
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
+                    .build();
+
+            ToBallOne = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    toBallOne,
+                                    toBallOneFull
+                            )
+                    )
                     .setTangentHeadingInterpolation()
                     .build();
 
-            FinalPose = follower.pathBuilder()
-                    .addPath(new BezierLine(shootPose, leavePose))
-                    .setConstantHeadingInterpolation(Math.toRadians(142))
+            ToBallOneFull = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    toBallOneFull,
+                                    startPose
+                            )
+                    )
+                    .setTangentHeadingInterpolation()
                     .build();
+
+            finalPose = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    startPose,
+                                    leavePose
+                            )
+                    )
+                    .setTangentHeadingInterpolation()
+                    .build();
+
         }
 
         private void buildPathsReg(Follower follower)
@@ -215,13 +255,13 @@ public class Blue extends AutoBase
             // --- Pose definitions (updated numbers) ---
             startPose = new Pose(62.000, 9.000, Math.toRadians(90));
 
-            final Pose ballOneLinePose = new Pose(40.000, 36.000);
+            final Pose ballOneLinePose = new Pose(50.000, 36.000);
             final Pose ballOneFullPose = new Pose(19.000, 36.000);
 
-            final Pose ballTwoLinePose = new Pose(41.000, 60.000);
+            final Pose ballTwoLinePose = new Pose(50.000, 60.000);
             final Pose ballTwoFullPose = new Pose(19.000, 60.000);
 
-            final Pose ballThreeLinePose = new Pose(40.000, 84.000);
+            final Pose ballThreeLinePose = new Pose(50.000, 84.000);
             final Pose ballThreeFullPose = new Pose(19.000, 84.000);
 
             final Pose shootPose = new Pose(62.000, 9.000);

@@ -67,12 +67,21 @@ public class Red extends AutoBase
         {
             switch (getPathState())
             {
-                case ToShoot: // Shoot, then drive to final pose
+                case ToShoot:
+                    // Shoots first, then drives to final pose
                     Shoot();
-                    follower.followPath(paths.finalPose, false);
-                    setPathState(Paths.PathState.finalPose);
+                    startIntake();
+                    follower.followPath(paths.ToBallOne, false);
+                    setPathState(Blue.Paths.PathState.ToBallOne);
                     break;
+                case ToBallOne:
+                    stopIntake();
+                    follower.followPath(paths.ToBallOneFull);
+                    setPathState(Blue.Paths.PathState.ToBallOneFull);
+                case ToBallOneFull:
 
+                    follower.followPath(paths.finalPose);
+                    setPathState(Blue.Paths.PathState.finalPose);
                 case finalPose:
                     finishedAutonomous = true;
                     break;
@@ -217,26 +226,36 @@ public class Red extends AutoBase
 
         private void buildPathsBasic(Follower follower)
         {
-            startPose = new Pose(79, 9,  Math.toRadians(90));
-            final Pose shootPose = new Pose(79, 9);
-            final Pose leavePose = new Pose(85, 50);
+            // --- Pose definitions ---
+            startPose = new Pose(82.000, 9.000, Math.toRadians(90));
 
-            ToShoot = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    startPose,
+            final Pose ballOneLinePose = new Pose(88.000, 36.000);
+            final Pose ballOneFullPose = new Pose(129.000, 36.000);
 
-                                    shootPose))
+            final Pose leavePose = new Pose(94.000, 58.000);
+
+
+// --- Paths ---
+
+            ToShoot = follower.pathBuilder()
+                    .addPath(new BezierLine(startPose, ballOneLinePose))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(0))
+                    .build();
+
+            ToBallOne = follower.pathBuilder()
+                    .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
+                    .setTangentHeadingInterpolation()
+                    .build();
+
+            ToBallOneFull = follower.pathBuilder()
+                    .addPath(new BezierLine(ballOneFullPose, startPose))
                     .setTangentHeadingInterpolation()
                     .setReversed()
                     .build();
 
-            finalPose = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    shootPose,
-
-                                    leavePose))
-                    .setConstantHeadingInterpolation(Math.toRadians(142))
-
+            finalPose = follower.pathBuilder()
+                    .addPath(new BezierLine(startPose, leavePose))
+                    .setTangentHeadingInterpolation()
                     .build();
         }
 
@@ -245,13 +264,13 @@ public class Red extends AutoBase
             // --- Pose definitions ---
             startPose = new Pose(80.000, 8.300, Math.toRadians(90));
 
-            final Pose ballOneLinePose = new Pose(104.000, 36.000);
+            final Pose ballOneLinePose = new Pose(95, 36.000);
             final Pose ballOneFullPose = new Pose(125.000, 36.000);
 
-            final Pose ballTwoLinePose = new Pose(103.000, 60.000);
+            final Pose ballTwoLinePose = new Pose(95, 60.000);
             final Pose ballTwoFullPose = new Pose(125.000, 60.000);
 
-            final Pose ballThreeLinePose = new Pose(104.000, 84.000);
+            final Pose ballThreeLinePose = new Pose(95, 84.000);
             final Pose ballThreeFullPose = new Pose(125.000, 84.000);
 
             final Pose shootPose = new Pose(80.000, 8.300);
@@ -268,7 +287,7 @@ public class Red extends AutoBase
             ToBallOneFull = follower.pathBuilder()
                     .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
                     .setTangentHeadingInterpolation()
-                    .setReversed()
+
                     .build();
 
             ToShoot_1 = follower.pathBuilder()
@@ -285,7 +304,7 @@ public class Red extends AutoBase
             ToBallTwoFull = follower.pathBuilder()
                     .addPath(new BezierLine(ballTwoLinePose, ballTwoFullPose))
                     .setTangentHeadingInterpolation()
-                    .setReversed()
+
                     .build();
 
             ToShoot_2 = follower.pathBuilder()
@@ -302,7 +321,7 @@ public class Red extends AutoBase
             ToThreeFull = follower.pathBuilder()
                     .addPath(new BezierLine(ballThreeLinePose, ballThreeFullPose))
                     .setTangentHeadingInterpolation()
-                    .setReversed()
+
                     .build();
 
             ToShoot_3 = follower.pathBuilder()
