@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase
     public void reverse(double power)
     {
         // setScale clamps to [0, maxRPM], so use setPower directly for reverse
-        intake.setScale(-Math.abs(power));
+        intake.setPower(-Math.abs(power));
     }
 
     public void transfer(double power)
