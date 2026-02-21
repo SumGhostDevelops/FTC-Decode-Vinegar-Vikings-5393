@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
 
-@Autonomous(name = "RedBlue_LastCall", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
+@Autonomous(name = "Red_LastCall", group = "Red", preselectTeleOp = "RedVikingsTeleOp")
 public class Red_LastCall extends AutoBase
 {
     private Paths paths;
@@ -254,33 +254,33 @@ public class Red_LastCall extends AutoBase
 
 // Ball Three second
             ToBallTwo = follower.pathBuilder()
-                    .addPath(new BezierLine(shootPose, ballThreeLinePose))
+                    .addPath(new BezierLine(shootPose, ballOneLinePose))
                     .setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(0))
                     .build();
 
             ToBallTwoFull = follower.pathBuilder()
-                    .addPath(new BezierLine(ballThreeLinePose, ballThreePose))
+                    .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
                     .setTangentHeadingInterpolation()
                     .build();
 
             ToShoot_2 = follower.pathBuilder()
-                    .addPath(new BezierLine(ballThreePose, shootPose))
+                    .addPath(new BezierLine(ballOneFullPose, shootPose))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                     .build();
 
 // Ball One last
             ToThree = follower.pathBuilder()
-                    .addPath(new BezierLine(shootPose, ballOneLinePose))
+                    .addPath(new BezierLine(shootPose, ballThreeLinePose))
                     .setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(0))
                     .build();
 
             ToThreeFull = follower.pathBuilder()
-                    .addPath(new BezierLine(ballOneLinePose, ballOneFullPose))
+                    .addPath(new BezierLine(ballThreeLinePose, ballThreePose))
                     .setTangentHeadingInterpolation()
                     .build();
 
             ToShoot_3 = follower.pathBuilder()
-                    .addPath(new BezierLine(ballOneFullPose, shootPose))
+                    .addPath(new BezierLine(ballThreePose, shootPose))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                     .build();
 
