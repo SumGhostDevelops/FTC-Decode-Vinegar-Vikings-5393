@@ -62,6 +62,7 @@ public class Blue extends AutoBase
             switch (getPathState())
             {
                 case ToShoot:
+                    startOuttake();
                     Shoot();
 
                     follower.followPath(paths.finalPose);
@@ -93,6 +94,7 @@ public class Blue extends AutoBase
             switch (getPathState())
             {
                 case ToShoot:
+                    startOuttake();
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToShootFar);
                     break;
@@ -178,6 +180,7 @@ public class Blue extends AutoBase
             switch (getPathState())
             {
                 case ToShoot: // Going to shoot
+                    startOuttake();
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToBallOne);
                     break;

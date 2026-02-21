@@ -56,11 +56,13 @@ public class Outtake extends SubsystemBase
 
         // Inches -> RPM
         rpmLUT = BetterInterpLUT.builder()
-                .add(52.37, 2845)
-                .add(62.41, 3005)
-                .add(71.18, 3090)
-                .add(82.37, 3185)
-                .add(121.67, 3790)
+                .add(50.69, 3000)
+                .add(40.54, 2850)
+                .add(60.6, 3070)
+                .add(70.44, 3250)
+                .add(82.78, 3455)
+                .add(103.48, 3720)
+                .add(130.49, 4750)
                 .build();
     }
 
@@ -238,7 +240,7 @@ public class Outtake extends SubsystemBase
 
     private double regression(double inches)
     {
-        return 2453 + 5.6*inches + 0.044*inches*inches;
+        return 3012 -(9.59 * inches) + (0.173 * inches * inches);
     }
 
     public double getTargetRPM()

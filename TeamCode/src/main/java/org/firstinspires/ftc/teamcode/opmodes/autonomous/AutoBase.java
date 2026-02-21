@@ -528,7 +528,9 @@ public abstract class AutoBase extends LinearOpMode
     protected void updateOuttakeRPM()
     {
         Pose2d pose = getPose2d();
-        Distance distToGoal = pose.distanceTo(getGoal());
+        Pose2d turretPose = subsystems.turret.getTurretPose(pose);
+        Distance distToGoal = turretPose.distanceTo(getGoal());
+
         subsystems.outtake.setTargetRPM(distToGoal);
     }
 

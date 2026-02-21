@@ -62,7 +62,7 @@ public class Red extends AutoBase
             switch (getPathState())
             {
                 case ToShoot:
-
+                    startOuttake();
 
                     follower.followPath(paths.Move);
                     setPathState(Paths.PathState.Move);
@@ -96,6 +96,7 @@ public class Red extends AutoBase
             {
                 //  When in a state, start the NEXT path.
                 case ToShoot:
+                    startOuttake();
                     // before following next path, it shoots.
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToShootFar);
@@ -171,6 +172,7 @@ public class Red extends AutoBase
             {
                 // Corrected Logic: When a state is finished, start the NEXT path and set the NEXT state.
                 case ToShoot:
+                    startOuttake();
                     Shoot();
                     follower.followPath(paths.ToBallOne); // Start path TO BallOne
                     setPathState(Paths.PathState.ToBallOne);
