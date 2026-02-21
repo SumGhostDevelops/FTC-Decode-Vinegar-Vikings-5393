@@ -204,7 +204,7 @@ public class Blue_LastCall extends AutoBase
             final Pose ballOneLinePose = new Pose(54.000, 60.000);
             final Pose ballOneFullPose = new Pose(17.000, 60.000);
             final Pose gateHitPose = new Pose(16.000, 69.000);
-            final Pose gateControlPoint = new Pose(23.000, 65.000); // Bezier control point
+            final Pose gateControlPoint = new Pose(28.000, 65.000); // Bezier control point
 
             final Pose shootPose = new Pose(54.000, 97.200);
 
