@@ -131,11 +131,6 @@ public class Blue extends AutoBase
 
                 case ToBallTwoFull:
                     stopIntake();
-                    follower.followPath(paths.Gate);
-                    setPathState(Paths.PathState.Gate);
-                    break;
-
-                case Gate:
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
@@ -519,11 +514,10 @@ public class Blue extends AutoBase
             final Pose shootPose = new Pose(54.000, 97.200);
 
             final Pose ballTwoLinePose = new Pose(54.000, 60.000);
-            final Pose ballTwoFullPose = new Pose(17.000, 60.000);
+            final Pose ballTwoFullPose = new Pose(21.000, 60.000);
 
             final Pose ballThreeLinePose = new Pose(54.000, 35.000);
             final Pose ballThreeFullPose = new Pose(16.000, 35.000);
-            final Pose gateHitPose = new Pose(55.000, 59.000);
 
             final Pose finalPose = new Pose(53.890, 69.156);
 
@@ -582,18 +576,10 @@ public class Blue extends AutoBase
                     .build();
 
 
-            Gate = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            ballTwoFullPose,
-                            gateHitPose))
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
-                    .build();
-
-
 
             ToShoot_2 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    gateHitPose,
+                                    ballTwoFullPose,
                                     shootPose))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
                     .build();
