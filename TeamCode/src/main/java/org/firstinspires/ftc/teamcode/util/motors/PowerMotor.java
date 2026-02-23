@@ -70,9 +70,11 @@ public class PowerMotor
     {
         this.motorEx = motorEx;
 
-        motorEx.setRunMode(Motor.RunMode.RawPower);
-        setPower(0); // hack fix for weird motor behavior prior to stop and reset according to https://ftc-community.firstinspires.org/t/stop-and-reset-encoder-sometimes-doesnt-stop-motor/922/7
+        motorEx.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorEx.motor.setPower(0); // hack fix for weird motor behavior prior to stop and reset according to https://ftc-community.firstinspires.org/t/stop-and-reset-encoder-sometimes-doesnt-stop-motor/922/7
         motorEx.stopAndResetEncoder(); // stop and reset, run without encoder
+
+        motorEx.setRunMode(Motor.RunMode.RawPower);
     }
 
     /**
