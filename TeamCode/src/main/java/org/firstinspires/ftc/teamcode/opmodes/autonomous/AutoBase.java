@@ -242,6 +242,8 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected void initAuto(Object paths)
     {
+        RobotConstants.Odometry.RESET_PINPOINT = true;
+
         // Initialize Timers
         pathStateTimer = new Timer();
         opModeTimer = new Timer();

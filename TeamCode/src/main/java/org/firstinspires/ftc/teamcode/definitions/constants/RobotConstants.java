@@ -228,7 +228,8 @@ public class RobotConstants
 
         public static boolean SET_FORWARD_DIRECTION_BASED_ON_TEAM = true;
         public static boolean ENABLE_CORNER_LOCALIZATION = true;
-        public static boolean RESET_PINPOINT_FULLY_ON_INIT = true;
+        public static boolean RESET_PINPOINT_FULLY = true;
+        public static boolean RESET_PINPOINT = true;
 
         @IgnoreConfigurable
         public static class Pinpoint

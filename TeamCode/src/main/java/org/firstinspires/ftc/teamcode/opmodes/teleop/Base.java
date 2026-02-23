@@ -80,6 +80,8 @@ public abstract class Base extends CommandOpMode
 
         ConstantsPresets.applyPreset();
 
+        RobotConstants.Odometry.RESET_PINPOINT = false;
+
         // 1. Initialize Hardware
         robot = new RobotContext(team, hardwareMap, telemetry, gamepad1, gamepad2);
 
@@ -130,7 +132,7 @@ public abstract class Base extends CommandOpMode
         {
             robot.hw.clearHubCache();
             robot.hw.readBattery();
-            
+
             // Continually attempt to load/configure/calibrate Pinpoint until ready
             if (s.odometry != null)
                 s.odometry.periodic();
