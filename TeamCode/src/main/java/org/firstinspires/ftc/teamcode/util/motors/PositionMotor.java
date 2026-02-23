@@ -252,6 +252,9 @@ public class PositionMotor extends PowerMotor
                 controller = new SquIDFController(coefficients);
                 break;
         }
+
+        controller.reset();
+
         return this;
     }
 

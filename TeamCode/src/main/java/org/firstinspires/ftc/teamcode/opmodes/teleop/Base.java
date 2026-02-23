@@ -128,6 +128,9 @@ public abstract class Base extends CommandOpMode
 
         do
         {
+            robot.hw.clearHubCache();
+            robot.hw.readBattery();
+            
             // Continually attempt to load/configure/calibrate Pinpoint until ready
             if (s.odometry != null)
                 s.odometry.periodic();

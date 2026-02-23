@@ -98,6 +98,8 @@ public class VelocityMotor extends PowerMotor
                 break;
         }
 
+        controller.reset();
+
         return this;
     }
 

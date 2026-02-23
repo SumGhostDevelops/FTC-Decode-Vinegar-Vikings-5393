@@ -75,6 +75,7 @@ public class PowerMotor
         motorEx.stopAndResetEncoder(); // stop and reset, run without encoder
 
         motorEx.setRunMode(Motor.RunMode.RawPower);
+        motorEx.resetEncoder();
     }
 
     /**
