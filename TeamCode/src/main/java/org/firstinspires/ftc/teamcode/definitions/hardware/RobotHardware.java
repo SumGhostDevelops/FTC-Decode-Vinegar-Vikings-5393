@@ -225,19 +225,19 @@ public class RobotHardware
         {
             try
             {
-                frontLeft = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+                frontLeft = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_LEFT, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
                         .setMotorDirection(Motor.Direction.REVERSE)
                         .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-                frontRight = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+                frontRight = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.FRONT_RIGHT, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
                         .setMotorDirection(Motor.Direction.REVERSE)
                         .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-                backLeft = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+                backLeft = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_LEFT, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
                         .setMotorDirection(Motor.Direction.REVERSE)
                         .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-                backRight = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT, Motor.GoBILDA.RPM_312), () -> cachedVoltage)
+                backRight = new PowerMotor(new MotorEx(hardwareMap, RobotConstants.Drive.WHEEL_NAMES.BACK_RIGHT, Motor.GoBILDA.RPM_435), () -> cachedVoltage)
                         .setMotorDirection(Motor.Direction.FORWARD)
                         .setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             }
