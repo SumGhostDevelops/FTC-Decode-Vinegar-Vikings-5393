@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.definitions.hardware;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
@@ -179,6 +180,8 @@ public class RobotHardware
 
         public Builder(HardwareMap hardwareMap, Telemetry telemetry)
         {
+            com.seattlesolvers.solverslib.command.CommandScheduler.getInstance().reset();
+
             this.hardwareMap = hardwareMap;
             this.telemetry = telemetry;
             initializeBaseHardware();
