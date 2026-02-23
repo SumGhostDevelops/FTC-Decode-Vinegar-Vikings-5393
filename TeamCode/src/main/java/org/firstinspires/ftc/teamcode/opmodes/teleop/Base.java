@@ -86,7 +86,7 @@ public abstract class Base extends CommandOpMode
         // 2. Register Subsystems
         Subsystems s = robot.subsystems;
 
-        Pose2d savedPose = getSavedAutonomousPose(RobotConstants.Autonomous.AUTONOMOUS_POSE_TIMEOUT);
+        Pose2d savedPose = getSavedAutonomousPose(RobotConstants.Autonomous.AUTONOMOUS_POSE_TIMEOUT_MS);
 
         if (savedPose != null && s.odometry != null)
         {
@@ -561,12 +561,20 @@ public abstract class Base extends CommandOpMode
             String[] parts = line.split(",");
 
             // x, y, heading, coordinate system
-            return new Pose2d(
+            Pose2d pose = new Pose2d(
                     new Distance(Double.parseDouble(parts[0]), DistanceUnit.INCH),
                     new Distance(Double.parseDouble(parts[1]), DistanceUnit.INCH),
                     new Angle(Double.parseDouble(parts[2]), AngleUnit.DEGREES),
                     CoordinateSystem.valueOf(parts[3])
             );
+
+            // Delete the file after successfully reading it
+            if (RobotConstants.Autonomous.DELETE_AUTONOMOUS_POSE_AFTER_FIRST_READ)
+            {
+                file.delete();
+            }
+
+            return pose;
         }
         catch (Exception e)
         {

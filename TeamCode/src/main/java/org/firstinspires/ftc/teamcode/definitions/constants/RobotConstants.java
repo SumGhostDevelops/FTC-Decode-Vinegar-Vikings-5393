@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
-import org.firstinspires.ftc.teamcode.util.measure.geometry.Vector2d;
 
 public class RobotConstants
 {
@@ -34,8 +33,9 @@ public class RobotConstants
         public static int WAIT_SYS_READY_MS = 4000;
         public static int SHOOT_LENGTH_MS = 1500;
         public static boolean SAVE_END_AUTONOMOUS_POSE = true;
-        public static long AUTONOMOUS_POSE_TIMEOUT = 90_000; // use this pose if it was created in the last 90,000 milliseconds (90 seconds)
+        public static long AUTONOMOUS_POSE_TIMEOUT_MS = 90_000; // use this pose if it was created in the last 90,000 milliseconds (90 seconds)
         public static String AUTONOMOUS_POSE_FILE_NAME = "saved_pose.txt";
+        public static boolean DELETE_AUTONOMOUS_POSE_AFTER_FIRST_READ = false;
     }
 
     @Configurable
