@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.motors;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -70,7 +71,8 @@ public class PowerMotor
         this.motorEx = motorEx;
 
         motorEx.setRunMode(Motor.RunMode.RawPower);
-        motorEx.stopAndResetEncoder();
+        setPower(0); // hack fix for weird motor behavior prior to stop and reset according to https://ftc-community.firstinspires.org/t/stop-and-reset-encoder-sometimes-doesnt-stop-motor/922/7
+        motorEx.stopAndResetEncoder(); // stop and reset, run without encoder
     }
 
     /**
