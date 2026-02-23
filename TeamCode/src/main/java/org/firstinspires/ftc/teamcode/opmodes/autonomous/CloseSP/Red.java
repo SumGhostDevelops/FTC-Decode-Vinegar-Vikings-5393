@@ -83,7 +83,7 @@ public class Red extends AutoBase
                     follower.followPath(paths.finalPose);
                     setPathState(Blue.Paths.PathState.finalPose);
                 case finalPose:
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -189,7 +189,7 @@ public class Red extends AutoBase
                     break;
 
                 case finalPose: // At shooting position, going to final pose
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }

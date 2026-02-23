@@ -6,8 +6,6 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.definitions.constants.PedroConstants;
 import org.firstinspires.ftc.teamcode.definitions.constants.Team;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.AutoBase;
@@ -97,7 +95,7 @@ public class Blue extends AutoBase
                     follower.followPath(paths.finalPose);
                     setPathState(Paths.PathState.finalPose);
                 case finalPose:
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -171,7 +169,7 @@ public class Blue extends AutoBase
                     break;
 
                 case finalPose:
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }

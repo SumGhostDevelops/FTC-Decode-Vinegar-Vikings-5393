@@ -80,7 +80,7 @@ public class Blue extends AutoBase
                     break;
 
                 case finalPose:
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -174,7 +174,7 @@ public class Blue extends AutoBase
                     break;
 
                 case finalPose:
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -282,7 +282,7 @@ public class Blue extends AutoBase
                     break;
 
                 case FinalPose:
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }

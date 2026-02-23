@@ -79,7 +79,7 @@ public class Red extends AutoBase
                     break;
 
                 case finalPose:
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -175,7 +175,7 @@ public class Red extends AutoBase
                     break;
 
                 case finalPose: // At shooting position, going to final pose
-                    finishedAutonomous = true;
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -324,6 +324,7 @@ public class Red extends AutoBase
                     Shoot();
 
                     follower.followPath(paths.finalPose, false);
+                    autonomousFinished = true;
                     break;
             }
         }

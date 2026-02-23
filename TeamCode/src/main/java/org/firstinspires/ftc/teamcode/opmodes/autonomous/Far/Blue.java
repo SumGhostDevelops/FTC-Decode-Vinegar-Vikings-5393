@@ -71,6 +71,7 @@ public class Blue extends AutoBase
 
                 case finalPose:
                     // after it reachest the last state, it starts moving.
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -160,6 +161,7 @@ public class Blue extends AutoBase
                     break;
 
                 case finalPose:
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -264,6 +266,7 @@ public class Blue extends AutoBase
                     Shoot();
 
                     follower.followPath(paths.finalPose, false);
+                    autonomousFinished = true;
                     break;
             }
         }

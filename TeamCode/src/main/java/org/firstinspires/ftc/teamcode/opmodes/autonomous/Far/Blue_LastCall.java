@@ -159,6 +159,7 @@ public class Blue_LastCall extends AutoBase
                     break;
 
                 case finalPose:
+                    autonomousFinished = true;
                     break;
             }
         }

@@ -71,7 +71,7 @@ public class Red extends AutoBase
                 case Move:
                     // after it reachest the last state, it starts moving.
                     Shoot();
-
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -156,7 +156,7 @@ public class Red extends AutoBase
                     setPathState(Paths.PathState.finalPose);
                     break;
                 case finalPose:
-
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -267,6 +267,7 @@ public class Red extends AutoBase
                     break;
                 case finalPose:
                     follower.followPath(paths.finalPose, true);
+                    autonomousFinished = true;
                     break;
             }
         }

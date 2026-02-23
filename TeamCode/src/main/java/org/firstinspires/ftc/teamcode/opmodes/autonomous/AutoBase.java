@@ -34,7 +34,7 @@ public abstract class AutoBase extends LinearOpMode
     protected RobotHardware hw;
     protected Subsystems subsystems;
     protected Follower follower;
-    protected boolean finishedAutonomous = false; // flag for if the robot should end the teleop mode early
+    protected boolean autonomousFinished = false; // flag for if the robot should end the teleop mode early
 
     // Constants from RobotConstants
     private final double intakePower = RobotConstants.Intake.intakePower;
@@ -121,6 +121,7 @@ public abstract class AutoBase extends LinearOpMode
     /**
      * Path logic for BASIC strategy.
      * Override in subclasses.
+     * Make sure to add {@code autonomousFinished = true} when done!
      */
     protected void PathBasic()
     {
@@ -130,6 +131,7 @@ public abstract class AutoBase extends LinearOpMode
     /**
      * Path logic for REGULAR strategy.
      * Override in subclasses.
+     * Make sure to add {@code autonomousFinished = true} when done!
      */
     protected void PathRegular()
     {
@@ -139,6 +141,7 @@ public abstract class AutoBase extends LinearOpMode
     /**
      * Path logic for GATE strategy.
      * Override in subclasses.
+     * Make sure to add {@code autonomousFinished = true} when done!
      */
     protected void PathGate()
     {
@@ -264,7 +267,7 @@ public abstract class AutoBase extends LinearOpMode
             opModeTimer.resetTimer();
             startOuttake();
 
-            while (opModeIsActive() && !isStopRequested() && !finishedAutonomous)
+            while (opModeIsActive() && !isStopRequested() && !autonomousFinished)
             {
                 handlePathing();
                 follower.update();
