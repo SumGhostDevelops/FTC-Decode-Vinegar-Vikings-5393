@@ -207,7 +207,7 @@ public class Red_LastCall extends AutoBase
 
             final Pose gateLinePose = new Pose(90.0, 58);
             final Pose gatePushPose = new Pose(127, 58);
-            final Pose gateControlPoint = new Pose(120, 65);  // mirrored from blue's (28, 65)
+            final Pose gateControlPoint = new Pose(100, 65);  // mirrored from blue's (28, 65)
             final Pose gateHitPose = new Pose(128, 69);       // mirrored gate hit
 
             final Pose ballThreeLinePose = new Pose(90.0, 35);
