@@ -287,7 +287,7 @@ public abstract class Base extends CommandOpMode
                 Graph.put("Intake (Power)", robot.hw.intake.getPower());
             }
 
-            if (robot.hw.transfer != null) Graph.put("Transfer (Position)", robot.hw.transfer.getRawPosition());
+            if (robot.hw.transfer != null) Graph.put("Transfer (Angle)", robot.hw.transfer.get());
             if (robot.hw.battery != null)  Graph.put("Battery (Voltage)", robot.hw.battery.getVoltage());
 
             Graph.update();
