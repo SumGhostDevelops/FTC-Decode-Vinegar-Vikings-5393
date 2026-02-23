@@ -163,8 +163,8 @@ public class RobotConstants
         @Sorter(sort = 6)
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]
         {
-                new UnnormalizedAngle(-260, UnnormalizedAngleUnit.DEGREES),
-                new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
+                new UnnormalizedAngle(-70, UnnormalizedAngleUnit.DEGREES), // negative clockwise, positive counter clockwise
+                new UnnormalizedAngle(70, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
         @Sorter(sort = 7)
         public static boolean AUTO_AIM_TO_GOAL = false;
 
@@ -206,7 +206,7 @@ public class RobotConstants
         @Sorter(sort = 1)
         public static double intakePower = 1.0;
         @Sorter(sort = 2)
-        public static double outtakePower = 0.6;
+        public static double outtakePower = 1.0;
         @Sorter(sort = 3)
         public static double minimumTransferPower = 0.65;
         public static double maximumTransferPower = 1.0;

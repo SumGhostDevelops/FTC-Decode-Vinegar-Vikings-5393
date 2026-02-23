@@ -196,7 +196,7 @@ public abstract class Base extends CommandOpMode
             logTimer.reset();
         }
 
-        if (presetOption.get() != ConstantsPresets.Preset.TESTING)
+        if (presetOption.get() == ConstantsPresets.Preset.COMPETITION)
         {
             telemetry.update();
             return;
@@ -208,6 +208,7 @@ public abstract class Base extends CommandOpMode
         if (pose != null)
         {
             telemetry.addData("Dist. to Goal", pose.coord.distanceTo(team.goalFromClose.coord).toUnit(DistanceUnit.INCH));
+            telemetry.addData("Turret Dist. to Goal", s.turret.getTurretPose(s.odometry.getPose()).distanceTo(getGoal()));
 
             telemetry.addLine("--- Odometry ---");
             telemetry.addData("Coord (Pedro)", pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
@@ -337,10 +338,13 @@ public abstract class Base extends CommandOpMode
                 .whenPressed(new DriveCommands.IncreaseSpeed(s.drive));
         if (s.odometry != null)
         {
+            /*
             driver.getGamepadButton(GamepadKeys.Button.B)
                     .whenPressed(new OdometryCommands.SetDriverForwardFromCurrent(s.odometry));
             driver.getGamepadButton(GamepadKeys.Button.X)
                     .whenPressed(new OdometryCommands.LocalizeWithDebugTelemetry(s.odometry, telemetry));
+
+             */
         }
     }
 
@@ -420,7 +424,7 @@ public abstract class Base extends CommandOpMode
             // Always bind the command - the actual adjustment check happens dynamically inside Outtake.setTargetRPM(Distance)
             active.whileActiveContinuous(new OuttakeCommands.UpdateRPMBasedOnDistance(
                     s.outtake,
-                    () -> s.turret.getTurretPose(s.odometry.getPose()).distanceTo(getGoal())));
+                    () -> s.odometry.getPose().distanceTo(getGoal())));
         }
     }
 

@@ -62,7 +62,7 @@ public class Outtake extends SubsystemBase
                 .add(70.44, 3250)
                 .add(82.78, 3455)
                 .add(103.48, 3720)
-                .add(130.49, 4750)
+                .add(130.49, 4300)
                 .build();
     }
 
@@ -240,7 +240,11 @@ public class Outtake extends SubsystemBase
 
     private double regression(double inches)
     {
-        return 3012 -(9.59 * inches) + (0.173 * inches * inches);
+        //return 3012 -(9.59 * inches) + (0.173 * inches * inches);
+
+        // return 0.108 * inches * inches - 0.771 * inches + 2735;
+
+        return 0.056 * inches * inches + 6.284 * inches + 2515;
     }
 
     public double getTargetRPM()
