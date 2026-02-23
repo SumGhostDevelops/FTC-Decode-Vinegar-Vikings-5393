@@ -207,8 +207,8 @@ public abstract class Base extends CommandOpMode
 
         if (pose != null)
         {
-            telemetry.addData("Dist. to Goal", pose.coord.distanceTo(team.goalFromClose.coord).toUnit(DistanceUnit.INCH));
-            telemetry.addData("Turret Dist. to Goal", s.turret.getTurretPose(s.odometry.getPose()).distanceTo(getGoal()));
+            telemetry.addData("Dist. to Goal", pose.distanceTo(team.goalFromClose.coord).toUnit(DistanceUnit.INCH));
+            telemetry.addData("Turret Dist. to Goal", s.turret.getTurretPose(pose).distanceTo(getGoal()));
 
             telemetry.addLine("--- Odometry ---");
             telemetry.addData("Coord (Pedro)", pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
