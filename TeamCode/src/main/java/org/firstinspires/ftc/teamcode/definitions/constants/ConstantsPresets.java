@@ -30,8 +30,8 @@ public class ConstantsPresets
                 break;
             case TESTING:
                 RobotConstants.Outtake.ON_BY_DEFAULT = false;
-                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = false;
-                RobotConstants.General.REGRESSION_TESTING_MODE = true;
+                RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
+                RobotConstants.General.REGRESSION_TESTING_MODE = false;
                 RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
                 break;
