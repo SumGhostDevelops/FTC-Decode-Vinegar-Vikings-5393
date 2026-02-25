@@ -14,9 +14,45 @@ public class Transfer extends SubsystemBase
     private final DoubleSupplier openAngle = () -> RobotConstants.Transfer.OPEN_ANGLE;
     private final DoubleSupplier closeIntakeAngle = () -> RobotConstants.Transfer.CLOSE_INTAKE_ANGLE;
 
+    private final double minAngle;
+    private final double maxAngle;
+
+    private final double angleTolerance;
+
     public Transfer(ServoEx transfer)
     {
+        this(transfer, 0, 360);
+    }
+
+    public Transfer(ServoEx transfer, double minAngle, double maxAngle)
+    {
+        this(transfer, minAngle, maxAngle, 1);
+    }
+
+    public Transfer(ServoEx transfer, double minAngle, double maxAngle, double angleTolerance)
+    {
+        if (maxAngle < minAngle)
+        {
+            throw new IllegalArgumentException("Minimum angle should be less than maximum angle!");
+        }
+
+        if (minAngle < 0)
+        {
+            throw new IllegalArgumentException("Minimum angle should be greater than or equal to 0!");
+        }
+
+        if (angleTolerance < 0)
+        {
+            throw new IllegalArgumentException("Angle tolerance should be greater than or equal to 0!");
+        }
+
         this.transfer = transfer;
+
+        this.minAngle = minAngle;
+        this.maxAngle = maxAngle;
+
+        this.angleTolerance = angleTolerance;
+
         close();
     }
 
@@ -42,11 +78,11 @@ public class Transfer extends SubsystemBase
     }
 
     /**
-     * @return the last requested input/set position call
+     * @return the angle of the servo
      */
-    public double getPosition()
+    public double getAngle()
     {
-        return transfer.get();
+        return transfer.getRawPosition() * (maxAngle - minAngle) + minAngle;
     }
 
     /**
@@ -55,5 +91,12 @@ public class Transfer extends SubsystemBase
     public double getRawPosition()
     {
         return transfer.getRawPosition();
+    }
+
+    public boolean isAtAngle()
+    {
+        double lastRequestedAngle = transfer.get();
+
+        return Math.abs(getAngle() - lastRequestedAngle) < angleTolerance;
     }
 }

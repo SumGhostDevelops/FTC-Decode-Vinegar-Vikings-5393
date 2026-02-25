@@ -573,8 +573,9 @@ public abstract class AutoBase extends LinearOpMode
         boolean turretAtTarget = s.turret.isAtTarget();
         boolean outtakeStable = s.outtake.isStable();
         boolean notMoving = follower.getVelocity().getMagnitude() < 1;
+        boolean transferAtAngle = s.transfer.isAtAngle();
 
-        return turretAtTarget && outtakeStable && notMoving;
+        return turretAtTarget && outtakeStable && transferAtAngle && notMoving;
     }
 
     /**
