@@ -278,7 +278,7 @@ public abstract class Base extends CommandOpMode
             if (s.intake != null && robot.hw.intake != null)
             {
                 Graph.put("Intake (RPM)", s.intake.getRPM());
-                Graph.put("Intake (Target RPM)", robot.hw.intake.getMotorTargetRPM());
+                //Graph.put("Intake (Target RPM)", robot.hw.intake.getMotorTargetRPM());
                 Graph.put("Intake (Power)", robot.hw.intake.getPower());
             }
 
