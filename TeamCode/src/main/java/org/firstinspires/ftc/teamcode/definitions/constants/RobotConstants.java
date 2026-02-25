@@ -22,7 +22,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION_TESTING;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
     }
@@ -127,7 +127,7 @@ public class RobotConstants
         public static class Tolerance
         {
             @Sorter(sort = 0)
-            public static int RPM = 75;
+            public static int RPM = 60;
             @Sorter(sort = 1)
             public static int RPM_ACCELERATION = 250;
         }
