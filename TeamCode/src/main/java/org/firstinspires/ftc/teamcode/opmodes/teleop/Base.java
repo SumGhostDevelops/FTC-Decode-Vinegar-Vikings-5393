@@ -213,7 +213,7 @@ public abstract class Base extends CommandOpMode
         if (pose != null)
         {
             telemetry.addData("Dist. to Goal", pose.distanceTo(team.goalFromClose.coord).toUnit(DistanceUnit.INCH));
-            telemetry.addData("Turret Dist. to Goal", s.turret.getTurretPose(pose).distanceTo(getGoal()));
+            telemetry.addData("Turret Dist. to Goal", s.turret.getTurretPose(pose).distanceTo(getGoal()).toUnit(DistanceUnit.INCH));
 
             telemetry.addLine("--- Odometry ---");
             telemetry.addData("Coord (Pedro)", pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH));
@@ -268,6 +268,7 @@ public abstract class Base extends CommandOpMode
                 Graph.put("Outtake (Flywheel RPM^2", s.outtake.getFlywheelRPMAcceleration());
                 Graph.put("Outtake (Flywheel RPM Target)", robot.hw.outtake.getOutputTargetRPM());
                 Graph.put("Outtake (Motor Target RPM)", robot.hw.outtake.getMotorTargetRPM());
+                Graph.put("Outtake (Residual RPM)", robot.hw.outtake.getMotorRPM() - robot.hw.outtake.getMotorTargetRPM());
                 Graph.put("Outtake (Power)", robot.hw.outtake.getPower());
                 Graph.put("Outtake Ready", s.outtake.isStable() ? 1 : 0);
             }
