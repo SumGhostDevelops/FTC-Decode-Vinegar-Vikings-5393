@@ -33,16 +33,13 @@ public class Hardpoints
     public static class Poses
     {
         @Sorter(sort = 0)
-        public static final Pose2d BLUE_LOADING_ZONE = new Pose2d(coord(135.32, 8.17), deg(0));
+        public static final Pose2d BLUE_LOADING_ZONE = new Pose2d(coord(135.0396, 8.3375), deg(0));
         @Sorter(sort = 1)
-        public static final Pose2d RED_LOADING_ZONE = new Pose2d(coord(9.47, 10.91), deg(180));
+        public static final Pose2d RED_LOADING_ZONE = new Pose2d(coord(8.9604, 8.3375), deg(180));
         @Sorter(sort = 2)
-        public static final Pose2d BLUE_GOAL = new Pose2d(new FieldCoordinate(new Distance(41.54, INCH), new Distance(134.5, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(90));
+        public static final Pose2d BLUE_GOAL = new Pose2d(coord(44, 135.0396), deg(90));
         @Sorter(sort = 3)
-        public static final Pose2d RED_GOAL = new Pose2d(new FieldCoordinate(new Distance(107.16, INCH), new Distance(131.5, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(90));
-
-        @IgnoreConfigurable
-        public static final Pose2d SMALL_TRIANGLE = new Pose2d(new FieldCoordinate(new Distance(72, INCH), new Distance(8.625, INCH), CoordinateSystem.DECODE_PEDROPATH), deg(90));
+        public static final Pose2d RED_GOAL = new Pose2d(coord(100.0875, 135.0396), deg(90));
     }
 
     /**
@@ -69,5 +66,4 @@ public class Hardpoints
     {
         return new FieldHeading(new Angle(degrees, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH);
     }
-
 }
