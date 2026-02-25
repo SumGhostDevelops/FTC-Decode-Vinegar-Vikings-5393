@@ -191,7 +191,7 @@ public class RobotConstants
         public static String NAME = "transfer";
 
         @Sorter(sort = 1)
-        public static double OPEN_ANGLE = 60; // Open means the transfer is allowing balls to pass through
+        public static double OPEN_ANGLE = 95; // Open means the transfer is allowing balls to pass through
 
         @Sorter(sort = 2)
         public static double CLOSE_INTAKE_ANGLE = 0; // 210; // An angle where the trapdoor blocks balls from entering
