@@ -248,6 +248,11 @@ public abstract class Base extends CommandOpMode
 
     private void updateDashboard(Subsystems s, Pose2d pose)
     {
+        if (RobotConstants.General.PRESET_OPTION == ConstantsPresets.Preset.COMPETITION)
+        {
+            return;
+        }
+
         if (enableFieldDrawing.getAsBoolean() && pose != null && s.turret != null && s.odometry != null)
         {
             FieldDrawing.draw(
@@ -288,7 +293,7 @@ public abstract class Base extends CommandOpMode
                 Graph.put("Intake (Power)", robot.hw.intake.getPower());
             }
 
-            if (robot.hw.transfer != null) Graph.put("Transfer (Angle)", robot.hw.transfer.get());
+            if (robot.hw.transfer != null) Graph.put("Transfer (Angle)", s.transfer.getAngle());
             if (robot.hw.battery != null)  Graph.put("Battery (Voltage)", robot.hw.battery.getVoltage());
 
             Graph.update();
