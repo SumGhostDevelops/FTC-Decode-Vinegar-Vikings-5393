@@ -41,6 +41,8 @@ public class ConstantsPresets
                 RobotConstants.General.REGRESSION_TESTING_MODE = false;
                 RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
+                RobotConstants.Telemetry.ENABLE_FIELD_DRAWING = false;
+                RobotConstants.Telemetry.ENABLE_GRAPH_OUTPUT = false;
                 break;
             case COMPETITION_TESTING:
                 RobotConstants.Outtake.ON_BY_DEFAULT = true;
@@ -48,6 +50,8 @@ public class ConstantsPresets
                 RobotConstants.General.REGRESSION_TESTING_MODE = false;
                 RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
+                RobotConstants.Telemetry.ENABLE_FIELD_DRAWING = true;
+                RobotConstants.Telemetry.ENABLE_GRAPH_OUTPUT = true;
         }
     }
 }
