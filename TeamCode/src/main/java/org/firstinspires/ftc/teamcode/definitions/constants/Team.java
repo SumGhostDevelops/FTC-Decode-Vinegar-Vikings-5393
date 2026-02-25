@@ -21,7 +21,7 @@ public enum Team
     RED(
             "red",
             new Goal(24, coord(134, 134)),
-            new Goal(24, coord(138, 137)),
+            new Goal(24, coord(144, 144)),
             new Base(coord(38.5, 33.5)),
             new Pose2d(Hardpoints.Coordinates.RED_BASE, deg(90)),
             deg(0)),
@@ -29,7 +29,7 @@ public enum Team
     BLUE(
             "blue",
             new Goal(20, coord(10, 134)),
-            new Goal(20, coord(6, 137)),
+            new Goal(20, coord(0, 144)),
             new Base(coord(105.25, 33.5)),
             new Pose2d(Hardpoints.Coordinates.BLUE_BASE, deg(90)),
             deg(180)),
