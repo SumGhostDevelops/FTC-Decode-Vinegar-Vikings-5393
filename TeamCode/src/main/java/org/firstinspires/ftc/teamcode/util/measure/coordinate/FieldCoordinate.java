@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.measure.coordinate;
 
+import com.pedropathing.geometry.Pose;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.measure.angle.generic.Angle;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
@@ -109,6 +111,13 @@ public class FieldCoordinate extends Coordinate
     {
         // Convert the other FieldCoordinate to our FieldCoordinate's coordinate system
         return super.angleTo(otherCoord.toCoordinateSystem(this.coordSys));
+    }
+
+    public Pose toPedro()
+    {
+        FieldCoordinate toPedro = this.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
+
+        return new Pose(toPedro.x.getInch(), toPedro.y.getInch());
     }
 
     public boolean isCoordinateSystem(CoordinateSystem coordSys)
