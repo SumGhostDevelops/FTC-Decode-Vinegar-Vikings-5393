@@ -184,6 +184,34 @@ public class Pose2d
     }
 
     /**
+     * Converts a global field coordinate into a local vector relative to the robot's center and heading.
+     * +X is forward distance, +Y is left (strafe) distance.
+     * * @param targetCoord The global point on the field.
+     * @return A Vector2d representing the local offsets required to reach the target from the robot.
+     */
+    public Vector2d toLocalRelative(FieldCoordinate targetCoord)
+    {
+        // 1. Get raw global deltas in the shared coordinate system
+        Vector2d globalDelta = this.coord.vectorTo(targetCoord);
+        double dxField = globalDelta.x.getInch();
+        double dyField = globalDelta.y.getInch();
+
+        double theta = this.heading.angle.getRadians();
+
+        // 2. Apply Inverse Rotation Matrix (transpose) to map Global(Field) -> Local(Robot)
+        // x_local =  dx_global * cos(theta) + dy_global * sin(theta)
+        // y_local = -dx_global * sin(theta) + dy_global * cos(theta)
+        double localX = dxField * Math.cos(theta) + dyField * Math.sin(theta);
+        double localY = -dxField * Math.sin(theta) + dyField * Math.cos(theta);
+
+        return new Vector2d(
+                new Distance(localX, DistanceUnit.INCH),
+                new Distance(localY, DistanceUnit.INCH),
+                CoordinateSystem.GENERIC
+        );
+    }
+
+    /**
      * @param otherPose
      * @return The straight line {@link Distance} to another {@link Pose2d}'s
      * {@link Pose2d#coord}
