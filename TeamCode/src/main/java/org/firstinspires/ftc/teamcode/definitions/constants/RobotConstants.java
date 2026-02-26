@@ -25,6 +25,8 @@ public class RobotConstants
         public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
+        public static Distance FORWARD_LENGTH = new Distance(17.920907, DistanceUnit.INCH);
+        public static Distance SIDEWAYS_WIDTH = new Distance(16.675, DistanceUnit.INCH);
     }
 
     @Configurable
