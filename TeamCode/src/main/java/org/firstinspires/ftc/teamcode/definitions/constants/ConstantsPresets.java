@@ -32,21 +32,21 @@ public class ConstantsPresets
                 RobotConstants.Outtake.ON_BY_DEFAULT = false;
                 RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = false;
                 RobotConstants.General.REGRESSION_TESTING_MODE = true;
-                RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
+                RobotConstants.Turret.ALWAYS_AIM_TO_GOAL = false;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
                 break;
             case COMPETITION:
                 RobotConstants.Outtake.ON_BY_DEFAULT = true;
                 RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
                 RobotConstants.General.REGRESSION_TESTING_MODE = false;
-                RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
+                RobotConstants.Turret.ALWAYS_AIM_TO_GOAL = false;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
                 break;
             case COMPETITION_TESTING:
                 RobotConstants.Outtake.ON_BY_DEFAULT = true;
                 RobotConstants.Outtake.AUTO_DISTANCE_ADJUSMENT = true;
                 RobotConstants.General.REGRESSION_TESTING_MODE = false;
-                RobotConstants.Turret.AUTO_AIM_TO_GOAL = false;
+                RobotConstants.Turret.ALWAYS_AIM_TO_GOAL = false;
                 RobotConstants.Intake.INTAKE_BY_DEFAULT = false;
         }
     }

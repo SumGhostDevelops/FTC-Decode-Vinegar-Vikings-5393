@@ -57,7 +57,7 @@ public abstract class Base extends CommandOpMode
     private final Supplier<ConstantsPresets.Preset> presetOption = () -> RobotConstants.General.PRESET_OPTION;
     private final BooleanSupplier enableFieldDrawing = () -> RobotConstants.Telemetry.ENABLE_FIELD_DRAWING;
     private final BooleanSupplier enableGraphOutput = () -> RobotConstants.Telemetry.ENABLE_GRAPH_OUTPUT;
-    private final BooleanSupplier autoAimToGoal = () -> RobotConstants.Turret.AUTO_AIM_TO_GOAL;
+    private final BooleanSupplier alwaysAimToGoal = () -> RobotConstants.Turret.ALWAYS_AIM_TO_GOAL;
     private final BooleanSupplier regressionTestingMode = () -> RobotConstants.General.REGRESSION_TESTING_MODE;
     private final DoubleSupplier intakePower = () -> RobotConstants.Intake.intakePower;
     private final DoubleSupplier minimumTransferPower = () -> RobotConstants.Intake.minimumTransferPower;
@@ -383,7 +383,7 @@ public abstract class Base extends CommandOpMode
                 ? shootBtn
                 : intakeBtn.and(shootBtn);
 
-        if (autoAimToGoal.getAsBoolean())
+        if (alwaysAimToGoal.getAsBoolean())
         {
             if (RobotConstants.Turret.TARGET_ONLY_WHEN_INTENDING_TO_SHOOT)
             {

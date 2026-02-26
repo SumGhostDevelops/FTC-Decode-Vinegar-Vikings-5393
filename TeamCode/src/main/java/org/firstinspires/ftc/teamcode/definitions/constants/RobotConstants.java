@@ -168,7 +168,7 @@ public class RobotConstants
                 new UnnormalizedAngle(-70, UnnormalizedAngleUnit.DEGREES), // negative clockwise, positive counter clockwise
                 new UnnormalizedAngle(70, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
         @Sorter(sort = 7)
-        public static boolean AUTO_AIM_TO_GOAL = false;
+        public static boolean ALWAYS_AIM_TO_GOAL = false;
 
         @Sorter(sort = 8)
         // only change p and d
