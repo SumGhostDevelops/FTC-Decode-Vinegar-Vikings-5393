@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.measure.coordinate;
 
+import com.pedropathing.geometry.Pose;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -283,6 +285,13 @@ public class Pose2d
         double yMeter = univCoord.y.getDistance(DistanceUnit.METER);
 
         return new Pose2D(DistanceUnit.METER, xMeter, yMeter, AngleUnit.RADIANS, headingRad);
+    }
+
+    public Pose toPedro()
+    {
+        Pose2d pedroPose = this.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
+
+        return new Pose(pedroPose.coord.x.getInch(), pedroPose.coord.y.getInch());
     }
 
     @Override
