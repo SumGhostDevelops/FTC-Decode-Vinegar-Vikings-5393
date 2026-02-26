@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.util.measure.coordinate.CoordinateSystem;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.FieldCoordinate;
 import org.firstinspires.ftc.teamcode.util.measure.coordinate.Pose2d;
 import org.firstinspires.ftc.teamcode.util.measure.distance.Distance;
+import org.firstinspires.ftc.teamcode.util.measure.geometry.RobotSize;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,6 +40,8 @@ public abstract class AutoBase extends LinearOpMode
     // Constants from RobotConstants
     private final double intakePower = RobotConstants.Intake.intakePower;
     private final double transferPower = RobotConstants.Intake.minimumTransferPower;
+
+    private final RobotSize robotSize = new RobotSize(RobotConstants.General.FORWARD_LENGTH, RobotConstants.General.SIDEWAYS_WIDTH);
 
     protected enum AutoStrat
     {
