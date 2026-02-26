@@ -22,7 +22,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION_TESTING;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
     }
@@ -195,6 +195,8 @@ public class RobotConstants
 
         @Sorter(sort = 2)
         public static double CLOSE_INTAKE_ANGLE = 0; // 210; // An angle where the trapdoor blocks balls from entering
+
+        public static long WAIT_BEFORE_TRANSFER = 500;
     }
 
     @Configurable
