@@ -150,7 +150,7 @@ public class RobotConstants
         @Sorter(sort = 4)
         public static Angle FORWARD_ANGLE = new Angle(0, AngleUnit.DEGREES);
 
-        public static boolean TARGET_ONLY_WHEN_INTENDING_TO_SHOOT = true;
+        public static boolean TARGET_ONLY_WHEN_INTENDING_TO_SHOOT = false;
 
         /**
          * Calibration offset to compensate for systematic aiming error.
