@@ -291,7 +291,7 @@ public class Pose2d
     {
         Pose2d pedroPose = this.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
 
-        return new Pose(pedroPose.coord.x.getInch(), pedroPose.coord.y.getInch());
+        return new Pose(pedroPose.coord.x.getInch(), pedroPose.coord.y.getInch(), pedroPose.heading.angle.getRadians());
     }
 
     @Override
