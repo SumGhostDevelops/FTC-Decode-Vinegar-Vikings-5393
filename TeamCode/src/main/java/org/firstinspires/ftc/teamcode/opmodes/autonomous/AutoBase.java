@@ -45,8 +45,8 @@ public abstract class AutoBase extends LinearOpMode
 
     protected final Pose RED_SMALL_TRIANGLE_STARTING_POSE = new Pose(87.7, 9);
     protected final Pose BLUE_SMALL_TRIANGLE_STARTING_POSE = RED_SMALL_TRIANGLE_STARTING_POSE.mirror(144);
-    protected final Pose RED_LARGE_TRIANGLE_STARTING_POSE = new Pose(111.7, 134.5);
-    protected final Pose BLUE_LARGE_TRIANGLE_STARTING_POSE = RED_LARGE_TRIANGLE_STARTING_POSE.mirror(144);
+    protected final Pose RED_LARGE_TRIANGLE_STARTING_POSE = new Pose(118.55, 129.74); // 36.6 degrees
+    protected final Pose BLUE_LARGE_TRIANGLE_STARTING_POSE = RED_LARGE_TRIANGLE_STARTING_POSE.mirror(144); // 143.4 degrees
 
     protected enum AutoStrat
     {
