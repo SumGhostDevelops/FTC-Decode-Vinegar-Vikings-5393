@@ -38,6 +38,8 @@ public class Turret extends SubsystemBase
     // Supplier for robot angular velocity (deg/s) for feedforward compensation
     private DoubleSupplier angularVelocitySupplier = () -> 0.0;
 
+    private boolean targetAngleOutOfLimit = false;
+
     public Turret(PositionMotor motor, Angle initialRelativeAngle)
     {
         this.motor = motor;
@@ -128,6 +130,10 @@ public class Turret extends SubsystemBase
         // Clamp to turn limits
         double minDegrees = turnLimits[0].getDegrees();
         double maxDegrees = turnLimits[1].getDegrees();
+
+        // Flag if the true target angle is out of physical limit bounds
+        this.targetAngleOutOfLimit = (targetDegrees < minDegrees) || (targetDegrees > maxDegrees);
+
         this.targetAngleDegrees = Math.max(minDegrees, Math.min(maxDegrees, targetDegrees));
 
         motor.setTargetDistance(this.targetAngleDegrees);
@@ -259,6 +265,13 @@ public class Turret extends SubsystemBase
             case OFF:
                 return true;
         }
+
+        // If the intended target exceeds our physical limits, we cannot be at the target.
+        if (targetAngleOutOfLimit)
+        {
+            return false;
+        }
+
         // Use the active dynamic tolerance instead of the static constant
         return Math.abs(bearingToTarget().getDegrees()) < this.currentToleranceDegrees;
     }
