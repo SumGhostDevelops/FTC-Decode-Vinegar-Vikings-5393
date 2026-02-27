@@ -43,6 +43,11 @@ public abstract class AutoBase extends LinearOpMode
 
     private final RobotSize robotSize = new RobotSize(RobotConstants.General.FORWARD_LENGTH, RobotConstants.General.SIDEWAYS_WIDTH);
 
+    protected final Pose RED_SMALL_TRIANGLE_STARTING_POSE = new Pose(87.7, 9);
+    protected final Pose BLUE_SMALL_TRIANGLE_STARTING_POSE = new Pose(56.3, 9);
+    protected final Pose RED_LARGE_TRIANGLE_STARTING_POSE = new Pose(111.7, 134.5);
+    protected final Pose BLUE_LARGE_TRIANGLE_STARTING_POSE = new Pose(32.3, 134.5);
+
     protected enum AutoStrat
     {
         BASIC, REGULAR, GATE

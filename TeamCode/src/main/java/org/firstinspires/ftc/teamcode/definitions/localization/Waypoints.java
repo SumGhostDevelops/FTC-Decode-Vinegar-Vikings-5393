@@ -30,7 +30,7 @@ public class Waypoints
 
         public static FieldCoordinate GATE = coord(GATE_X, GATE_Y);
 
-        public static FieldCoordinate STARTING_POSE_RIGHT_CORNER_WHEEL = coord(130.545, 128.717);
+        public static FieldCoordinate AWAY_STARTING_POSE_RIGHT_CORNER_WHEEL = coord(130.545, 128.717);
         public static FieldCoordinate LEAVE_AWAY_FRONT = coord(inch(18), GATE_Y);
         public static FieldCoordinate LEAVE_CLOSE_CENTER = coord(36, 12);
     }
@@ -44,7 +44,7 @@ public class Waypoints
 
         public static FieldCoordinate GATE = mirror(Blue.GATE);
 
-        public static FieldCoordinate STARTING_POSE_LEFT_CORNER_WHEEL = mirror(Blue.STARTING_POSE_RIGHT_CORNER_WHEEL);
+        public static FieldCoordinate AWAY_STARTING_POSE_LEFT_CORNER_WHEEL = mirror(Blue.AWAY_STARTING_POSE_RIGHT_CORNER_WHEEL);
         public static FieldCoordinate LEAVE_AWAY_FRONT = mirror(Blue.LEAVE_AWAY_FRONT);
         public static FieldCoordinate LEAVE_CLOSE_CENTER = mirror(Blue.LEAVE_CLOSE_CENTER);
     }
