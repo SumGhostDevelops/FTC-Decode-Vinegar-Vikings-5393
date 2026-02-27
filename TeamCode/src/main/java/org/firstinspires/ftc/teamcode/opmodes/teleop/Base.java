@@ -12,6 +12,7 @@ import com.seattlesolvers.solverslib.util.Timing;
 import com.seattlesolvers.solverslib.util.Timing.Timer;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
@@ -234,6 +235,8 @@ public abstract class Base extends CommandOpMode
             telemetry.addData("Outtake Stable", s.outtake.isStable());
         }
 
+        telemetry.addData("Drive (Amps)", robot.hw.frontLeft.motorEx.getCurrent(CurrentUnit.AMPS) + robot.hw.frontRight.motorEx.getCurrent(CurrentUnit.AMPS) + robot.hw.backLeft.motorEx.getCurrent(CurrentUnit.AMPS) + robot.hw.backRight.motorEx.getCurrent(CurrentUnit.AMPS));
+
         if (s.turret != null)
         {
             telemetry.addLine("--- Turret ---");
@@ -296,6 +299,8 @@ public abstract class Base extends CommandOpMode
             if (robot.hw.transfer != null) Graph.put("Transfer (Angle)", s.transfer.getAngle());
             Graph.put("Transfer (Raw Position)", s.transfer.getRawPosition());
             if (robot.hw.battery != null)  Graph.put("Battery (Voltage)", robot.hw.battery.getVoltage());
+
+            Graph.put("Drive (Amps)", robot.hw.frontLeft.motorEx.getCurrent(CurrentUnit.AMPS) + robot.hw.frontRight.motorEx.getCurrent(CurrentUnit.AMPS) + robot.hw.backLeft.motorEx.getCurrent(CurrentUnit.AMPS) + robot.hw.backRight.motorEx.getCurrent(CurrentUnit.AMPS));
 
             Graph.update();
         }

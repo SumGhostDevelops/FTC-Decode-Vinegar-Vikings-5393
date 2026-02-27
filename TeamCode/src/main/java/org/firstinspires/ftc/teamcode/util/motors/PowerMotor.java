@@ -20,7 +20,7 @@ import java.util.function.DoubleSupplier;
 public class PowerMotor
 {
     // The motor object that this class wraps around
-    protected final MotorEx motorEx;
+    public final MotorEx motorEx;
     // Filter factor: 0.0 = infinite smoothing (no change), 1.0 = no smoothing (raw
     // data)
     // Start with 0.8. If still noisy, lower it. If too laggy, raise it.
