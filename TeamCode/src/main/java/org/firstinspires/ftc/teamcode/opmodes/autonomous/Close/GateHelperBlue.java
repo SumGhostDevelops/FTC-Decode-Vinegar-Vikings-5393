@@ -85,10 +85,12 @@ public class GateHelperBlue extends AutoBase {
             switch (getPathState())
             {
                 case toShoot:
+                    Shoot();
                     follower.followPath(paths.toShoot);
                     setPathState(Paths.PathState.Extra);
                     break;
                 case Extra:
+                    startIntake();
                     follower.followPath(paths.ToHit);
                     setPathState(Paths.PathState.ToHit);
 
@@ -98,6 +100,7 @@ public class GateHelperBlue extends AutoBase {
                     break;
 
                 case Move:
+                    stopIntake();
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToShoot);
                     break;
@@ -109,6 +112,7 @@ public class GateHelperBlue extends AutoBase {
                     break;
 
                 case Swing_1:
+                    startIntake();
                     follower.followPath(paths.Hit_1);
                     setPathState(Paths.PathState.Hit_1);
                     break;
@@ -124,6 +128,7 @@ public class GateHelperBlue extends AutoBase {
                     break;
 
                 case Hit_2:
+                    stopIntake();
                     follower.followPath(paths.ToShoot_2);
                     setPathState(Paths.PathState.ToShoot_2);
                     break;
@@ -135,6 +140,7 @@ public class GateHelperBlue extends AutoBase {
                     break;
 
                 case ToSwingTwo_1:
+                    startIntake();
                     follower.followPath(paths.HitTwo_1);
                     setPathState(Paths.PathState.HitTwo_1);
                     break;
@@ -150,6 +156,7 @@ public class GateHelperBlue extends AutoBase {
                     break;
 
                 case HitTwo_2:
+                    stopIntake();
                     follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
@@ -161,6 +168,7 @@ public class GateHelperBlue extends AutoBase {
                     break;
 
                 case ToSwingThree_1:
+                    startIntake();
                     follower.followPath(paths.HitThree_1);
                     setPathState(Paths.PathState.HitThree_1);
                     break;
@@ -176,6 +184,7 @@ public class GateHelperBlue extends AutoBase {
                     break;
 
                 case HitThree_2:
+                    stopIntake();
                     follower.followPath(paths.ToShoot_4);
                     setPathState(Paths.PathState.ToShoot_4);
                     break;
