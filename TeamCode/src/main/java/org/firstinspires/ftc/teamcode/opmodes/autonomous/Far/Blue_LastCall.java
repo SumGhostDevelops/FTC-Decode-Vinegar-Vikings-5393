@@ -209,8 +209,8 @@ public class Blue_LastCall extends AutoBase
 
             final Pose shootPose = new Pose(54.000, 97.200);
 
-            final Pose ballTwoLinePose = new Pose(54.000, 60.000);
-            final Pose ballTwoFullPose = new Pose(17.000, 60.000);
+            final Pose ballTwoLinePose = new Pose(54.000, 63.000);
+            final Pose ballTwoFullPose = new Pose(17.000, 63.000);
 
             final Pose ballThreeLinePose = new Pose(54.000, 35.000);
             final Pose ballThreeFullPose = new Pose(16.000, 35.000);

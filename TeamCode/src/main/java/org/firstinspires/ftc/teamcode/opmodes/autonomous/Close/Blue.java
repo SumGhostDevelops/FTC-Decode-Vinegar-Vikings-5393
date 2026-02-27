@@ -466,8 +466,8 @@ public class Blue extends AutoBase
             final Pose ballOneFullPose = new Pose(19.000, 36.000);
             final Pose shootPose = new Pose(48, 95.200);
 
-            final Pose ballTwoLinePose = new Pose(55.000, 60.000);
-            final Pose ballTwoFullPose = new Pose(19.000, 60.000);
+            final Pose ballTwoLinePose = new Pose(55.000, 63.000);
+            final Pose ballTwoFullPose = new Pose(19.000, 63.000);
 
             final Pose ballThreeLinePose = new Pose(55.000, 84.000);
             final Pose ballThreeFullPose = new Pose(19.000, 84.000);
