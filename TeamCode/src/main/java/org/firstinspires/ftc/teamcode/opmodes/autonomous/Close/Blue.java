@@ -190,30 +190,31 @@ public class Blue extends AutoBase
             switch (getPathState())
             {
                 case ToShoot:
-                    startOuttake();
+                    Shoot();
                     follower.followPath(paths.ToShoot);
                     setPathState(Paths.PathState.ToShootFar);
                     break;
 
                 case ToShootFar:
-                    Shoot();
+                    startIntake();
                     follower.followPath(paths.ToBallOne);
                     setPathState(Paths.PathState.ToBallOne);
                     break;
 
                 case ToBallOne:
-                    startIntake();
+                    stop();
                     follower.followPath(paths.Gate);
                     setPathState(Paths.PathState.Gate);
                     break;
 
                 case Gate:
+
                     follower.followPath(paths.Eat);
                     setPathState(Paths.PathState.Eat);
                     break;
 
                 case Eat:
-                    stopIntake();
+
                     follower.followPath(paths.ToShoot_1);
                     setPathState(Paths.PathState.ToShoot_1);
                     break;
@@ -225,12 +226,13 @@ public class Blue extends AutoBase
                     break;
 
                 case Gate_2:
-                    startIntake();
+
                     follower.followPath(paths.Eat_2);
                     setPathState(Paths.PathState.Eat_2);
                     break;
 
                 case Eat_2:
+                    startIntake();
                     follower.followPath(paths.Gate_3);
                     setPathState(Paths.PathState.Gate_3);
                     break;
@@ -253,29 +255,31 @@ public class Blue extends AutoBase
                     break;
 
                 case bottomBalls:
-                    startIntake();
+
                     follower.followPath(paths.bottomBallsEat);
                     setPathState(Paths.PathState.bottomBallsEat);
                     break;
 
                 case bottomBallsEat:
+                    startIntake();
                     follower.followPath(paths.ToShoot_3);
                     setPathState(Paths.PathState.ToShoot_3);
                     break;
 
                 case ToShoot_3:
+                    stopIntake();
                     follower.followPath(paths.ToShoot_4);
                     setPathState(Paths.PathState.ToShoot_4);
                     break;
 
                 case ToShoot_4:
-                    stopIntake();
+                    Shoot();
                     follower.followPath(paths.ToShoot_5);
                     setPathState(Paths.PathState.ToShoot_5);
                     break;
 
                 case ToShoot_5:
-                    Shoot();
+
                     follower.followPath(paths.upperBalls);
                     setPathState(Paths.PathState.upperBalls);
                     break;
@@ -294,6 +298,12 @@ public class Blue extends AutoBase
 
                 case toShoot:
                     Shoot();
+                    follower.followPath(paths.finalPose);
+                    setPathState(Red.Paths.PathState.finalPose);
+                    break;
+
+                case finalPose:
+                    autonomousFinished = true;
                     break;
             }
         }
@@ -360,8 +370,9 @@ public class Blue extends AutoBase
             final Pose ballThreeFullPose = new Pose(25.000, 70.000);
             final Pose ballPickPose = new Pose(52.000, 36.000);
             final Pose topEatPose = new Pose(17.000, 36.000);
-            final Pose randomPose = new Pose(63.000, 20.000);
             final Pose shootPose = new Pose(62.000, 8.000);
+            final Pose endPose = new Pose(37, 16);
+
 
             ToShoot = follower.pathBuilder()
                     .addPath(new BezierLine(startPose, ballOneLinePose))
@@ -452,7 +463,11 @@ public class Blue extends AutoBase
                     .build();
 
             toShoot = follower.pathBuilder()
-                    .addPath(new BezierLine(topEatPose, randomPose))
+                    .addPath(new BezierLine(topEatPose, shootPose))
+                    .setConstantHeadingInterpolation(Math.toRadians(90))
+                    .build();
+            finalPose = follower.pathBuilder()
+                    .addPath(new BezierLine(shootPose, endPose))
                     .setConstantHeadingInterpolation(Math.toRadians(90))
                     .build();
         }
