@@ -695,15 +695,48 @@ public abstract class AutoBase extends LinearOpMode
      */
     protected FieldCoordinate getGoal()
     {
-        Pose2d pose = getPose2d();
+        Pose2d robotPose = getPose2d();
 
-        if (pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).coord.y.getInch() > 48)
+        FieldCoordinate coord = subsystems.turret.
+                getTurretPose(robotPose).coord.
+                toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
+
+        double x = coord.x.getInch();
+        double y = coord.y.getInch();
+
+        if (y > 120) // greater than 120, aim at the side goal
         {
-            return team.goalFromClose.coord;
+            return team.sideGoal.coord;
         }
-        else
+        else if (y > 48) // greater than 48, aim at the side goal
         {
-            return team.goalFromFar.coord;
+            return team.cornerGoal.coord;
+        }
+        else // we are in the far shooting zone
+        {
+            switch (team)
+            {
+                case BLUE:
+                    if (x > 72) // on the opposite side, aim at the corner
+                    {
+                        return team.cornerGoal.coord;
+                    }
+                    else // on the same side, aim at the back goal
+                    {
+                        return team.backGoal.coord;
+                    }
+                case RED:
+                    if (x < 72) // on the opposite side, aim at the corner
+                    {
+                        return team.cornerGoal.coord;
+                    }
+                    else // on the same side, aim at the back goal
+                    {
+                        return team.backGoal.coord;
+                    }
+                default:
+                    return team.cornerGoal.coord;
+            }
         }
     }
 

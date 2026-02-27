@@ -213,7 +213,7 @@ public abstract class Base extends CommandOpMode
 
         if (pose != null)
         {
-            telemetry.addData("Dist. to Goal", pose.distanceTo(team.goalFromClose.coord).toUnit(DistanceUnit.INCH));
+            telemetry.addData("Dist. to Goal", pose.distanceTo(team.sideGoal.coord).toUnit(DistanceUnit.INCH));
             telemetry.addData("Turret Dist. to Goal", s.turret.getTurretPose(pose).distanceTo(getGoal()).toUnit(DistanceUnit.INCH));
 
             telemetry.addLine("--- Odometry ---");
@@ -516,17 +516,58 @@ public abstract class Base extends CommandOpMode
     private FieldCoordinate getGoal()
     {
         Odometry odometry = robot.subsystems.odometry;
+        Turret turret = robot.subsystems.turret;
 
         if (odometry == null)
-            return robot.team.goalFromFar.coord;
+            return robot.team.cornerGoal.coord;
 
-        if (odometry.getFieldCoord().toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).y.getInch() > 48)
+        //FieldCoordinate coord = odometry.getFieldCoord();
+
+        FieldCoordinate coord = turret.getTurretPose(odometry.getPose()).coord;
+
+        return getGoal(coord);
+    }
+
+    private FieldCoordinate getGoal(FieldCoordinate coord)
+    {
+        coord = coord.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH);
+
+        double x = coord.x.getInch();
+        double y = coord.y.getInch();
+
+        if (y > 120) // greater than 120, aim at the side goal
         {
-            return robot.team.goalFromClose.coord;
+            return robot.team.sideGoal.coord;
         }
-        else
+        else if (y > 48) // greater than 48, aim at the side goal
         {
-            return robot.team.goalFromFar.coord;
+            return robot.team.cornerGoal.coord;
+        }
+        else // we are in the far shooting zone
+        {
+            switch (robot.team)
+            {
+                case BLUE:
+                    if (x > 72) // on the opposite side, aim at the corner
+                    {
+                        return robot.team.cornerGoal.coord;
+                    }
+                    else // on the same side, aim at the back goal
+                    {
+                        return robot.team.backGoal.coord;
+                    }
+                case RED:
+                    if (x < 72) // on the opposite side, aim at the corner
+                    {
+                        return robot.team.cornerGoal.coord;
+                    }
+                    else // on the same side, aim at the back goal
+                    {
+                        return robot.team.backGoal.coord;
+                    }
+                default:
+                    return robot.team.cornerGoal.coord;
+            }
         }
     }
 

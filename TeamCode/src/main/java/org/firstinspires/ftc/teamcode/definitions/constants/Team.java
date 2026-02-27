@@ -20,16 +20,18 @@ public enum Team
     // You can change these default coordinates and IDs as needed.
     RED(
             "red",
-            new Goal(24, coord(134, 134)),
-            new Goal(24, coord(144, 144)),
+            new Goal(24, coord(144, 137)), // side
+            new Goal(24, coord(144, 144)), // corner
+            new Goal(24, coord(137, 144)), // back
             new Base(coord(38.5, 33.5)),
             new Pose2d(Hardpoints.Coordinates.RED_BASE, deg(90)),
             deg(0)),
 
     BLUE(
             "blue",
-            new Goal(20, coord(10, 134)),
-            new Goal(20, coord(0, 144)),
+            new Goal(20, coord(0, 137)), // side
+            new Goal(20, coord(0, 144)), // corner
+            new Goal(20, coord(137, 144)), // back
             new Base(coord(105.25, 33.5)),
             new Pose2d(Hardpoints.Coordinates.BLUE_BASE, deg(90)),
             deg(180)),
@@ -38,14 +40,16 @@ public enum Team
             "none",
             new Goal(-1, coord(72, 140.5)),
             new Goal(-1, coord(72, 140.5)),
+            new Goal(-1, coord(72, 140.5)),
             new Base(coord(72, 33.5)),
             new Pose2d(coord(72, 9), deg(90)),
             deg(90));
 
     // --- Enum Fields and Methods ---
     public final String color;
-    public final Goal goalFromClose;
-    public final Goal goalFromFar;
+    public final Goal sideGoal; // side backboard
+    public final Goal cornerGoal; // corner
+    public final Goal backGoal; // back backboard
     public final Base base;
     public final Pose2d initialPose; // currently configured for an 18in x 18in robot, starting in the small triangle corner
     public final FieldHeading forwardAngle;
@@ -56,15 +60,16 @@ public enum Team
      * Private constructor for the enum.
      *
      * @param color         The team's color
-     * @param goalFromClose   The team's goal
-     * @param goalFromFar
+     * @param sideGoal   The team's goal
+     * @param cornerGoal
      * @param base          The team's base
      */
-    Team(String color, Goal goalFromClose, Goal goalFromFar, Base base, Pose2d initialPose, FieldHeading forwardAngle)
+    Team(String color, Goal sideGoal, Goal cornerGoal, Goal backGoal, Base base, Pose2d initialPose, FieldHeading forwardAngle)
     {
         this.color = color;
-        this.goalFromClose = goalFromClose;
-        this.goalFromFar = goalFromFar;
+        this.sideGoal = sideGoal;
+        this.cornerGoal = cornerGoal;
+        this.backGoal = backGoal;
         this.base = base;
         this.initialPose = initialPose;
         this.forwardAngle = forwardAngle;
