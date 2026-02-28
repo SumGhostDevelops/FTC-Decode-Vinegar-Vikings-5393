@@ -26,7 +26,6 @@ import java.util.function.BooleanSupplier;
 public class Odometry extends SubsystemBase
 {
     private final Pinpoint pinpoint;
-    private final Webcam webcam;
 
     private final BooleanSupplier setForwardBasedOnTeam = () -> RobotConstants.Odometry.SET_FORWARD_DIRECTION_BASED_ON_TEAM;
 
@@ -43,16 +42,14 @@ public class Odometry extends SubsystemBase
     private boolean referencePoseWasSet = false;
     private Pose2D referencePose;
 
-    public Odometry(Pinpoint pinpoint, WebcamName webcam)
+    public Odometry(Pinpoint pinpoint)
     {
-        this(pinpoint, webcam, new Pose2d(new Distance(72, DistanceUnit.INCH), new Distance(72, DistanceUnit.INCH),
-                new Angle(90, AngleUnit.DEGREES), CoordinateSystem.DECODE_PEDROPATH));
+        this(pinpoint, RobotConstants.Odometry.DEFAULT_POSE);
     }
 
-    public Odometry(Pinpoint pinpoint, WebcamName webcam, Pose2d referencePose)
+    public Odometry(Pinpoint pinpoint, Pose2d referencePose)
     {
         this.pinpoint = pinpoint;
-        this.webcam = new Webcam(webcam);
 
         // Initialize cached values first
         this.cachedPose = referencePose;
@@ -191,56 +188,56 @@ public class Odometry extends SubsystemBase
         this.referencePoseWasSet = true;
     }
 
-    /**
-     * Localizes using an AprilTag
-     *
-     * @return If the localization was successful or not
-     */
-    public boolean localizeWithAprilTag()
-    {
-        // verify the apriltag exists
-        webcam.updateDetections();
-
-        Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
-        if (possibleTag.isEmpty())
-            return false;
-
-        AprilTagDetection tag = possibleTag.get();
-        Pose2d estimatedPose = Pose2d.fromAprilTagRobotPose(tag.robotPose);
-
-        // Preserve driver's relative heading before resetting hardware
-        FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
-
-        // Update driverForward based on the new absolute estimate
-        driverForward = estimatedPose.heading.minus(currentDriverHeading);
-
-        // Set hardware to the new estimated pose (translation and rotation)
-        pinpoint.setPosition(estimatedPose.toPose2D());
-
-        return true;
-    }
-
-    /**
-     * Localizes using an AprilTag, and automatically sets the driver forward
-     * direction (if enabled)
-     *
-     * @param team
-     * @return If localization was successful or not
-     */
-    public boolean localizeWithAprilTag(Team team)
-    {
-        if (!localizeWithAprilTag())
-        {
-            return false;
-        }
-
-        if (setForwardBasedOnTeam.getAsBoolean())
-        {
-            driverForward = team.forwardAngle;
-        }
-
-        return true;
-    }
+//    /**
+//     * Localizes using an AprilTag
+//     *
+//     * @return If the localization was successful or not
+//     */
+//    public boolean localizeWithAprilTag()
+//    {
+//        // verify the apriltag exists
+//        webcam.updateDetections();
+//
+//        Optional<AprilTagDetection> possibleTag = webcam.goal.getAny();
+//        if (possibleTag.isEmpty())
+//            return false;
+//
+//        AprilTagDetection tag = possibleTag.get();
+//        Pose2d estimatedPose = Pose2d.fromAprilTagRobotPose(tag.robotPose);
+//
+//        // Preserve driver's relative heading before resetting hardware
+//        FieldHeading currentDriverHeading = getFieldHeading().minus(driverForward);
+//
+//        // Update driverForward based on the new absolute estimate
+//        driverForward = estimatedPose.heading.minus(currentDriverHeading);
+//
+//        // Set hardware to the new estimated pose (translation and rotation)
+//        pinpoint.setPosition(estimatedPose.toPose2D());
+//
+//        return true;
+//    }
+//
+//    /**
+//     * Localizes using an AprilTag, and automatically sets the driver forward
+//     * direction (if enabled)
+//     *
+//     * @param team
+//     * @return If localization was successful or not
+//     */
+//    public boolean localizeWithAprilTag(Team team)
+//    {
+//        if (!localizeWithAprilTag())
+//        {
+//            return false;
+//        }
+//
+//        if (setForwardBasedOnTeam.getAsBoolean())
+//        {
+//            driverForward = team.forwardAngle;
+//        }
+//
+//        return true;
+//    }
 
     public boolean referencePoseWasSet()
     {
@@ -268,8 +265,8 @@ public class Odometry extends SubsystemBase
         }
     }
 
-    public void close()
-    {
-        webcam.close();
-    }
+//    public void close()
+//    {
+//        webcam.close();
+//    }
 }

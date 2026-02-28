@@ -33,7 +33,7 @@ public class RobotHardware
     public List<LynxModule> hubs;
     // Subsystems (Nullable if not built)
     public Pinpoint pinpoint;
-    public WebcamName webcam;
+//    public WebcamName webcam;
     public PowerMotor frontLeft, frontRight, backLeft, backRight;
     public PowerMotor intake;
     public VelocityMotorGroup outtake;
@@ -65,7 +65,7 @@ public class RobotHardware
         this.transfer = builder.transfer;
 
         this.pinpoint = builder.pinpoint;
-        this.webcam = builder.webcam;
+//        this.webcam = builder.webcam;
     }
 
     public void clearHubCache()
@@ -176,7 +176,7 @@ public class RobotHardware
         private PowerMotor intake;
         private ServoEx transfer;
         private Pinpoint pinpoint;
-        private WebcamName webcam;
+//        private WebcamName webcam;
 
         public Builder(HardwareMap hardwareMap, Telemetry telemetry)
         {
@@ -364,14 +364,14 @@ public class RobotHardware
                 telemetry.log().add("Warning: goBilda Pinpoint not found");
             }
             // Webcam
-            try
-            {
-                webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.Webcam.NAME);
-            }
-            catch (Exception e)
-            {
-                telemetry.log().add("Warning: Webcam not found");
-            }
+//            try
+//            {
+//                webcam = hardwareMap.get(WebcamName.class, RobotConstants.Odometry.Webcam.NAME);
+//            }
+//            catch (Exception e)
+//            {
+//                telemetry.log().add("Warning: Webcam not found");
+//            }
             return this;
         }
 

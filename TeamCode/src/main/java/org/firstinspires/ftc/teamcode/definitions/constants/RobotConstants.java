@@ -22,8 +22,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
-
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
 
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
@@ -108,7 +107,7 @@ public class RobotConstants
         @Sorter(sort = 4)
         public static boolean AUTO_DISTANCE_ADJUSMENT = true;
 
-        public static boolean USE_LUT = false;
+        public static boolean USE_LUT = true;
 
         public static Distance OFFSET_FROM_CENTER = new Distance(-4.5, DistanceUnit.INCH);
 

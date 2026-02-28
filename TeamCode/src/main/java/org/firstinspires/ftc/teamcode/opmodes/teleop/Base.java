@@ -309,8 +309,8 @@ public abstract class Base extends CommandOpMode
     @Override
     public void end()
     {
-        if (robot.subsystems.odometry != null)
-            robot.subsystems.odometry.close();
+//        if (robot.subsystems.odometry != null)
+//            robot.subsystems.odometry.close();
     }
 
     public void bindKeys()
