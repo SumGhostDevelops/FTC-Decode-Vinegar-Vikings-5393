@@ -659,8 +659,9 @@ public abstract class AutoBase extends LinearOpMode
      * Complete shoot sequence using state machine logic.
      * 1. Ensures outtake is on, opens transfer, and aims turret
      * 2. Waits for systems to be ready
-     * 3. If ready, transfer & shoot for duration
-     * 4. Stop the intake, close the transfer, and center the turret
+     * 3. Applies zone-based transfer delay if necessary
+     * 4. If ready, transfer & shoot for duration
+     * 5. Stop the intake, close the transfer, and center the turret
      */
     public void Shoot()
     {
@@ -675,6 +676,12 @@ public abstract class AutoBase extends LinearOpMode
         // If ready, let it score for the duration
         if (isReady)
         {
+            long delayMs = getIntakeTransferDelay();
+            if (delayMs > 0)
+            {
+                waitForDuration(delayMs);
+            }
+
             transferIntake();
             waitForDuration(RobotConstants.Autonomous.SHOOT_LENGTH_MS);
         }
@@ -741,9 +748,13 @@ public abstract class AutoBase extends LinearOpMode
         }
     }
 
+    // ========================
+    // Goal & Transfer Selection
+    // ========================
+
     /**
      * Gets the appropriate intake transfer power based on field position.
-     * Uses full power if Y > 48 inches, otherwise minimum transfer power.
+     * Uses max power if Y > 48 inches, otherwise minimum transfer power.
      *
      * @return the intake power to use for transferring balls
      */
@@ -753,11 +764,31 @@ public abstract class AutoBase extends LinearOpMode
 
         if (pose.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).coord.y.getInch() > 48)
         {
-            return 1.0;
+            return RobotConstants.Intake.maximumTransferPower;
         }
         else
         {
-            return transferPower;
+            return RobotConstants.Intake.minimumTransferPower;
+        }
+    }
+
+    /**
+     * Gets the appropriate transfer delay based on field position.
+     *
+     * @return delay in milliseconds
+     */
+    protected long getIntakeTransferDelay()
+    {
+        Pose2d pose = getPose2d();
+        double y = subsystems.turret.getTurretPose(pose).coord.toCoordinateSystem(CoordinateSystem.DECODE_PEDROPATH).y.getInch();
+
+        if (y < 48) // if in far zone
+        {
+            return RobotConstants.Transfer.WAIT_BEFORE_TRANSFER;
+        }
+        else // if in close zone
+        {
+            return 0;
         }
     }
 
