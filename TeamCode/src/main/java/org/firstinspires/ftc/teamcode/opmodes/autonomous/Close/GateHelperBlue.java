@@ -34,7 +34,7 @@ public class GateHelperBlue extends AutoBase {
         initAuto(paths);
 
         // Set initial state
-      //  setPathState(Paths.PathState.toShoot);
+        setPathState(Paths.PathState.toShoot);
 
         // Wait for start
         waitForStart();

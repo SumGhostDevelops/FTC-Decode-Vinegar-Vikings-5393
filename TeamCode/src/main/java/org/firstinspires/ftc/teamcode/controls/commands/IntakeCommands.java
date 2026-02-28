@@ -43,11 +43,12 @@ public class IntakeCommands
     public static class Transfer extends CommandBase
     {
         protected final Intake intake;
+
         private final DoubleSupplier power;
+
+        private final LongSupplier waitTime;
         private long timestamp = 0;
         private boolean on = false;
-
-        private LongSupplier waitTime = () -> RobotConstants.Transfer.WAIT_BEFORE_TRANSFER;
 
         public Transfer(Intake intake, double power)
         {
@@ -56,8 +57,14 @@ public class IntakeCommands
 
         public Transfer(Intake intake, DoubleSupplier power)
         {
+            this(intake, power, () -> RobotConstants.Transfer.WAIT_BEFORE_TRANSFER);
+        }
+
+        public Transfer(Intake intake, DoubleSupplier power, LongSupplier waitTime)
+        {
             this.intake = intake;
             this.power = power;
+            this.waitTime = waitTime;
             addRequirements(intake);
         }
 

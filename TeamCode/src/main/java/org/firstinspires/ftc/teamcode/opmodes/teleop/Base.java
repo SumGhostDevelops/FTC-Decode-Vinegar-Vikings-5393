@@ -372,7 +372,7 @@ public abstract class Base extends CommandOpMode
     {
         if (s.turret == null || s.odometry == null) return;
 
-        Supplier<Pose2d> turretPose = s.odometry::getPose;
+        Supplier<Pose2d> turretPose = () -> s.turret.getTurretPose(s.odometry.getPose());
         Command aimCmd = new TurretCommands.AimToCoordinate(s.turret, this::getGoal, turretPose);
         Command off = new InstantCommand(() -> s.turret.setState(Turret.State.OFF));
         Command aimCenter = new InstantCommand(s.turret::center);
@@ -458,7 +458,7 @@ public abstract class Base extends CommandOpMode
 
         // --- Commands ---
         Command intakeIn = new IntakeCommands.In(s.intake, intakePower.getAsDouble());
-        Command intakeScore = new IntakeCommands.Transfer(s.intake, this::getIntakeTransferPower);
+        Command intakeScore = new IntakeCommands.Transfer(s.intake, this::getIntakeTransferPower, this::getIntakeTransferDelay);
         Command reverseIntake = new IntakeCommands.Reverse(s.intake, outtakePower.getAsDouble());
         //Command closeTransfer = new TransferCommands.CloseOnce(s.transfer);
         Command openTransfer = new TransferCommands.Open(s.transfer);
@@ -585,6 +585,22 @@ public abstract class Base extends CommandOpMode
         else
         {
             return minimumTransferPower.getAsDouble();
+        }
+    }
+
+    private long getIntakeTransferDelay()
+    {
+        Odometry odometry = robot.subsystems.odometry;
+
+        double y = robot.subsystems.turret.getTurretPose(odometry.getPose()).coord.y.getInch();
+
+        if (y < 48) // if in far zone
+        {
+            return RobotConstants.Transfer.WAIT_BEFORE_TRANSFER;
+        }
+        else // if in close zone
+        {
+            return 0;
         }
     }
 

@@ -22,7 +22,7 @@ public class RobotConstants
     @Configurable
     public static class General
     {
-        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.TESTING;
+        public static ConstantsPresets.Preset PRESET_OPTION = ConstantsPresets.Preset.COMPETITION;
 
         public static boolean REGRESSION_TESTING_MODE = false;
         public static double MOTOR_ACCELERATION_FILTER_FACTOR = 0.5;
@@ -166,8 +166,8 @@ public class RobotConstants
         @Sorter(sort = 6)
         public static UnnormalizedAngle[] TURN_LIMITS = new UnnormalizedAngle[]
         {
-                new UnnormalizedAngle(-70, UnnormalizedAngleUnit.DEGREES), // negative clockwise, positive counter clockwise
-                new UnnormalizedAngle(70, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
+                new UnnormalizedAngle(-100, UnnormalizedAngleUnit.DEGREES), // negative clockwise, positive counter clockwise
+                new UnnormalizedAngle(100, UnnormalizedAngleUnit.DEGREES) }; // in both directions, so if 0 is forward
         @Sorter(sort = 7)
         public static boolean ALWAYS_AIM_TO_GOAL = false;
 

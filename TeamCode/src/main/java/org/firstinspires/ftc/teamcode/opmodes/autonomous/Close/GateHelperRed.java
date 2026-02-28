@@ -34,7 +34,7 @@ public class GateHelperRed extends AutoBase {
         initAuto(paths);
 
         // Set initial state
-      //  setPathState(Paths.PathState.toShoot);
+        setPathState(Paths.PathState.toShoot);
 
         // Wait for start
         waitForStart();
@@ -55,25 +55,24 @@ public class GateHelperRed extends AutoBase {
     @Override
     protected Object createPaths(Follower follower, AutoStrat autoStrat)
     {
-        return new GateHelperBlue.Paths(follower, autoStrat);
+        return new Paths(follower, autoStrat);
     }
 
     @Override
     protected Pose getStartingPose(Object paths)
     {
-        return ((GateHelperBlue.Paths) paths).startPose;
+        return ((Paths) paths).startPose;
     }
 
-    private void setPathState(GateHelperBlue.Paths.PathState pathState)
+    private void setPathState(Paths.PathState pathState)
     {
         setPathState((Object) pathState);
     }
 
-    private GateHelperBlue.Paths.PathState getPathState()
+    private Paths.PathState getPathState()
     {
-        return (GateHelperBlue.Paths.PathState) currentPathState;
+        return (Paths.PathState) currentPathState;
     }
-
 
     @Override
     protected void PathRegular()
@@ -85,112 +84,112 @@ public class GateHelperRed extends AutoBase {
                 case toShoot:
                     Shoot();
                     follower.followPath(paths.toShoot);
-                    setPathState(GateHelperBlue.Paths.PathState.Extra);
+                    setPathState(Paths.PathState.Extra);
                     break;
                 case Extra:
                     startIntake();
                     follower.followPath(paths.ToHit);
-                    setPathState(GateHelperBlue.Paths.PathState.ToHit);
+                    setPathState(Paths.PathState.ToHit);
 
                 case ToHit:
                     follower.followPath(paths.Move);
-                    setPathState(GateHelperBlue.Paths.PathState.Move);
+                    setPathState(Paths.PathState.Move);
                     break;
 
                 case Move:
                     stopIntake();
                     follower.followPath(paths.ToShoot);
-                    setPathState(GateHelperBlue.Paths.PathState.ToShoot);
+                    setPathState(Paths.PathState.ToShoot);
                     break;
 
                 case ToShoot:
                     Shoot();
                     follower.followPath(paths.Swing_1);
-                    setPathState(GateHelperBlue.Paths.PathState.Swing_1);
+                    setPathState(Paths.PathState.Swing_1);
                     break;
 
                 case Swing_1:
                     startIntake();
                     follower.followPath(paths.Hit_1);
-                    setPathState(GateHelperBlue.Paths.PathState.Hit_1);
+                    setPathState(Paths.PathState.Hit_1);
                     break;
 
                 case Hit_1:
                     follower.followPath(paths.Swing_2);
-                    setPathState(GateHelperBlue.Paths.PathState.Swing_2);
+                    setPathState(Paths.PathState.Swing_2);
                     break;
 
                 case Swing_2:
                     follower.followPath(paths.Hit_2);
-                    setPathState(GateHelperBlue.Paths.PathState.Hit_2);
+                    setPathState(Paths.PathState.Hit_2);
                     break;
 
                 case Hit_2:
                     stopIntake();
                     follower.followPath(paths.ToShoot_2);
-                    setPathState(GateHelperBlue.Paths.PathState.ToShoot_2);
+                    setPathState(Paths.PathState.ToShoot_2);
                     break;
 
                 case ToShoot_2:
                     Shoot();
                     follower.followPath(paths.ToSwingTwo_1);
-                    setPathState(GateHelperBlue.Paths.PathState.ToSwingTwo_1);
+                    setPathState(Paths.PathState.ToSwingTwo_1);
                     break;
 
                 case ToSwingTwo_1:
                     startIntake();
                     follower.followPath(paths.HitTwo_1);
-                    setPathState(GateHelperBlue.Paths.PathState.HitTwo_1);
+                    setPathState(Paths.PathState.HitTwo_1);
                     break;
 
                 case HitTwo_1:
                     follower.followPath(paths.ToSwingTwo_2);
-                    setPathState(GateHelperBlue.Paths.PathState.ToSwingTwo_2);
+                    setPathState(Paths.PathState.ToSwingTwo_2);
                     break;
 
                 case ToSwingTwo_2:
                     follower.followPath(paths.HitTwo_2);
-                    setPathState(GateHelperBlue.Paths.PathState.HitTwo_2);
+                    setPathState(Paths.PathState.HitTwo_2);
                     break;
 
                 case HitTwo_2:
                     stopIntake();
                     follower.followPath(paths.ToShoot_3);
-                    setPathState(GateHelperBlue.Paths.PathState.ToShoot_3);
+                    setPathState(Paths.PathState.ToShoot_3);
                     break;
 
                 case ToShoot_3:
                     Shoot();
                     follower.followPath(paths.ToSwingThree_1);
-                    setPathState(GateHelperBlue.Paths.PathState.ToSwingThree_1);
+                    setPathState(Paths.PathState.ToSwingThree_1);
                     break;
 
                 case ToSwingThree_1:
                     startIntake();
                     follower.followPath(paths.HitThree_1);
-                    setPathState(GateHelperBlue.Paths.PathState.HitThree_1);
+                    setPathState(Paths.PathState.HitThree_1);
                     break;
 
                 case HitThree_1:
                     follower.followPath(paths.ToSwingThree_2);
-                    setPathState(GateHelperBlue.Paths.PathState.ToSwingThree_2);
+                    setPathState(Paths.PathState.ToSwingThree_2);
                     break;
 
                 case ToSwingThree_2:
                     follower.followPath(paths.HitThree_2);
-                    setPathState(GateHelperBlue.Paths.PathState.HitThree_2);
+                    setPathState(Paths.PathState.HitThree_2);
                     break;
 
                 case HitThree_2:
                     stopIntake();
                     follower.followPath(paths.ToShoot_4);
-                    setPathState(GateHelperBlue.Paths.PathState.ToShoot_4);
+                    setPathState(Paths.PathState.ToShoot_4);
                     break;
 
                 case ToShoot_4:
                     Shoot();
                     follower.followPath(paths.finalPose);
-                    setPathState(GateHelperBlue.Paths.PathState.finalPose);
+                    setPathState(Paths.PathState.finalPose);
                     break;
 
                 case finalPose:
@@ -199,13 +198,6 @@ public class GateHelperRed extends AutoBase {
             }
         }
     }
-
-
-
-
-
-
-
 
     static class Paths{
 

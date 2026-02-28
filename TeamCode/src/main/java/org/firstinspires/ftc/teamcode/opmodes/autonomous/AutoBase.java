@@ -36,6 +36,7 @@ public abstract class AutoBase extends LinearOpMode
     protected Subsystems subsystems;
     protected Follower follower;
     protected boolean autonomousFinished = false; // flag for if the robot should end the teleop mode early
+    protected boolean poseSaved = false;
 
     // Constants from RobotConstants
     private final double intakePower = RobotConstants.Intake.intakePower;
@@ -784,6 +785,7 @@ public abstract class AutoBase extends LinearOpMode
         {
             out.println(data);
             telemetry.addData("Pose", "Saved: %s", data);
+            poseSaved = true;
         }
         catch (Exception e)
         {

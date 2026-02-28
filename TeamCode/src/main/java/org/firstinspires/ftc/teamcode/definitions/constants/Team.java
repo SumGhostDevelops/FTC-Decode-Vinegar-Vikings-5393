@@ -20,18 +20,18 @@ public enum Team
     // You can change these default coordinates and IDs as needed.
     RED(
             "red",
-            new Goal(24, coord(144, 137)), // side
+            new Goal(24, coord(144, 140)), // side
             new Goal(24, coord(144, 144)), // corner
-            new Goal(24, coord(137, 144)), // back
+            new Goal(24, coord(142, 144)), // back
             new Base(coord(38.5, 33.5)),
             new Pose2d(Hardpoints.Coordinates.RED_BASE, deg(90)),
             deg(0)),
 
     BLUE(
             "blue",
-            new Goal(20, coord(0, 137)), // side
+            new Goal(20, coord(0, 140)), // side
             new Goal(20, coord(0, 144)), // corner
-            new Goal(20, coord(137, 144)), // back
+            new Goal(20, coord(2, 144)), // back
             new Base(coord(105.25, 33.5)),
             new Pose2d(Hardpoints.Coordinates.BLUE_BASE, deg(90)),
             deg(180)),
