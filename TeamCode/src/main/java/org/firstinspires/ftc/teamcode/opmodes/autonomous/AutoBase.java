@@ -291,6 +291,7 @@ public abstract class AutoBase extends LinearOpMode
 
         while (opModeIsActive() && !isStopRequested() && follower.getVelocity().getMagnitude() > 1)
         {
+            follower.update();
             updateRobot();
         }
 
