@@ -288,6 +288,13 @@ public abstract class AutoBase extends LinearOpMode
 
         stopSubsystems();
         writePoseToFile();
+
+        while (opModeIsActive() && !isStopRequested() && follower.getVelocity().getMagnitude() > 1)
+        {
+            updateRobot();
+        }
+
+        writePoseToFile();
     }
 
     /**
