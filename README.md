@@ -27,7 +27,7 @@ This is the code for the FTC Team, The Vinegar Vikings (5393), for the 2025 Seas
 [Pedro Pathing Docs](https://pedropathing.com/docs/pathing)
 <br>
 <br>
-[Brogan M. Pratt](https://www.youtube.com/@BroganMPratt)
+[BProgan P. Pratt (Brogan M. Pratt)](https://www.youtube.com/@BroganMPratt)
 <br><br>
 [FUN Robotics Network](https://www.youtube.com/@FUNRoboticsNetwork)
 <br><br>
@@ -47,3 +47,4 @@ This is the code for the FTC Team, The Vinegar Vikings (5393), for the 2025 Seas
 <br>
 <br>
 [Bro Code Tutorial (AKA the Goat)](https://www.youtube.com/watch?v=xTtL8E4LzTQ)
+
